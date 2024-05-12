@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BrockApp</string>
+    <string name="main_message">ACCESS WITH RUNIBO</string>
+    <string name="main_button">ACCESS</string>
+    <string name="authenticator_username">Username</string>
+    <string name="authenticator_password">Password</string>
+    <string name="authenticator_button">ACCESS</string>
+</resources>
