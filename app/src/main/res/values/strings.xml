@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">BrockApp</string>
-    <string name="main_message">ACCESS WITH RUNIBO</string>
-    <string name="main_button">ACCESS</string>
+    <string name="main_button_sign_in">REGISTRATI</string>
+    <string name="main_button_login">ACCEDI</string>
+    <string name="main_message">Corri con RUNIBO</string>
     <string name="authenticator_username">Username</string>
     <string name="authenticator_password">Password</string>
-    <string name="authenticator_button">ACCESS</string>
+    <string name="authenticator_message">Ti sei già iscritto all\'applicazione? Clicca qui</string>
+    <string name="sign_in_button">SIGN IN</string>
+    <string name="sign_in_message">Ti sei già iscritto all\'applicazione? Clicca qui</string>
+    <string name="login_button">LOGIN</string>
+    <string name="google_button">ACCEDI CON GOOGLE</string>
+    <string name="login_message">Non sei ancora iscritto all\'applicazione? Clicca qui</string>
+    <string name="web_view_button">REPOSITORY</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
