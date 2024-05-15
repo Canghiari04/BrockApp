@@ -1,27 +1,23 @@
-package com.example.ppt
-package com.example.authenticator
+package com.example.brockapp
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import androidx.activity.ComponentActivity
-import com.example.brockapp.R
+import androidx.appcompat.app.AppCompatActivity
 
-class AuthenticatorActivity : ComponentActivity() {
+class AuthenticatorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.authenticator_activity)
 
-        findViewById<Button>(R.id.button_auth).setOnClickListener {
-            authenticateBuiltIn()
+        if(intent.getStringExtra("TYPE_PAGE").toString() == "SignIn") {
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.auth_fragment, SignInFragment())
+                commit()
+            }
+        } else {
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.auth_fragment, LoginFragment())
+                commit()
+            }
         }
-    }
-
-    private fun authenticateBuiltIn() {
-        val username = findViewById<EditText>(R.id.text_username).text.toString()
-        val password = findViewById<EditText>(R.id.text_password).text.toString()
-
-        // I CAN COMMUNICATE THE CREDENTIALS AND THEN RETURN A BOOLEAN VALUE THAT TELL ME IF THEY ARE TRUTHY OR FALSY
-
     }
 }
