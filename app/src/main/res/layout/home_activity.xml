@@ -6,37 +6,18 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- TODO ADD A TEXTVIEW ON THE TOP -->
+    <!-- TODO INSERT THE ICON IN THE CARDS -->
+
     <GridLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_margin="25dp"
         android:columnCount="2"
         android:rowCount="2">
-
-        <!-- TODO INSERT THE ID INSIDE THE CARDS -->
         <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:cardCornerRadius="5dp"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="10dp">
-            <!-- TODO INSER THE ICON IN THE CARDS -->
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </ImageView>
-            <TextView
-                android:textAlignment="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:text="IL TUO STORICO">
-            </TextView>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
+            android:id="@+id/historical_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:cardCornerRadius="5dp"
@@ -49,14 +30,17 @@
             </ImageView>
             <TextView
                 android:textAlignment="center"
+                android:text="@string/historical_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:text="CALENDARIO">
+                android:padding="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@color/uni_red">
             </TextView>
         </androidx.cardview.widget.CardView>
-
         <androidx.cardview.widget.CardView
+            android:id="@+id/calendar_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:cardCornerRadius="5dp"
@@ -69,14 +53,17 @@
             </ImageView>
             <TextView
                 android:textAlignment="center"
+                android:text="@string/calendar_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:text="PIANIFICALE LE TUE ATTIVITÀ">
+                android:padding="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@color/uni_red">
             </TextView>
         </androidx.cardview.widget.CardView>
-
         <androidx.cardview.widget.CardView
+            android:id="@+id/activity_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:cardCornerRadius="5dp"
@@ -89,13 +76,40 @@
             </ImageView>
             <TextView
                 android:textAlignment="center"
+                android:text="@string/activity_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:text="I TUOI AMICI">
+                android:padding="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@color/uni_red">
             </TextView>
         </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/friends_card"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:cardCornerRadius="5dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="10dp">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </ImageView>
+            <TextView
+                android:textAlignment="center"
+                android:text="@string/charts_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@color/uni_red">
+            </TextView>
+        </androidx.cardview.widget.CardView>
+
+        <!-- TODO ADD A TEXTVIEW ON THE BOTTOM -->
 
     </GridLayout>
-
 </LinearLayout>
