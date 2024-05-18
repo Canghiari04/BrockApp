@@ -1,12 +1,13 @@
 package com.example.brockapp.detect
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresPermission
+import com.example.brockapp.CUSTOM_INTENT_USER_ACTION
+import com.example.brockapp.CUSTOM_REQUEST_CODE_USER_ACTION
 //import com.example.platform.location.utils.CUSTOM_INTENT_USER_ACTION
 //import com.example.platform.location.utils.CUSTOM_REQUEST_CODE_USER_ACTION
 import com.google.android.gms.location.ActivityRecognition
