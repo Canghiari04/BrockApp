@@ -11,9 +11,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        // CLEAR SHARED PREFERENCES, ONLY FOR TEST AND DEVELOP OF THE PROJECT
-        getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE).edit().clear().apply()
-
         findViewById<Button>(R.id.button_sign_in).setOnClickListener {
             callAuthenticator("SignIn")
         }
@@ -22,14 +19,16 @@ class MainActivity : ComponentActivity() {
             callAuthenticator("Login")
         }
 
+        findViewById<Button>(R.id.button_google).setOnClickListener {
+            /* TODO --> CREDENTIAL MANAGER FOR THE GOOGLE LOGIN */
+        }
+
         findViewById<Button>(R.id.button_web_view).setOnClickListener {
-            // TO DO THE WEB VIEW FOR THE REPOSITORY
+            /* TODO --> WEB VIEW TO SEE THE REPOSITORY OF THE PROJECT */
         }
     }
 
     private fun callAuthenticator(typeFragment : String) {
-        val authIntent : Intent = Intent(this, AuthenticatorActivity::class.java)
-        authIntent.putExtra("TYPE_PAGE", typeFragment)
-        startActivity(authIntent)
+        startActivity(Intent(this, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", typeFragment))
     }
 }

@@ -1,12 +1,11 @@
 package com.example.brockapp
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 
-class HomeActivity : AppCompatActivity() {
+class DetectActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.home_activity)
+        setContentView(R.layout.detect_activity)
     }
 }

@@ -2,6 +2,8 @@ package com.example.brockapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.authenticator.LoginFragment
+import com.example.brockapp.authenticator.SignInFragment
 
 class AuthenticatorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

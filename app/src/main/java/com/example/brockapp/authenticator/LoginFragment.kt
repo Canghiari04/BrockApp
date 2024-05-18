@@ -1,13 +1,15 @@
-package com.example.brockapp
+package com.example.brockapp.authenticator
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import com.example.brockapp.authenticator.BuiltInAuthenticator
+import com.example.brockapp.HomeActivity
+import com.example.brockapp.R
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     companion object {
@@ -24,13 +26,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             val username : String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password : String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
-            if(username.isBlank() || password.isBlank()) { // CHECK IF THE FIELD ARE BLANK
+            if(username.isBlank() || password.isBlank()) { // CHECK IF THE FIELDS ARE BLANK
                 view.findViewById<TextView>(R.id.text_login_error).text = blankError
             } else {
                 if(obj.authCredentials(username, password, activity?.getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE)))
-                    // START THE INTENT FOR THE HOMEPAGE
-                else
+                    startActivity(Intent(activity, HomeActivity::class.java)) // START THE HOMEPAGE ACTIVITY
+                else {
                     view.findViewById<TextView>(R.id.text_login_error).text = loginError
+                }
             }
         }
     }

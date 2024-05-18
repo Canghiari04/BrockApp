@@ -1,4 +1,4 @@
-package com.example.brockapp
+package com.example.brockapp.authenticator
 
 import android.content.Context
 import android.os.Bundle
@@ -7,10 +7,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import com.example.brockapp.authenticator.BuiltInAuthenticator
+import com.example.brockapp.R
 
 class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     companion object {
+        const val successSignIn : String = "CREAZIONE ACCOUNT AVVENUTA"
         const val blankError : String = "CREDENZIALI ERRATE. NON HAI INSERITO TUTTI I CAMPI NEL FORM"
         const val signInError : String = "CREDENZIALI PRESENTI. ACCEDI PIUTTOSTO CHE REGISTRARTI"
         const val signInCredentialsError: String = "CREDENZIALI PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD"
@@ -32,7 +33,9 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                 }
                 else {
                     obj.addCredentials(username, password, activity?.getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE))
-                    // START INTENT FOR THE HOMEPAGE
+                    view.findViewById<TextView>(R.id.text_sign_in_error).text = successSignIn
+
+                    /* TODO --> REDIRECT THE USER TO LOGIN PAGE*/
                 }
             }
         }
