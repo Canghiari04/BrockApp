@@ -27,7 +27,8 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
             if(username.isBlank() || password.isBlank()) {
                 view.findViewById<TextView>(R.id.text_sign_in_error).text = blankError
-            } else {
+            }
+            else {
                 if(obj.authCredentials(username, password, activity?.getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE))) {
                     view.findViewById<TextView>(R.id.text_sign_in_error).text = signInCredentialsError
                 }
