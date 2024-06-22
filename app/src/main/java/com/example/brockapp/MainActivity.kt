@@ -32,4 +32,6 @@ class MainActivity : ComponentActivity() {
     private fun callAuthenticator(typeFragment : String) {
         startActivity(Intent(this, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", typeFragment))
     }
+
+
 }

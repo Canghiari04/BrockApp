@@ -1,6 +1,7 @@
 package com.example.brockapp.authenticator
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.example.brockapp.R
+import com.example.brockapp.HomeActivity
 
 class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     companion object {
@@ -36,7 +38,16 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                     obj.addCredentials(username, password, activity?.getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE))
                     view.findViewById<TextView>(R.id.text_sign_in_error).text = successSignIn
 
-                    /* TODO --> REDIRECT THE USER TO LOGIN PAGE*/
+                    val sharedPrefs = activity?.getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
+
+                    if (sharedPrefs != null) {
+                        with (sharedPrefs.edit()) {
+                            putString("username", username)
+                            apply()
+                        }
+                    }
+
+                    startActivity(Intent(activity, HomeActivity::class.java))
                 }
             }
         }

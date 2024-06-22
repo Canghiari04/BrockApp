@@ -51,4 +51,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     // https://mvnrepository.com/artifact/com.google.android.gms/play-services-location
     implementation(libs.play.services.location)
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7") // Use the latest version
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 }
