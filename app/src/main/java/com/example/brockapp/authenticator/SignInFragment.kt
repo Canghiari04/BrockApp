@@ -15,8 +15,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     companion object {
         const val successSignIn : String = "CREAZIONE ACCOUNT AVVENUTA"
         const val blankError : String = "CREDENZIALI ERRATE. NON HAI INSERITO TUTTI I CAMPI NEL FORM"
-        const val signInError : String = "CREDENZIALI PRESENTI. ACCEDI PIUTTOSTO CHE REGISTRARTI"
-        const val signInCredentialsError: String = "CREDENZIALI PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD"
+        const val signInCredentialsError: String = "CREDENZIALI GIA' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD"
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
