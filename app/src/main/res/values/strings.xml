@@ -14,4 +14,10 @@
     <string name="charts_text_view">I TUOI GRAFICI</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="activity_main_text">Le tue attività</string>
+    <string name="calendar_main_text">Il tuo calendario</string>"
+    <string name="friends_main_text">I tuoi amici</string>"
+    <string name="charts_main_text">I tuoi grafici</string>"
+    <string name="historical_main_text">Il tuo storico</string>"
+
 </resources>

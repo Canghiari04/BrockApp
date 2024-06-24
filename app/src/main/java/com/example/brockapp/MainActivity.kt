@@ -1,6 +1,5 @@
 package com.example.brockapp
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -10,6 +9,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+
 
         findViewById<Button>(R.id.button_sign_in).setOnClickListener {
             callAuthenticator("SignIn")
@@ -28,7 +28,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     private fun callAuthenticator(typeFragment : String) {
         startActivity(Intent(this, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", typeFragment))
     }
+
+
 }

@@ -9,6 +9,14 @@
     <!-- TODO ADD A TEXTVIEW ON THE TOP -->
     <!-- TODO INSERT THE ICON IN THE CARDS -->
 
+    <TextView
+        android:id="@+id/welcome_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+        android:text="Welcome, " />
+
     <GridLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -86,7 +94,7 @@
             </TextView>
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
-            android:id="@+id/friends_card"
+            android:id="@+id/charts_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:cardCornerRadius="5dp"
