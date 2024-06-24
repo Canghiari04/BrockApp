@@ -2,17 +2,12 @@ package com.example.brockapp
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.pdf.PdfDocument.Page
 import android.os.Bundle
-import android.view.View
-import android.os.PersistableBundle
-import android.widget.Button
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.example.brockapp.authenticator.SignInFragment
-import android.util.Log
+
 class HomeActivity : AppCompatActivity() {
 
     companion object {

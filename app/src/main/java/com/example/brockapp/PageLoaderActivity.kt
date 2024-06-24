@@ -2,7 +2,6 @@ package com.example.brockapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.brockapp.ActivitiesFragment
 
 class PageLoaderActivity : AppCompatActivity()  {
 
