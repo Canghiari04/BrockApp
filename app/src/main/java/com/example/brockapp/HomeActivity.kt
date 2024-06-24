@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.brockapp.authenticator.SignInFragment
-
+import android.util.Log
 class HomeActivity : AppCompatActivity() {
 
     companion object {
@@ -45,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
             loadPage(CALENDAR)
         }
 
-        findViewById<CardView>(R.id.friends_card).setOnClickListener {
+        findViewById<CardView>(R.id.charts_card).setOnClickListener {
             loadPage(FRIENDS)
         }
     }
@@ -55,6 +55,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun loadPage(typeFragment : String) {
+        Log.d("HomeActivity", "Loading page: $typeFragment")
         startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("TYPE_PAGE", typeFragment))
     }
 }

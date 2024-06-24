@@ -27,5 +27,8 @@
         <activity android:name="com.example.brockapp.HomeActivity">
 
         </activity>
+        <activity android:name="com.example.brockapp.PageLoaderActivity">
+
+        </activity>
     </application>
 </manifest>

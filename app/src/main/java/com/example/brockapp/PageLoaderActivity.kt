@@ -8,37 +8,35 @@ class PageLoaderActivity : AppCompatActivity()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.page_loader_activity)
-
-
+        setContentView(R.layout.page_loader_activity)
 
         val pageType = intent.getStringExtra("TYPE_PAGE").toString()
 
         when (pageType) {
             "activities" -> {
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.activities_fragment, ActivitiesFragment())
+                    replace(R.id.page_loader_activity, ActivitiesFragment())
                     commit()
                 }
             }
-//            "calendar" -> {
-//                supportFragmentManager.beginTransaction().apply {
-//                    replace(R.id.auth_fragment, CalendarFragment()) // Replace with your actual fragment
-//                    commit()
-//                }
-//            }
-//            "history" -> {
-//                supportFragmentManager.beginTransaction().apply {
-//                    replace(R.id.auth_fragment, HistoryFragment()) // Replace with your actual fragment
-//                    commit()
-//                }
-//            }
-//            "friends" -> {
-//                supportFragmentManager.beginTransaction().apply {
-//                    replace(R.id.auth_fragment, FriendsFragment()) // Replace with your actual fragment
-//                    commit()
-//                }
-//            }
+            "calendar" -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.page_loader_activity, CalendarFragment()) // Replace with your actual fragment
+                    commit()
+                }
+            }
+            "history" -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.page_loader_activity, HistoryFragment()) // Replace with your actual fragment
+                    commit()
+                }
+            }
+            "friends" -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.page_loader_activity, ChartsFragment()) // Replace with your actual fragment
+                    commit()
+                }
+            }
             else -> {
                 System.out.println("Page not found")
             }
