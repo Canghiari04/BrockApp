@@ -36,8 +36,10 @@ class HomeActivity : AppCompatActivity() {
             loadPage(ACTIVITIES)
         }
 
-        findViewById<CardView>(R.id.calendar_card).setOnClickListener {
-            loadPage(CALENDAR)
+        val button = findViewById<CardView>(R.id.calendar_card)
+        button.setOnClickListener {
+            val intent = Intent(this, CalendarActivity::class.java)
+            startActivity(intent)
         }
 
         findViewById<CardView>(R.id.charts_card).setOnClickListener {

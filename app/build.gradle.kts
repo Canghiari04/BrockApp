@@ -42,7 +42,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.auth)
-    //implementation(KotlinPlatformType.common.ktx)
+
+    implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
+        exclude(group = "com.android.support")
+    }
     implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
