@@ -10,7 +10,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-
         findViewById<Button>(R.id.button_sign_in).setOnClickListener {
             callAuthenticator("SignIn")
         }
@@ -28,10 +27,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     private fun callAuthenticator(typeFragment : String) {
         startActivity(Intent(this, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", typeFragment))
     }
-
-
 }
