@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.brockapp.HomeActivity
 import com.example.brockapp.R
+import com.example.brockapp.database.DbHelper
 
 class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     companion object {
@@ -21,8 +22,11 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         super.onViewCreated(view, savedInstanceState)
 
         var obj = BuiltInAuthenticator()
+        val context = requireContext()
+        val dbHelper = DbHelper(context)
 
         getView()?.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
+
             var username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             var password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
@@ -36,6 +40,8 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                 else {
                     obj.addCredentials(username, password, activity?.getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE))
                     view.findViewById<TextView>(R.id.text_sign_in_error).text = successSignIn
+
+                    dbHelper.insertUser(dbHelper, username, password)
 
                     val sharedPrefs = activity?.getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
 

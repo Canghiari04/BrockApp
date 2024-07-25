@@ -11,25 +11,54 @@ import com.example.brockapp.DATABASE_VERSION
 class DbHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    companion object UserActivity {
+
         // Table contents are grouped together in an anonymous object.
-        object UserActivityEntry : BaseColumns {
-            const val TABLE_NAME = "user-activity"
-            const val COLUMN_NAME = "name"
-            const val COLUMN_ACTIVITY_TYPE = "activity-type"
-            const val COLUMN_TRANSITION_TYPE = "transition-type"
-            const val COLUMN_TIMESTAMP = "timestamp"
-        }
+    object UserActivityEntry : BaseColumns {
+        const val TABLE_NAME = "user-activity"
+        const val COLUMN_ID = "id"
+        const val COLUMN_NAME = "name"
+        const val COLUMN_ACTIVITY_TYPE = "activity-type"
+        const val COLUMN_TRANSITION_TYPE = "transition-type"
+        const val COLUMN_TIMESTAMP = "timestamp"
+    }
+
+
+    object UserEntry {
+        const val TABLE_NAME = "user"
+        const val COLUMN_ID = "id"
+        const val COLUMN_USERNAME = "username"
+        const val COLUMN_PASSWORD = "password"
+
     }
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
-            "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${BaseColumns._ID} INTEGER PRIMARY KEY, " +
+            "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.COLUMN_ID} INTEGER PRIMARY KEY, " +
                     "${UserActivityEntry.COLUMN_NAME} TEXT, ${UserActivityEntry.COLUMN_ACTIVITY_TYPE} TEXT," +
                     "${UserActivityEntry.COLUMN_TRANSITION_TYPE} TEXT, ${UserActivityEntry.COLUMN_TIMESTAMP} LONG)"
+        )
+        db.execSQL(
+            "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.COLUMN_ID} INTEGER PRIMARY KEY, " +
+                    "${UserEntry.COLUMN_USERNAME} TEXT, ${UserEntry.COLUMN_PASSWORD} TEXT)"
         )
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+    }
+
+    fun insertUser(dbHelper: DbHelper, username: String, password: String) : Long? {
+        val db = dbHelper.writableDatabase
+
+        val values = ContentValues().apply {
+            put(DbHelper.UserEntry.COLUMN_USERNAME, username)
+            put(DbHelper.UserEntry.COLUMN_PASSWORD, password)
+
+            // Inserisci la nuova riga
+            val newRowId = db?.insert(DbHelper.UserEntry.TABLE_NAME, null, this)
+            return newRowId
+        }
+
+
+
     }
 
     fun insertUserActivity(dbHelper: DbHelper, name: String, activityType: String, transitionType: String, timestamp: Long
@@ -39,14 +68,14 @@ class DbHelper(context: Context) :
 
         // Crea una nuova mappa di valori, dove i nomi delle colonne sono le chiavi
         val values = ContentValues().apply {
-            put(DbHelper.UserActivity.UserActivityEntry.COLUMN_NAME, name)
-            put(DbHelper.UserActivity.UserActivityEntry.COLUMN_ACTIVITY_TYPE, activityType)
-            put(DbHelper.UserActivity.UserActivityEntry.COLUMN_TRANSITION_TYPE, transitionType)
-            put(DbHelper.UserActivity.UserActivityEntry.COLUMN_TIMESTAMP, timestamp)
+            put(DbHelper.UserActivityEntry.COLUMN_NAME, name)
+            put(DbHelper.UserActivityEntry.COLUMN_ACTIVITY_TYPE, activityType)
+            put(DbHelper.UserActivityEntry.COLUMN_TRANSITION_TYPE, transitionType)
+            put(DbHelper.UserActivityEntry.COLUMN_TIMESTAMP, timestamp)
         }
 
         // Inserisci la nuova riga, restituendo il valore della chiave primaria della nuova riga
-        val newRowId = db?.insert(DbHelper.UserActivity.UserActivityEntry.TABLE_NAME, null, values)
+        val newRowId = db?.insert(DbHelper.UserActivityEntry.TABLE_NAME, null, values)
         return newRowId
     }
 
