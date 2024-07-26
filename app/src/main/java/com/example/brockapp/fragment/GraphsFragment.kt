@@ -1,12 +1,13 @@
-package com.example.brockapp
+package com.example.brockapp.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.brockapp.R
 
-class HistoryFragment : Fragment(R.layout.history_fragment_container) {
+class GraphsFragment : Fragment(R.layout.history_fragment_container) {
 
     override fun onCreateView(
         inflater: LayoutInflater,
