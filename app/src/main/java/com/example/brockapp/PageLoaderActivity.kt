@@ -1,9 +1,10 @@
 package com.example.brockapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
-class PageLoaderActivity : AppCompatActivity()  {
+class PageLoaderActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -13,26 +14,25 @@ class PageLoaderActivity : AppCompatActivity()  {
 
         when (pageType) {
             "activities" -> {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, ActivitiesFragment())
-                    commit()
-                }
+                // Utilizza 'this' come Context e specifica l'attività da avviare
+                val intent = Intent(this, DetectActivity::class.java)
+                startActivity(intent)
             }
             "calendar" -> {
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, CalendarFragment()) // Replace with your actual fragment
+                    replace(R.id.page_loader_activity, CalendarFragment()) // Sostituisci con il tuo Fragment
                     commit()
                 }
             }
             "history" -> {
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, HistoryFragment()) // Replace with your actual fragment
+                    replace(R.id.page_loader_activity, HistoryFragment()) // Sostituisci con il tuo Fragment
                     commit()
                 }
             }
             "friends" -> {
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, ChartsFragment()) // Replace with your actual fragment
+                    replace(R.id.page_loader_activity, ChartsFragment()) // Sostituisci con il tuo Fragment
                     commit()
                 }
             }

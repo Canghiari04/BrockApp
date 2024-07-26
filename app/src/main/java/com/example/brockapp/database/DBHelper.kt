@@ -14,11 +14,11 @@ class DbHelper(context: Context) :
 
         // Table contents are grouped together in an anonymous object.
     object UserActivityEntry : BaseColumns {
-        const val TABLE_NAME = "user-activity"
+        const val TABLE_NAME = "user_activity"
         const val COLUMN_ID = "id"
         const val COLUMN_NAME = "name"
-        const val COLUMN_ACTIVITY_TYPE = "activity-type"
-        const val COLUMN_TRANSITION_TYPE = "transition-type"
+        const val COLUMN_ACTIVITY_TYPE = "activity_type"
+        const val COLUMN_TRANSITION_TYPE = "transition_type"
         const val COLUMN_TIMESTAMP = "timestamp"
     }
 
@@ -32,14 +32,16 @@ class DbHelper(context: Context) :
     }
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
+            "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.COLUMN_ID} INTEGER PRIMARY KEY, " +
+                    "${UserEntry.COLUMN_USERNAME} TEXT, ${UserEntry.COLUMN_PASSWORD} TEXT)"
+        )
+
+        db.execSQL(
             "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.COLUMN_ID} INTEGER PRIMARY KEY, " +
                     "${UserActivityEntry.COLUMN_NAME} TEXT, ${UserActivityEntry.COLUMN_ACTIVITY_TYPE} TEXT," +
                     "${UserActivityEntry.COLUMN_TRANSITION_TYPE} TEXT, ${UserActivityEntry.COLUMN_TIMESTAMP} LONG)"
         )
-        db.execSQL(
-            "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.COLUMN_ID} INTEGER PRIMARY KEY, " +
-                    "${UserEntry.COLUMN_USERNAME} TEXT, ${UserEntry.COLUMN_PASSWORD} TEXT)"
-        )
+
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -48,7 +50,7 @@ class DbHelper(context: Context) :
     fun insertUser(dbHelper: DbHelper, username: String, password: String) : Long? {
         val db = dbHelper.writableDatabase
 
-        val values = ContentValues().apply {
+        ContentValues().apply {
             put(DbHelper.UserEntry.COLUMN_USERNAME, username)
             put(DbHelper.UserEntry.COLUMN_PASSWORD, password)
 
@@ -56,9 +58,6 @@ class DbHelper(context: Context) :
             val newRowId = db?.insert(DbHelper.UserEntry.TABLE_NAME, null, this)
             return newRowId
         }
-
-
-
     }
 
     fun insertUserActivity(dbHelper: DbHelper, name: String, activityType: String, transitionType: String, timestamp: Long
