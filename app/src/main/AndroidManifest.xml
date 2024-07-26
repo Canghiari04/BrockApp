@@ -32,6 +32,9 @@
         <activity android:name="com.example.brockapp.PageLoaderActivity">
         </activity>
 
+        <activity android:name="com.example.brockapp.DetectActivity">
+        </activity>
+
         <activity android:name="com.example.brockapp.CalendarActivity">
         </activity>
 

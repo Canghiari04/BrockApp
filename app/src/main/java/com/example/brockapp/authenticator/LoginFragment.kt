@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.brockapp.HomeActivity
+import com.example.brockapp.PageLoaderActivity
 import com.example.brockapp.R
 import com.example.brockapp.database.DbHelper
 
@@ -36,7 +36,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     apply()
                 }
 
-                startActivity(Intent(activity, HomeActivity::class.java))
+                startActivity(Intent(activity, PageLoaderActivity::class.java))
             } else {
                 view.findViewById<TextView>(R.id.text_login_error).text = loginError
             }
