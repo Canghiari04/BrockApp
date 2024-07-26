@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.brockapp.HomeActivity
+import com.example.brockapp.PageLoaderActivity
 import com.example.brockapp.R
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
@@ -30,7 +30,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 view.findViewById<TextView>(R.id.text_login_error).text = blankError
             } else {
                 if(obj.authCredentials(username, password, activity?.getSharedPreferences("AUTH_CREDENTIALS", Context.MODE_PRIVATE)))
-                    startActivity(Intent(activity, HomeActivity::class.java)) // START THE HOMEPAGE ACTIVITY
+                    startActivity(Intent(activity, PageLoaderActivity::class.java))
                 else {
                     view.findViewById<TextView>(R.id.text_login_error).text = loginError
                 }

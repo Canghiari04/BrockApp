@@ -1,12 +1,16 @@
 package com.example.brockapp
 
-import android.content.ClipData.Item
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.example.brockapp.fragment.GraphsFragment
+import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.fragment.NewActivityFragment
+import com.example.brockapp.fragment.OptionsFragment
+import com.example.brockapp.fragment.PlusFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class PageLoaderActivity : ComponentActivity()  {
+class PageLoaderActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.page_loader_activity)
@@ -14,26 +18,37 @@ class PageLoaderActivity : ComponentActivity()  {
         /*
          * Dall'intent acquisisco la tipologia di fragment che dovrà essere sovrapposta.
          */
-        findViewById<View>(R.id.bottom_navigation_view)
-        when (intent.getStringExtra("TYPE_PAGE").toString()) {
-            "home" -> {
-                startActivity(Intent(this, DetectActivity::class.java))
-            }
-            "activities" -> {
-                startActivity(Intent(this, DetectActivity::class.java))
-            }
-            "calendar" -> {
-                startActivity(Intent(this, DetectActivity::class.java))
-            }
-            "history" -> {
-                startActivity(Intent(this, DetectActivity::class.java))
-            }
-            "friends" -> {
-                startActivity(Intent(this, DetectActivity::class.java))
-            }
-            else -> {
-                System.out.println("Page not found")
+        findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navbar_item_home -> {
+                    replaceFragment(HomeFragment())
+                    true
+                }
+                R.id.navbar_item_graphics -> {
+                    replaceFragment(GraphsFragment())
+                    true
+                }
+                R.id.navbar_item_plus -> {
+                    replaceFragment(PlusFragment())
+                    true
+                }
+                R.id.navbar_item_activities -> {
+                    replaceFragment(NewActivityFragment())
+                    true
+                }
+                R.id.navbar_item_more -> {
+                    replaceFragment(OptionsFragment())
+                    true
+                }
+                else -> false
             }
         }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.page_loader_fragment, fragment)
+            .commit()
     }
 }

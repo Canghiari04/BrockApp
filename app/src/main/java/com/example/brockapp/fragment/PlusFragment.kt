@@ -1,12 +1,13 @@
-package com.example.brockapp
+package com.example.brockapp.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.brockapp.R
 
-class ActivitiesFragment : Fragment(R.layout.activities_fragment_container) {
+class PlusFragment : Fragment(R.layout.charts_fragment_container) {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -14,7 +15,7 @@ class ActivitiesFragment : Fragment(R.layout.activities_fragment_container) {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.activities_fragment_container, container, false)
+        return inflater.inflate(R.layout.charts_fragment_container, container, false)
     }
 
 }
