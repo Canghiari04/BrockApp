@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import android.util.Log
 import com.example.brockapp.DATABASE_NAME
 import com.example.brockapp.DATABASE_VERSION
 
@@ -31,9 +32,10 @@ class DbHelper(context: Context) :
 
     }
     override fun onCreate(db: SQLiteDatabase) {
+
         db.execSQL(
             "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.COLUMN_ID} INTEGER PRIMARY KEY, " +
-                    "${UserEntry.COLUMN_USERNAME} TEXT, ${UserEntry.COLUMN_PASSWORD} TEXT)"
+                    "${UserEntry.COLUMN_USERNAME} TEXT , ${UserEntry.COLUMN_PASSWORD} TEXT)"
         )
 
         db.execSQL(
@@ -49,16 +51,20 @@ class DbHelper(context: Context) :
 
     fun insertUser(dbHelper: DbHelper, username: String, password: String) : Long? {
         val db = dbHelper.writableDatabase
-
-        ContentValues().apply {
-            put(DbHelper.UserEntry.COLUMN_USERNAME, username)
-            put(DbHelper.UserEntry.COLUMN_PASSWORD, password)
-
-            // Inserisci la nuova riga
-            val newRowId = db?.insert(DbHelper.UserEntry.TABLE_NAME, null, this)
-            return newRowId
+        val contentValues = ContentValues().apply {
+            put(UserEntry.COLUMN_USERNAME, username)
+            put(UserEntry.COLUMN_PASSWORD, password)
         }
+
+        val newRowId = db?.insert(UserEntry.TABLE_NAME, null, contentValues)
+        if (newRowId == -1L) {
+            Log.e("DB_INSERT", "Errore durante l'inserimento dell'utente: $username")
+        } else {
+            Log.d("DB_INSERT", "Inserimento riuscito con ID: $newRowId")
+        }
+        return newRowId
     }
+
 
     fun insertUserActivity(dbHelper: DbHelper, name: String, activityType: String, transitionType: String, timestamp: Long
     ) : Long?{
@@ -67,14 +73,14 @@ class DbHelper(context: Context) :
 
         // Crea una nuova mappa di valori, dove i nomi delle colonne sono le chiavi
         val values = ContentValues().apply {
-            put(DbHelper.UserActivityEntry.COLUMN_NAME, name)
-            put(DbHelper.UserActivityEntry.COLUMN_ACTIVITY_TYPE, activityType)
-            put(DbHelper.UserActivityEntry.COLUMN_TRANSITION_TYPE, transitionType)
-            put(DbHelper.UserActivityEntry.COLUMN_TIMESTAMP, timestamp)
+            put(UserActivityEntry.COLUMN_NAME, name)
+            put(UserActivityEntry.COLUMN_ACTIVITY_TYPE, activityType)
+            put(UserActivityEntry.COLUMN_TRANSITION_TYPE, transitionType)
+            put(UserActivityEntry.COLUMN_TIMESTAMP, timestamp)
         }
 
         // Inserisci la nuova riga, restituendo il valore della chiave primaria della nuova riga
-        val newRowId = db?.insert(DbHelper.UserActivityEntry.TABLE_NAME, null, values)
+        val newRowId = db?.insert(UserActivityEntry.TABLE_NAME, null, values)
         return newRowId
     }
 
@@ -87,14 +93,14 @@ class DbHelper(context: Context) :
             UserActivityEntry.COLUMN_TRANSITION_TYPE,
             UserActivityEntry.COLUMN_TIMESTAMP,
             )
-        val cursor = db.query( // Returns a Cursor
-            UserActivityEntry.TABLE_NAME, // The table to query
-            projection, // The array of columns to return (pass null to get all)
+        val cursor = db.query(
+            UserActivityEntry.TABLE_NAME,
+            projection,
             "${UserActivityEntry.COLUMN_NAME} = ?",
-            arrayOf(user),// The values for the WHERE clause (injected args)
-            null, // GROUP BY
-            null, // FILTER BY
-            null // SORT
+            arrayOf(user),
+            null,
+            null,
+            null
         )
 
         val items = mutableListOf<String>()
@@ -105,5 +111,28 @@ class DbHelper(context: Context) :
             }
         }
         cursor.close()
+    }
+
+    fun checkIfUserExists(username: String, password: String): Boolean {
+        val db = this.readableDatabase
+
+        val selection = "${UserEntry.COLUMN_USERNAME} = ? AND ${UserEntry.COLUMN_PASSWORD} = ?"
+        val selectionArgs = arrayOf(username, password)
+
+        val cursor = db.query(
+            UserEntry.TABLE_NAME,
+            arrayOf(UserEntry.COLUMN_ID),
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+
+        val userExists = cursor.count > 0
+        cursor.close()
+        return userExists
+
+
     }
 }

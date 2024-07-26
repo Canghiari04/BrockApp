@@ -22,7 +22,7 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.home_activity) // Set content view first
 
         val userData = getUserData(this)
-        val userName = userData["username"] as? String
+        val userName = userData["username"] as? String ?: "Guest" // Default a "Guest" se username non è presente
         val welcomeMessage = "Welcome, $userName!"
 
         val welcomeTextView = findViewById<TextView>(R.id.welcome_text) // Now find the view
