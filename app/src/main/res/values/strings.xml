@@ -19,5 +19,8 @@
     <string name="friends_main_text">I tuoi amici</string>"
     <string name="charts_main_text">I tuoi grafici</string>"
     <string name="historical_main_text">Il tuo storico</string>"
-
+    <string name="permission_title">Permesso richiesto</string>
+    <string name="permission_message">Permesso richiesto</string>
+    <string name="permission_positive_button">Concedi</string>
+    <string name="permission_negative_button">Anulla</string>
 </resources>

@@ -17,29 +17,46 @@ import com.google.android.gms.location.DetectedActivity
 import kotlinx.coroutines.tasks.await
 
 class UserActivityTransitionManager(context: Context) {
+    fun getTransitions(): List<ActivityTransition> {
+        val transitions = mutableListOf<ActivityTransition>()
 
-    companion object {
-        fun getActivityType(int: Int): String {
-            return when (int) {
-                0 -> "IN_VEHICLE"
-                1 -> "ON_BICYCLE"
-                2 -> "ON_FOOT"
-                3 -> "STILL"
-                4 -> "UNKNOWN"
-                5 -> "TILTING"
-                7 -> "WALKING"
-                8 -> "RUNNING"
-                else -> "UNKNOWN"
-            }
-        }
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.IN_VEHICLE)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                .build()
 
-        fun getTransitionType(int: Int): String {
-            return when (int) {
-                0 -> "STARTED"
-                1 -> "STOPPED"
-                else -> ""
-            }
-        }
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.IN_VEHICLE)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+                .build()
+
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.WALKING)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                .build()
+
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.WALKING)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                .build()
+
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.STILL)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                .build()
+
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.STILL)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+                .build()
+
+        return transitions
     }
 
     // list of activity transitions to be monitored

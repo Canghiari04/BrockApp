@@ -1,40 +1,35 @@
 package com.example.brockapp
 
+import android.content.ClipData.Item
+import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.View
+import androidx.activity.ComponentActivity
 
-class PageLoaderActivity : AppCompatActivity()  {
-
+class PageLoaderActivity : ComponentActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.page_loader_activity)
 
-        val pageType = intent.getStringExtra("TYPE_PAGE").toString()
-
-        when (pageType) {
+        /*
+         * Dall'intent acquisisco la tipologia di fragment che dovrà essere sovrapposta.
+         */
+        findViewById<View>(R.id.bottom_navigation_view)
+        when (intent.getStringExtra("TYPE_PAGE").toString()) {
+            "home" -> {
+                startActivity(Intent(this, DetectActivity::class.java))
+            }
             "activities" -> {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, ActivitiesFragment())
-                    commit()
-                }
+                startActivity(Intent(this, DetectActivity::class.java))
             }
             "calendar" -> {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, CalendarFragment()) // Replace with your actual fragment
-                    commit()
-                }
+                startActivity(Intent(this, DetectActivity::class.java))
             }
             "history" -> {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, HistoryFragment()) // Replace with your actual fragment
-                    commit()
-                }
+                startActivity(Intent(this, DetectActivity::class.java))
             }
             "friends" -> {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.page_loader_activity, ChartsFragment()) // Replace with your actual fragment
-                    commit()
-                }
+                startActivity(Intent(this, DetectActivity::class.java))
             }
             else -> {
                 System.out.println("Page not found")

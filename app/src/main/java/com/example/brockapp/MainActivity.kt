@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         }
 
         findViewById<Button>(R.id.button_login).setOnClickListener {
-            callAuthenticator("Login")
+            callAuthenticator("LogIn")
         }
 
         findViewById<Button>(R.id.button_google).setOnClickListener {

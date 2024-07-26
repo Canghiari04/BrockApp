@@ -1,6 +1,7 @@
 package com.example.brockapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.brockapp.authenticator.LoginFragment
 import com.example.brockapp.authenticator.SignInFragment
@@ -15,11 +16,13 @@ class AuthenticatorActivity : AppCompatActivity() {
                 replace(R.id.auth_fragment, SignInFragment())
                 commit()
             }
-        } else {
+        } else if(intent.getStringExtra("TYPE_PAGE").toString() == "LogIn") {
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.auth_fragment, LoginFragment())
                 commit()
             }
+        } else {
+            Log.d("WTF", "WTF")
         }
     }
 }
