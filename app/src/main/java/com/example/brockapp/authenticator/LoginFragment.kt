@@ -8,11 +8,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.brockapp.PageLoaderActivity
+import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.R
 import com.example.brockapp.database.DbHelper
 
-class LoginFragment : Fragment(R.layout.fragment_login) {
+class LoginFragment : Fragment(R.layout.login_fragment) {
     companion object {
         const val loginError: String = "CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL'APPLICAZIONE?"
     }

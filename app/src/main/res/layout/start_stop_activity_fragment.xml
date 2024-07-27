@@ -4,13 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     <LinearLayout
-        android:id="@+id/container"
         android:orientation="vertical"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-        <Chronometer
-            android:id="@+id/chronometer"
+        <EditText
+            android:id="@+id/text_time"
             android:inputType="time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,9 +22,7 @@
             android:layout_marginTop="25dp"
             android:backgroundTint="@color/uni_red"
             android:text="STOP"
-            android:textColor="@color/white"
-            android:enabled="false" />
-
+            android:textColor="@color/white" />
         <Button
             android:id="@+id/button_start"
             android:layout_width="wrap_content"
