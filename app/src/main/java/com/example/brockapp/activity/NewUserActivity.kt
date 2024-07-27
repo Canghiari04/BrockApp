@@ -1,23 +1,21 @@
-package com.example.brockapp
+package com.example.brockapp.activity
 
 import android.Manifest
-import android.content.Context
-import android.content.DialogInterface
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.brockapp.detect.UserActivityTransitionManager
-import com.google.android.gms.location.ActivityRecognition
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityTransitionRequest
+import androidx.core.app.ActivityCompat
+import com.example.brockapp.PageLoaderActivity
+import com.example.brockapp.R
+import com.example.brockapp.fragment.WalkFragment
+import com.example.brockapp.fragment.StillFragment
+import com.example.brockapp.fragment.VehicleFragment
 
-class DetectActivity : AppCompatActivity() {
+class NewUserActivity : AppCompatActivity() {
     companion object {
         const val REQUEST_CODE_ACTIVITY_RECOGNITION = 1001
     }
@@ -25,6 +23,35 @@ class DetectActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         startDetectActivity()
+
+        findViewById<FrameLayout>(R.id.detect_fragment).setOnClickListener { button ->
+            when (button.id) {
+//                R.id.button_daily_detect -> {
+//                    supportFragmentManager.beginTransaction().apply {
+//                        replace(R.id.detect_fragment, DailyDetectFragment())
+//                        commit()
+//                    }
+//                }
+                R.id.button_sit -> {
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.detect_fragment, StillFragment())
+                        commit()
+                    }
+                }
+                R.id.button_walk -> {
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.detect_fragment, WalkFragment())
+                        commit()
+                    }
+                }
+                R.id.button_vehicle -> {
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.detect_fragment, VehicleFragment())
+                        commit()
+                    }
+                }
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -32,8 +59,7 @@ class DetectActivity : AppCompatActivity() {
 
         if(requestCode == REQUEST_CODE_ACTIVITY_RECOGNITION) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setContentView(R.layout.detect_activity)
-                detectActivities()
+                setContentView(R.layout.new_activity)
             }
         }
     }
@@ -43,8 +69,7 @@ class DetectActivity : AppCompatActivity() {
      */
     private fun startDetectActivity() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            setContentView(R.layout.detect_activity)
-            detectActivities()
+            setContentView(R.layout.new_activity)
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)) {
             showPermissionDialog()
         } else {
@@ -54,10 +79,6 @@ class DetectActivity : AppCompatActivity() {
                 REQUEST_CODE_ACTIVITY_RECOGNITION
             )
         }
-    }
-
-    private fun detectActivities() {
-
     }
 
     /*

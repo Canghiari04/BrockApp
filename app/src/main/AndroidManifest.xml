@@ -24,18 +24,12 @@
         <activity
             android:name="com.example.brockapp.AuthenticatorActivity"
             android:parentActivityName=".MainActivity">
-
         </activity>
-        <activity android:name="com.example.brockapp.HomeActivity">
-
+        <activity android:name=".activity.HomeActivity">
+        </activity>
+        <activity android:name=".activity.NewUserActivity">
         </activity>
         <activity android:name="com.example.brockapp.PageLoaderActivity">
-        </activity>
-
-        <activity android:name="com.example.brockapp.DetectActivity">
-        </activity>
-
-        <activity android:name="com.example.brockapp.CalendarActivity">
         </activity>
     </application>
 </manifest>
