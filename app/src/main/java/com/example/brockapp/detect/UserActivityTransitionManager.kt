@@ -65,7 +65,6 @@ class UserActivityTransitionManager(context: Context?) {
     }
 
     fun getPendingIntent(context : Context) : PendingIntent {
-
         val intent = Intent(context, UserActivityBroadcastReceiver::class.java)
 
         return PendingIntent.getBroadcast(

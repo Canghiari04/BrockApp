@@ -2,7 +2,9 @@ package com.example.brockapp.activity
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 import com.example.brockapp.R
 import com.example.brockapp.fragment.PageLoaderActivityFragment
+import androidx.core.content.ContextCompat.registerReceiver
+import com.example.brockapp.detect.UserActivityBroadcastReceiver
 
 class NewUserActivity : AppCompatActivity() {
     companion object {
@@ -18,7 +22,13 @@ class NewUserActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startDetectActivity()
+
+        if(startDetectActivity()) {
+            val intentFilter = IntentFilter()
+            intentFilter.addAction("com.google.android.gms.location.ACTIVITY_TRANSITION_UPDATE")
+
+            registerReceiver(UserActivityBroadcastReceiver(), intentFilter, 0)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -26,29 +36,43 @@ class NewUserActivity : AppCompatActivity() {
 
         if(requestCode == REQUEST_CODE_ACTIVITY_RECOGNITION) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showPageDialog()
+                showNewActivityPage()
+
+                val intentFilter = IntentFilter()
+                intentFilter.addAction("com.google.android.gms.location.ACTIVITY_TRANSITION_UPDATE")
+
+                registerReceiver(UserActivityBroadcastReceiver(), intentFilter, 0)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        unregisterReceiver(UserActivityBroadcastReceiver())
     }
 
     /**
      * Controllo se il permesso ACTIVITY_RECOGNITION è stato dato.
      */
-    private fun startDetectActivity() {
+    private fun startDetectActivity(): Boolean {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            showPageDialog()
+            showNewActivityPage()
+            return true
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)) {
             showPermissionDialog()
+            return false
         } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
                 REQUEST_CODE_ACTIVITY_RECOGNITION
             )
+            return false
         }
     }
 
-    private fun showPageDialog() {
+    private fun showNewActivityPage() {
         setContentView(R.layout.new_user_activity)
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.detect_fragment, PageLoaderActivityFragment())
