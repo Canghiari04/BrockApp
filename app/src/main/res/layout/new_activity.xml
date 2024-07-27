@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:orientation="vertical"
     android:gravity="center"
     android:layout_width="match_parent"
@@ -31,7 +32,7 @@
                 <Button
                     android:id="@+id/button_daily_detect"
                     android:textAlignment="textStart"
-                    android:text=""
+                    android:text="DAILY DETECT"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="25dp"
@@ -47,7 +48,7 @@
                 <Button
                     android:id="@+id/button_sit"
                     android:textAlignment="textStart"
-                    android:text="@string/historical_text_view"
+                    android:text="STILL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="25dp"
@@ -79,7 +80,7 @@
                 <Button
                     android:id="@+id/button_vehicle"
                     android:textAlignment="textStart"
-                    android:text="@string/historical_text_view"
+                    android:text="VEICOLO"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="25dp"
