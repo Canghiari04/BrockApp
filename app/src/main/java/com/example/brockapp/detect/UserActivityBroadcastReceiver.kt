@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.example.brockapp.database.DbHelper
 import com.google.android.gms.location.ActivityTransitionResult
 
 /*
@@ -19,6 +20,10 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         /*
          * Condizione per accertarsi se l'intent contiene un risultato di activity recognition.
          */
+
+        val dbHelper = DbHelper(context)
+
+
         if (ActivityTransitionResult.hasResult(intent)) {
             /*
              * !! il risultato non può essere null
