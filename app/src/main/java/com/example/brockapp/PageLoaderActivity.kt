@@ -1,13 +1,10 @@
 package com.example.brockapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import com.example.brockapp.fragment.GraphsFragment
-import com.example.brockapp.fragment.HomeFragment
-import com.example.brockapp.fragment.NewActivityFragment
-import com.example.brockapp.fragment.OptionsFragment
-import com.example.brockapp.fragment.PlusFragment
+import com.example.brockapp.activity.HomeActivity
+import com.example.brockapp.activity.NewActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PageLoaderActivity : AppCompatActivity()  {
@@ -21,34 +18,15 @@ class PageLoaderActivity : AppCompatActivity()  {
         findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navbar_item_home -> {
-                    replaceFragment(HomeFragment())
-                    true
-                }
-                R.id.navbar_item_graphics -> {
-                    replaceFragment(GraphsFragment())
+                    startActivity(Intent(this, HomeActivity::class.java))
                     true
                 }
                 R.id.navbar_item_plus -> {
-                    replaceFragment(PlusFragment())
-                    true
-                }
-                R.id.navbar_item_activities -> {
-                    replaceFragment(NewActivityFragment())
-                    true
-                }
-                R.id.navbar_item_more -> {
-                    replaceFragment(OptionsFragment())
+                    startActivity(Intent(this, NewActivity::class.java))
                     true
                 }
                 else -> false
             }
         }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.page_loader_fragment, fragment)
-            .commit()
     }
 }
