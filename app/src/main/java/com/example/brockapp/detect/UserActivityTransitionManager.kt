@@ -1,11 +1,15 @@
 package com.example.brockapp.detect
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.ActivityTransitionRequest
 import com.google.android.gms.location.DetectedActivity
 
 class UserActivityTransitionManager(context: Context?) {
-    private val pendingIntent by lazy {
+    companion object {
+        const val BROADCAST_RECEIVER_REQUEST_CODE = 0
     }
 
     /**
@@ -37,7 +41,7 @@ class UserActivityTransitionManager(context: Context?) {
         transitions +=
             ActivityTransition.Builder()
                 .setActivityType(DetectedActivity.WALKING)
-                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
                 .build()
 
         transitions +=
@@ -53,5 +57,22 @@ class UserActivityTransitionManager(context: Context?) {
                 .build()
 
         return transitions
+    }
+
+    fun getRequest() : ActivityTransitionRequest {
+        val transitions = getTransitions()
+        return ActivityTransitionRequest(transitions)
+    }
+
+    fun getPendingIntent(context : Context) : PendingIntent {
+
+        val intent = Intent(context, UserActivityBroadcastReceiver::class.java)
+
+        return PendingIntent.getBroadcast(
+            context,
+            BROADCAST_RECEIVER_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
     }
 }

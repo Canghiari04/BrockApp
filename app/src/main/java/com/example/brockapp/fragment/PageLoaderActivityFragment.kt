@@ -1,10 +1,13 @@
 package com.example.brockapp.fragment
 
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.core.content.ContextCompat.registerReceiver
 import androidx.fragment.app.Fragment
 import com.example.brockapp.R
+import com.example.brockapp.detect.UserActivityBroadcastReceiver
 import com.example.brockapp.detect.UserActivityTransitionManager
 
 class PageLoaderActivityFragment : Fragment(R.layout.page_loader_activity_fragment) {
