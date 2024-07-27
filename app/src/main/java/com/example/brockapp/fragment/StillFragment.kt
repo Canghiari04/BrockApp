@@ -15,12 +15,10 @@ import com.example.brockapp.R
 import com.example.brockapp.database.DbHelper
 import com.example.brockapp.detect.UserActivityTransitionManager
 import com.google.android.gms.location.ActivityRecognition
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -42,9 +40,6 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
 
                 buttonStart.isEnabled = false
                 buttonStop.isEnabled = true
-
-                // Invio broadcast all'inizio del monitoraggio
-                sendCustomBroadcast("android.permission.ACTIVITY_RECOGNITION")
             }
 
             startDetection(transitionManager)
@@ -58,9 +53,6 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
 
                 buttonStart.isEnabled = true
                 buttonStop.isEnabled = false
-
-                // Invio broadcast alla fine del monitoraggio
-                sendCustomBroadcast("android.permission.ACTIVITY_RECOGNITION")
             }
         }
 
@@ -72,11 +64,11 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
         val context = requireContext()
 
         val request = transitionManager.getRequest()
-        val pendingIntent = transitionManager.getPendingIntent(context)
+        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(context)
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             val task = ActivityRecognition.getClient(context)
-                .requestActivityTransitionUpdates(request, pendingIntent)
+                .requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
 
             task.addOnSuccessListener {
                 Log.d("DETECT", "Ti sei correttamente connesso all'api")
@@ -85,13 +77,18 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
             task.addOnFailureListener { e: Exception ->
                 Log.d("DETECT", "Errore nella connessione all'api")
             }
+
+            simulateFakeActivityTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
         } else {
             Log.d("WTF", "WTF")
         }
     }
 
-    private fun sendCustomBroadcast(action: String) {
-        val intent = Intent(action)
+    private fun simulateFakeActivityTransition(activityType: Int, transitionType: Int) {
+        val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
+            putExtra("activityType", activityType)
+            putExtra("transitionType", transitionType)
+        }
         requireContext().sendBroadcast(intent)
     }
 }

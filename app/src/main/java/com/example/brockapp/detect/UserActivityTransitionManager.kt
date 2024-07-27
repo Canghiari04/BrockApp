@@ -17,7 +17,7 @@ class UserActivityTransitionManager(context: Context?) {
      *
      * FORSE SAREBBE MEGLIO FARE LISTE PER SINGOLE TRANSIZIONI?
      */
-    fun getTransitions(): List<ActivityTransition> {
+    private fun getTransitions(): List<ActivityTransition> {
         val transitions = mutableListOf<ActivityTransition>()
 
         transitions +=
@@ -59,9 +59,11 @@ class UserActivityTransitionManager(context: Context?) {
         return transitions
     }
 
+    /**
+     * Get della richiesta da avanzare all'api.
+     */
     fun getRequest() : ActivityTransitionRequest {
-        val transitions = getTransitions()
-        return ActivityTransitionRequest(transitions)
+        return ActivityTransitionRequest(getTransitions())
     }
 
     fun getPendingIntent(context : Context) : PendingIntent {

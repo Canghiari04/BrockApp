@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
@@ -24,11 +26,7 @@ class NewUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if(startDetectActivity()) {
-            val intentFilter = IntentFilter()
-            intentFilter.addAction("com.google.android.gms.location.ACTIVITY_TRANSITION_UPDATE")
-
-            registerReceiver(UserActivityBroadcastReceiver(), intentFilter, RECEIVER_NOT_EXPORTED)
-
+            registerActivityRecognition()
         }
     }
 
@@ -38,11 +36,7 @@ class NewUserActivity : AppCompatActivity() {
         if(requestCode == REQUEST_CODE_ACTIVITY_RECOGNITION) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showNewActivityPage()
-
-                val intentFilter = IntentFilter()
-                intentFilter.addAction("android.permission.ACTIVITY_RECOGNITION")
-
-                registerReceiver(UserActivityBroadcastReceiver(), intentFilter, RECEIVER_NOT_EXPORTED)
+                registerActivityRecognition()
             }
         }
     }
@@ -71,6 +65,12 @@ class NewUserActivity : AppCompatActivity() {
             )
             return false
         }
+    }
+
+    private fun registerActivityRecognition() {
+        val intentFilter = IntentFilter("TRANSITIONS_RECEIVER_ACTION")
+
+        registerReceiver(UserActivityBroadcastReceiver(), intentFilter, RECEIVER_NOT_EXPORTED)
     }
 
     private fun showNewActivityPage() {
