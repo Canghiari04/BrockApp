@@ -17,7 +17,7 @@
     <FrameLayout
         android:id="@+id/detect_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" >
         <GridLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 <Button
                     android:id="@+id/button_daily_detect"
                     android:textAlignment="textStart"
-                    android:text="@string/historical_text_view"
+                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="25dp"
@@ -63,7 +63,7 @@
                 <Button
                     android:id="@+id/button_walk"
                     android:textAlignment="textStart"
-                    android:text="@string/historical_text_view"
+                    android:text="CAMMINATA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="25dp"
