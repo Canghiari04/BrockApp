@@ -1,8 +1,9 @@
-package com.example.brockapp
+package com.example.brockapp.activity
 
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.R
 import com.example.brockapp.authenticator.LoginFragment
 import com.example.brockapp.authenticator.SignInFragment
 
