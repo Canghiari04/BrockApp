@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.brockapp.activity.HomeActivity
-import com.example.brockapp.activity.NewActivity
+import com.example.brockapp.activity.NewUserActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PageLoaderActivity : AppCompatActivity()  {
@@ -22,7 +22,7 @@ class PageLoaderActivity : AppCompatActivity()  {
                     true
                 }
                 R.id.navbar_item_plus -> {
-                    startActivity(Intent(this, NewActivity::class.java))
+                    startActivity(Intent(this, NewUserActivity::class.java))
                     true
                 }
                 else -> false

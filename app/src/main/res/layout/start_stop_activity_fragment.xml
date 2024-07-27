@@ -15,21 +15,23 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:ems="10" />
+
         <Button
             android:id="@+id/button_stop"
-            android:text="STOP"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red" />
+            android:backgroundTint="@color/uni_red"
+            android:text="STOP"
+            android:textColor="@color/white" />
+
         <Button
             android:id="@+id/button_start"
-            android:text="START"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red" />
+            android:backgroundTint="@color/uni_red"
+            android:text="START"
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

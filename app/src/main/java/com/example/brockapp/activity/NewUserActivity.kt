@@ -5,18 +5,17 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 import com.example.brockapp.PageLoaderActivity
 import com.example.brockapp.R
-import com.example.brockapp.authenticator.SignInFragment
-import com.example.brockapp.detect.UserActivityTransitionManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.brockapp.fragment.WalkFragment
+import com.example.brockapp.fragment.StillFragment
+import com.example.brockapp.fragment.VehicleFragment
 
-class NewActivity : AppCompatActivity() {
+class NewUserActivity : AppCompatActivity() {
     companion object {
         const val REQUEST_CODE_ACTIVITY_RECOGNITION = 1001
     }
@@ -27,12 +26,12 @@ class NewActivity : AppCompatActivity() {
 
         findViewById<FrameLayout>(R.id.detect_fragment).setOnClickListener { button ->
             when (button.id) {
-                R.id.button_daily_detect -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.detect_fragment, DailyDetectFragment())
-                        commit()
-                    }
-                }
+//                R.id.button_daily_detect -> {
+//                    supportFragmentManager.beginTransaction().apply {
+//                        replace(R.id.detect_fragment, DailyDetectFragment())
+//                        commit()
+//                    }
+//                }
                 R.id.button_sit -> {
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.detect_fragment, StillFragment())
