@@ -35,9 +35,4 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
             }
         }
     }
-
-    private fun saveActivityToDatabase(context: Context, activityType: String, transitionType: String, timestamp: Long) {
-        // Implementa il salvataggio nel database
-        // Puoi usare una coroutine o qualsiasi altro meccanismo di threading per salvare nel database
-    }
 }

@@ -1,6 +1,7 @@
 package com.example.brockapp.fragment
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.SystemClock
@@ -14,9 +15,6 @@ import com.example.brockapp.R
 import com.example.brockapp.database.DbHelper
 import com.example.brockapp.detect.UserActivityTransitionManager
 import com.google.android.gms.location.ActivityRecognition
-import com.google.android.gms.location.ActivityTransition
-
-
 
 class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +22,9 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        val transitionManager : UserActivityTransitionManager = UserActivityTransitionManager(requireContext())
         super.onViewCreated(view, savedInstanceState)
 
+        val transitionManager = UserActivityTransitionManager(requireContext())
         val dbHelper = DbHelper(requireContext())
 
         val chronometer = view.findViewById<Chronometer>(R.id.chronometer)
@@ -45,6 +42,9 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
 
                 buttonStart.isEnabled = false
                 buttonStop.isEnabled = true
+
+                // Invio broadcast all'inizio del monitoraggio
+                sendCustomBroadcast("android.permission.ACTIVITY_RECOGNITION")
             }
 
             startDetection(transitionManager)
@@ -58,36 +58,40 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
 
                 buttonStart.isEnabled = true
                 buttonStop.isEnabled = false
+
+                // Invio broadcast alla fine del monitoraggio
+                sendCustomBroadcast("android.permission.ACTIVITY_RECOGNITION")
             }
         }
-
 
         buttonStart.isEnabled = true
         buttonStop.isEnabled = false
     }
 
-
-    private fun startDetection(transitionManager : UserActivityTransitionManager) {
+    private fun startDetection(transitionManager: UserActivityTransitionManager) {
         val context = requireContext()
 
         val request = transitionManager.getRequest()
         val pendingIntent = transitionManager.getPendingIntent(context)
 
-        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             val task = ActivityRecognition.getClient(context)
                 .requestActivityTransitionUpdates(request, pendingIntent)
 
             task.addOnSuccessListener {
                 Log.d("DETECT", "Ti sei correttamente connesso all'api")
-
             }
 
             task.addOnFailureListener { e: Exception ->
-                // Handle error
                 Log.d("DETECT", "Errore nella connessione all'api")
             }
         } else {
             Log.d("WTF", "WTF")
         }
+    }
+
+    private fun sendCustomBroadcast(action: String) {
+        val intent = Intent(action)
+        requireContext().sendBroadcast(intent)
     }
 }

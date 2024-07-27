@@ -27,7 +27,8 @@ class NewUserActivity : AppCompatActivity() {
             val intentFilter = IntentFilter()
             intentFilter.addAction("com.google.android.gms.location.ACTIVITY_TRANSITION_UPDATE")
 
-            registerReceiver(UserActivityBroadcastReceiver(), intentFilter, 0)
+            registerReceiver(UserActivityBroadcastReceiver(), intentFilter, RECEIVER_NOT_EXPORTED)
+
         }
     }
 
@@ -39,9 +40,9 @@ class NewUserActivity : AppCompatActivity() {
                 showNewActivityPage()
 
                 val intentFilter = IntentFilter()
-                intentFilter.addAction("com.google.android.gms.location.ACTIVITY_TRANSITION_UPDATE")
+                intentFilter.addAction("android.permission.ACTIVITY_RECOGNITION")
 
-                registerReceiver(UserActivityBroadcastReceiver(), intentFilter, 0)
+                registerReceiver(UserActivityBroadcastReceiver(), intentFilter, RECEIVER_NOT_EXPORTED)
             }
         }
     }
