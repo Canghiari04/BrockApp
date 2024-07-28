@@ -27,12 +27,13 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
-            val userAlreadyExists: Boolean = dbHelper.checkIfUserExists(username, password)
-            if (userAlreadyExists) {
+            val userId: Long = dbHelper.getUserId(username, password)
+            if (userId != -1L) {
 
                 val sharedPrefs = context.getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
                 with(sharedPrefs.edit()) {
                     putString("username", username)
+                    putLong("userId", userId)
                     apply()
                 }
 

@@ -15,8 +15,10 @@ import androidx.core.app.ActivityCompat
 import com.example.brockapp.R
 import com.example.brockapp.fragment.PageLoaderActivityFragment
 import androidx.core.content.ContextCompat.registerReceiver
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.detect.UserActivityBroadcastReceiver
 
+val userActivityBroadcastReceiver = UserActivityBroadcastReceiver()
 class NewUserActivity : AppCompatActivity() {
     companion object {
         const val REQUEST_CODE_ACTIVITY_RECOGNITION = 1001
@@ -42,9 +44,9 @@ class NewUserActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        unregisterReceiver(userActivityBroadcastReceiver)
         super.onDestroy()
 
-        unregisterReceiver(UserActivityBroadcastReceiver())
     }
 
     /**
@@ -69,9 +71,9 @@ class NewUserActivity : AppCompatActivity() {
 
     private fun registerActivityRecognition() {
         val intentFilter = IntentFilter("TRANSITIONS_RECEIVER_ACTION")
-
-        registerReceiver(UserActivityBroadcastReceiver(), intentFilter, RECEIVER_NOT_EXPORTED)
+        LocalBroadcastManager.getInstance(this).registerReceiver(userActivityBroadcastReceiver, intentFilter)
     }
+
 
     private fun showNewActivityPage() {
         setContentView(R.layout.new_user_activity)

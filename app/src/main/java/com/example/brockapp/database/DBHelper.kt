@@ -9,7 +9,7 @@ import android.util.Log
 import com.example.brockapp.DATABASE_NAME
 
 
-const val DATABASE_VERSION = 2
+const val DATABASE_VERSION = 3
 class DbHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
@@ -33,6 +33,8 @@ class DbHelper(context: Context) :
         const val PASSWORD = "password"
 
     }
+
+
     override fun onCreate(db: SQLiteDatabase) {
 
         db.execSQL(
@@ -53,30 +55,60 @@ class DbHelper(context: Context) :
      *
      */
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 2) {
+        if (oldVersion < 3) {
             db.execSQL("ALTER TABLE ${UserEntry.TABLE_NAME} RENAME TO ${UserEntry.TABLE_NAME}_old")
 
             db.execSQL(
-                "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.ID} LONG PRIMARY KEY, " +
-                        "${UserEntry.USERNAME} TEXT , ${UserEntry.PASSWORD} TEXT)"
-            )
-            db.execSQL(
-                "INSERT INTO ${UserEntry.TABLE_NAME} (${UserEntry.ID}, ${UserEntry.USERNAME}, ${UserEntry.PASSWORD}) " +
-                        "SELECT ${UserEntry.ID}, ${UserEntry.USERNAME}, ${UserEntry.PASSWORD} FROM ${UserEntry.TABLE_NAME}_old"
+                "CREATE TABLE ${UserEntry.TABLE_NAME} (" +
+                        "${UserEntry.ID} LONG, " +
+                        "${UserEntry.USERNAME} TEXT NOT NULL PRIMARY KEY, " +
+                        "${UserEntry.PASSWORD} TEXT NOT NULL" +
+                        ")"
             )
 
             db.execSQL("DROP TABLE ${UserEntry.TABLE_NAME}_old")
-            db.execSQL("ALTER TABLE ${UserActivityEntry.TABLE_NAME} ADD COLUMN ${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID})")
+
+            db.execSQL("CREATE TABLE USER_ID_SEQUENCE(next_id INTEGER PRIMARY KEY)")
+            db.execSQL("INSERT INTO USER_ID_SEQUENCE VALUES(1)")
+
         }
     }
-    fun insertUser(dbHelper: DbHelper, username: String, password: String) : Long? {
+
+
+    @Synchronized
+    fun getNextUserId(): Long {
+        val db = this.readableDatabase
+
+        val cursor = db.rawQuery("SELECT next_id FROM USER_ID_SEQUENCE", null)
+
+        var nextId = -1L
+        if (cursor.moveToFirst()) {
+            nextId = cursor.getLong(0)
+        }
+
+        cursor.close()
+
+        return nextId
+    }
+
+    @Synchronized
+    fun updateNextUserId() {
+        val db = this.writableDatabase
+        db.execSQL("UPDATE USER_ID_SEQUENCE SET next_id = next_id + 1")
+    }
+
+    fun insertUser(dbHelper: DbHelper, username: String, password: String) : Long {
         val db = dbHelper.writableDatabase
+        val userId = getNextUserId()
+        updateNextUserId()
+
         val contentValues = ContentValues().apply {
+            put(UserEntry.ID, userId)
             put(UserEntry.USERNAME, username)
             put(UserEntry.PASSWORD, password)
         }
 
-        val newRowId = db?.insert(UserEntry.TABLE_NAME, null, contentValues)
+        val newRowId = db.insert(UserEntry.TABLE_NAME, null, contentValues)
         if (newRowId == -1L) {
             Log.e("DB_INSERT", "Errore durante l'inserimento dell'utente: $username")
         } else {
@@ -133,7 +165,7 @@ class DbHelper(context: Context) :
         cursor.close()
     }
 
-    fun checkIfUserExists(username: String, password: String): Boolean {
+    fun getUserId(username: String, password: String): Long {
         val db = this.readableDatabase
 
         val selection = "${UserEntry.USERNAME} = ? AND ${UserEntry.PASSWORD} = ?"
@@ -149,10 +181,38 @@ class DbHelper(context: Context) :
             null
         )
 
-        val userExists = cursor.count > 0
+        var userId = -1L
+
+        if (cursor.moveToFirst()) {
+            // Ottiene l'ID dell'utente dalla colonna 0 del risultato della query
+            userId = cursor.getLong(0)
+        }
+
         cursor.close()
-        return userExists
+        return userId
+    }
+
+    fun checkIfUserIsPresent(username: String, password: String): Boolean {
+        val db = this.readableDatabase
+
+        val selection = "${UserEntry.USERNAME} = ? AND ${UserEntry.PASSWORD} = ?"
+        val selectionArgs = arrayOf(username, password)
+
+        val cursor = db.query(
+            UserEntry.TABLE_NAME,
+            arrayOf(UserEntry.ID),
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+
+        val isPresent = cursor.count > 0
+        cursor.close()
+        return isPresent
 
 
     }
+
 }

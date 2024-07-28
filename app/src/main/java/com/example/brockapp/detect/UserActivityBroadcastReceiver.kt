@@ -7,15 +7,14 @@ import android.util.Log
 import com.example.brockapp.database.DbHelper
 import com.google.android.gms.location.ActivityTransitionResult
 
+
 class UserActivityBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (ActivityTransitionResult.hasResult(intent)) {
-            val result = ActivityTransitionResult.extractResult(intent)!!
-                for(event in result.transitionEvents) {
-                    Log.d("DETECT", event.toString())
-                }
-        } else {
-            Log.d("WTF", "WTF")
-        }
+        val dbHelper = DbHelper(context)
+
+        val sharedPreferences = context.getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getLong("userId", -1)
+
+        Log.d("UserId", userId.toString())
     }
 }

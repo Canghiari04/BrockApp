@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.Chronometer
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.R
 import com.example.brockapp.database.DbHelper
 import com.example.brockapp.detect.UserActivityTransitionManager
@@ -89,6 +90,7 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
         }
-        requireContext().sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
+
 }

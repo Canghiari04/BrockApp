@@ -27,17 +27,18 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             var username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             var password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
-            var userAlreadyExists : Boolean = dbHelper.checkIfUserExists(username, password)
+            var userAlreadyExists : Boolean = dbHelper.checkIfUserIsPresent(username, password)
 
             if(userAlreadyExists){
                 view.findViewById<TextView>(R.id.text_sign_in_error).text = signInCredentialsError
             }
             else {
-                dbHelper.insertUser(dbHelper, username, password)
+                val userId : Long = dbHelper.insertUser(dbHelper, username, password)
 
                 val sharedPrefs = context.getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
                 with(sharedPrefs.edit()) {
                     putString("username", username)
+                    putLong("userId", userId)
                     apply()
                 }
                 startActivity(Intent(activity, PageLoaderActivity::class.java))
