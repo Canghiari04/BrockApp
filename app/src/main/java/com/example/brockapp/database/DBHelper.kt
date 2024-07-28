@@ -9,7 +9,7 @@ import android.util.Log
 import com.example.brockapp.DATABASE_NAME
 
 
-const val DATABASE_VERSION = 3
+const val DATABASE_VERSION = 4
 class DbHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
@@ -55,22 +55,16 @@ class DbHelper(context: Context) :
      *
      */
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 3) {
-            db.execSQL("ALTER TABLE ${UserEntry.TABLE_NAME} RENAME TO ${UserEntry.TABLE_NAME}_old")
+        if (oldVersion < 4) {
+            db.execSQL("ALTER TABLE ${UserActivityEntry.TABLE_NAME} RENAME TO ${UserActivityEntry.TABLE_NAME}_old")
 
             db.execSQL(
-                "CREATE TABLE ${UserEntry.TABLE_NAME} (" +
-                        "${UserEntry.ID} LONG, " +
-                        "${UserEntry.USERNAME} TEXT NOT NULL PRIMARY KEY, " +
-                        "${UserEntry.PASSWORD} TEXT NOT NULL" +
-                        ")"
+                "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
+                        "${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} INTEGER," +
+                        "${UserActivityEntry.TRANSITION_TYPE} INTEGER, ${UserActivityEntry.TIMESTAMP} TEXT)"
             )
 
-            db.execSQL("DROP TABLE ${UserEntry.TABLE_NAME}_old")
-
-            db.execSQL("CREATE TABLE USER_ID_SEQUENCE(next_id INTEGER PRIMARY KEY)")
-            db.execSQL("INSERT INTO USER_ID_SEQUENCE VALUES(1)")
-
+            db.execSQL("DROP TABLE ${UserActivityEntry.TABLE_NAME}_old")
         }
     }
 
@@ -118,17 +112,17 @@ class DbHelper(context: Context) :
     }
 
 
-    fun insertUserActivity(dbHelper: DbHelper, name: String, activityType: String, transitionType: String, timestamp: Long
-    ) : Long?{
+    fun insertUserActivity(activityType: String, transitionType: String, timestamp: String, userId: Long) : Long?{
         // Ottieni il database in modalità scrittura
-        val db = dbHelper.writableDatabase
+        val db = this.writableDatabase
 
         // Crea una nuova mappa di valori, dove i nomi delle colonne sono le chiavi
         val values = ContentValues().apply {
-            put(UserActivityEntry.NAME, name)
+
             put(UserActivityEntry.ACTIVITY_TYPE, activityType)
             put(UserActivityEntry.TRANSITION_TYPE, transitionType)
             put(UserActivityEntry.TIMESTAMP, timestamp)
+            put(UserActivityEntry.USER_ID, userId)
         }
 
         // Inserisci la nuova riga, restituendo il valore della chiave primaria della nuova riga
@@ -140,10 +134,10 @@ class DbHelper(context: Context) :
         val db = dbHelper.readableDatabase
         // Define a projection: the SELECT part of a query
         val projection = arrayOf(BaseColumns._ID,
-            UserActivityEntry.NAME,
             UserActivityEntry.ACTIVITY_TYPE,
             UserActivityEntry.TRANSITION_TYPE,
             UserActivityEntry.TIMESTAMP,
+            UserActivityEntry.USER_ID
             )
         val cursor = db.query(
             UserActivityEntry.TABLE_NAME,

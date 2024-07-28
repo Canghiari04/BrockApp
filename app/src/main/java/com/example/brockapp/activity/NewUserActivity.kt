@@ -44,8 +44,8 @@ class NewUserActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        unregisterReceiver(userActivityBroadcastReceiver)
         super.onDestroy()
+        unregisterReceiver(userActivityBroadcastReceiver)
 
     }
 
