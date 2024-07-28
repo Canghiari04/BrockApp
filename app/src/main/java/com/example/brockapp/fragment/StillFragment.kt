@@ -1,91 +1,88 @@
 package com.example.brockapp.fragment
 
+import com.example.brockapp.database.DbHelper
+
 import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.view.View
+import android.os.Bundle
 import android.widget.Button
-import android.widget.Chronometer
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.R
-import com.example.brockapp.database.DbHelper
-import com.example.brockapp.detect.UserActivityTransitionManager
-import com.google.android.gms.location.ActivityRecognition
-import com.google.android.gms.location.ActivityTransition
+import android.os.SystemClock
+import android.content.Intent
+import android.widget.Chronometer
+import androidx.fragment.app.Fragment
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.ActivityRecognition
+import com.example.brockapp.detect.UserActivityTransitionManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val transitionManager = UserActivityTransitionManager(requireContext())
-        val dbHelper = DbHelper(requireContext())
-
         val chronometer = view.findViewById<Chronometer>(R.id.chronometer)
-        val buttonStart: Button = view.findViewById(R.id.button_start)
-        val buttonStop: Button = view.findViewById(R.id.button_stop)
 
-        var pauseOffset: Long = 0
         var running = false
+        var pauseOffset: Long = 0
 
-        buttonStart.setOnClickListener {
+        view.findViewById<Button>(R.id.button_start).setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
                 chronometer.start()
                 running = true
 
-                buttonStart.isEnabled = false
-                buttonStop.isEnabled = true
+                view.findViewById<Button>(R.id.button_start).isEnabled = false
+                view.findViewById<Button>(R.id.button_stop).isEnabled = true
             }
 
             startDetection(transitionManager)
         }
 
-        buttonStop.setOnClickListener {
+        view.findViewById<Button>(R.id.button_stop).setOnClickListener {
             if (running) {
                 chronometer.stop()
                 pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
-                buttonStart.isEnabled = true
-                buttonStop.isEnabled = false
+                view.findViewById<Button>(R.id.button_start).isEnabled = true
+                view.findViewById<Button>(R.id.button_stop).isEnabled = false
             }
+
+            stopDetection(DbHelper(requireContext()), transitionManager)
         }
 
-        buttonStart.isEnabled = true
-        buttonStop.isEnabled = false
+        view.findViewById<Button>(R.id.button_start).isEnabled = true
+        view.findViewById<Button>(R.id.button_stop).isEnabled = false
     }
 
     private fun startDetection(transitionManager: UserActivityTransitionManager) {
-        val context = requireContext()
-
         val request = transitionManager.getRequest()
-        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(context)
+        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
 
+        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            val task = ActivityRecognition.getClient(context)
-                .requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
+            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
 
             task.addOnSuccessListener {
-                Log.d("DETECT", "Ti sei correttamente connesso all'api")
+                Log.d("DETECT", "Connesso all'API activity recognition")
             }
 
-            task.addOnFailureListener { e: Exception ->
-                Log.d("DETECT", "Errore nella connessione all'api")
+            task.addOnFailureListener {
+                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
             }
 
-            simulateFakeActivityTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+            simulateStartActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
         } else {
             Log.d("WTF", "WTF")
         }
     }
 
-    private fun simulateFakeActivityTransition(activityType: Int, transitionType: Int) {
+    private fun simulateStartActivity(activityType: Int, transitionType: Int) {
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
@@ -93,4 +90,7 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 
+    private fun stopDetection(dbHelper: DbHelper, transitionManager: UserActivityTransitionManager) {
+        // TODO --> SAREBBE QUI DA MEMORIZZARE LA FINE DELL'ACTIVITY RECOGNITION
+    }
 }
