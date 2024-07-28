@@ -1,23 +1,37 @@
 package com.example.brockapp.detect
 
-import android.app.PendingIntent
-import android.content.Context
+import com.example.brockapp.REQUEST_CODE_BROADCAST_RECEIVER
+
 import android.content.Intent
+import android.content.Context
+import android.app.PendingIntent
+import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest
-import com.google.android.gms.location.DetectedActivity
 
 class UserActivityTransitionManager(context: Context?) {
-    companion object {
-        const val BROADCAST_RECEIVER_REQUEST_CODE = 0
+    /**
+     * Restituisce il pending intent necessario per risvegliare il broadcast receiver.
+     */
+    fun getPendingIntent(context: Context) : PendingIntent {
+        val intent = Intent(context, UserActivityBroadcastReceiver::class.java)
+
+        return PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE_BROADCAST_RECEIVER,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    fun getRequest() : ActivityTransitionRequest {
+        return ActivityTransitionRequest(getTransitions())
     }
 
     /**
-     * Get della lista delle transition activity di interesse.
-     *
-     * FORSE SAREBBE MEGLIO FARE LISTE PER SINGOLE TRANSIZIONI?
+     * Restituisce la lista delle transition activity di interesse.
      */
-    private fun getTransitions(): List<ActivityTransition> {
+    private fun getTransitions() : List<ActivityTransition> {
         val transitions = mutableListOf<ActivityTransition>()
 
         transitions +=
@@ -57,23 +71,5 @@ class UserActivityTransitionManager(context: Context?) {
                 .build()
 
         return transitions
-    }
-
-    /**
-     * Get della richiesta da avanzare all'api.
-     */
-    fun getRequest() : ActivityTransitionRequest {
-        return ActivityTransitionRequest(getTransitions())
-    }
-
-    fun getPendingIntent(context : Context) : PendingIntent {
-        val intent = Intent(context, UserActivityBroadcastReceiver::class.java)
-
-        return PendingIntent.getBroadcast(
-            context,
-            BROADCAST_RECEIVER_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
     }
 }

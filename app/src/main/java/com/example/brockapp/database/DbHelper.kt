@@ -1,21 +1,24 @@
 package com.example.brockapp.database
 
-import android.content.ContentValues
+import com.example.brockapp.DATABASE_NAME
+import com.example.brockapp.DATABASE_VERSION
+
+import android.util.Log
 import android.content.Context
+import android.provider.BaseColumns
+import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.provider.BaseColumns
-import android.util.Log
-import com.example.brockapp.DATABASE_NAME
 
+class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    object UserEntry {
+        const val TABLE_NAME = "user"
+        const val ID = "id"
+        const val USERNAME = "username"
+        const val PASSWORD = "password"
+    }
 
-const val DATABASE_VERSION = 4
-class DbHelper(context: Context) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-
-
-        // Table contents are grouped together in an anonymous object.
-    object UserActivityEntry : BaseColumns {
+    object UserActivityEntry {
         const val TABLE_NAME = "user_activity"
         const val ID = "id"
         const val NAME = "name"
@@ -25,75 +28,40 @@ class DbHelper(context: Context) :
         const val TIMESTAMP = "timestamp"
     }
 
-
-    object UserEntry {
-        const val TABLE_NAME = "user"
-        const val ID = "id"
-        const val USERNAME = "username"
-        const val PASSWORD = "password"
-
-    }
-
-
+    /**
+     * Crea le tabelle interne al database.
+     */
     override fun onCreate(db: SQLiteDatabase) {
-
         db.execSQL(
             "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.ID} LONG PRIMARY KEY, " +
-                    "${UserEntry.USERNAME} TEXT , ${UserEntry.PASSWORD} TEXT)"
+                 "${UserEntry.USERNAME} TEXT , ${UserEntry.PASSWORD} TEXT)"
         )
 
         db.execSQL(
             "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
-                    "${UserActivityEntry.NAME} TEXT, ${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} TEXT," +
-                    "${UserActivityEntry.TRANSITION_TYPE} TEXT, ${UserActivityEntry.TIMESTAMP} LONG)"
+                 "${UserActivityEntry.NAME} TEXT, ${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} TEXT," +
+                 "${UserActivityEntry.TRANSITION_TYPE} TEXT, ${UserActivityEntry.TIMESTAMP} LONG)"
         )
-
     }
 
-    /*
-     * Upgradare la versione del db ogni volta che si vuole modificare la struttura delle tabelle
-     *
-     */
+    // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 4) {
             db.execSQL("ALTER TABLE ${UserActivityEntry.TABLE_NAME} RENAME TO ${UserActivityEntry.TABLE_NAME}_old")
 
             db.execSQL(
                 "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
-                        "${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} INTEGER," +
-                        "${UserActivityEntry.TRANSITION_TYPE} INTEGER, ${UserActivityEntry.TIMESTAMP} TEXT)"
+                     "${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} INTEGER," +
+                     "${UserActivityEntry.TRANSITION_TYPE} INTEGER, ${UserActivityEntry.TIMESTAMP} TEXT)"
             )
 
             db.execSQL("DROP TABLE ${UserActivityEntry.TABLE_NAME}_old")
         }
     }
 
-
-    @Synchronized
-    fun getNextUserId(): Long {
-        val db = this.readableDatabase
-
-        val cursor = db.rawQuery("SELECT next_id FROM USER_ID_SEQUENCE", null)
-
-        var nextId = -1L
-        if (cursor.moveToFirst()) {
-            nextId = cursor.getLong(0)
-        }
-
-        cursor.close()
-
-        return nextId
-    }
-
-    @Synchronized
-    fun updateNextUserId() {
-        val db = this.writableDatabase
-        db.execSQL("UPDATE USER_ID_SEQUENCE SET next_id = next_id + 1")
-    }
-
     fun insertUser(dbHelper: DbHelper, username: String, password: String) : Long {
-        val db = dbHelper.writableDatabase
         val userId = getNextUserId()
+
         updateNextUserId()
 
         val contentValues = ContentValues().apply {
@@ -102,43 +70,57 @@ class DbHelper(context: Context) :
             put(UserEntry.PASSWORD, password)
         }
 
-        val newRowId = db.insert(UserEntry.TABLE_NAME, null, contentValues)
+        val newRowId = dbHelper.writableDatabase.insert(UserEntry.TABLE_NAME, null, contentValues)
         if (newRowId == -1L) {
             Log.e("DB_INSERT", "Errore durante l'inserimento dell'utente: $username")
         } else {
             Log.d("DB_INSERT", "Inserimento riuscito con ID: $newRowId")
         }
+
         return newRowId
     }
 
+    @Synchronized
+    fun getNextUserId() : Long {
+        var nextId = -1L
+
+        val cursor = this.readableDatabase.rawQuery("SELECT next_id FROM USER_ID_SEQUENCE", null)
+        if (cursor.moveToFirst()) {
+            nextId = cursor.getLong(0)
+        }
+
+        cursor.close()
+        return nextId
+    }
+
+    @Synchronized
+    fun updateNextUserId() {
+        this.writableDatabase.execSQL("UPDATE USER_ID_SEQUENCE SET next_id = next_id + 1")
+    }
 
     fun insertUserActivity(activityType: String, transitionType: String, timestamp: String, userId: Long) : Long?{
-        // Ottieni il database in modalità scrittura
-        val db = this.writableDatabase
-
-        // Crea una nuova mappa di valori, dove i nomi delle colonne sono le chiavi
         val values = ContentValues().apply {
-
             put(UserActivityEntry.ACTIVITY_TYPE, activityType)
             put(UserActivityEntry.TRANSITION_TYPE, transitionType)
             put(UserActivityEntry.TIMESTAMP, timestamp)
             put(UserActivityEntry.USER_ID, userId)
         }
 
-        // Inserisci la nuova riga, restituendo il valore della chiave primaria della nuova riga
-        val newRowId = db?.insert(UserActivityEntry.TABLE_NAME, null, values)
+        val newRowId = this.writableDatabase?.insert(UserActivityEntry.TABLE_NAME, null, values)
+
         return newRowId
     }
 
-    fun readUserActivity(dbHelper: DbHelper, user: String){
+    fun readUserActivity(dbHelper: DbHelper, user: String) {
         val db = dbHelper.readableDatabase
-        // Define a projection: the SELECT part of a query
+
         val projection = arrayOf(BaseColumns._ID,
             UserActivityEntry.ACTIVITY_TYPE,
             UserActivityEntry.TRANSITION_TYPE,
             UserActivityEntry.TIMESTAMP,
             UserActivityEntry.USER_ID
-            )
+        )
+
         val cursor = db.query(
             UserActivityEntry.TABLE_NAME,
             projection,
@@ -156,14 +138,17 @@ class DbHelper(context: Context) :
                 items.add(item)
             }
         }
+
         cursor.close()
     }
 
-    fun getUserId(username: String, password: String): Long {
+    fun getUserId(username: String, password: String) : Long {
         val db = this.readableDatabase
 
         val selection = "${UserEntry.USERNAME} = ? AND ${UserEntry.PASSWORD} = ?"
         val selectionArgs = arrayOf(username, password)
+
+        var userId = -1L
 
         val cursor = db.query(
             UserEntry.TABLE_NAME,
@@ -174,8 +159,6 @@ class DbHelper(context: Context) :
             null,
             null
         )
-
-        var userId = -1L
 
         if (cursor.moveToFirst()) {
             // Ottiene l'ID dell'utente dalla colonna 0 del risultato della query
@@ -205,8 +188,5 @@ class DbHelper(context: Context) :
         val isPresent = cursor.count > 0
         cursor.close()
         return isPresent
-
-
     }
-
 }

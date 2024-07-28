@@ -1,23 +1,22 @@
 package com.example.brockapp.detect
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.util.Log
+import com.example.brockapp.User
 import com.example.brockapp.database.DbHelper
-import com.google.android.gms.location.ActivityTransitionResult
+
+import android.util.Log
 import java.time.Instant
 import java.time.ZoneOffset
+import android.content.Intent
+import android.content.Context
+import android.content.BroadcastReceiver
 import java.time.format.DateTimeFormatter
-
 
 class UserActivityBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        val user = User.getInstance()
         val dbHelper = DbHelper(context)
 
-        val sharedPreferences = context.getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getLong("userId", -1)
-
+        // TODO -> CONTROLLO SULLE ACTITIVITY DI INTERESSE
 
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
@@ -26,8 +25,10 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 
-        dbHelper.insertUserActivity(activityType.toString(), transitionType.toString(), timestamp, userId)
-
-        Log.d("UserId", userId.toString())
+        try {
+            dbHelper.insertUserActivity(activityType.toString(), transitionType.toString(), timestamp, user.id)
+        } catch (e: Exception) {
+            Log.d("INSERT DATABASE", e.toString())
+        }
     }
 }
