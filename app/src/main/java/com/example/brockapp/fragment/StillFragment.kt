@@ -38,6 +38,8 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
 
                 view.findViewById<Button>(R.id.button_start).isEnabled = false
                 view.findViewById<Button>(R.id.button_stop).isEnabled = true
+
+                registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
             }
 
             startDetection(transitionManager)
@@ -51,6 +53,8 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
 
                 view.findViewById<Button>(R.id.button_start).isEnabled = true
                 view.findViewById<Button>(R.id.button_stop).isEnabled = false
+
+                registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
             }
 
             stopDetection(DbHelper(requireContext()), transitionManager)
@@ -76,13 +80,13 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
                 Log.d("DETECT", "Errore di connessione con l'API activity recognition")
             }
 
-            simulateStartActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+            //registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
         } else {
             Log.d("WTF", "WTF")
         }
     }
 
-    private fun simulateStartActivity(activityType: Int, transitionType: Int) {
+    private fun registerTransition(activityType: Int, transitionType: Int) {
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
