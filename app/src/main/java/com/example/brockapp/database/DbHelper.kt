@@ -18,6 +18,11 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         const val PASSWORD = "password"
     }
 
+    object UserIdSequence {
+        const val TABLE_NAME = "user_id_sequence"
+        const val ID = "next_id"
+    }
+
     object UserActivityEntry {
         const val TABLE_NAME = "user_activity"
         const val ID = "id"
@@ -38,6 +43,10 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         )
 
         db.execSQL(
+            "CREATE TABLE IF NOT EXISTS ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID} INTEGER PRIMARY KEY)"
+        )
+
+        db.execSQL(
             "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
                  "${UserActivityEntry.NAME} TEXT, ${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} TEXT," +
                  "${UserActivityEntry.TRANSITION_TYPE} TEXT, ${UserActivityEntry.TIMESTAMP} LONG)"
@@ -46,16 +55,37 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 4) {
-            db.execSQL("ALTER TABLE ${UserActivityEntry.TABLE_NAME} RENAME TO ${UserActivityEntry.TABLE_NAME}_old")
+        if (oldVersion < 6) {
+            db.execSQL(
+                "DROP TABLE ${UserActivityEntry.TABLE_NAME}"
+            )
+
+            db.execSQL(
+                "DROP TABLE ${UserEntry.TABLE_NAME}"
+            )
+
+            db.execSQL(
+                "DROP TABLE ${UserIdSequence.TABLE_NAME}"
+            )
+
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID} INTEGER PRIMARY KEY)"
+            )
+
+            db.execSQL(
+                "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.ID} LONG PRIMARY KEY, " +
+                        "${UserEntry.USERNAME} TEXT , ${UserEntry.PASSWORD} TEXT)"
+            )
+
+            db.execSQL (
+                "INSERT INTO ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID}) VALUES (1)"
+            )
 
             db.execSQL(
                 "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
                      "${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} INTEGER," +
                      "${UserActivityEntry.TRANSITION_TYPE} INTEGER, ${UserActivityEntry.TIMESTAMP} TEXT)"
             )
-
-            db.execSQL("DROP TABLE ${UserActivityEntry.TABLE_NAME}_old")
         }
     }
 
@@ -84,7 +114,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     fun getNextUserId() : Long {
         var nextId = -1L
 
-        val cursor = this.readableDatabase.rawQuery("SELECT next_id FROM USER_ID_SEQUENCE", null)
+        val cursor = this.readableDatabase.rawQuery("SELECT next_id FROM user_id_sequence", null)
         if (cursor.moveToFirst()) {
             nextId = cursor.getLong(0)
         }
@@ -95,7 +125,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     @Synchronized
     fun updateNextUserId() {
-        this.writableDatabase.execSQL("UPDATE USER_ID_SEQUENCE SET next_id = next_id + 1")
+        this.writableDatabase.execSQL("UPDATE ${UserIdSequence.TABLE_NAME} SET ${UserIdSequence.ID} = ${UserIdSequence.ID} + 1")
     }
 
     fun insertUserActivity(activityType: String, transitionType: String, timestamp: String, userId: Long) : Long?{

@@ -20,6 +20,10 @@ class PageLoaderActivity : AppCompatActivity()  {
                     startActivity(Intent(this, HomeActivity::class.java))
                     true
                 }
+                R.id.navbar_item_activities -> {
+                    startActivity(Intent(this, CalendarActivity::class.java))
+                    true
+                }
                 R.id.navbar_item_plus -> {
                     startActivity(Intent(this, NewUserActivity::class.java))
                     true

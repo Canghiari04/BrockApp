@@ -53,7 +53,7 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
                 view.findViewById<Button>(R.id.button_stop).isEnabled = false
             }
 
-            stopDetection(DbHelper(requireContext()), transitionManager)
+            simulateActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
         }
 
         view.findViewById<Button>(R.id.button_start).isEnabled = true
@@ -76,21 +76,20 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
                 Log.d("DETECT", "Errore di connessione con l'API activity recognition")
             }
 
-            simulateStartActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+            simulateActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
         } else {
             Log.d("WTF", "WTF")
         }
     }
 
-    private fun simulateStartActivity(activityType: Int, transitionType: Int) {
+    private fun simulateActivity(activityType: Int, transitionType: Int) {
+        // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.
+
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
         }
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
-    }
 
-    private fun stopDetection(dbHelper: DbHelper, transitionManager: UserActivityTransitionManager) {
-        // TODO --> SAREBBE QUI DA MEMORIZZARE LA FINE DELL'ACTIVITY RECOGNITION
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 }
