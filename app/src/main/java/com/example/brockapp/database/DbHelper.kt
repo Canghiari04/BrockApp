@@ -56,36 +56,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 6) {
-            db.execSQL(
-                "DROP TABLE ${UserActivityEntry.TABLE_NAME}"
-            )
 
-            db.execSQL(
-                "DROP TABLE ${UserEntry.TABLE_NAME}"
-            )
-
-            db.execSQL(
-                "DROP TABLE ${UserIdSequence.TABLE_NAME}"
-            )
-
-            db.execSQL(
-                "CREATE TABLE IF NOT EXISTS ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID} INTEGER PRIMARY KEY)"
-            )
-
-            db.execSQL(
-                "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.ID} LONG PRIMARY KEY, " +
-                        "${UserEntry.USERNAME} TEXT , ${UserEntry.PASSWORD} TEXT)"
-            )
-
-            db.execSQL (
-                "INSERT INTO ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID}) VALUES (1)"
-            )
-
-            db.execSQL(
-                "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
-                     "${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} INTEGER," +
-                     "${UserActivityEntry.TRANSITION_TYPE} INTEGER, ${UserActivityEntry.TIMESTAMP} TEXT)"
-            )
         }
     }
 
