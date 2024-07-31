@@ -91,5 +91,5 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment) {
         }
 
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
-    } 
+    }
 }
