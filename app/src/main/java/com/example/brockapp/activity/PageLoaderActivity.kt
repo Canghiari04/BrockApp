@@ -1,9 +1,9 @@
 package com.example.brockapp.activity
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import com.example.brockapp.R
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PageLoaderActivity : AppCompatActivity()  {
@@ -12,12 +12,16 @@ class PageLoaderActivity : AppCompatActivity()  {
         setContentView(R.layout.page_loader_activity)
 
         /*
-         * Dall'intent acquisisco la tipologia di fragment che dovrà essere sovrapposta.
+         * Dall'intent acquisisco la tipologia di fragment che dovrà essere posta in primo piano.
          */
         findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navbar_item_home -> {
                     startActivity(Intent(this, HomeActivity::class.java))
+                    true
+                }
+                R.id.navbar_item_activities -> {
+                    startActivity(Intent(this, CalendarActivity::class.java))
                     true
                 }
                 R.id.navbar_item_plus -> {

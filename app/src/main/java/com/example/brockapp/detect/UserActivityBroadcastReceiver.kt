@@ -1,43 +1,46 @@
 package com.example.brockapp.detect
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.util.Log
+import com.example.brockapp.User
 import com.example.brockapp.database.DbHelper
-import com.google.android.gms.location.ActivityTransitionResult
 
-/*
-* BroadcastReceiver è un componente che rimane in ascolto di ricevere intent,
-* in base alla tipologia di intent provvederà a realizzare un determinato comportamento.
-* In questo caso provvederà a definire la tipologia di attività compiuta dall'utente.
-*/
+import android.util.Log
+import java.time.Instant
+import java.time.ZoneOffset
+import android.content.Intent
+import android.content.Context
+import android.content.BroadcastReceiver
+import com.google.android.gms.location.DetectedActivity
+import java.time.format.DateTimeFormatter
+
 class UserActivityBroadcastReceiver : BroadcastReceiver() {
-    /*
-     * Gestione dell'intent per definire la tipologia di attività da detect.
-     */
     override fun onReceive(context: Context, intent: Intent) {
-        /*
-         * Condizione per accertarsi se l'intent contiene un risultato di activity recognition.
-         */
-
+        val user = User.getInstance()
         val dbHelper = DbHelper(context)
 
+        // TODO -> CONTROLLO SULLE ACTITIVITY DI INTERESSE
 
-        if (ActivityTransitionResult.hasResult(intent)) {
-            /*
-             * !! il risultato non può essere null
-             */
-            val result = ActivityTransitionResult.extractResult(intent)!!
+        val activityType = intent.getIntExtra("activityType", -1)
+        val transitionType = intent.getIntExtra("transitionType", -1)
+        val timestamp = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(ZoneOffset.UTC)
+            .format(Instant.now())
 
-            for(event in result.transitionEvents) {
-                Log.d("User Activity", event.toString())
+        try {
+
+            when (activityType) {
+                DetectedActivity.WALKING -> {
+                    val stepNumber = intent.getLongExtra("stepNumber", -1)
+                    dbHelper.insertUserWalkActivity(user.id, transitionType, timestamp, stepNumber)
+                }
+                DetectedActivity.IN_VEHICLE -> {
+                    val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)
+                    dbHelper.insertUserVehicleActivity(user.id, transitionType, timestamp, distanceTravelled)
+                }
             }
-        }
-    }
 
-    private fun saveActivityToDatabase(context: Context, activityType: String, transitionType: String, timestamp: Long) {
-        // Implementa il salvataggio nel database
-        // Puoi usare una coroutine o qualsiasi altro meccanismo di threading per salvare nel database
+        } catch (e: Exception) {
+            Log.d("INSERT DATABASE", e.toString())
+        }
     }
 }
