@@ -1,15 +1,18 @@
 package com.example.brockapp.database
 
-import com.example.brockapp.DATABASE_NAME
-import com.example.brockapp.DATABASE_VERSION
-
-import android.util.Log
-import android.content.Context
 import android.content.ContentValues
+import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import com.example.brockapp.DATABASE_NAME
+import com.example.brockapp.DATABASE_VERSION
+import com.example.brockapp.User
+import com.example.brockapp.mapper.UserStillActivityMapper
+import com.example.brockapp.mapper.UserVehicleActivityMapper
 import com.example.brockapp.mapper.UserWalkActivityMapper
+import java.time.LocalDate
 
 
 class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -69,20 +72,32 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
      * Crea le tabelle interne al database.
      */
     override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS ${UserEntry.TABLE_NAME} (${UserEntry.ID} INTEGER PRIMARY KEY, " +
+                " ${UserEntry.USERNAME} TEXT, ${UserEntry.PASSWORD} TEXT)")
 
-        db.execSQL(
-            "CREATE TABLE IF NOT EXISTS ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID} INTEGER PRIMARY KEY)"
-        )
+        db.execSQL("CREATE TABLE IF NOT EXISTS ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID} INTEGER PRIMARY KEY)")
+        db.execSQL("INSERT INTO ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID}) VALUES (1)")
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS ${ActivityIdSequence.TABLE_NAME} (${ActivityIdSequence.ID} INTEGER PRIMARY KEY)")
+        db.execSQL("INSERT INTO ${ActivityIdSequence.TABLE_NAME} (${ActivityIdSequence.ID}) VALUES (1)")
+
+        db.execSQL("DROP TABLE IF EXISTS ${UserActivityEntry.TABLE_NAME}")
+        db.execSQL("DROP TABLE IF EXISTS ${UserWalkActivity.TABLE_NAME}")
+        db.execSQL("DROP TABLE IF EXISTS ${UserVehicleActivity.TABLE_NAME}")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS ${UserWalkActivity.TABLE_NAME} (${UserWalkActivity.ID} INTEGER PRIMARY KEY, " +
+                "${UserWalkActivity.USER_ID} LONG, ${UserWalkActivity.TRANSITION_TYPE} INTEGER, ${UserWalkActivity.TIMESTAMP} TEXT, ${UserWalkActivity.STEP_NUMBER} INTEGER)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS ${UserVehicleActivity.TABLE_NAME} (${UserVehicleActivity.ID} INTEGER PRIMARY KEY, " +
+                "${UserWalkActivity.USER_ID} LONG, ${UserVehicleActivity.TRANSITION_TYPE} INTEGER, ${UserVehicleActivity.TIMESTAMP} TEXT, ${UserVehicleActivity.DISTANCE_TRAVELLED} DOUBLE)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS ${UserStillActivity.TABLE_NAME} (${UserStillActivity.ID} INTEGER PRIMARY KEY, " +
+                "${UserStillActivity.USER_ID} LONG, ${UserStillActivity.TRANSITION_TYPE} INTEGER, ${UserStillActivity.TIMESTAMP} TEXT)")
     }
 
     // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 8) {
-
-            db.execSQL("CREATE TABLE IF NOT EXISTS ${ActivityIdSequence.TABLE_NAME} (${ActivityIdSequence.ID} INTEGER PRIMARY KEY)")
-            db.execSQL("INSERT INTO ${ActivityIdSequence.TABLE_NAME} (${ActivityIdSequence.ID}) VALUES (1)")
-
+        if (oldVersion < 11) {
             db.execSQL("DROP TABLE IF EXISTS ${UserActivityEntry.TABLE_NAME}")
             db.execSQL("DROP TABLE IF EXISTS ${UserWalkActivity.TABLE_NAME}")
             db.execSQL("DROP TABLE IF EXISTS ${UserVehicleActivity.TABLE_NAME}")
@@ -153,7 +168,6 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     }
 
     fun insertUserWalkActivity(userId: Long, transitionType: Int, timestamp: String, stepNumber: Long) : Long? {
-
         val activityId = getNextActivityId()
         updateNextActivityId()
 
@@ -172,7 +186,6 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     }
 
     fun insertUserVehicleActivity(userId: Long, transitionType: Int, timestamp: String, distanceTravelled: Double): Long? {
-
         val activityId = getNextActivityId()
         updateNextActivityId()
 
@@ -186,8 +199,6 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         return this.writableDatabase?.insert(UserVehicleActivity.TABLE_NAME, null, contentValues)
     }
-
-
 
     fun getUserId(username: String, password: String) : Long {
         val db = this.readableDatabase
@@ -237,25 +248,87 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return isPresent
     }
 
-    fun getUserWalkActivities(db: SQLiteDatabase, userId: Long, date: String): List<UserWalkActivityMapper> {
-        val activities = mutableListOf<UserWalkActivityMapper>()
-        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP", "STEP_NUMBER")
+    fun getUserWalkActivities(userId: Long, date: String) : ArrayList<String>{
+        val db = this.readableDatabase
+        var list = ArrayList<String>()
+
+        val args = arrayOf(userId.toString(), 1.toString())
+        val cursor = db.rawQuery("SELECT ${UserWalkActivity.USER_ID}, ${UserWalkActivity.STEP_NUMBER}, ${UserWalkActivity.TIMESTAMP} FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = ?", args)
+
+        while(cursor.moveToNext()) {
+            val timestamp = cursor.getString(2)
+            list.add(timestamp)
+        }
+
+        cursor.close()
+
+
+//        val activities = mutableListOf<UserWalkActivityMapper>()
+//        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP", "STEP_NUMBER")
+//        val selection = "USER_ID = ? AND TIMESTAMP = ? AND TRANSITION_TYPE = 1"
+//        val selectionArgs = arrayOf(userId.toString(), date)
+//
+//        val cursor: Cursor = db.query(UserWalkActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, null)
+//        while (cursor.moveToNext()) {
+//            val activity = UserWalkActivityMapper(
+//                id = cursor.getLong(cursor.getColumnIndexOrThrow("ID")),
+//                userId = cursor.getLong(cursor.getColumnIndexOrThrow("USER_ID")),
+//                transitionType = cursor.getInt(cursor.getColumnIndexOrThrow("TRANSITION_TYPE")),
+//                timestamp = cursor.getString(cursor.getColumnIndexOrThrow("TIMESTAMP")),
+//                stepNumber = cursor.getInt(cursor.getColumnIndexOrThrow("STEP_NUMBER"))
+//            )
+//            activities.add(activity)
+//        }
+//
+//        cursor.close()
+//        return activities
+        return list
+    }
+
+    fun getUserVehicleActivities(userId: Long, date: String): List<UserVehicleActivityMapper> {
+        val db = this.readableDatabase
+
+        val activities = mutableListOf<UserVehicleActivityMapper>()
+        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP", "DISTANCE_TRAVELLED")
         val selection = "USER_ID = ? AND DATE(TIMESTAMP) = ? AND TRANSITION_TYPE = 1"
         val selectionArgs = arrayOf(userId.toString(), date)
 
-        val cursor: Cursor = db.query(UserWalkActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, null)
+        val cursor: Cursor = db.query(UserVehicleActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, "TIMESTAMP")
         while (cursor.moveToNext()) {
-            val activity = UserWalkActivityMapper(
+            val activity = UserVehicleActivityMapper(
                 id = cursor.getLong(cursor.getColumnIndexOrThrow("ID")),
                 userId = cursor.getLong(cursor.getColumnIndexOrThrow("USER_ID")),
                 transitionType = cursor.getInt(cursor.getColumnIndexOrThrow("TRANSITION_TYPE")),
                 timestamp = cursor.getString(cursor.getColumnIndexOrThrow("TIMESTAMP")),
-                stepNumber = cursor.getInt(cursor.getColumnIndexOrThrow("STEP_NUMBER"))
+                distanceTravelled = cursor.getDouble(cursor.getColumnIndexOrThrow("DISTANCE_TRAVELLED"))
             )
             activities.add(activity)
         }
+
         cursor.close()
         return activities
     }
 
+    fun getUserStillActivities(userId: Long, date: String): List<UserStillActivityMapper> {
+        val db = this.readableDatabase
+
+        val activities = mutableListOf<UserStillActivityMapper>()
+        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP")
+        val selection = "USER_ID = ? AND DATE(TIMESTAMP) = ? AND TRANSITION_TYPE = 1"
+        val selectionArgs = arrayOf(userId.toString(), date)
+
+        val cursor: Cursor = db.query(UserStillActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, "TIMESTAMP")
+        while (cursor.moveToNext()) {
+            val activity = UserStillActivityMapper(
+                id = cursor.getLong(cursor.getColumnIndexOrThrow("ID")),
+                userId = cursor.getLong(cursor.getColumnIndexOrThrow("USER_ID")),
+                transitionType = cursor.getInt(cursor.getColumnIndexOrThrow("TRANSITION_TYPE")),
+                timestamp = cursor.getString(cursor.getColumnIndexOrThrow("TIMESTAMP"))
+            )
+            activities.add(activity)
+        }
+
+        cursor.close()
+        return activities
+    }
 }

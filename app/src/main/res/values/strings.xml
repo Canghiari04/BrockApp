@@ -32,4 +32,5 @@
     <string name="venerdi_text_view">VEN</string>
     <string name="sabato_text_view">SAB</string>
     <string name="domenica_text_view">DOM</string>
+    <string name="description_icon_activity">Activity icon</string>
 </resources>

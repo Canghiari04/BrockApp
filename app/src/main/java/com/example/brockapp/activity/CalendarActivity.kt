@@ -1,10 +1,15 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.R
+import com.example.brockapp.User
+import com.example.brockapp.database.DbHelper
+import com.example.brockapp.calendar.CalendarAdapter
+import com.example.brockapp.calendar.ActivitiesAdapter
+
 import android.os.Bundle
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
-import com.example.brockapp.R
 import android.widget.TextView
 import android.widget.ImageButton
 import java.time.temporal.ChronoUnit
@@ -12,24 +17,22 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.calendar.CalendarAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.brockapp.User
-import com.example.brockapp.database.DbHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class CalendarActivity : AppCompatActivity() {
+    val dbHelper = DbHelper(this)
 
     companion object {
-        var user: User = User.getInstance()
+        val user: User = User.getInstance()
     }
 
-    val dbHelper = DbHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.calendar_activity)
         setDate(LocalDate.now())
 
-        populateRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), findViewById(R.id.calendar_recycler_view))
+        populateCalendarRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), findViewById(R.id.calendar_recycler_view))
 
         val buttonBack = findViewById<ImageButton>(R.id.button_back_month)
         val buttonForward = findViewById<ImageButton>(R.id.button_forward_month)
@@ -40,7 +43,7 @@ class CalendarActivity : AppCompatActivity() {
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() - 1, tokens[0].toInt())
 
-            populateRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
             setDate(date)
         }
 
@@ -50,7 +53,7 @@ class CalendarActivity : AppCompatActivity() {
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() + 1, tokens[0].toInt())
 
-            populateRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
             setDate(date)
         }
     }
@@ -62,10 +65,8 @@ class CalendarActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()
     }
 
-    private fun populateRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
-        val adapterCalendar = CalendarAdapter(days, dates) { date
-            -> onItemClick(date)
-        }
+    private fun populateCalendarRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
+        val adapterCalendar = CalendarAdapter(days, dates, { date -> onItemClick(date) }, {date -> showActivityOfDay(date)})
         val layoutManager = GridLayoutManager(this, 7)
 
         calendar.adapter = adapterCalendar
@@ -116,10 +117,29 @@ class CalendarActivity : AppCompatActivity() {
         return ArrayList(MutableList(daysDistance.toInt()) {""})
     }
 
-    fun onItemClick(date: String) {
+    private fun onItemClick(date: String) {
         val tokens = date.split("/").toList()
         val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
+
         setDate(item)
     }
 
+    private fun showActivityOfDay(date: String) {
+        val listActivityWalk = dbHelper.getUserWalkActivities(user.id, date)
+        val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, date)
+        val listActivityStill = dbHelper.getUserStillActivities(user.id, date)
+
+        // val listActivities = ((listActivityWalk union listActivityVehicle) union listActivityStill)
+
+        // USATA SOLO COME PROVA, DOVREMMO CREARE UNA LISTA CHE COMBINA LE ATTIVITÀ IN ORDINE CRONOLOGICO DAI GET PRECEDENTI.
+        populateActivitiesRecyclerView(ArrayList(MutableList(listActivityWalk.size) {"Walk"}), findViewById(R.id.activities_recycler_view))
+    }
+
+    private fun populateActivitiesRecyclerView(activities: ArrayList<String>, list: RecyclerView) {
+        val adapterActivities = ActivitiesAdapter(activities)
+        val layoutManager = LinearLayoutManager(this)
+
+        list.adapter = adapterActivities
+        list.layoutManager = layoutManager
+    }
 }

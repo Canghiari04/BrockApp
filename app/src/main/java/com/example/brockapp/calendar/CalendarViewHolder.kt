@@ -1,15 +1,13 @@
 package com.example.brockapp.calendar
 
 import android.view.View
-import java.time.LocalDate
 import com.example.brockapp.R
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.selects.select
 
-class CalendarViewHolder(itemView: View, private val onItemClick: (String) -> Unit) : RecyclerView.ViewHolder(itemView) {
+class CalendarViewHolder(itemView: View, private val onItemClick: (String) -> Unit, private val showActivityOfDay: (String) -> Unit) : RecyclerView.ViewHolder(itemView) {
     var selectedItem: View? = null
-    val dayOfMonth = itemView.findViewById<TextView>(R.id.cell_day_text)
+    private val dayOfMonth = itemView.findViewById<TextView>(R.id.cell_day_text)
 
     /**
      *  Associazione dei parametri in input alla view holder in questione.
@@ -23,6 +21,7 @@ class CalendarViewHolder(itemView: View, private val onItemClick: (String) -> Un
         } else {
             itemView.setOnClickListener{
                 onItemClick(date)
+                showActivityOfDay(date)
             }
         }
     }
