@@ -27,18 +27,15 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
             .format(Instant.now())
 
         try {
-            dbHelper.insertUserActivity(activityType.toString(), transitionType.toString(), timestamp, user.id)
 
             when (activityType) {
                 DetectedActivity.WALKING -> {
                     val stepNumber = intent.getLongExtra("stepNumber", -1)
-                    if(stepNumber != -1L)
-                        dbHelper.insertUserWalkActivity(user.id, stepNumber)
+                    dbHelper.insertUserWalkActivity(user.id, transitionType, timestamp, stepNumber)
                 }
                 DetectedActivity.IN_VEHICLE -> {
                     val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)
-                    if(distanceTravelled != -1.0)
-                        dbHelper.insertUserVehicleActivity(user.id, distanceTravelled)
+                    dbHelper.insertUserVehicleActivity(user.id, transitionType, timestamp, distanceTravelled)
                 }
             }
 

@@ -14,8 +14,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.calendar.CalendarAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.brockapp.User
+import com.example.brockapp.database.DbHelper
 
 class CalendarActivity : AppCompatActivity() {
+
+    companion object {
+        var user: User = User.getInstance()
+    }
+
+    val dbHelper = DbHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.calendar_activity)
@@ -112,5 +120,12 @@ class CalendarActivity : AppCompatActivity() {
         val tokens = date.split("/").toList()
         val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
         setDate(item)
+    }
+
+    fun showUserActivityOfDay(date: String){
+
+
+        dbHelper.getUserActivityOfDay(date)
+
     }
 }

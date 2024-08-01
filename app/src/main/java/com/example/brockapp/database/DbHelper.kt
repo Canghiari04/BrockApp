@@ -5,10 +5,12 @@ import com.example.brockapp.DATABASE_VERSION
 
 import android.util.Log
 import android.content.Context
-import android.provider.BaseColumns
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.brockapp.mapper.UserWalkActivityMapper
+
 
 class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     object UserEntry {
@@ -23,10 +25,14 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         const val ID = "next_id"
     }
 
+    object ActivityIdSequence{
+        const val TABLE_NAME = "activity_id_sequence"
+        const val ID = "next_id"
+    }
+
     object UserActivityEntry {
         const val TABLE_NAME = "user_activity"
         const val ID = "id"
-        const val NAME = "name"
         const val USER_ID = "user_id"
         const val ACTIVITY_TYPE = "activity_type"
         const val TRANSITION_TYPE = "transition_type"
@@ -37,6 +43,8 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         const val TABLE_NAME = "user_walk_activity"
         const val ID = "id"
         const val USER_ID = "user_id"
+        const val TRANSITION_TYPE = "transition_type"
+        const val TIMESTAMP = "timestamp"
         const val STEP_NUMBER = "step_number"
     }
 
@@ -44,37 +52,49 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         const val TABLE_NAME = "user_vehicle_activity"
         const val ID = "id"
         const val USER_ID = "user_id"
+        const val TRANSITION_TYPE = "transition_type"
+        const val TIMESTAMP = "timestamp"
         const val DISTANCE_TRAVELLED = "distance_travelled"
+    }
+
+    object UserStillActivity {
+        const val TABLE_NAME = "user_still_activity"
+        const val ID = "id"
+        const val USER_ID = "user_id"
+        const val TRANSITION_TYPE = "transition_type"
+        const val TIMESTAMP = "timestamp"
     }
 
     /**
      * Crea le tabelle interne al database.
      */
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            "CREATE TABLE ${UserEntry.TABLE_NAME} (${UserEntry.ID} LONG PRIMARY KEY, " +
-                 "${UserEntry.USERNAME} TEXT , ${UserEntry.PASSWORD} TEXT)"
-        )
 
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS ${UserIdSequence.TABLE_NAME} (${UserIdSequence.ID} INTEGER PRIMARY KEY)"
         )
 
-        db.execSQL(
-            "CREATE TABLE ${UserActivityEntry.TABLE_NAME} (${UserActivityEntry.ID} INTEGER PRIMARY KEY, " +
-                 "${UserActivityEntry.NAME} TEXT, ${UserActivityEntry.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserActivityEntry.ACTIVITY_TYPE} TEXT," +
-                 "${UserActivityEntry.TRANSITION_TYPE} TEXT, ${UserActivityEntry.TIMESTAMP} LONG)"
-        )
     }
 
     // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 7) {
+        if (oldVersion < 8) {
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS ${ActivityIdSequence.TABLE_NAME} (${ActivityIdSequence.ID} INTEGER PRIMARY KEY)")
+            db.execSQL("INSERT INTO ${ActivityIdSequence.TABLE_NAME} (${ActivityIdSequence.ID}) VALUES (1)")
+
+            db.execSQL("DROP TABLE IF EXISTS ${UserActivityEntry.TABLE_NAME}")
+            db.execSQL("DROP TABLE IF EXISTS ${UserWalkActivity.TABLE_NAME}")
+            db.execSQL("DROP TABLE IF EXISTS ${UserVehicleActivity.TABLE_NAME}")
+
             db.execSQL("CREATE TABLE IF NOT EXISTS ${UserWalkActivity.TABLE_NAME} (${UserWalkActivity.ID} INTEGER PRIMARY KEY, " +
-                    "${UserWalkActivity.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserWalkActivity.STEP_NUMBER} INTEGER)")
+                    "${UserWalkActivity.USER_ID} LONG, ${UserWalkActivity.TRANSITION_TYPE} INTEGER, ${UserWalkActivity.TIMESTAMP} TEXT, ${UserWalkActivity.STEP_NUMBER} INTEGER)")
 
             db.execSQL("CREATE TABLE IF NOT EXISTS ${UserVehicleActivity.TABLE_NAME} (${UserVehicleActivity.ID} INTEGER PRIMARY KEY, " +
-                    "${UserVehicleActivity.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserVehicleActivity.DISTANCE_TRAVELLED} DOUBLE)")
+                    "${UserWalkActivity.USER_ID} LONG, ${UserVehicleActivity.TRANSITION_TYPE} INTEGER, ${UserVehicleActivity.TIMESTAMP} TEXT, ${UserVehicleActivity.DISTANCE_TRAVELLED} DOUBLE)")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS ${UserStillActivity.TABLE_NAME} (${UserStillActivity.ID} INTEGER PRIMARY KEY, " +
+                    "${UserStillActivity.USER_ID} LONG, ${UserStillActivity.TRANSITION_TYPE} INTEGER, ${UserStillActivity.TIMESTAMP} TEXT)")
         }
     }
 
@@ -117,66 +137,50 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         this.writableDatabase.execSQL("UPDATE ${UserIdSequence.TABLE_NAME} SET ${UserIdSequence.ID} = ${UserIdSequence.ID} + 1")
     }
 
-    fun insertUserActivity(activityType: String, transitionType: String, timestamp: String, userId: Long) : Long?{
-        val values = ContentValues().apply {
-            put(UserActivityEntry.ACTIVITY_TYPE, activityType)
-            put(UserActivityEntry.TRANSITION_TYPE, transitionType)
-            put(UserActivityEntry.TIMESTAMP, timestamp)
-            put(UserActivityEntry.USER_ID, userId)
+    @Synchronized
+    fun getNextActivityId() : Long {
+        var nextId = -1L
+        val cursor = this.readableDatabase.rawQuery("SELECT next_id FROM activity_id_sequence", null)
+        if (cursor.moveToFirst()) {
+            nextId = cursor.getLong(0)
         }
-
-        val newRowId = this.writableDatabase?.insert(UserActivityEntry.TABLE_NAME, null, values)
-
-        return newRowId
-    }
-
-    fun readUserActivity(dbHelper: DbHelper, user: String) {
-        val db = dbHelper.readableDatabase
-
-        val projection = arrayOf(BaseColumns._ID,
-            UserActivityEntry.ACTIVITY_TYPE,
-            UserActivityEntry.TRANSITION_TYPE,
-            UserActivityEntry.TIMESTAMP,
-            UserActivityEntry.USER_ID
-        )
-
-        val cursor = db.query(
-            UserActivityEntry.TABLE_NAME,
-            projection,
-            "${UserActivityEntry.NAME} = ?",
-            arrayOf(user),
-            null,
-            null,
-            null
-        )
-
-        val items = mutableListOf<String>()
-        with(cursor) {
-            while (moveToNext()) {
-                val item = getString(getColumnIndexOrThrow(UserActivityEntry.NAME))
-                items.add(item)
-            }
-        }
-
         cursor.close()
+        return nextId
+    }
+    @Synchronized
+    fun updateNextActivityId() {
+        this.writableDatabase.execSQL("UPDATE ${ActivityIdSequence.TABLE_NAME} SET ${ActivityIdSequence.ID} = ${ActivityIdSequence.ID} + 1")
     }
 
-    fun insertUserWalkActivity(userId: Long, stepNumber: Long) : Long? {
+    fun insertUserWalkActivity(userId: Long, transitionType: Int, timestamp: String, stepNumber: Long) : Long? {
+
+        val activityId = getNextActivityId()
+        updateNextActivityId()
+
         val values = ContentValues().apply {
+            put(UserWalkActivity.ID, activityId)
             put(UserWalkActivity.USER_ID, userId)
+            put(UserWalkActivity.TRANSITION_TYPE, transitionType)
+            put(UserWalkActivity.TIMESTAMP, timestamp)
             put(UserWalkActivity.STEP_NUMBER, stepNumber)
 
         }
-
-        val newRowId = this.writableDatabase?.insert(UserActivityEntry.TABLE_NAME, null, values)
+        val newRowId = this.writableDatabase?.insert(UserWalkActivity.TABLE_NAME, null, values)
 
         return newRowId
 
     }
 
-    fun insertUserVehicleActivity(userId: Long, distanceTravelled: Double): Long? {
+    fun insertUserVehicleActivity(userId: Long, transitionType: Int, timestamp: String, distanceTravelled: Double): Long? {
+
+        val activityId = getNextActivityId()
+        updateNextActivityId()
+
         val contentValues = ContentValues().apply {
+            put(UserVehicleActivity.ID, activityId)
             put(UserVehicleActivity.USER_ID, userId)
+            put(UserVehicleActivity.TRANSITION_TYPE, transitionType)
+            put(UserVehicleActivity.TIMESTAMP, timestamp)
             put(UserVehicleActivity.DISTANCE_TRAVELLED, distanceTravelled)
         }
 
@@ -232,4 +236,26 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         cursor.close()
         return isPresent
     }
+
+    fun getUserWalkActivities(db: SQLiteDatabase, userId: Long, date: String): List<UserWalkActivityMapper> {
+        val activities = mutableListOf<UserWalkActivityMapper>()
+        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP", "STEP_NUMBER")
+        val selection = "USER_ID = ? AND DATE(TIMESTAMP) = ? AND TRANSITION_TYPE = 1"
+        val selectionArgs = arrayOf(userId.toString(), date)
+
+        val cursor: Cursor = db.query(UserWalkActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, null)
+        while (cursor.moveToNext()) {
+            val activity = UserWalkActivityMapper(
+                id = cursor.getLong(cursor.getColumnIndexOrThrow("ID")),
+                userId = cursor.getLong(cursor.getColumnIndexOrThrow("USER_ID")),
+                transitionType = cursor.getInt(cursor.getColumnIndexOrThrow("TRANSITION_TYPE")),
+                timestamp = cursor.getString(cursor.getColumnIndexOrThrow("TIMESTAMP")),
+                stepNumber = cursor.getInt(cursor.getColumnIndexOrThrow("STEP_NUMBER"))
+            )
+            activities.add(activity)
+        }
+        cursor.close()
+        return activities
+    }
+
 }

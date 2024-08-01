@@ -21,20 +21,9 @@ class CalendarViewHolder(itemView: View, private val onItemClick: (String) -> Un
         if(date.isEmpty()) {
             itemView.isClickable = false
         } else {
-            itemView.id = dateToInt(date)
             itemView.setOnClickListener{
-//                selectedItem?.setBackgroundResource(0)
-//                itemView.setBackgroundResource(R.drawable.border_red)
-//                selectedItem = itemView
                 onItemClick(date)
             }
         }
-    }
-
-    /**
-     * Funzione attuata per creare un id univico da associare alla view holder a partire dalla data.
-     */
-    private fun dateToInt(date: String): Int {
-        return date.replace("/", "").toInt()
     }
 }
