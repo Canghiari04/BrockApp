@@ -31,9 +31,9 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
 
             when (activityType) {
                 DetectedActivity.WALKING -> {
-                    val stepNumber = intent.getIntExtra("stepNumber", -1)
-                    if(stepNumber != -1)
-                        dbHelper.insertUserWalkActivity(user.id,stepNumber)
+                    val stepNumber = intent.getLongExtra("stepNumber", -1)
+                    if(stepNumber != -1L)
+                        dbHelper.insertUserWalkActivity(user.id, stepNumber)
                 }
                 DetectedActivity.IN_VEHICLE -> {
                     val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)

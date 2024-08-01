@@ -161,7 +161,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         cursor.close()
     }
 
-    fun insertUserWalkActivity(userId: Long, stepNumber: Int) : Long? {
+    fun insertUserWalkActivity(userId: Long, stepNumber: Long) : Long? {
         val values = ContentValues().apply {
             put(UserWalkActivity.USER_ID, userId)
             put(UserWalkActivity.STEP_NUMBER, stepNumber)
