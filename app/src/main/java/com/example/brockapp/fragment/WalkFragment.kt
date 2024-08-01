@@ -1,6 +1,5 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.database.DbHelper
 import android.Manifest
 import android.content.Context
 import android.util.Log
@@ -57,7 +56,7 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
                 startStepCounting()
             }
 
-            startDetection(transitionManager)
+            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, -1L)
         }
 
         view.findViewById<Button>(R.id.button_stop).setOnClickListener {
@@ -73,7 +72,7 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
                 stopStepCounting()
             }
 
-            simulateActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, stepCount.toLong())
         }
 
         view.findViewById<Button>(R.id.button_start).isEnabled = true
@@ -104,34 +103,35 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
 
     }
 
-    private fun startDetection(transitionManager: UserActivityTransitionManager) {
-        val request = transitionManager.getRequest()
-        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
+//    private fun startDetection(transitionManager: UserActivityTransitionManager) {
+//        val request = transitionManager.getRequest()
+//        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
+//
+//        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
+//        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
+//            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
+//
+//            task.addOnSuccessListener {
+//                Log.d("DETECT", "Connesso all'API activity recognition")
+//            }
+//
+//            task.addOnFailureListener {
+//                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
+//            }
+//
+//            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+//        } else {
+//            Log.d("WTF", "WTF")
+//        }
+//    }
 
-        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-
-            task.addOnSuccessListener {
-                Log.d("DETECT", "Connesso all'API activity recognition")
-            }
-
-            task.addOnFailureListener {
-                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-            }
-
-            simulateActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-        } else {
-            Log.d("WTF", "WTF")
-        }
-    }
-
-    private fun simulateActivity(activityType: Int, transitionType: Int) {
+    private fun registerActivity(activityType: Int, transitionType: Int, stepCount : Long) {
         // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.
 
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
+            putExtra("stepNumber", stepCount)
         }
 
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)

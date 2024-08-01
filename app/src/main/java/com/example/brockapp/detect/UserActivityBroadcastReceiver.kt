@@ -9,6 +9,7 @@ import java.time.ZoneOffset
 import android.content.Intent
 import android.content.Context
 import android.content.BroadcastReceiver
+import com.google.android.gms.location.DetectedActivity
 import java.time.format.DateTimeFormatter
 
 class UserActivityBroadcastReceiver : BroadcastReceiver() {
@@ -27,6 +28,20 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
 
         try {
             dbHelper.insertUserActivity(activityType.toString(), transitionType.toString(), timestamp, user.id)
+
+            when (activityType) {
+                DetectedActivity.WALKING -> {
+                    val stepNumber = intent.getIntExtra("stepNumber", -1)
+                    if(stepNumber != -1)
+                        dbHelper.insertUserWalkActivity(user.id,stepNumber)
+                }
+                DetectedActivity.IN_VEHICLE -> {
+                    val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)
+                    if(distanceTravelled != -1.0)
+                        dbHelper.insertUserVehicleActivity(user.id, distanceTravelled)
+                }
+            }
+
         } catch (e: Exception) {
             Log.d("INSERT DATABASE", e.toString())
         }

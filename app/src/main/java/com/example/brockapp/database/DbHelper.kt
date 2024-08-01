@@ -33,6 +33,20 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         const val TIMESTAMP = "timestamp"
     }
 
+    object UserWalkActivity {
+        const val TABLE_NAME = "user_walk_activity"
+        const val ID = "id"
+        const val USER_ID = "user_id"
+        const val STEP_NUMBER = "step_number"
+    }
+
+    object UserVehicleActivity {
+        const val TABLE_NAME = "user_vehicle_activity"
+        const val ID = "id"
+        const val USER_ID = "user_id"
+        const val DISTANCE_TRAVELLED = "distance_travelled"
+    }
+
     /**
      * Crea le tabelle interne al database.
      */
@@ -55,8 +69,12 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 8) {
+        if (oldVersion < 7) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS ${UserWalkActivity.TABLE_NAME} (${UserWalkActivity.ID} INTEGER PRIMARY KEY, " +
+                    "${UserWalkActivity.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserWalkActivity.STEP_NUMBER} INTEGER)")
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS ${UserVehicleActivity.TABLE_NAME} (${UserVehicleActivity.ID} INTEGER PRIMARY KEY, " +
+                    "${UserVehicleActivity.USER_ID} LONG REFERENCES ${UserEntry.TABLE_NAME}(${UserEntry.ID}), ${UserVehicleActivity.DISTANCE_TRAVELLED} DOUBLE)")
         }
     }
 
@@ -142,6 +160,30 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         cursor.close()
     }
+
+    fun insertUserWalkActivity(userId: Long, stepNumber: Int) : Long? {
+        val values = ContentValues().apply {
+            put(UserWalkActivity.USER_ID, userId)
+            put(UserWalkActivity.STEP_NUMBER, stepNumber)
+
+        }
+
+        val newRowId = this.writableDatabase?.insert(UserActivityEntry.TABLE_NAME, null, values)
+
+        return newRowId
+
+    }
+
+    fun insertUserVehicleActivity(userId: Long, distanceTravelled: Double): Long? {
+        val contentValues = ContentValues().apply {
+            put(UserVehicleActivity.USER_ID, userId)
+            put(UserVehicleActivity.DISTANCE_TRAVELLED, distanceTravelled)
+        }
+
+        return this.writableDatabase?.insert(UserVehicleActivity.TABLE_NAME, null, contentValues)
+    }
+
+
 
     fun getUserId(username: String, password: String) : Long {
         val db = this.readableDatabase

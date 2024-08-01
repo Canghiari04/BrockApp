@@ -1,7 +1,5 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.database.DbHelper
-
 import android.Manifest
 import android.util.Log
 import android.view.View
@@ -40,7 +38,7 @@ class VehicleFragment() : Fragment(R.layout.start_stop_activity_fragment) {
                 view.findViewById<Button>(R.id.button_stop).isEnabled = true
             }
 
-            startDetection(transitionManager)
+            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER, -1.0)
         }
 
         view.findViewById<Button>(R.id.button_stop).setOnClickListener {
@@ -52,42 +50,43 @@ class VehicleFragment() : Fragment(R.layout.start_stop_activity_fragment) {
                 view.findViewById<Button>(R.id.button_start).isEnabled = true
                 view.findViewById<Button>(R.id.button_stop).isEnabled = false
             }
-
-            simulateActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+            //TODO implementare lettura distanza percorsa
+            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_EXIT, 1.0)
         }
 
         view.findViewById<Button>(R.id.button_start).isEnabled = true
         view.findViewById<Button>(R.id.button_stop).isEnabled = false
     }
 
-    private fun startDetection(transitionManager: UserActivityTransitionManager) {
-        val request = transitionManager.getRequest()
-        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
+//    private fun startDetection(transitionManager: UserActivityTransitionManager) {
+//        val request = transitionManager.getRequest()
+//        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
+//
+//        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
+//        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
+//            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
+//
+//            task.addOnSuccessListener {
+//                Log.d("DETECT", "Connesso all'API activity recognition")
+//            }
+//
+//            task.addOnFailureListener {
+//                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
+//            }
+//
+//            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+//        } else {
+//            Log.d("WTF", "WTF")
+//        }
+//    }
 
-        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-
-            task.addOnSuccessListener {
-                Log.d("DETECT", "Connesso all'API activity recognition")
-            }
-
-            task.addOnFailureListener {
-                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-            }
-
-            simulateActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-        } else {
-            Log.d("WTF", "WTF")
-        }
-    }
-
-    private fun simulateActivity(activityType: Int, transitionType: Int) {
+    private fun registerActivity(activityType: Int, transitionType: Int, distanceTravelled : Double) {
         // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.
 
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
+            putExtra("distanceTravelled", distanceTravelled)
         }
 
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
