@@ -122,10 +122,4 @@ class CalendarActivity : AppCompatActivity() {
         setDate(item)
     }
 
-    fun showUserActivityOfDay(date: String){
-
-
-        dbHelper.getUserActivityOfDay(date)
-
-    }
 }
