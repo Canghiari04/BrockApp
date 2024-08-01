@@ -55,7 +55,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     // Aggiornare la versione del database ogni volta che si voglia modificare la struttura delle tabelle.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 6) {
+        if (oldVersion < 8) {
 
         }
     }

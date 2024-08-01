@@ -2,90 +2,115 @@ package com.example.brockapp.activity
 
 import android.os.Bundle
 import android.util.Log
+import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.example.brockapp.R
 import android.widget.TextView
 import android.widget.ImageButton
+import java.time.temporal.ChronoUnit
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.R
 import com.example.brockapp.calendar.CalendarAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 
 class CalendarActivity : AppCompatActivity() {
-    private var currentDate: LocalDate = LocalDate.now()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.calendar_activity)
-        setDate(currentDate)
+        setDate(LocalDate.now())
+
+        populateRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), findViewById(R.id.calendar_recycler_view))
 
         val buttonBack = findViewById<ImageButton>(R.id.button_back_month)
         val buttonForward = findViewById<ImageButton>(R.id.button_forward_month)
-        val calendarRecyclerView = findViewById<RecyclerView>(R.id.calendar_recycler_view)
-
-        populateRecyclerView(currentDate, calendarRecyclerView)
 
         buttonBack.setOnClickListener {
-            currentDate = currentDate.minusMonths(1)
-            populateRecyclerView(currentDate, calendarRecyclerView)
-            setDate(currentDate)
+            val strDate = findViewById<TextView>(R.id.date_text_view).text
+            val tokens = strDate.split("/").toList()
+
+            val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() - 1, tokens[0].toInt())
+
+            populateRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            setDate(date)
         }
 
         buttonForward.setOnClickListener {
-            currentDate = currentDate.plusMonths(1)
-            populateRecyclerView(currentDate, calendarRecyclerView)
-            setDate(currentDate)
+            val strDate = findViewById<TextView>(R.id.date_text_view).text
+            val tokens = strDate.split("/").toList()
+
+            val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() + 1, tokens[0].toInt())
+
+            populateRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            setDate(date)
         }
     }
 
-    private fun populateRecyclerView(date: LocalDate, calendar: RecyclerView) {
-        val days = getCurrentDaysWithEmpty(date)
-        val ids = getIdsByDate(date)
-        val adapterCalendar = CalendarAdapter(days, ids)
-        val layoutManager = GridLayoutManager(this, 7) // 7 colonne per i giorni della settimana
+    /**
+     * Metodo attuato per modificare la visualizzazione grafica della data corrente.
+     */
+    private fun setDate(date: LocalDate) {
+        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()
+    }
+
+    private fun populateRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
+        val adapterCalendar = CalendarAdapter(days, dates) { date
+            -> onItemClick(date)
+        }
+        val layoutManager = GridLayoutManager(this, 7)
 
         calendar.adapter = adapterCalendar
         calendar.layoutManager = layoutManager
     }
 
     /**
-     * Funzione attuata per ottenere tutti i giorni di un determinato mese, con spazi vuoti
-     * per allineare il primo giorno del mese con il giorno della settimana corretto.
+     * Funzione attuata per ottenere tutti i giorni di un determinato mese.
      */
-    private fun getCurrentDaysWithEmpty(date: LocalDate): List<String> {
-        val daysInMonth = date.lengthOfMonth()
-        val firstDayOfWeek = date.withDayOfMonth(1).dayOfWeek.value % 7 // 0 = Domenica, 1 = Lunedì, ..., 6 = Sabato
-        val days = mutableListOf<String>()
+    private fun getCurrentDays(date: LocalDate) : ArrayList<String> {
+        var i = 0
+        val list = getList(date)
 
-        // Aggiungi spazi vuoti per i giorni della settimana precedenti il primo giorno del mese
-        for (i in 0 until firstDayOfWeek) {
-            days.add("")
-        }
+        do {
+            i++
+            list.add(i.toString())
+        } while(i < date.month.length(false))
 
-        // Aggiungi i giorni del mese
-        for (day in 1..daysInMonth) {
-            days.add(day.toString())
-        }
-
-        return days
+        return list
     }
 
     /**
-     * Genera una lista di LocalDate per ogni giorno del mese.
+     * Funzione attuata per ottenere tutte le date complete da associare alle molteplici view holder.
      */
-    private fun getIdsByDate(date: LocalDate): ArrayList<LocalDate> {
-        val daysInMonth = date.lengthOfMonth()
-        val ids = ArrayList<LocalDate>(daysInMonth)
+    private fun getDates(date: LocalDate) : ArrayList<String> {
+        var i = 0
+        var myDateId: String
+        val list = getList(date)
 
-        for (day in 1..daysInMonth) {
-            ids.add(LocalDate.of(date.year, date.month, day))
-        }
+        do {
+            try {
+                i++
+                myDateId = i.toString() + "/" + date.monthValue.toString() + "/" + date.year.toString()
+                list.add(myDateId)
+            } catch (e: Exception) {
+                Log.d("CALENDAR", e.toString())
+            }
+        } while(i < date.month.length(false))
 
-        return ids
+        return list
     }
 
-    private fun setDate(date: LocalDate) {
-        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("MM/yyyy"))
+    private fun getList(date: LocalDate): ArrayList<String> {
+        val firstDayOfMonth = LocalDate.of(date.year, date.month, 1)
+        val startOfWeek = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val daysDistance = ChronoUnit.DAYS.between(startOfWeek, firstDayOfMonth)
+
+        return ArrayList(MutableList(daysDistance.toInt()) {""})
+    }
+
+    fun onItemClick(date: String) {
+        val tokens = date.split("/").toList()
+        val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
+        setDate(item)
     }
 }
