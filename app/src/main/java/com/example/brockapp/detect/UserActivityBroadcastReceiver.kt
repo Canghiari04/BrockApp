@@ -9,6 +9,7 @@ import java.time.ZoneOffset
 import android.content.Intent
 import android.content.Context
 import android.content.BroadcastReceiver
+import com.example.brockapp.DATE_FORMAT
 import com.google.android.gms.location.DetectedActivity
 import java.time.format.DateTimeFormatter
 
@@ -22,7 +23,7 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm:ss")
+            .ofPattern(DATE_FORMAT)
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 
@@ -36,6 +37,9 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
                 DetectedActivity.IN_VEHICLE -> {
                     val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)
                     dbHelper.insertUserVehicleActivity(user.id, transitionType, timestamp, distanceTravelled)
+                }
+                DetectedActivity.STILL -> {
+                    dbHelper.insertUserStillActivity(user.id, transitionType, timestamp)
                 }
             }
 

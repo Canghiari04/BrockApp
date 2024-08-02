@@ -1,25 +1,29 @@
-package com.example.brockapp.mapper
+open class UserActivity(
+    open val id: Long,
+    open val userId: Long,
+    open val transitionType: Int,
+    open val timestamp: String
+)
 
 data class UserWalkActivityMapper(
-    val id: Long,
-    val userId: Long,
-    val transitionType: Int,
-    val timestamp: String,
-    val stepNumber: Int
-)
+    override val id: Long,
+    override val userId: Long,
+    override val transitionType: Int,
+    override val timestamp: String,
+    val stepNumber: Long
+) : UserActivity(id, userId, transitionType, timestamp)
 
 data class UserVehicleActivityMapper(
-    val id: Long,
-    val userId: Long,
-    val transitionType: Int,
-    val timestamp: String,
+    override val id: Long,
+    override val userId: Long,
+    override val transitionType: Int,
+    override val timestamp: String,
     val distanceTravelled: Double
-)
+) : UserActivity(id, userId, transitionType, timestamp)
 
 data class UserStillActivityMapper(
-    val id: Long,
-    val userId: Long,
-    val transitionType: Int,
-    val timestamp: String
-)
-
+    override val id: Long,
+    override val userId: Long,
+    override val transitionType: Int,
+    override val timestamp: String
+) : UserActivity(id, userId, transitionType, timestamp)

@@ -1,56 +1,64 @@
 package com.example.brockapp.activity
 
+import UserActivity
+import android.content.Intent
+import com.example.brockapp.R
+import com.example.brockapp.User
+import com.example.brockapp.database.DbHelper
+import com.example.brockapp.calendar.CalendarAdapter
+
 import android.os.Bundle
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
-import com.example.brockapp.R
 import android.widget.TextView
+import java.text.SimpleDateFormat
 import android.widget.ImageButton
 import java.time.temporal.ChronoUnit
 import java.time.format.DateTimeFormatter
+import com.example.brockapp.DATE_SEPARATOR
 import java.time.temporal.TemporalAdjusters
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.calendar.CalendarAdapter
+import com.example.brockapp.calendar.DailyActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.brockapp.User
-import com.example.brockapp.database.DbHelper
 
 class CalendarActivity : AppCompatActivity() {
+    private val dbHelper = DbHelper(this)
 
     companion object {
-        var user: User = User.getInstance()
+        val user: User = User.getInstance()
     }
 
-    val dbHelper = DbHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.calendar_activity)
         setDate(LocalDate.now())
 
-        populateRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), findViewById(R.id.calendar_recycler_view))
+        val calendar = findViewById<RecyclerView>(R.id.calendar_recycler_view)
+
+        populateCalendarRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), calendar)
 
         val buttonBack = findViewById<ImageButton>(R.id.button_back_month)
         val buttonForward = findViewById<ImageButton>(R.id.button_forward_month)
 
         buttonBack.setOnClickListener {
             val strDate = findViewById<TextView>(R.id.date_text_view).text
-            val tokens = strDate.split("/").toList()
+            val tokens = strDate.split(DATE_SEPARATOR).toList()
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() - 1, tokens[0].toInt())
 
-            populateRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
         }
 
         buttonForward.setOnClickListener {
             val strDate = findViewById<TextView>(R.id.date_text_view).text
-            val tokens = strDate.split("/").toList()
+            val tokens = strDate.split(DATE_SEPARATOR).toList()
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() + 1, tokens[0].toInt())
 
-            populateRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
         }
     }
@@ -59,13 +67,11 @@ class CalendarActivity : AppCompatActivity() {
      * Metodo attuato per modificare la visualizzazione grafica della data corrente.
      */
     private fun setDate(date: LocalDate) {
-        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()
+        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()
     }
 
-    private fun populateRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
-        val adapterCalendar = CalendarAdapter(days, dates) { date
-            -> onItemClick(date)
-        }
+    private fun populateCalendarRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
+        val adapterCalendar = CalendarAdapter(days, dates, { date -> onItemClick(date) }, {date -> showActivityOfDay(date)})
         val layoutManager = GridLayoutManager(this, 7)
 
         calendar.adapter = adapterCalendar
@@ -98,7 +104,7 @@ class CalendarActivity : AppCompatActivity() {
         do {
             try {
                 i++
-                myDateId = i.toString() + "/" + date.monthValue.toString() + "/" + date.year.toString()
+                myDateId = i.toString() + DATE_SEPARATOR + date.monthValue.toString() + DATE_SEPARATOR + date.year.toString()
                 list.add(myDateId)
             } catch (e: Exception) {
                 Log.d("CALENDAR", e.toString())
@@ -116,10 +122,18 @@ class CalendarActivity : AppCompatActivity() {
         return ArrayList(MutableList(daysDistance.toInt()) {""})
     }
 
-    fun onItemClick(date: String) {
-        val tokens = date.split("/").toList()
+    private fun onItemClick(date: String) {
+        val tokens = date.split(DATE_SEPARATOR ).toList()
         val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
+
         setDate(item)
     }
 
+    private fun showActivityOfDay(date: String) {
+
+        val intent = Intent(this, DailyActivity::class.java)
+        intent.putExtra("ACTIVITY_DATE", date)
+
+        startActivity(intent)
+    }
 }

@@ -12,7 +12,7 @@
         android:id="@+id/navbar_item_plus"
         android:icon="@drawable/baseline_add_24" />
     <item
-        android:id="@+id/navbar_item_graphics"
+        android:id="@+id/navbar_item_charts"
         android:icon="@drawable/baseline_auto_graph_24"
         android:title="Grafici" />
     <item
