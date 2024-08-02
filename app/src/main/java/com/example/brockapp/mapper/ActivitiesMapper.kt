@@ -5,7 +5,7 @@ data class UserWalkActivityMapper(
     val userId: Long,
     val transitionType: Int,
     val timestamp: String,
-    val stepNumber: Int
+    val stepNumber: Long
 )
 
 data class UserVehicleActivityMapper(

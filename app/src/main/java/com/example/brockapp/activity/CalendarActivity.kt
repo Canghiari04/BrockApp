@@ -136,14 +136,14 @@ class CalendarActivity : AppCompatActivity() {
         val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, startOfDay, endOfDay)
         val listActivityStill = dbHelper.getUserStillActivities(user.id, startOfDay, endOfDay)
 
-        val activityList = listActivityVehicle + listActivityStill + listActivityWalk
+        //val activityList = listActivityVehicle + listActivityStill + listActivityWalk
 
         val dateFormat = SimpleDateFormat(DATE_FORMAT)
 
         // Converte le stringhe in oggetti Date e sortale in ordine cronologico inverso
-        val sortedList = activityList.map { dateFormat.parse(it) to it }
-            .sortedByDescending { it.first }
-            .map { it.second }
+//        val sortedList = activityList.map { dateFormat.parse(it) to it }
+//            .sortedByDescending { it.first }
+//            .map { it.second }
 
 
         // USATA SOLO COME PROVA, DOVREMMO CREARE UNA LISTA CHE COMBINA LE ATTIVITÀ IN ORDINE CRONOLOGICO DAI GET PRECEDENTI.

@@ -38,10 +38,13 @@ android {
 
 dependencies {
 
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.auth)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
 
     implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
         exclude(group = "com.android.support")
