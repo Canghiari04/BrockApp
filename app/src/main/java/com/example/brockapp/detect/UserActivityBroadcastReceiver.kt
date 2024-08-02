@@ -22,7 +22,7 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
-            .ofPattern("dd-MM-yyyy")
+            .ofPattern("dd-MM-yyyy HH:mm:ss")
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 
@@ -36,6 +36,9 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
                 DetectedActivity.IN_VEHICLE -> {
                     val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)
                     dbHelper.insertUserVehicleActivity(user.id, transitionType, timestamp, distanceTravelled)
+                }
+                DetectedActivity.STILL -> {
+                    dbHelper.insertUserStillActivity(user.id, transitionType, timestamp)
                 }
             }
 

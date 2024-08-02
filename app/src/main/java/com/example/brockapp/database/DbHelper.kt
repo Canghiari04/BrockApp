@@ -12,7 +12,9 @@ import com.example.brockapp.User
 import com.example.brockapp.mapper.UserStillActivityMapper
 import com.example.brockapp.mapper.UserVehicleActivityMapper
 import com.example.brockapp.mapper.UserWalkActivityMapper
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Calendar
 
 
 class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -200,6 +202,21 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return this.writableDatabase?.insert(UserVehicleActivity.TABLE_NAME, null, contentValues)
     }
 
+    fun insertUserStillActivity (userId: Long, transitionType: Int, timestamp: String) : Long? {
+        val activityId = getNextActivityId()
+        updateNextActivityId()
+
+        val contentValues = ContentValues().apply {
+            put(UserVehicleActivity.ID, activityId)
+            put(UserVehicleActivity.USER_ID, userId)
+            put(UserVehicleActivity.TRANSITION_TYPE, transitionType)
+            put(UserVehicleActivity.TIMESTAMP, timestamp)
+        }
+
+        return this.writableDatabase?.insert(UserStillActivity.TABLE_NAME, null, contentValues)
+
+    }
+
     fun getUserId(username: String, password: String) : Long {
         val db = this.readableDatabase
 
@@ -248,15 +265,16 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return isPresent
     }
 
-    fun getUserWalkActivities(userId: Long, date: String) : ArrayList<String>{
+    fun getUserWalkActivities(userId: Long, startOfDay: String, endOfDay : String) : ArrayList<String>{
         val db = this.readableDatabase
         var list = ArrayList<String>()
 
-        val args = arrayOf(userId.toString(), 1.toString())
-        val cursor = db.rawQuery("SELECT ${UserWalkActivity.USER_ID}, ${UserWalkActivity.STEP_NUMBER}, ${UserWalkActivity.TIMESTAMP} FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = ?", args)
+
+        val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
+        val cursor = db.rawQuery("SELECT * FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?", args)
 
         while(cursor.moveToNext()) {
-            val timestamp = cursor.getString(2)
+            val timestamp = cursor.getString(3)
             list.add(timestamp)
         }
 
@@ -285,50 +303,62 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return list
     }
 
-    fun getUserVehicleActivities(userId: Long, date: String): List<UserVehicleActivityMapper> {
+    fun getUserVehicleActivities(userId: Long, startOfDay: String, endOfDay : String): List<String> {
         val db = this.readableDatabase
+        var list = ArrayList<String>()
 
-        val activities = mutableListOf<UserVehicleActivityMapper>()
-        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP", "DISTANCE_TRAVELLED")
-        val selection = "USER_ID = ? AND DATE(TIMESTAMP) = ? AND TRANSITION_TYPE = 1"
-        val selectionArgs = arrayOf(userId.toString(), date)
 
-        val cursor: Cursor = db.query(UserVehicleActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, "TIMESTAMP")
-        while (cursor.moveToNext()) {
-            val activity = UserVehicleActivityMapper(
-                id = cursor.getLong(cursor.getColumnIndexOrThrow("ID")),
-                userId = cursor.getLong(cursor.getColumnIndexOrThrow("USER_ID")),
-                transitionType = cursor.getInt(cursor.getColumnIndexOrThrow("TRANSITION_TYPE")),
-                timestamp = cursor.getString(cursor.getColumnIndexOrThrow("TIMESTAMP")),
-                distanceTravelled = cursor.getDouble(cursor.getColumnIndexOrThrow("DISTANCE_TRAVELLED"))
-            )
-            activities.add(activity)
+        val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
+        val cursor = db.rawQuery("SELECT * FROM ${UserVehicleActivity.TABLE_NAME} WHERE ${UserVehicleActivity.USER_ID} = ? AND ${UserVehicleActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?", args)
+
+        while(cursor.moveToNext()) {
+            val timestamp = cursor.getString(3)
+            list.add(timestamp)
         }
 
         cursor.close()
-        return activities
+        return list
     }
 
-    fun getUserStillActivities(userId: Long, date: String): List<UserStillActivityMapper> {
+    fun getUserStillActivities(userId: Long, startOfDay: String, endOfDay : String): List<String> {
         val db = this.readableDatabase
+        var list = ArrayList<String>()
 
-        val activities = mutableListOf<UserStillActivityMapper>()
-        val columns = arrayOf("ID", "USER_ID", "TRANSITION_TYPE", "TIMESTAMP")
-        val selection = "USER_ID = ? AND DATE(TIMESTAMP) = ? AND TRANSITION_TYPE = 1"
-        val selectionArgs = arrayOf(userId.toString(), date)
 
-        val cursor: Cursor = db.query(UserStillActivity.TABLE_NAME, columns, selection, selectionArgs, null, null, "TIMESTAMP")
-        while (cursor.moveToNext()) {
-            val activity = UserStillActivityMapper(
-                id = cursor.getLong(cursor.getColumnIndexOrThrow("ID")),
-                userId = cursor.getLong(cursor.getColumnIndexOrThrow("USER_ID")),
-                transitionType = cursor.getInt(cursor.getColumnIndexOrThrow("TRANSITION_TYPE")),
-                timestamp = cursor.getString(cursor.getColumnIndexOrThrow("TIMESTAMP"))
-            )
-            activities.add(activity)
+        val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
+        val cursor = db.rawQuery("SELECT * FROM ${UserStillActivity.TABLE_NAME} WHERE ${UserStillActivity.USER_ID} = ? AND ${UserStillActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?", args)
+
+        while(cursor.moveToNext()) {
+            val timestamp = cursor.getString(3)
+            list.add(timestamp)
         }
 
         cursor.close()
-        return activities
+        return list
+    }
+
+
+    fun getDayRange(dateStr: String): Pair<String, String> {
+        val inputFormat = SimpleDateFormat("dd-MM-yyyy")
+        val outputFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        val date = inputFormat.parse(dateStr)
+
+        // Inizio del giorno
+        val calendarStart = Calendar.getInstance()
+        calendarStart.time = date
+        calendarStart.set(Calendar.HOUR_OF_DAY, 0)
+        calendarStart.set(Calendar.MINUTE, 0)
+        calendarStart.set(Calendar.SECOND, 0)
+        val startOfDay = outputFormat.format(calendarStart.time)
+
+        // Fine del giorno
+        val calendarEnd = Calendar.getInstance()
+        calendarEnd.time = date
+        calendarEnd.set(Calendar.HOUR_OF_DAY, 23)
+        calendarEnd.set(Calendar.MINUTE, 59)
+        calendarEnd.set(Calendar.SECOND, 59)
+        val endOfDay = outputFormat.format(calendarEnd.time)
+
+        return Pair(startOfDay, endOfDay)
     }
 }

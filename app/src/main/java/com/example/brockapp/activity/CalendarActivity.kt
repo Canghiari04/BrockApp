@@ -62,7 +62,7 @@ class CalendarActivity : AppCompatActivity() {
      * Metodo attuato per modificare la visualizzazione grafica della data corrente.
      */
     private fun setDate(date: LocalDate) {
-        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()
+        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()
     }
 
     private fun populateCalendarRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
@@ -99,7 +99,7 @@ class CalendarActivity : AppCompatActivity() {
         do {
             try {
                 i++
-                myDateId = i.toString() + "/" + date.monthValue.toString() + "/" + date.year.toString()
+                myDateId = i.toString() + "-" + date.monthValue.toString() + "-" + date.year.toString()
                 list.add(myDateId)
             } catch (e: Exception) {
                 Log.d("CALENDAR", e.toString())
@@ -118,16 +118,19 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun onItemClick(date: String) {
-        val tokens = date.split("/").toList()
+        val tokens = date.split("-").toList()
         val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
 
         setDate(item)
     }
 
     private fun showActivityOfDay(date: String) {
-        val listActivityWalk = dbHelper.getUserWalkActivities(user.id, date)
-        val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, date)
-        val listActivityStill = dbHelper.getUserStillActivities(user.id, date)
+
+
+        val (startOfDay, endOfDay) = dbHelper.getDayRange(date)
+        val listActivityWalk = dbHelper.getUserWalkActivities(user.id, startOfDay, endOfDay)
+        val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, startOfDay, endOfDay)
+        val listActivityStill = dbHelper.getUserStillActivities(user.id, startOfDay, endOfDay)
 
         // val listActivities = ((listActivityWalk union listActivityVehicle) union listActivityStill)
 
