@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="10dp">
-    <ImageView
-        android:id="@+id/activity_cell_image"
-        android:src="@drawable/baseline_arrow_forward_24"
-        android:contentDescription="@string/description_icon_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        app:tint="@color/uni_red"/>
-    <TextView
-        android:id="@+id/activity_day_text"
-        android:text=""
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="start"
-        android:layout_marginStart="10dp"
-        android:textSize="20sp"
-        android:textColor="@color/black"/>
-</LinearLayout>
+    android:layout_margin="15dp"
+    app:cardCornerRadius="5dp"
+    android:backgroundTint="@color/uni_red">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+        <ImageView
+            android:id="@+id/activity_cell_image"
+            android:src="@drawable/baseline_arrow_forward_24"
+            android:contentDescription="@string/description_icon_activity"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="5dp"
+            app:tint="@color/white"/>
+        <TextView
+            android:id="@+id/activity_cell_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start|center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+    </androidx.cardview.widget.CardView>

@@ -1,31 +1,29 @@
 package com.example.brockapp.activity
 
+import android.content.Intent
 import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.database.DbHelper
 import com.example.brockapp.calendar.CalendarAdapter
-import com.example.brockapp.calendar.ActivitiesAdapter
 
 import android.os.Bundle
 import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
 import android.widget.TextView
+import java.text.SimpleDateFormat
 import android.widget.ImageButton
 import java.time.temporal.ChronoUnit
 import java.time.format.DateTimeFormatter
+import com.example.brockapp.DATE_SEPARATOR
 import java.time.temporal.TemporalAdjusters
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.calendar.DailyActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.brockapp.DATE_FORMAT
-import com.example.brockapp.DATE_SEPARATOR
-import java.text.SimpleDateFormat
-
 
 class CalendarActivity : AppCompatActivity() {
-    val dbHelper = DbHelper(this)
+    private val dbHelper = DbHelper(this)
 
     companion object {
         val user: User = User.getInstance()
@@ -36,7 +34,9 @@ class CalendarActivity : AppCompatActivity() {
         setContentView(R.layout.calendar_activity)
         setDate(LocalDate.now())
 
-        populateCalendarRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), findViewById(R.id.calendar_recycler_view))
+        val calendar = findViewById<RecyclerView>(R.id.calendar_recycler_view)
+
+        populateCalendarRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), calendar)
 
         val buttonBack = findViewById<ImageButton>(R.id.button_back_month)
         val buttonForward = findViewById<ImageButton>(R.id.button_forward_month)
@@ -47,7 +47,7 @@ class CalendarActivity : AppCompatActivity() {
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() - 1, tokens[0].toInt())
 
-            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
         }
 
@@ -57,7 +57,7 @@ class CalendarActivity : AppCompatActivity() {
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() + 1, tokens[0].toInt())
 
-            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), findViewById(R.id.calendar_recycler_view))
+            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
         }
     }
@@ -129,32 +129,15 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun showActivityOfDay(date: String) {
-
-
         val (startOfDay, endOfDay) = dbHelper.getDayRange(date)
         val listActivityWalk = dbHelper.getUserWalkActivities(user.id, startOfDay, endOfDay)
         val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, startOfDay, endOfDay)
         val listActivityStill = dbHelper.getUserStillActivities(user.id, startOfDay, endOfDay)
 
-        //val activityList = listActivityVehicle + listActivityStill + listActivityWalk
+        val intent = Intent(this, DailyActivity::class.java)
+        intent.putExtra("ACTIVITY_DATE", date)
+        intent.putExtra("ACTIVITIES_LIST", activityList.toTypedArray())
 
-        val dateFormat = SimpleDateFormat(DATE_FORMAT)
-
-        // Converte le stringhe in oggetti Date e sortale in ordine cronologico inverso
-//        val sortedList = activityList.map { dateFormat.parse(it) to it }
-//            .sortedByDescending { it.first }
-//            .map { it.second }
-
-
-        // USATA SOLO COME PROVA, DOVREMMO CREARE UNA LISTA CHE COMBINA LE ATTIVITÀ IN ORDINE CRONOLOGICO DAI GET PRECEDENTI.
-        populateActivitiesRecyclerView(ArrayList(MutableList(listActivityWalk.size) {"Walk"}), findViewById(R.id.activities_recycler_view))
-    }
-
-    private fun populateActivitiesRecyclerView(activities: ArrayList<String>, list: RecyclerView) {
-        val adapterActivities = ActivitiesAdapter(activities)
-        val layoutManager = LinearLayoutManager(this)
-
-        list.adapter = adapterActivities
-        list.layoutManager = layoutManager
+        startActivity(intent)
     }
 }

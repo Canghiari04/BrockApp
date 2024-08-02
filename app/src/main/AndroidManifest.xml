@@ -15,7 +15,7 @@
         android:theme="@style/Theme.BrockApp"
         tools:targetApi="31">
         <activity
-            android:name="com.example.brockapp.activity.MainActivity" android:exported="true">
+            android:name=".activity.MainActivity" android:exported="true">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
@@ -24,10 +24,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.brockapp.activity.PageLoaderActivity">
+            android:name=".activity.PageLoaderActivity">
         </activity>
         <activity
-            android:name="com.example.brockapp.activity.AuthenticatorActivity"
+            android:name=".activity.AuthenticatorActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.HomeActivity"
@@ -48,6 +48,10 @@
         <activity
             android:name=".activity.OptionsActivity"
             android:parentActivityName=".activity.PageLoaderActivity">
+        </activity>
+        <activity
+            android:name=".calendar.DailyActivity"
+            android:parentActivityName=".activity.CalendarActivity">
         </activity>
     </application>
 </manifest>

@@ -22,6 +22,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_margin="2dp"
                 app:tint="@color/white"
                 android:backgroundTint="@color/uni_red">
             </ImageButton>
@@ -43,6 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_margin="2dp"
                 app:tint="@color/white"
                 android:backgroundTint="@color/uni_red">
             </ImageButton>
@@ -50,7 +52,8 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
             <TextView
                 android:text="@string/lunedi_text_view"
                 android:layout_width="0dp"
@@ -114,20 +117,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/calendar_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="10dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/uni_red"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/activities_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="10dp"/>
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
