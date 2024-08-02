@@ -1,5 +1,8 @@
 package com.example.brockapp.database
 
+import UserStillActivityMapper
+import UserVehicleActivityMapper
+import UserWalkActivityMapper
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
@@ -10,9 +13,7 @@ import com.example.brockapp.DATABASE_NAME
 import com.example.brockapp.DATABASE_VERSION
 import com.example.brockapp.DATE_FORMAT
 import com.example.brockapp.User
-import com.example.brockapp.mapper.UserStillActivityMapper
-import com.example.brockapp.mapper.UserVehicleActivityMapper
-import com.example.brockapp.mapper.UserWalkActivityMapper
+import com.example.brockapp.mapper.*
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
@@ -271,7 +272,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         var list = ArrayList<UserWalkActivityMapper>()
 
         val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
-        val cursor = db.rawQuery("SELECT * FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?", args)
+        val cursor = db.rawQuery("SELECT * FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ? ORDER BY TIMESTAMP", args)
 
         while(cursor.moveToNext()) {
             val activityId = cursor.getLong(0)
@@ -300,7 +301,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         var list = ArrayList<UserVehicleActivityMapper>()
 
         val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
-        val cursor = db.rawQuery("SELECT * FROM ${UserVehicleActivity.TABLE_NAME} WHERE ${UserVehicleActivity.USER_ID} = ? AND ${UserVehicleActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?", args)
+        val cursor = db.rawQuery("SELECT * FROM ${UserVehicleActivity.TABLE_NAME} WHERE ${UserVehicleActivity.USER_ID} = ? AND ${UserVehicleActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?  ORDER BY TIMESTAMP", args)
 
         while(cursor.moveToNext()) {
             val activityId = cursor.getLong(0)
@@ -328,7 +329,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         var list = ArrayList<UserStillActivityMapper>()
 
         val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
-        val cursor = db.rawQuery("SELECT * FROM ${UserStillActivity.TABLE_NAME} WHERE ${UserStillActivity.USER_ID} = ? AND ${UserStillActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?", args)
+        val cursor = db.rawQuery("SELECT * FROM ${UserStillActivity.TABLE_NAME} WHERE ${UserStillActivity.USER_ID} = ? AND ${UserStillActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ?  ORDER BY TIMESTAMP", args)
 
         while(cursor.moveToNext()) {
             val activityId = cursor.getLong(0)
@@ -351,7 +352,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     }
 
 
-    fun getDayRange(dateStr: String): Pair<String, String> {
+    fun getDayRange(dateStr: String?): Pair<String, String> {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy")
         val outputFormat = SimpleDateFormat(DATE_FORMAT)
         val date = inputFormat.parse(dateStr)

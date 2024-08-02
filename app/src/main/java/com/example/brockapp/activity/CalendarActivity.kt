@@ -1,5 +1,6 @@
 package com.example.brockapp.activity
 
+import UserActivity
 import android.content.Intent
 import com.example.brockapp.R
 import com.example.brockapp.User
@@ -129,14 +130,9 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun showActivityOfDay(date: String) {
-        val (startOfDay, endOfDay) = dbHelper.getDayRange(date)
-        val listActivityWalk = dbHelper.getUserWalkActivities(user.id, startOfDay, endOfDay)
-        val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, startOfDay, endOfDay)
-        val listActivityStill = dbHelper.getUserStillActivities(user.id, startOfDay, endOfDay)
 
         val intent = Intent(this, DailyActivity::class.java)
         intent.putExtra("ACTIVITY_DATE", date)
-        intent.putExtra("ACTIVITIES_LIST", activityList.toTypedArray())
 
         startActivity(intent)
     }
