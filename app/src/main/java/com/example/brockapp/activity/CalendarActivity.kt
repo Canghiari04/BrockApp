@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import java.text.SimpleDateFormat
 
 class CalendarActivity : AppCompatActivity() {
     val dbHelper = DbHelper(this)
@@ -132,7 +133,15 @@ class CalendarActivity : AppCompatActivity() {
         val listActivityVehicle = dbHelper.getUserVehicleActivities(user.id, startOfDay, endOfDay)
         val listActivityStill = dbHelper.getUserStillActivities(user.id, startOfDay, endOfDay)
 
-        // val listActivities = ((listActivityWalk union listActivityVehicle) union listActivityStill)
+        val activityList = listActivityVehicle + listActivityStill + listActivityWalk
+
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+
+        // Converte le stringhe in oggetti Date e sortale in ordine cronologico inverso
+        val sortedList = activityList.map { dateFormat.parse(it) to it }
+            .sortedByDescending { it.first }
+            .map { it.second }
+
 
         // USATA SOLO COME PROVA, DOVREMMO CREARE UNA LISTA CHE COMBINA LE ATTIVITÀ IN ORDINE CRONOLOGICO DAI GET PRECEDENTI.
         populateActivitiesRecyclerView(ArrayList(MutableList(listActivityWalk.size) {"Walk"}), findViewById(R.id.activities_recycler_view))
