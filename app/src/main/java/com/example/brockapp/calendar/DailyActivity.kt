@@ -2,16 +2,14 @@ package com.example.brockapp.calendar
 
 import UserActivity
 import com.example.brockapp.R
+import com.example.brockapp.database.DbHelper
+import com.example.brockapp.activity.CalendarActivity
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.activity.CalendarActivity
-import com.example.brockapp.database.DbHelper
-import java.time.LocalDate
 
 class DailyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

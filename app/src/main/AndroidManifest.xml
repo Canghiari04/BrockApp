@@ -53,5 +53,6 @@
             android:name=".calendar.DailyActivity"
             android:parentActivityName=".activity.CalendarActivity">
         </activity>
+        <receiver android:name=".geofencing.GeofenceBroadcastReceiver"/>
     </application>
 </manifest>

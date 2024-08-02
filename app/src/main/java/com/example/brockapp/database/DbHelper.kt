@@ -5,17 +5,13 @@ import UserVehicleActivityMapper
 import UserWalkActivityMapper
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.example.brockapp.DATABASE_NAME
 import com.example.brockapp.DATABASE_VERSION
 import com.example.brockapp.DATE_FORMAT
-import com.example.brockapp.User
-import com.example.brockapp.mapper.*
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Calendar
 
 
