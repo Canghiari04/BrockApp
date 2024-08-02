@@ -19,7 +19,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.brockapp.DATE_FORMAT
+import com.example.brockapp.DATE_SEPARATOR
 import java.text.SimpleDateFormat
+
 
 class CalendarActivity : AppCompatActivity() {
     val dbHelper = DbHelper(this)
@@ -40,7 +43,7 @@ class CalendarActivity : AppCompatActivity() {
 
         buttonBack.setOnClickListener {
             val strDate = findViewById<TextView>(R.id.date_text_view).text
-            val tokens = strDate.split("/").toList()
+            val tokens = strDate.split(DATE_SEPARATOR).toList()
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() - 1, tokens[0].toInt())
 
@@ -50,7 +53,7 @@ class CalendarActivity : AppCompatActivity() {
 
         buttonForward.setOnClickListener {
             val strDate = findViewById<TextView>(R.id.date_text_view).text
-            val tokens = strDate.split("/").toList()
+            val tokens = strDate.split(DATE_SEPARATOR).toList()
 
             val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() + 1, tokens[0].toInt())
 
@@ -100,7 +103,7 @@ class CalendarActivity : AppCompatActivity() {
         do {
             try {
                 i++
-                myDateId = i.toString() + "-" + date.monthValue.toString() + "-" + date.year.toString()
+                myDateId = i.toString() + DATE_SEPARATOR + date.monthValue.toString() + DATE_SEPARATOR + date.year.toString()
                 list.add(myDateId)
             } catch (e: Exception) {
                 Log.d("CALENDAR", e.toString())
@@ -119,7 +122,7 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun onItemClick(date: String) {
-        val tokens = date.split("-").toList()
+        val tokens = date.split(DATE_SEPARATOR ).toList()
         val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
 
         setDate(item)
@@ -135,7 +138,7 @@ class CalendarActivity : AppCompatActivity() {
 
         val activityList = listActivityVehicle + listActivityStill + listActivityWalk
 
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        val dateFormat = SimpleDateFormat(DATE_FORMAT)
 
         // Converte le stringhe in oggetti Date e sortale in ordine cronologico inverso
         val sortedList = activityList.map { dateFormat.parse(it) to it }

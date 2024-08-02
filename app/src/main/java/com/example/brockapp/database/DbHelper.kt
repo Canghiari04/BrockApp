@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.example.brockapp.DATABASE_NAME
 import com.example.brockapp.DATABASE_VERSION
+import com.example.brockapp.DATE_FORMAT
 import com.example.brockapp.User
 import com.example.brockapp.mapper.UserStillActivityMapper
 import com.example.brockapp.mapper.UserVehicleActivityMapper
@@ -340,7 +341,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     fun getDayRange(dateStr: String): Pair<String, String> {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy")
-        val outputFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        val outputFormat = SimpleDateFormat(DATE_FORMAT)
         val date = inputFormat.parse(dateStr)
 
         // Inizio del giorno

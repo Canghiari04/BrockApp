@@ -9,6 +9,7 @@ import java.time.ZoneOffset
 import android.content.Intent
 import android.content.Context
 import android.content.BroadcastReceiver
+import com.example.brockapp.DATE_FORMAT
 import com.google.android.gms.location.DetectedActivity
 import java.time.format.DateTimeFormatter
 
@@ -22,7 +23,7 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
-            .ofPattern("dd-MM-yyyy HH:mm:ss")
+            .ofPattern(DATE_FORMAT)
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 

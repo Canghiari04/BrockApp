@@ -42,7 +42,7 @@
             android:parentActivityName=".activity.PageLoaderActivity">
         </activity>
         <activity
-            android:name=".activity.GraphsActivity"
+            android:name=".activity.ChartsActivity"
             android:parentActivityName=".activity.PageLoaderActivity">
         </activity>
         <activity
