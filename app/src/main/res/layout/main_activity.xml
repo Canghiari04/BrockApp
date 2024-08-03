@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
+
         <TextView
             android:textAlignment="center"
             android:text="@string/main_message"
@@ -11,12 +13,14 @@
             android:padding="25dp"
             android:textColor="@color/white"
             android:background="@color/uni_red"
-            android:textSize="20sp"/>
+            android:textSize="20sp" />
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="25dp">
+            android:padding="25dp" >
+
         <Button
             android:id="@+id/button_sign_in"
             android:text="@string/sign_in_button"
@@ -24,7 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red"/>
+            android:backgroundTint="@color/uni_red" />
+
         <Button
             android:id="@+id/button_login"
             android:text="@string/login_button"
@@ -32,7 +37,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red"/>
+            android:backgroundTint="@color/uni_red" />
+
         <Button
             android:id="@+id/button_google"
             android:text="@string/google_button"
@@ -40,7 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red"/>
+            android:backgroundTint="@color/uni_red" />
+
         <Button
             android:id="@+id/button_web_view"
             android:text="@string/web_view_button"
@@ -48,6 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red"/>
+            android:backgroundTint="@color/uni_red" />
     </LinearLayout>
 </LinearLayout>

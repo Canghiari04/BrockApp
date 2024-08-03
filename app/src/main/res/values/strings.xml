@@ -1,28 +1,37 @@
 <resources>
     <string name="app_name">BrockApp</string>
+
     <string name="main_message">Corri con RUNIBO</string>
-    <string name="authenticator_username">Username</string>
-    <string name="authenticator_password">Password</string>
-    <string name="authenticator_message">Ti sei già iscritto all\'applicazione? Clicca qui</string>
     <string name="sign_in_button">SIGN IN</string>
     <string name="login_button">LOGIN</string>
     <string name="google_button">ACCEDI CON GOOGLE</string>
     <string name="web_view_button">REPOSITORY</string>
+
+    <string name="authenticator_username">Username</string>
+    <string name="authenticator_password">Password</string>
+    <string name="authenticator_message">Ti sei già iscritto all\'applicazione? Clicca qui</string>
+
+    <string name="description_error_signin">CREDENZIALI GIA\' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD</string>
+    <string name="description_error_login">CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL\'APPLICAZIONE?</string>
+
+    <string name="permission_title">Permesso richiesto</string>
+    <string name="permission_message">Concedi il permesso dei tuoi spostamenti per usufruire di tutte le funzionalità.</string>
+    <string name="permission_positive_button">Concedi</string>
+    <string name="permission_negative_button">Annulla</string>
+    <string name="permission_setting_button">Settings</string>
+    <string name="permissions_title">Permessi richiesti</string>
+    <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere alla tua posizione per fornire tutte le funzionalità.</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_activity">Attività</string>
+    <string name="menu_plot">Grafici</string>
+    <string name="menu_more">More</string>
+
     <string name="historical_text_view">IL TUO STORICO</string>
     <string name="calendar_text_view">CALENDARIO</string>
     <string name="activity_text_view">LE TUE ATTIVITÀ</string>
     <string name="charts_text_view">I TUOI GRAFICI</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="activity_main_text">Le tue attività</string>
-    <string name="calendar_main_text">Il tuo calendario</string>"
-    <string name="friends_main_text">I tuoi amici</string>"
-    <string name="charts_main_text">I tuoi grafici</string>"
-    <string name="historical_main_text">Il tuo storico</string>"
-    <string name="permission_title">Permesso richiesto</string>
-    <string name="permission_message">Concedi il permesso dei tuoi spostamenti per usufruire di tutte le funzionalità</string>
-    <string name="permission_positive_button">Concedi</string>
-    <string name="permission_negative_button">Annulla</string>
+
     <string name="description_back_month_button">Back arrow</string>
     <string name="description_forward_month_button">Forward arrow</string>
     <string name="lunedi_text_view">LUN</string>
@@ -32,5 +41,21 @@
     <string name="venerdi_text_view">VEN</string>
     <string name="sabato_text_view">SAB</string>
     <string name="domenica_text_view">DOM</string>
+
+    <string name="daily_detect_button">DAILY DETECT</string>
+    <string name="walk_button">CAMMINATA</string>
+    <string name="vehicle_button">VIAGGIO IN MACCHINA</string>
+    <string name="still_button">STILL</string>
+
+    <string name="stop_button">STOP</string>
+    <string name="start_button">START</string>
+
     <string name="description_icon_activity">Activity icon</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="activity_main_text">Le tue attività</string>
+    <string name="historical_main_text">Il tuo storico</string>
+    <string name="calendar_main_text">Il tuo calendario</string>
+    <string name="charts_main_text">I tuoi grafici</string>
+    <string name="friends_main_text">I tuoi amici</string>
 </resources>
