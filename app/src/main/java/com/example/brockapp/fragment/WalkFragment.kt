@@ -16,6 +16,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
@@ -23,7 +24,7 @@ import com.google.android.gms.location.ActivityRecognition
 import com.example.brockapp.detect.UserActivityTransitionManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEventListener {
+class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var stepCounterSensor: Sensor? = null
@@ -40,17 +41,17 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
         }
 
         val transitionManager = UserActivityTransitionManager(requireContext())
-        val chronometer = view.findViewById<Chronometer>(R.id.chronometer)
+        val chronometer = view.findViewById<Chronometer>(R.id.walk_chronometer)
         var pauseOffset: Long = 0
 
-        view.findViewById<Button>(R.id.button_start).setOnClickListener {
+        view.findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
                 chronometer.start()
                 running = true
 
-                view.findViewById<Button>(R.id.button_start).isEnabled = false
-                view.findViewById<Button>(R.id.button_stop).isEnabled = true
+                view.findViewById<Button>(R.id.walk_button_start).isEnabled = false
+                view.findViewById<Button>(R.id.walk_button_stop).isEnabled = true
 
                 // Avvia il contapassi
                 startStepCounting()
@@ -59,14 +60,14 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
             registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, -1L)
         }
 
-        view.findViewById<Button>(R.id.button_stop).setOnClickListener {
+        view.findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
             if (running) {
                 chronometer.stop()
                 pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
-                view.findViewById<Button>(R.id.button_start).isEnabled = true
-                view.findViewById<Button>(R.id.button_stop).isEnabled = false
+                view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
+                view.findViewById<Button>(R.id.walk_button_stop).isEnabled = false
 
                 // Ferma il contapassi
                 stopStepCounting()
@@ -75,8 +76,8 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
             registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, stepCount.toLong())
         }
 
-        view.findViewById<Button>(R.id.button_start).isEnabled = true
-        view.findViewById<Button>(R.id.button_stop).isEnabled = false
+        view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
+        view.findViewById<Button>(R.id.walk_button_stop).isEnabled = false
     }
 
     private fun startStepCounting() {
@@ -95,6 +96,8 @@ class WalkFragment() : Fragment(R.layout.start_stop_activity_fragment), SensorEv
             // Il valore del contapassi è il primo elemento nell'array values
             stepCount = event.values[0].toInt()
             Log.d("StepCount", "Passi: $stepCount")
+
+            view?.findViewById<TextView>(R.id.step_count)?.text = stepCount.toString()
 
         }
     }
