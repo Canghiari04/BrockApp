@@ -1,5 +1,6 @@
 package com.example.brockapp.authenticator
 
+import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.database.DbHelper
 import com.example.brockapp.activity.MainActivity
@@ -7,26 +8,29 @@ import com.example.brockapp.activity.PageLoaderActivity
 
 import android.util.Log
 import android.Manifest
-import android.view.View
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
-import com.example.brockapp.R
 import android.content.Intent
 import android.widget.EditText
-import android.content.Context
-import android.app.AlertDialog
 import android.widget.TextView
+import android.app.AlertDialog
+import android.content.Context
+import android.provider.Settings
+import android.content.pm.PackageManager
+
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 
-class LoginFragment : Fragment(R.layout.login_fragment) {
+class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = ArrayList<String>()
 
     companion object {
-        const val LOGINERROR: String = "CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL'APPLICAZIONE?"
-        val PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val PERMISSIONS = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,36 +53,46 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                 if (hasPermissions(requireContext(), PERMISSIONS)) {
                     startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
                 } else {
-                    if (shouldShowRequestPermissionRationale()) {
-                        showPermissionRationaleDialog()
+                    if(!shouldShowRationaleDialog(PERMISSIONS)) {
+                        permissionLauncher.launch(PERMISSIONS)
                     } else {
-                        permissionsLauncher.launch(PERMISSIONS)
+                        showLocationPermissionRationaleDialog(requireContext())
                     }
                 }
             } else {
-                view.findViewById<TextView>(R.id.text_login_error).text = LOGINERROR
+                view.findViewById<TextView>(R.id.text_login_error).setText(R.string.description_error_login)
             }
         }
     }
 
-    private fun hasPermissions(context: Context, permissions: Array<String>): Boolean = permissions.all {
-        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    private fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
+        return permissions.all {
+            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
-    private fun shouldShowRequestPermissionRationale(): Boolean {
-        return PERMISSIONS.any { ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), it) }
+    private fun shouldShowRationaleDialog(permissions: Array<String>): Boolean {
+        return permissions.any {
+            ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), it)
+        }
     }
 
-    private val permissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+    /**
+     * Variabile privata di tipo ActivityResultLauncher, utilizzata per accertarsi se l'utente abbia
+     * accettato o meno i permessi richiesti.
+     */
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         listPermissions.clear()
 
         for (permission in permissions) {
             when (permission.key) {
                 Manifest.permission.ACCESS_FINE_LOCATION -> {
-                    if (!permission.value) listPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                    if (!permission.value)
+                        listPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
                 Manifest.permission.ACCESS_COARSE_LOCATION -> {
-                    if (!permission.value) listPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    if (!permission.value)
+                        listPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
                 }
                 else -> Log.d("WTF", "WTF")
             }
@@ -87,17 +101,21 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         if (listPermissions.isEmpty()) {
             startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
         } else {
-            showPermissionDialog(requireContext())
+            showLocationPermissionDialog(requireContext())
         }
     }
 
-    private fun showPermissionDialog(context: Context) {
+    /**
+     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
+     * richiesti.
+     */
+    private fun showLocationPermissionDialog(context: Context) {
         AlertDialog.Builder(context)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_message)
+            .setTitle(R.string.permissions_title)
+            .setMessage(R.string.permissions_message)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                permissionsLauncher.launch(PERMISSIONS)
+                permissionLauncher.launch(PERMISSIONS)
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
@@ -107,14 +125,21 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             .show()
     }
 
-    private fun showPermissionRationaleDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("CIAO")
-            .setMessage("CIAO")
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                // TODO PORTARLO AI SETTINGS
+    /**
+     * Metodo attuato per mostrare la finesta di dialogo successiva a differenti eventi "Deny"
+     * dei permessi richiesti. Il metodo risveglierà l'activity settings del dispositivo.
+     */
+    private fun showLocationPermissionRationaleDialog(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.permissions_title)
+            .setMessage(R.string.permissions_message)
+            .setPositiveButton(R.string.permissions_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(requireContext(), MainActivity::class.java))
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+                startActivity(Intent(context, MainActivity::class.java))
             }
             .create()
             .show()

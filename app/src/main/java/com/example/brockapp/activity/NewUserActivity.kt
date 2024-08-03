@@ -1,23 +1,23 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.detect.UserActivityBroadcastReceiver
+import com.example.brockapp.R
 import com.example.brockapp.fragment.PageLoaderActivityFragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.detect.UserActivityBroadcastReceiver
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 
-import android.Manifest
 import android.util.Log
+import android.Manifest
 import android.os.Bundle
 import android.content.Intent
-import com.example.brockapp.R
 import android.app.AlertDialog
 import android.content.IntentFilter
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class NewUserActivity : AppCompatActivity() {
+class NewUserActivity: AppCompatActivity() {
     companion object {
         val userActivityBroadcastReceiver = UserActivityBroadcastReceiver()
     }
@@ -29,6 +29,7 @@ class NewUserActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if(requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showNewActivityPage()
@@ -39,6 +40,7 @@ class NewUserActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(userActivityBroadcastReceiver)
         } catch (e: Exception) {
@@ -48,6 +50,7 @@ class NewUserActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(userActivityBroadcastReceiver)
         } catch (e: Exception) {
@@ -56,14 +59,15 @@ class NewUserActivity : AppCompatActivity() {
     }
 
     /**
-     * Definisce se i permessi di activity recognition siano stati accettati oppure negati.
+     * Metodo attuato per definire se il permesso di activity recognition sia stato accettato
+     * oppure negato.
      */
     private fun checkDetectActivity() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             showNewActivityPage()
             registerActivityRecognition()
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)) {
-            showPermissionDialog()
+            showDetectPermissionDialog()
         } else {
             ActivityCompat.requestPermissions(
                 this,
@@ -74,7 +78,8 @@ class NewUserActivity : AppCompatActivity() {
     }
 
     /**
-     * Richiamato quando i permessi sono accettati. Imposta il corretto fragment all'interno del frame layout dell'activity.
+     * Metodo richiamato quando i permessi sono accettati. Imposta il corretto fragment all'interno
+     * del frame layout dell'activity.
      */
     private fun showNewActivityPage() {
         setContentView(R.layout.new_user_activity)
@@ -85,7 +90,8 @@ class NewUserActivity : AppCompatActivity() {
     }
 
     /**
-     * Registra il broadcast receiver per ricevere successivamente updates riferiti ad activity recognition.
+     * Metodo attuato per registrare il broadcast receiver, affinchè possa ricevere updates relativi
+     * ad activity recognition.
      */
     private fun registerActivityRecognition() {
         try {
@@ -96,9 +102,10 @@ class NewUserActivity : AppCompatActivity() {
     }
 
     /**
-     * Dispone la finestra di dialogo necessaria per accettare i permessi richiesti.
+     * Metodo attuato per mostrare la finestra di dialogo necessaria per accettare i permessi
+     * richiesti.
      */
-    private fun showPermissionDialog() {
+    private fun showDetectPermissionDialog() {
         AlertDialog.Builder(this)
             .setTitle(R.string.permission_title)
             .setMessage(R.string.permission_message)
