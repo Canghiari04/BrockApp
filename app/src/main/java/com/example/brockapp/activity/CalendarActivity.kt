@@ -22,9 +22,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.calendar.DailyActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.brockapp.CALENDAR_DATE_FORMAT
+import com.example.brockapp.CHARTS_DATE_FORMAT
+import java.time.YearMonth
 
 class CalendarActivity : AppCompatActivity() {
     private val dbHelper = DbHelper(this)
+    private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
     companion object {
         val user: User = User.getInstance()
@@ -33,7 +37,7 @@ class CalendarActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.calendar_activity)
-        setDate(LocalDate.now())
+        setDate(LocalDate.of(2024, 8, 31))
 
         val calendar = findViewById<RecyclerView>(R.id.calendar_recycler_view)
 
@@ -44,9 +48,13 @@ class CalendarActivity : AppCompatActivity() {
 
         buttonBack.setOnClickListener {
             val strDate = findViewById<TextView>(R.id.date_text_view).text
-            val tokens = strDate.split(DATE_SEPARATOR).toList()
 
-            val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() - 1, tokens[0].toInt())
+            var date = LocalDate.parse(strDate, formatter)
+
+            date = date.minusMonths(1)
+
+            date.format(formatter)
+
 
             populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
@@ -54,9 +62,10 @@ class CalendarActivity : AppCompatActivity() {
 
         buttonForward.setOnClickListener {
             val strDate = findViewById<TextView>(R.id.date_text_view).text
-            val tokens = strDate.split(DATE_SEPARATOR).toList()
+            var date = LocalDate.parse(strDate, formatter)
 
-            val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt() + 1, tokens[0].toInt())
+            date = date.plusMonths(1)
+            date.format(formatter)
 
             populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
