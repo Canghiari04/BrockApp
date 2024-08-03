@@ -26,17 +26,18 @@
                 app:tint="@color/white"
                 android:backgroundTint="@color/uni_red">
             </ImageButton>
+
             <TextView
                 android:id="@+id/date_text_view"
-                android:text=""
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textAlignment="center"
                 android:textSize="20sp"
-                android:textColor="@color/black">
+                android:textColor="@color/black" >
             </TextView>
+
             <ImageButton
                 android:id="@+id/button_forward_month"
                 android:contentDescription="@string/description_forward_month_button"
@@ -46,14 +47,15 @@
                 android:layout_weight="1"
                 android:layout_margin="2dp"
                 app:tint="@color/white"
-                android:backgroundTint="@color/uni_red">
+                android:backgroundTint="@color/uni_red" >
             </ImageButton>
         </LinearLayout>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="20dp" >
             <TextView
                 android:text="@string/lunedi_text_view"
                 android:layout_width="0dp"
@@ -61,7 +63,8 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
+
             <TextView
                 android:text="@string/martedi_text_view"
                 android:layout_width="0dp"
@@ -69,7 +72,8 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
+
             <TextView
                 android:text="@string/mercoledi_text_view"
                 android:layout_width="0dp"
@@ -77,7 +81,8 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
+
             <TextView
                 android:text="@string/giovedi_text_view"
                 android:layout_width="0dp"
@@ -85,7 +90,8 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
+
             <TextView
                 android:text="@string/venerdi_text_view"
                 android:layout_width="0dp"
@@ -93,14 +99,16 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
+
             <TextView
                 android:text="@string/sabato_text_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textAlignment="center"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
+
             <TextView
                 android:text="@string/domenica_text_view"
                 android:layout_width="0dp"
@@ -108,12 +116,14 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical" >
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/calendar_recycler_view"
                 android:layout_width="match_parent"
