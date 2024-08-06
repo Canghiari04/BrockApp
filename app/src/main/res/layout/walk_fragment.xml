@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp" >
 
     <LinearLayout
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
 
         <Chronometer
             android:id="@+id/walk_chronometer"
@@ -21,28 +22,26 @@
             android:id="@+id/step_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="20sp"
+            android:gravity="center"
             android:layout_marginTop="20dp"
-            android:gravity="center" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/walk_button_stop"
+            android:text="@string/stop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            android:backgroundTint="@color/uni_red"
-            android:text="STOP"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:backgroundTint="@color/uni_red" />
 
         <Button
             android:id="@+id/walk_button_start"
+            android:text="@string/start_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            android:backgroundTint="@color/uni_red"
-            android:text="START"
-            android:textColor="@color/white" />
-
+            android:textColor="@color/white"
+            android:backgroundTint="@color/uni_red" />
     </LinearLayout>
 </LinearLayout>

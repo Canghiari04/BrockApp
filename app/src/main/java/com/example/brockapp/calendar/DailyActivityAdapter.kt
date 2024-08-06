@@ -1,11 +1,13 @@
 package com.example.brockapp.calendar
 
-import android.view.ViewGroup
 import com.example.brockapp.R
+import com.example.brockapp.data.UserActivity
+
+import android.view.ViewGroup
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 
-class DailyActivityAdapter(private val activities: ArrayList<String>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
+class DailyActivityAdapter(private val activities: List<UserActivity>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
         val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.activity_calendar_cell, parent, false)
 
@@ -17,6 +19,6 @@ class DailyActivityAdapter(private val activities: ArrayList<String>) : Recycler
     }
 
     override fun onBindViewHolder(holder: DailyActivityViewHolder, position: Int) {
-        holder.bindActivity(activities[position])
+        holder.bindActivity(activities[position].type)
     }
 }

@@ -1,33 +1,29 @@
 package com.example.brockapp.activity
 
-import UserActivity
 import android.content.Intent
 import com.example.brockapp.R
-import com.example.brockapp.User
-import com.example.brockapp.database.DbHelper
+import com.example.brockapp.data.User
+import com.example.brockapp.DATE_SEPARATOR
+import com.example.brockapp.CALENDAR_DATE_FORMAT
+import com.example.brockapp.calendar.DailyActivity
 import com.example.brockapp.calendar.CalendarAdapter
 
-import android.os.Bundle
+import java.time.Month
 import android.util.Log
+import android.os.Bundle
+import java.time.YearMonth
 import java.time.DayOfWeek
 import java.time.LocalDate
 import android.widget.TextView
-import java.text.SimpleDateFormat
 import android.widget.ImageButton
 import java.time.temporal.ChronoUnit
 import java.time.format.DateTimeFormatter
-import com.example.brockapp.DATE_SEPARATOR
 import java.time.temporal.TemporalAdjusters
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.calendar.DailyActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.brockapp.CALENDAR_DATE_FORMAT
-import com.example.brockapp.CHARTS_DATE_FORMAT
-import java.time.YearMonth
 
 class CalendarActivity : AppCompatActivity() {
-    private val dbHelper = DbHelper(this)
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
     companion object {
@@ -47,23 +43,20 @@ class CalendarActivity : AppCompatActivity() {
         val buttonForward = findViewById<ImageButton>(R.id.button_forward_month)
 
         buttonBack.setOnClickListener {
-            val strDate = findViewById<TextView>(R.id.date_text_view).text
+            val tokens = (findViewById<TextView>(R.id.date_text_view).text).split(" ")
 
-            var date = LocalDate.parse(strDate, formatter)
-
+            var date = getDateByTokens(tokens)
             date = date.minusMonths(1)
-
             date.format(formatter)
-
 
             populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
         }
 
         buttonForward.setOnClickListener {
-            val strDate = findViewById<TextView>(R.id.date_text_view).text
-            var date = LocalDate.parse(strDate, formatter)
+            val tokens = (findViewById<TextView>(R.id.date_text_view).text).split(" ")
 
+            var date = getDateByTokens(tokens)
             date = date.plusMonths(1)
             date.format(formatter)
 
@@ -76,7 +69,8 @@ class CalendarActivity : AppCompatActivity() {
      * Metodo attuato per modificare la visualizzazione grafica della data corrente.
      */
     private fun setDate(date: LocalDate) {
-        findViewById<TextView>(R.id.date_text_view).text = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()
+        val strDate = "${date.month}" + " ${date.year}"
+        findViewById<TextView>(R.id.date_text_view).text = strDate.lowercase()
     }
 
     private fun populateCalendarRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
@@ -131,17 +125,27 @@ class CalendarActivity : AppCompatActivity() {
         return ArrayList(MutableList(daysDistance.toInt()) {""})
     }
 
+    /**
+     * Funzione attuata per ricavare l'ultimo giorno del mese. La LocalDate restituita è utilizzata
+     * per navigare tra i mesi dell'anno circoscritto.
+     */
+    private fun getDateByTokens(tokens: List<String>): LocalDate {
+        val year = tokens[1].toInt()
+        val month = Month.valueOf(tokens[0].uppercase()).value
+        val lastDay = YearMonth.of(year, month).atEndOfMonth()
+
+        return LocalDate.parse(lastDay.toString(), formatter)
+    }
+
     private fun onItemClick(date: String) {
-        val tokens = date.split(DATE_SEPARATOR ).toList()
+        val tokens = date.split(DATE_SEPARATOR).toList()
         val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
 
         setDate(item)
     }
 
     private fun showActivityOfDay(date: String) {
-
-        val intent = Intent(this, DailyActivity::class.java)
-        intent.putExtra("ACTIVITY_DATE", date)
+        val intent = Intent(this, DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
 
         startActivity(intent)
     }

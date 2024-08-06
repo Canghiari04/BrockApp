@@ -1,6 +1,6 @@
 package com.example.brockapp.authenticator
 
-import com.example.brockapp.User
+import com.example.brockapp.data.User
 import com.example.brockapp.database.DbHelper
 import com.example.brockapp.activity.PageLoaderActivity
 
