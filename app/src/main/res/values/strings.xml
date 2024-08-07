@@ -42,6 +42,8 @@
     <string name="sabato_text_view">SAB</string>
     <string name="domenica_text_view">DOM</string>
 
+    <string name="empty_vie">Wow, come è vuoto...</string>
+
     <string name="daily_detect_button">DAILY DETECT</string>
     <string name="walk_button">CAMMINATA</string>
     <string name="vehicle_button">VIAGGIO IN MACCHINA</string>

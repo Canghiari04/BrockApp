@@ -30,11 +30,18 @@ class DailyActivity : AppCompatActivity() {
 
         val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
         val textView = findViewById<TextView>(R.id.date_text_view)
-        textView.text = date
+        textView.text = getPrettyDate(date)
 
         val sortedActivities = getUserActivities(date)
 
         populateDailyActivitiesRecyclerView(sortedActivities, dailyList)
+    }
+
+    private fun getPrettyDate(strDate: String?): String {
+        val tokens = strDate!!.split("-")
+        val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
+
+        return "${date.dayOfWeek}, ${tokens[0]} ${date.month}".lowercase()
     }
 
     /**
