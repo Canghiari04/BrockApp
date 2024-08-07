@@ -11,17 +11,17 @@ class DailyActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
     private val activityTextView = itemView.findViewById<TextView>(R.id.activity_cell_text)
     private val activityImageView = itemView.findViewById<ImageView>(R.id.activity_cell_image)
 
-    fun bindActivity(nameActivity: String) {
-        activityTextView.text = nameActivity
+    fun bindActivity(typeActivity: String) {
+        activityTextView.text = typeActivity
 
-        when(nameActivity) {
-            "Walk" -> {
+        when(typeActivity) {
+            "WALK" -> {
                 activityImageView.setImageResource(R.drawable.baseline_directions_walk_24)
             }
-            "Vehicle" -> {
+            "VEHICLE" -> {
                 activityImageView.setImageResource(R.drawable.baseline_directions_car_24)
             }
-            "Still" -> {
+            "STILL" -> {
                 activityImageView.setImageResource(R.drawable.baseline_chair_24)
             }
         }

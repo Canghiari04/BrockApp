@@ -55,7 +55,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp" >
+            android:layout_margin="10dp" >
             <TextView
                 android:text="@string/lunedi_text_view"
                 android:layout_width="0dp"
@@ -122,7 +122,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/calendar_recycler_view"

@@ -1,32 +1,72 @@
 package com.example.brockapp.activity
 
 import android.os.Bundle
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.CHARTS_DATE_FORMAT
+import com.example.brockapp.DATE_FORMAT
+import com.example.brockapp.DATE_SEPARATOR
 import com.example.brockapp.R
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.utils.ColorTemplate
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+
 
 class ChartsActivity : AppCompatActivity() {
 
 
     private lateinit var barChart: BarChart
     private lateinit var pieChart: PieChart
+    val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.charts_activity)
+        setDate(YearMonth.now())
 
         // Inizializza i grafici
         barChart = findViewById(R.id.barChart)
         pieChart = findViewById(R.id.pieChart)
+        val buttonBack = findViewById<ImageButton>(R.id.charts_button_back_month)
+        val buttonForward = findViewById<ImageButton>(R.id.charts_button_forward_month)
+
+        buttonBack.setOnClickListener {
+            val strDate = findViewById<TextView>(R.id.charts_date_text_view).text
+
+            // Parsing the date string to LocalDate
+            var date = YearMonth.parse(strDate, formatter)
+
+            date = date.minusMonths(1)
+
+            setDate(date)
+        }
+
+        buttonForward.setOnClickListener {
+            val strDate = findViewById<TextView>(R.id.charts_date_text_view).text
+
+            // Parsing the date string to LocalDate
+            var date = YearMonth.parse(strDate, formatter)
+
+            date = date.plusMonths(1)
+
+            setDate(date)
+        }
 
         // Popola l'istogramma
         setupBarChart()
 
         // Popola il diagramma a torta
         setupPieChart()
+
+    }
+
+    private fun setDate(date: YearMonth) {
+        findViewById<TextView>(R.id.charts_date_text_view).text = date.format(DateTimeFormatter.ofPattern("MM-yyyy")).toString()
     }
 
     private fun setupBarChart() {
