@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("kapt") version "1.8.0"
 }
 
 android {
@@ -37,13 +38,13 @@ android {
 }
 
 dependencies {
-
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.auth)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // chart
+    implementation(libs.mpandroidchart)
 
 
     implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
@@ -56,4 +57,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.android.gms/play-services-location
     implementation(libs.play.services.location)
     implementation(libs.material)
+
+    // room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt("androidx.room:room-compiler:2.6.1")
 }
