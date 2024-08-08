@@ -14,7 +14,8 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" >
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/uni_red" >
 
             <Button
                 android:id="@+id/button_daily_detect"
@@ -24,15 +25,15 @@
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/uni_red" >
+                android:textColor="@color/white" >
             </Button>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" >
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/uni_red" >
 
             <Button
                 android:id="@+id/button_still"
@@ -42,15 +43,16 @@
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/uni_red" >
+                android:textColor="@color/white" >
             </Button>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" >
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/uni_red" >
+
             <Button
                 android:id="@+id/button_walk"
                 android:text="@string/walk_button"
@@ -59,15 +61,15 @@
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/uni_red" >
+                android:textColor="@color/white" >
             </Button>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" >
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/uni_red" >
 
             <Button
                 android:id="@+id/button_vehicle"
@@ -77,8 +79,7 @@
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/uni_red" >
+                android:textColor="@color/white" >
             </Button>
         </androidx.cardview.widget.CardView>
     </GridLayout>

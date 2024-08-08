@@ -1,51 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical" >
+        android:layout_margin="20dp">
+
+        <TextView
+            android:id="@+id/login_message_text_view"
+            android:text="@string/login_welcome_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:textSize="22sp"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+        </TextView>
 
         <EditText
             android:id="@+id/text_username"
-            android:inputType="text"
             android:hint="@string/authenticator_username"
+            android:inputType="text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="65dp"
+            android:padding="15dp"
             android:textSize="20sp"
             android:ems="10"
-            android:backgroundTint="@color/uni_red" />
+            android:backgroundTint="@color/uni_red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_message_text_view" />
 
         <EditText
             android:id="@+id/text_password"
-            android:inputType="textPassword"
             android:hint="@string/authenticator_password"
+            android:inputType="textPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:layout_marginTop="25dp"
+            android:padding="15dp"
+            android:backgroundTint="@color/uni_red"
             android:ems="10"
-            android:backgroundTint="@color/uni_red" />
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_username" />
 
         <Button
             android:id="@+id/button_login"
             android:text="@string/login_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="50dp"
             android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red" />
+            android:backgroundTint="@color/uni_red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_password" />
 
-        <TextView
-            android:id="@+id/text_login_error"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="25dp"
-            android:textSize="16sp"
-            android:textAlignment="center" />
-    </LinearLayout>
+            android:layout_height="22dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="115dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_login">
+
+            <TextView
+                android:id="@+id/text_view_sign_up"
+                android:text="@string/message_to_signin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="textEnd"
+                android:textSize="18sp"
+                android:textStyle="bold|italic">
+            </TextView>
+
+            <TextView
+                android:id="@+id/signin_text_view"
+                android:text="@string/on_click_signin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:textAlignment="textStart"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/uni_red">
+            </TextView>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

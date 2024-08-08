@@ -12,6 +12,7 @@ import android.content.Intent
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.brockapp.activity.AuthenticatorActivity
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     companion object {
@@ -31,7 +32,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             val userAlreadyExists: Boolean = dbHelper.checkIfUserIsPresent(username, password)
 
             if(userAlreadyExists){
-                view.findViewById<TextView>(R.id.text_sign_in_error).text = signInCredentialsError
+                // TODO --> FINESTRA DI DIALOGO CHE DICE DI USARE ALTRE CREDENZIALI
             } else {
                 val userId: Long = dbHelper.insertUser(dbHelper, username, password)
 
@@ -41,6 +42,10 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
                 startActivity(Intent(activity, PageLoaderActivity::class.java))
             }
+        }
+
+        view.findViewById<TextView>(R.id.login_text_view).setOnClickListener {
+            startActivity(Intent(activity, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", "LogIn"))
         }
     }
 }

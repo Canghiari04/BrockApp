@@ -13,4 +13,14 @@ object User {
     fun getInstance() : User {
         return instance
     }
+
+    /**
+     * Metodo attuato per "distruggere" l'istanza del Singleton dopo aver effettuato il logout
+     * dall'applicazione
+     */
+    fun logoutUser(user: User) {
+        user.id = 0
+        user.username = ""
+        user.password = ""
+    }
 }

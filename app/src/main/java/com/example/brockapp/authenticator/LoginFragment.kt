@@ -12,6 +12,7 @@ import android.content.Intent
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.brockapp.activity.AuthenticatorActivity
 
 class LoginFragment : Fragment(R.layout.login_fragment) {
     companion object {
@@ -39,8 +40,12 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
                 startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
             } else {
-                view.findViewById<TextView>(R.id.text_login_error).text = loginError
+                // TODO --> FINESTRA DI DIALOGO CHE DICE DEL LOGIN SBAGLIATO
             }
+        }
+
+        view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
+            startActivity(Intent(activity, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", "SignIn"))
         }
     }
 }

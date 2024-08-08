@@ -32,6 +32,10 @@ class PageLoaderActivity : AppCompatActivity()  {
                     startActivity(Intent(this, NewUserActivity::class.java))
                     true
                 }
+                R.id.navbar_item_more -> {
+                    startActivity(Intent(this, MoreActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }

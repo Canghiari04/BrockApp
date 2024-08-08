@@ -46,7 +46,7 @@
             android:parentActivityName=".activity.PageLoaderActivity">
         </activity>
         <activity
-            android:name=".activity.OptionsActivity"
+            android:name=".activity.MoreActivity"
             android:parentActivityName=".activity.PageLoaderActivity">
         </activity>
         <activity

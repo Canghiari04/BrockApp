@@ -9,7 +9,14 @@
 
     <string name="authenticator_username">Username</string>
     <string name="authenticator_password">Password</string>
-    <string name="authenticator_message">Ti sei già iscritto all\'applicazione? Clicca qui</string>
+
+    <string name="login_welcome_text_view">Login</string>
+    <string name="message_to_signin">Non hai un account?</string>
+    <string name="on_click_signin">Signin</string>
+
+    <string name="signin_welcome_text_view">Signin</string>
+    <string name="message_to_login">Hai già un account?</string>
+    <string name="on_click_login">Login</string>
 
     <string name="description_error_signin">CREDENZIALI GIA\' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD</string>
     <string name="description_error_login">CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL\'APPLICAZIONE?</string>
@@ -60,4 +67,20 @@
     <string name="calendar_main_text">Il tuo calendario</string>
     <string name="charts_main_text">I tuoi grafici</string>
     <string name="friends_main_text">I tuoi amici</string>
+
+    <string name="account_text_view">Account</string>
+    <string name="description_icon_account">Account icon</string>
+    <string name="logout_text_view">Logout</string>
+    <string name="description_icon_logout">Logout icon</string>
+    <string name="dangerous_text_view">Zona pericolosa</string>
+    <string name="description_icon_dangerous">Dangerous icon</string>
+    <string name="dangerous_dialog_title">Attenzione</string>
+    <string name="dangerous_dialog_message">Se cliccherai su ELIMINA perderai il tuo account e tutti i dati associati.</string>
+    <string name="dangerous_positive_button">Elimina</string>
+    <string name="dangerous_negative_button">Annulla</string>
+
+    <string name="username_account_dialog">Username:</string>
+    <string name="password_account_dialog">Password:</string>
+
+    <string name="exit_dialog_button">ESCI</string>
 </resources>

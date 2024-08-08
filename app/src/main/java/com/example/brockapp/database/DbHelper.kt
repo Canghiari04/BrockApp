@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.brockapp.data.User
 
 class DbHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     object UserEntry {
@@ -127,6 +128,15 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null,
         }
 
         return newRowId
+    }
+
+    fun deleteUser(userId: Long) {
+        val db = this.writableDatabase
+
+        db.delete(UserEntry.TABLE_NAME, "${UserEntry.ID} = ?", arrayOf(userId.toString()))
+        db.delete(UserWalkActivity.TABLE_NAME, "${UserWalkActivity.ID} = ?", arrayOf(userId.toString()))
+        db.delete(UserVehicleActivity.TABLE_NAME, "${UserVehicleActivity.ID} = ?", arrayOf(userId.toString()))
+        db.delete(UserStillActivity.TABLE_NAME, "${UserStillActivity.ID} = ?", arrayOf(userId.toString()))
     }
 
     @Synchronized
