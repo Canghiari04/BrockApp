@@ -1,11 +1,9 @@
 package com.example.brockapp.calendar
 
+import UserActivity
 import com.example.brockapp.R
-import com.example.brockapp.data.User
-import com.example.brockapp.DATE_FORMAT
-import com.example.brockapp.UNIVERSAL_DATE
 import com.example.brockapp.database.DbHelper
-import com.example.brockapp.data.UserActivity
+import com.example.brockapp.activity.CalendarActivity
 
 import android.os.Bundle
 import java.time.LocalDate
@@ -16,12 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity : AppCompatActivity() {
-    private val dbHelper : DbHelper = DbHelper(this)
-
-    companion object {
-        val user = User.getInstance()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.daily_activity_activity)
@@ -41,8 +33,10 @@ class DailyActivity : AppCompatActivity() {
         val tokens = strDate!!.split("-")
         val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
 
-        return "${date.dayOfWeek}, ${tokens[0]} ${date.month}".lowercase()
-    }
+        val timestamps: List<String> = userActivityList.map { it.timestamp }
+        val walkActivityCount = listActivityWalk.size
+        val vehicleActivityCount = listActivityVehicle.size
+        val stillActivityCount = listActivityStill.size
 
     /**
      * In base al range temporale, è restituita la lista delle attività effettuate dall'utente in

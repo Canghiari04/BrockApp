@@ -12,11 +12,11 @@ class MainActivity : ComponentActivity() {
         setContentView(R.layout.main_activity)
 
         findViewById<Button>(R.id.button_sign_in).setOnClickListener {
-            callAuthenticator("SignIn")
+            callAuthenticator("Signin")
         }
 
         findViewById<Button>(R.id.button_login).setOnClickListener {
-            callAuthenticator("LogIn")
+            callAuthenticator("Login")
         }
 
         findViewById<Button>(R.id.button_google).setOnClickListener {

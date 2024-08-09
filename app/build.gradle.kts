@@ -37,15 +37,10 @@ android {
 }
 
 dependencies {
-
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.auth)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-
-
     implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
         exclude(group = "com.android.support")
     }
@@ -53,7 +48,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    // https://mvnrepository.com/artifact/com.google.android.gms/play-services-location
     implementation(libs.play.services.location)
     implementation(libs.material)
 }

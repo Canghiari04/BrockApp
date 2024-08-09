@@ -271,8 +271,8 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null,
         val db = this.readableDatabase
         val list = ArrayList<UserActivity>()
 
-        val args = arrayOf(userId.toString(), startOfDay, endOfDay)
-        val cursor = db.rawQuery("SELECT * FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = 1 AND TIMESTAMP BETWEEN ? AND ? ORDER BY TIMESTAMP", args)
+        val args = arrayOf(userId.toString(), 1.toString(), startOfDay, endOfDay)
+        val cursor = db.rawQuery("SELECT * FROM ${UserWalkActivity.TABLE_NAME} WHERE ${UserWalkActivity.USER_ID} = ? AND ${UserWalkActivity.TRANSITION_TYPE} = ? AND TIMESTAMP BETWEEN ? AND ? ORDER BY TIMESTAMP", args)
 
         while(cursor.moveToNext()) {
             val activityId = cursor.getLong(0)
@@ -314,7 +314,7 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null,
 
     fun getUserStillActivities(userId: Long, startOfDay: String, endOfDay : String): List<UserActivity> {
         val db = this.readableDatabase
-        val list = ArrayList<UserActivity>()
+        var list = ArrayList<UserStillActivityMapper>()
 
         val args = arrayOf(userId.toString(), startOfDay, endOfDay)
         val cursor = db.rawQuery("SELECT * FROM ${UserStillActivity.TABLE_NAME} WHERE ${UserStillActivity.USER_ID} = ? AND ${UserStillActivity.TRANSITION_TYPE} = 1 AND TIMESTAMP BETWEEN ? AND ?  ORDER BY TIMESTAMP", args)
