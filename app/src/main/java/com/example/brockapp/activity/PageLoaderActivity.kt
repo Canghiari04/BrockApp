@@ -28,6 +28,10 @@ class PageLoaderActivity : AppCompatActivity()  {
                     startActivity(Intent(this, NewUserActivity::class.java))
                     true
                 }
+                R.id.navbar_item_charts ->{
+                    startActivity(Intent(this, ChartsActivity::class.java))
+                    true
+                }
                 R.id.navbar_item_more -> {
                     startActivity(Intent(this, MoreActivity::class.java))
                     true
