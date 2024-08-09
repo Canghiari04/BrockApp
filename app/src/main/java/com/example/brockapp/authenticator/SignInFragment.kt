@@ -7,7 +7,6 @@ import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
 import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.activity.AuthenticatorActivity
 
 import android.util.Log
 import android.Manifest
@@ -17,17 +16,17 @@ import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
-import android.widget.TextView
-import kotlinx.coroutines.launch
 import android.app.AlertDialog
 import android.content.Context
+import kotlinx.coroutines.launch
 import android.provider.Settings
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.lifecycleScope
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import androidx.lifecycle.lifecycleScope
+import com.example.brockapp.activity.MainActivity
 import androidx.activity.result.contract.ActivityResultContracts
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
@@ -50,37 +49,45 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
-            if(username.isNotEmpty() && password.isNotEmpty()) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    val userAlreadyExists = withContext(Dispatchers.IO) {
-                        userDao.checkIfUserIsPresent(username, password)
-                    }
+            var userAlreadyExists = false
+            var userId = 0L
 
-                    if(userAlreadyExists){
-                        Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
-                    } else {
+            if(username.isNotEmpty() && password.isNotEmpty()) {
+                 viewLifecycleOwner.lifecycleScope.launch {
+                     userAlreadyExists = withContext(Dispatchers.IO) {
+                         userDao.checkIfUserIsPresent(username, password)
+                     }
+                 }
+
+                if (userAlreadyExists) {
+                    Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
+                } else {
+                    viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             userDao.insertUser(UserEntity(username = username, password = password))
                         }
+                    }
 
-                        val user = User.getInstance()
+                    val user = User.getInstance()
 
-                        user.id = withContext(Dispatchers.IO) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        userId = withContext(Dispatchers.IO) {
                             userDao.getIdFromUsernameAndPassword(username, password)
                         }
-                        user.username = username
-                        user.password = password
-
-                if(hasPermissions(requireContext(), PERMISSIONS)) {
-                    startActivity(Intent(activity, PageLoaderActivity::class.java))
-                } else {
-                    if(shouldShowRationaleDialog(PERMISSIONS)) {
-                        showLocationPermissionRationaleDialog(requireContext())
-                    } else {
-                        permissionLauncher.launch(PERMISSIONS)
                     }
-                }
+
+                    user.id = userId
+                    user.username = username
+                    user.password = password
+
+                    if (hasPermissions(requireContext(), PERMISSIONS)) {
                         startActivity(Intent(activity, PageLoaderActivity::class.java))
+                    } else {
+                        if (shouldShowRationaleDialog(PERMISSIONS)) {
+                            showLocationPermissionRationaleDialog(requireContext())
+                        } else {
+                            permissionLauncher.launch(PERMISSIONS)
+                        }
                     }
                 }
             } else {

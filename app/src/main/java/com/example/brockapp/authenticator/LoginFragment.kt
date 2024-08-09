@@ -5,32 +5,28 @@ import com.example.brockapp.User
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.activity.AuthenticatorActivity
 
 import android.util.Log
 import android.Manifest
+import android.view.View
 import android.os.Bundle
 import android.widget.Toast
-import android.view.View
 import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
-import android.widget.TextView
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
 import android.app.AlertDialog
 import android.content.Context
+import kotlinx.coroutines.launch
 import android.provider.Settings
-import android.content.pm.PackageManager
-
+import kotlinx.coroutines.withContext
 import androidx.fragment.app.Fragment
-import com.example.brockapp.activity.AuthenticatorActivity
+import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
-import androidx.activity.result.contract.ActivityResultContracts
-import com.example.brockapp.R
+import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.result.contract.ActivityResultContracts
 
 class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = ArrayList<String>()
@@ -48,46 +44,47 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
         val db = BrockDB.getInstance(requireContext())
         val userDao = db.UserDao()
 
+        var userAlreadyExists = false
+        var userId = 0L
+
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val userAlreadyExists = withContext(Dispatchers.IO) {
+                    userAlreadyExists = withContext(Dispatchers.IO) {
                         userDao.checkIfUserIsPresent(username, password)
                     }
+                }
 
-                    // Condizione definita per accertarsi che l'utente sia iscritto all'applicazione.
-                    if(userAlreadyExists) {
-                        // Istanza del singoletto, utilizzata per memorizzare le informazione di accesso dell'utente.
-                        val user = User.getInstance()
+                if (userAlreadyExists) {
+                    val user = User.getInstance()
 
-                        user.id = withContext(Dispatchers.IO) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        userId = withContext(Dispatchers.IO) {
                             userDao.getIdFromUsernameAndPassword(username, password)
                         }
-                        user.username = username
-                        user.password = password
+                    }
 
+                    user.id = userId
+                    user.username = username
+                    user.password = password
+
+                    if (hasPermissions(requireContext(), PERMISSIONS)) {
                         startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
                     } else {
-                        Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
+                        if (shouldShowRationaleDialog(SignInFragment.PERMISSIONS)) {
+                            showLocationPermissionRationaleDialog(requireContext())
+                        } else {
+                            permissionLauncher.launch(SignInFragment.PERMISSIONS)
+                        }
                     }
+                } else {
+                    Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
                 }
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
-            }
-        }
-                if (hasPermissions(requireContext(), PERMISSIONS)) {
-                    startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
-                } else {
-                    if(!shouldShowRationaleDialog(PERMISSIONS)) {
-                        permissionLauncher.launch(PERMISSIONS)
-                    } else {
-                        showLocationPermissionRationaleDialog(requireContext())
-                    }
-                }
-            } else {
             }
         }
     }
