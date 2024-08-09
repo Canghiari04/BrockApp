@@ -35,11 +35,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = ArrayList<String>()
 
-    companion object {
-        val PERMISSIONS_LOCATION = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-        const val PERMISSION_BACKGROUND = Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -70,7 +65,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                         }
                         user.username = username
                         user.password = password
-
 
                         checkLocationPermissions()
                     }
@@ -114,6 +108,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun checkBackgroundPermission() {
         when {
             hasBackgroundPermission(requireContext()) -> {
+                // DEVO FAR PARTIRE IL GEOFENCE
                 startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
             }
             shouldShowBackgroundPermissionRationaleDialog() -> {
@@ -207,6 +202,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
     private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
+            // DEVO FAR PARTIRE IL GEOFENCE
             startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
         } else {
             showBackgroundPermissionDialog(requireContext())

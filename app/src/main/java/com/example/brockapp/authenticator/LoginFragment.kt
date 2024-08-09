@@ -61,7 +61,6 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
                         user.username = username
                         user.password = password
 
-
                         checkLocationPermissions()
                     } else {
                         Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
@@ -106,6 +105,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
     private fun checkBackgroundPermission() {
         when {
             hasBackgroundPermission(requireContext()) -> {
+                // DEVO FAR PARTIRE IL GEOFENCE
                 startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
             }
             shouldShowBackgroundPermissionRationaleDialog() -> {
@@ -195,6 +195,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
 
     private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
+            // DEVO FAR PARTIRE IL GEOFENCE
             startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
         } else {
             showBackgroundPermissionDialog(requireContext())
