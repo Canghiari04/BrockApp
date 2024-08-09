@@ -1,7 +1,7 @@
 package com.example.brockapp.dialog
 
 import com.example.brockapp.R
-import com.example.brockapp.data.User
+import com.example.brockapp.User
 
 import android.view.View
 import android.os.Bundle

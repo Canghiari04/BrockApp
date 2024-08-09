@@ -20,7 +20,7 @@ class CalendarViewHolder(itemView: View, private val onItemClick: (String) -> Un
             dayOfMonth.isClickable = false
             dayOfMonth.setBackgroundResource(R.color.grey)
         } else {
-            itemView.setOnClickListener{
+            itemView.setOnClickListener {
                 onItemClick(date)
                 showActivityOfDay(date)
             }

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("kapt") version "1.8.0"
 }
 
 android {
@@ -41,6 +42,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.auth)
+
+    // chart
+    implementation(libs.mpandroidchart)
+
+
     implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
         exclude(group = "com.android.support")
     }
@@ -50,4 +56,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.play.services.location)
     implementation(libs.material)
+
+    // room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt("androidx.room:room-compiler:2.6.1")
 }

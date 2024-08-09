@@ -1,0 +1,37 @@
+package com.example.brockapp.database
+
+import com.example.brockapp.ROOM_DATABASE_VERSION
+
+import androidx.room.Room
+import androidx.room.Database
+import android.content.Context
+import androidx.room.RoomDatabase
+
+@Database(
+    entities = [UserEntity::class, UserStillActivityEntity::class, UserVehicleActivityEntity::class, UserWalkActivityEntity::class],
+    version = ROOM_DATABASE_VERSION
+)
+abstract class BrockDB: RoomDatabase() {
+    abstract fun UserDao(): UserDao
+    abstract fun UserStillActivityDao(): UserStillActivityDao
+    abstract fun UserVehicleActivityDao(): UserVehicleActivityDao
+    abstract fun UserWalkActivityDao(): UserWalkActivityDao
+
+    companion object {
+        @Volatile
+        var INSTANCE: BrockDB? = null
+
+        @Synchronized
+        fun getInstance(context: Context): BrockDB {
+            if (INSTANCE == null) {
+                INSTANCE = Room.databaseBuilder(
+                    context,
+                    BrockDB::class.java,
+                    "brock.db"
+                ).fallbackToDestructiveMigration()
+                    .build()
+            }
+            return INSTANCE as BrockDB
+        }
+    }
+}

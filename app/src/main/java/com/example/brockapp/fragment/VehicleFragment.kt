@@ -1,21 +1,17 @@
 package com.example.brockapp.fragment
 
-import android.Manifest
-import android.util.Log
+import com.example.brockapp.R
+import com.example.brockapp.detect.UserActivityTransitionManager
+
 import android.view.View
 import android.os.Bundle
 import android.widget.Button
-import com.example.brockapp.R
 import android.os.SystemClock
 import android.content.Intent
 import android.widget.Chronometer
 import androidx.fragment.app.Fragment
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityRecognition
-import com.example.brockapp.detect.UserActivityTransitionManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VehicleFragment() : Fragment(R.layout.start_stop_activity_fragment) {
