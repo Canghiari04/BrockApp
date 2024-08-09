@@ -23,8 +23,6 @@
     android:layout_marginTop="20dp"
     android:layout_marginBottom="20dp">
 
-
-
         <ImageButton
         android:id="@+id/charts_button_back_month"
         android:contentDescription="@string/description_back_month_button"
@@ -66,12 +64,24 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/charts_step_count_text"
+        />
+
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/charts_pie_chart_text"
+        />
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pieChart"

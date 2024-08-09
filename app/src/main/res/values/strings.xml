@@ -61,6 +61,9 @@
 
     <string name="description_icon_activity">Activity icon</string>
 
+    <string name="charts_step_count_text">Numero di passi giornaliero</string>
+    <string name="charts_pie_chart_text">Suddivisione delle attività nel mese</string>
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="activity_main_text">Le tue attività</string>
     <string name="historical_main_text">Il tuo storico</string>

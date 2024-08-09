@@ -9,6 +9,6 @@ interface UserStillActivityDao {
     @Insert()
     suspend fun insertStillActivity(userStillActivity: UserStillActivityEntity)
 
-    @Query("SELECT * FROM UserStillActivity WHERE user_id=:userId AND transition_type=1 AND timestamp BETWEEN :startOfDay AND :endOfDay ORDER BY timestamp")
-    suspend fun getStillActivitiesByUserIdAndDay(userId: Long, startOfDay: String, endOfDay: String): List<UserStillActivityEntity>
+    @Query("SELECT * FROM UserStillActivity WHERE user_id=:userId AND transition_type=1 AND timestamp BETWEEN :startTime AND :endTime ORDER BY timestamp")
+    suspend fun getStillActivitiesByUserIdAndPeriod(userId: Long, startTime: String, endTime: String): List<UserStillActivityEntity>
 }

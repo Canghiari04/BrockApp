@@ -8,7 +8,6 @@ import com.example.brockapp.database.BrockDB
 import com.example.brockapp.data.UserActivity
 
 import android.os.Bundle
-import android.util.Log
 import java.time.LocalDate
 import android.widget.TextView
 import kotlinx.coroutines.launch
@@ -55,9 +54,9 @@ class DailyActivity : AppCompatActivity() {
         val (startOfDay, endOfDay) = getDayRange(date)
         val listActivities = ArrayList<UserActivity>()
 
-        val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
-        val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
-        val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+        val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+        val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
 
         // TODO -> TROVARE IL MODO PER MIGLIORARE QUESTA SCHIFEZZA
         for(activity in listStillActivities) {
