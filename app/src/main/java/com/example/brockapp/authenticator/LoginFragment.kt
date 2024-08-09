@@ -1,7 +1,7 @@
 package com.example.brockapp.authenticator
 
 import com.example.brockapp.R
-import com.example.brockapp.data.User
+import com.example.brockapp.User
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
 import com.example.brockapp.database.BrockDB

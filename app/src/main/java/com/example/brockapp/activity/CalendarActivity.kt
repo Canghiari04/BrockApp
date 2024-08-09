@@ -2,7 +2,7 @@ package com.example.brockapp.activity
 
 import android.content.Intent
 import com.example.brockapp.R
-import com.example.brockapp.data.User
+import com.example.brockapp.User
 import com.example.brockapp.DATE_SEPARATOR
 import com.example.brockapp.CALENDAR_DATE_FORMAT
 import com.example.brockapp.calendar.DailyActivity

@@ -1,7 +1,7 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.data.User
+import com.example.brockapp.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
 

@@ -1,7 +1,7 @@
 package com.example.brockapp.calendar
 
 import com.example.brockapp.R
-import com.example.brockapp.data.User
+import com.example.brockapp.User
 import com.example.brockapp.DATE_FORMAT
 import com.example.brockapp.UNIVERSAL_DATE
 import com.example.brockapp.database.BrockDB
@@ -20,11 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity : AppCompatActivity() {
+    private val user = User.getInstance()
     private val db = BrockDB.getInstance(this)
-
-    companion object {
-        val user = User.getInstance()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,10 +105,18 @@ class DailyActivity : AppCompatActivity() {
      * Metodo definito per popolare la recycler view tramite la lista delle attività dell'utente.
      */
     private fun populateDailyActivitiesRecyclerView(activities: List<UserActivity>, dailyList: RecyclerView) {
-        val adapterActivities = DailyActivityAdapter(activities)
+        val adapterActivities = DailyActivityAdapter(activities, {activityId, type -> onItemClick(activityId, type)})
         val layoutManager = LinearLayoutManager(this)
 
         dailyList.adapter = adapterActivities
         dailyList.layoutManager = layoutManager
+    }
+
+    private fun onItemClick(activityId: Long, type: String) {
+
+        // PRENDERE IL DIALOG
+        // PASSARGLI I DATI
+        // DIALOG INTERNAMENTE QUERY AL DB ROOM
+        // ASSOCIAZIONE DEI DATI ESTRAPOLATI NELLA VIEW
     }
 }

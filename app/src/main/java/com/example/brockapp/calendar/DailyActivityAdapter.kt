@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 
-class DailyActivityAdapter(private val activities: List<UserActivity>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
+class DailyActivityAdapter(private val activities: List<UserActivity>, private val onItemClick: (Long, String) -> Unit) : RecyclerView.Adapter<DailyActivityViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
         val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.activity_calendar_cell, parent, false)
 
-        return DailyActivityViewHolder(activityItem)
+        return DailyActivityViewHolder(activityItem, onItemClick)
     }
 
     override fun getItemCount(): Int {
@@ -19,6 +19,6 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
     }
 
     override fun onBindViewHolder(holder: DailyActivityViewHolder, position: Int) {
-        holder.bindActivity(activities[position].type)
+        holder.bindActivity(activities[position].activityId, activities[position].type)
     }
 }

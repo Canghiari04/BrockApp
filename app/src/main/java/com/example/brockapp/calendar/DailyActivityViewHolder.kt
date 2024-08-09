@@ -7,11 +7,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class DailyActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class DailyActivityViewHolder(itemView: View, private val onItemClick: (Long, String) -> Unit) : RecyclerView.ViewHolder(itemView) {
     private val activityTextView = itemView.findViewById<TextView>(R.id.activity_cell_text)
     private val activityImageView = itemView.findViewById<ImageView>(R.id.activity_cell_image)
 
-    fun bindActivity(typeActivity: String) {
+    fun bindActivity(activityId: Long, typeActivity: String) {
         activityTextView.text = typeActivity
 
         when(typeActivity) {
@@ -24,6 +24,10 @@ class DailyActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
             "STILL" -> {
                 activityImageView.setImageResource(R.drawable.baseline_chair_24)
             }
+        }
+
+        itemView.setOnClickListener {
+            onItemClick(activityId, typeActivity)
         }
     }
 }

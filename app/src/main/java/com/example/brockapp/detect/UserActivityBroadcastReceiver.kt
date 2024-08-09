@@ -1,6 +1,6 @@
 package com.example.brockapp.detect
 
-import com.example.brockapp.data.User
+import com.example.brockapp.User
 import com.example.brockapp.DATE_FORMAT
 
 import android.util.Log

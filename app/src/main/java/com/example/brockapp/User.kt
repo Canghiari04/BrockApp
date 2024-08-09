@@ -1,4 +1,4 @@
-package com.example.brockapp.data
+package com.example.brockapp
 
 /**
  * Singoletto utilizzato per mantenere durante il run dell'applicazione il riferimento ad una sola istanza User.
@@ -19,8 +19,8 @@ object User {
      * dall'applicazione
      */
     fun logoutUser(user: User) {
-        user.id = 0
-        user.username = ""
-        user.password = ""
+        id = 0
+        username = ""
+        password = ""
     }
 }

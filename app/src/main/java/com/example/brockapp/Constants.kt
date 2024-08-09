@@ -1,8 +1,8 @@
 package com.example.brockapp
 
-const val SIGN_IN_ERROR = "CREDENZIALI PRESENTI, SEI SICURO DI NON AVERE GIÀ UN ACCOUNT?"
-const val LOGIN_ERROR = "CREDENZIALI ERRATE, SEI SICURO DI AVERE UN ACCOUNT?"
-const val BLANK_ERROR = "INSERISCI USERNAME E PASSWORD PER EFFETTUARE L'ACCESSO."
+const val SIGN_IN_ERROR = "Credenziali già presenti, passa a Login."
+const val LOGIN_ERROR = "Credenziali errate, riprova."
+const val BLANK_ERROR = "Inserisci le credenziali."
 
 const val ROOM_DATABASE_VERSION = 12
 
