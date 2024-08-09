@@ -7,7 +7,9 @@ import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
 import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.activity.AuthenticatorActivity
 
+import android.net.Uri
 import android.util.Log
 import android.Manifest
 import android.os.Bundle
@@ -17,6 +19,7 @@ import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
+import android.widget.TextView
 import android.content.Context
 import kotlinx.coroutines.launch
 import android.provider.Settings
@@ -25,20 +28,16 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.activity.MainActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.brockapp.activity.AuthenticatorActivity
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = ArrayList<String>()
 
     companion object {
-        val PERMISSIONS = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        val PERMISSIONS_LOCATION = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        const val PERMISSION_BACKGROUND = Manifest.permission.ACCESS_BACKGROUND_LOCATION
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,15 +71,8 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                         user.username = username
                         user.password = password
 
-                        if (hasPermissions(requireContext(), PERMISSIONS)) {
-                            startActivity(Intent(activity, PageLoaderActivity::class.java))
-                        } else {
-                            if (shouldShowRationaleDialog(PERMISSIONS)) {
-                                showLocationPermissionRationaleDialog(requireContext())
-                            } else {
-                                permissionLauncher.launch(PERMISSIONS)
-                            }
-                        }
+
+                        checkLocationPermissions()
                     }
                 }
             } else {
@@ -93,23 +85,83 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         }
     }
 
-    private fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
+    private fun checkLocationPermissions() {
+        when {
+            hasLocationPermissions(requireContext(), com.example.brockapp.PERMISSIONS_LOCATION) -> {
+                checkBackgroundPermission()
+            }
+            shouldShowLocationPermissionsRationaleDialog(com.example.brockapp.PERMISSIONS_LOCATION) -> {
+                showPermissionsRationaleDialog(requireContext())
+            }
+            else -> {
+                permissionsLocationLauncher.launch(com.example.brockapp.PERMISSIONS_LOCATION)
+            }
+        }
+    }
+
+    private fun hasLocationPermissions(context: Context, permissions: Array<String>): Boolean {
         return permissions.all {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
-    private fun shouldShowRationaleDialog(permissions: Array<String>): Boolean {
+    private fun shouldShowLocationPermissionsRationaleDialog(permissions: Array<String>): Boolean {
         return permissions.any {
             ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), it)
         }
+    }
+
+    private fun checkBackgroundPermission() {
+        when {
+            hasBackgroundPermission(requireContext()) -> {
+                startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+            }
+            shouldShowBackgroundPermissionRationaleDialog() -> {
+                showPermissionsRationaleDialog(requireContext())
+            }
+            else -> {
+                permissionBackGroundLauncher.launch(com.example.brockapp.PERMISSION_BACKGROUND)
+            }
+        }
+    }
+
+    private fun hasBackgroundPermission(context: Context): Boolean {
+        return ActivityCompat.checkSelfPermission(context,
+            com.example.brockapp.PERMISSION_BACKGROUND
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun shouldShowBackgroundPermissionRationaleDialog(): Boolean {
+        return ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
+            com.example.brockapp.PERMISSION_BACKGROUND
+        )
+    }
+
+    /**
+     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
+     * richiesti.
+     */
+    private fun showPermissionsRationaleDialog(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.permissions_title)
+            .setMessage(R.string.permissions_message)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+                startActivity(Intent(context, MainActivity::class.java))
+            }
+            .create()
+            .show()
     }
 
     /**
      * Variabile privata di tipo ActivityResultLauncher, utilizzata per accertarsi se l'utente abbia
      * accettato o meno i permessi richiesti.
      */
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+    private val permissionsLocationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         listPermissions.clear()
 
         for (permission in permissions) {
@@ -126,10 +178,10 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             }
         }
 
-        if (listPermissions.isEmpty()) {
-            startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+        if(listPermissions.isNotEmpty()) {
+            showLocationPermissionsDialog(requireContext())
         } else {
-            showLocationPermissionDialog(requireContext())
+            permissionBackGroundLauncher.launch(com.example.brockapp.PERMISSION_BACKGROUND)
         }
     }
 
@@ -137,13 +189,13 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
      * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
      * richiesti.
      */
-    private fun showLocationPermissionRationaleDialog(context: Context) {
+    private fun showLocationPermissionsDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                checkLocationPermissions()
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
@@ -153,17 +205,21 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             .show()
     }
 
-    /**
-     * Metodo attuato per mostrare la finesta di dialogo successiva a differenti eventi "Deny"
-     * dei permessi richiesti. Il metodo risveglierà l'activity settings del dispositivo.
-     */
-    private fun showLocationPermissionDialog(context: Context) {
+    private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if(isGranted) {
+            startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+        } else {
+            showBackgroundPermissionDialog(requireContext())
+        }
+    }
+
+    private fun showBackgroundPermissionDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                permissionLauncher.launch(PERMISSIONS)
+                checkBackgroundPermission()
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
