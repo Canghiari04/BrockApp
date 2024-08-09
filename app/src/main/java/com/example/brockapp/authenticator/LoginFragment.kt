@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import com.example.brockapp.activity.AuthenticatorActivity
 import androidx.core.app.ActivityCompat
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.brockapp.R
 
 class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = ArrayList<String>()
@@ -60,7 +61,6 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
                     }
                 }
             } else {
-                view.findViewById<TextView>(R.id.text_login_error).setText(R.string.description_error_login)
             }
         }
     }
@@ -133,7 +133,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)
-            .setPositiveButton(R.string.permissions_positive_button) { dialog, _ ->
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
                 startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
             }
