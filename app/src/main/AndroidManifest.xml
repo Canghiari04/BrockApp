@@ -27,8 +27,7 @@
             android:name=".activity.PageLoaderActivity">
         </activity>
         <activity
-            android:name=".activity.AuthenticatorActivity"
-            android:parentActivityName=".activity.MainActivity" />
+            android:name=".activity.AuthenticatorActivity" />
         <activity
             android:name=".activity.HomeActivity"
             android:parentActivityName=".activity.PageLoaderActivity">
