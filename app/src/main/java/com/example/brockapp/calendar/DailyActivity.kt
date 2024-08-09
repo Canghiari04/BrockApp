@@ -27,20 +27,16 @@ class DailyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.daily_activity_activity)
 
+        val date: String? = intent.getStringExtra("ACTIVITY_DATE")
+
+        val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
+        val textView = findViewById<TextView>(R.id.date_text_view)
+        textView.text = getPrettyDate(date)
+
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val date : String? = intent.getStringExtra("ACTIVITY_DATE")
+            val sortedActivities = getUserActivities(date)
 
-                val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
-                val textView = findViewById<TextView>(R.id.date_text_view)
-                textView.text = getPrettyDate(date)
-
-                val sortedActivities = getUserActivities(date)
-
-                populateDailyActivitiesRecyclerView(sortedActivities, dailyList)
-            } catch(e: Exception) {
-                Log.d("CALENDAR", e.toString())
-            }
+            populateDailyActivitiesRecyclerView(sortedActivities, dailyList)
         }
     }
 
@@ -56,16 +52,12 @@ class DailyActivity : AppCompatActivity() {
      * ordine temporale.
      */
     private suspend fun getUserActivities(date: String?): List<UserActivity> {
-        val userStillActivityDao = db.UserStillActivityDao()
-        val userVehicleActivityDao = db.UserVehicleActivityDao()
-        val userWalkActivityDao = db.UserWalkActivityDao()
-
         val (startOfDay, endOfDay) = getDayRange(date)
         val listActivities = ArrayList<UserActivity>()
 
-        val listStillActivities = userStillActivityDao.getStillActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
-        val listVehicleActivities = userVehicleActivityDao.getVehicleActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
-        val listWalkingActivities = userWalkActivityDao.getWalkActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
 
         // TODO -> TROVARE IL MODO PER MIGLIORARE QUESTA SCHIFEZZA
         for(activity in listStillActivities) {

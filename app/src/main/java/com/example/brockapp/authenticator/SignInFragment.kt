@@ -42,51 +42,42 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val db = BrockDB.getInstance(requireContext())
-        val userDao = db.UserDao()
-
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
+            val db = BrockDB.getInstance(requireContext())
+            val userDao = db.UserDao()
+
             val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
-            var userAlreadyExists = false
-            var userId = 0L
-
             if(username.isNotEmpty() && password.isNotEmpty()) {
-                 viewLifecycleOwner.lifecycleScope.launch {
-                     userAlreadyExists = withContext(Dispatchers.IO) {
-                         userDao.checkIfUserIsPresent(username, password)
-                     }
-                 }
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val userAlreadyExists = withContext(Dispatchers.IO) {
+                            userDao.checkIfUserIsPresent(username, password)
+                    }
 
-                if (userAlreadyExists) {
-                    Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
-                } else {
-                    viewLifecycleOwner.lifecycleScope.launch {
+                    if (userAlreadyExists) {
+                        Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
+                    } else {
                         withContext(Dispatchers.IO) {
                             userDao.insertUser(UserEntity(username = username, password = password))
                         }
-                    }
 
-                    val user = User.getInstance()
+                        val user = User.getInstance()
 
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        userId = withContext(Dispatchers.IO) {
+                        user.id = withContext(Dispatchers.IO) {
                             userDao.getIdFromUsernameAndPassword(username, password)
                         }
-                    }
+                        user.username = username
+                        user.password = password
 
-                    user.id = userId
-                    user.username = username
-                    user.password = password
-
-                    if (hasPermissions(requireContext(), PERMISSIONS)) {
-                        startActivity(Intent(activity, PageLoaderActivity::class.java))
-                    } else {
-                        if (shouldShowRationaleDialog(PERMISSIONS)) {
-                            showLocationPermissionRationaleDialog(requireContext())
+                        if (hasPermissions(requireContext(), PERMISSIONS)) {
+                            startActivity(Intent(activity, PageLoaderActivity::class.java))
                         } else {
-                            permissionLauncher.launch(PERMISSIONS)
+                            if (shouldShowRationaleDialog(PERMISSIONS)) {
+                                showLocationPermissionRationaleDialog(requireContext())
+                            } else {
+                                permissionLauncher.launch(PERMISSIONS)
+                            }
                         }
                     }
                 }

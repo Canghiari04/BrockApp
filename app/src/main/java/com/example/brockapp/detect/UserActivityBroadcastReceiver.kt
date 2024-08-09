@@ -52,7 +52,6 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
                         userWalkActivityDao.insertWalkActivity(UserWalkActivityEntity(userId = user.id, transitionType = transitionType, timestamp = timestamp, stepNumber = stepNumber))
                     }
                 }
-
             } catch (e: Exception) {
                 Log.d("INSERT DATABASE", e.toString())
             }

@@ -41,47 +41,40 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val db = BrockDB.getInstance(requireContext())
-        val userDao = db.UserDao()
-
-        var userAlreadyExists = false
-        var userId = 0L
-
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
+            val db = BrockDB.getInstance(requireContext())
+            val userDao = db.UserDao()
+
             val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    userAlreadyExists = withContext(Dispatchers.IO) {
+                    val userAlreadyExists = withContext(Dispatchers.IO) {
                         userDao.checkIfUserIsPresent(username, password)
                     }
-                }
 
-                if (userAlreadyExists) {
-                    val user = User.getInstance()
+                    if (userAlreadyExists) {
+                        val user = User.getInstance()
 
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        userId = withContext(Dispatchers.IO) {
+                        user.id = withContext(Dispatchers.IO) {
                             userDao.getIdFromUsernameAndPassword(username, password)
                         }
-                    }
+                        user.username = username
+                        user.password = password
 
-                    user.id = userId
-                    user.username = username
-                    user.password = password
-
-                    if (hasPermissions(requireContext(), PERMISSIONS)) {
-                        startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
-                    } else {
-                        if (shouldShowRationaleDialog(SignInFragment.PERMISSIONS)) {
-                            showLocationPermissionRationaleDialog(requireContext())
+                        if (hasPermissions(requireContext(), PERMISSIONS)) {
+                            startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
                         } else {
-                            permissionLauncher.launch(SignInFragment.PERMISSIONS)
+                            if (shouldShowRationaleDialog(SignInFragment.PERMISSIONS)) {
+                                showLocationPermissionRationaleDialog(requireContext())
+                            } else {
+                                permissionLauncher.launch(SignInFragment.PERMISSIONS)
+                            }
                         }
+                    } else {
+                        Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
                     }
-                } else {
-                    Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
                 }
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
