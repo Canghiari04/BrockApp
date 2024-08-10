@@ -37,7 +37,6 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
             stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         }
 
-        val transitionManager = UserActivityTransitionManager(requireContext())
         val chronometer = view.findViewById<Chronometer>(R.id.walk_chronometer)
         var pauseOffset: Long = 0
 
