@@ -62,7 +62,9 @@
     <string name="description_icon_activity">Activity icon</string>
 
     <string name="charts_step_count_text">Numero di passi giornaliero</string>
+    <string name="charts_distance_travelled_text">Distanza percorsa giornaliera</string>
     <string name="charts_pie_chart_text">Suddivisione delle attività nel mese</string>
+    <string name="no_activity_text">Nessuna attività compiuta nel mese</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="activity_main_text">Le tue attività</string>

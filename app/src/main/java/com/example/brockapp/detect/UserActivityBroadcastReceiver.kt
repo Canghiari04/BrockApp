@@ -29,7 +29,7 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
-            .ofPattern(DATE_FORMAT)
+            .ofPattern("yyyy-MM-dd HH:mm:ss")
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 

@@ -1,93 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="25dp"
-        android:gravity="center"
-        android:text="@string/charts_text_view"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="28dp"></TextView>
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="25dp"
+            android:gravity="center"
+            android:text="@string/charts_text_view"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="28dp"/>
 
-    <LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="40dp"
-    android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp">
+        <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
 
-        <ImageButton
-        android:id="@+id/charts_button_back_month"
-        android:contentDescription="@string/description_back_month_button"
-        android:src="@drawable/baseline_arrow_back_24"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_margin="2dp"
-        app:tint="@color/white"
-        android:backgroundTint="@color/uni_red">
-    </ImageButton>
-    <TextView
-        android:id="@+id/charts_date_text_view"
-        android:text=""
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textColor="@color/black">
-    </TextView>
+            <ImageButton
+            android:id="@+id/charts_button_back_month"
+            android:contentDescription="@string/description_back_month_button"
+            android:src="@drawable/baseline_arrow_back_24"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            app:tint="@color/white"
+            android:backgroundTint="@color/uni_red"/>
+            <TextView
+                android:id="@+id/charts_date_text_view"
+                android:text=""
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textColor="@color/black"/>
 
 
-    <ImageButton
-        android:id="@+id/charts_button_forward_month"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_margin="2dp"
-        android:layout_weight="1"
-        android:backgroundTint="@color/uni_red"
-        android:contentDescription="@string/description_forward_month_button"
-        android:src="@drawable/baseline_arrow_forward_24"
-        app:tint="@color/white"
-        tools:layout_editor_absoluteX="363dp"
-        tools:layout_editor_absoluteY="-64dp">
+            <ImageButton
+                android:id="@+id/charts_button_forward_month"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/uni_red"
+                android:contentDescription="@string/description_forward_month_button"
+                android:src="@drawable/baseline_arrow_forward_24"
+                app:tint="@color/white"
+                tools:layout_editor_absoluteX="363dp"
+                tools:layout_editor_absoluteY="-64dp"/>
 
-    </ImageButton>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/charts_step_count_text"
+            />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/step_count_bar_chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/charts_distance_travelled_text"
+            />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/distance_travelled_bar_chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/charts_pie_chart_text"
+            />
+
+        <TextView
+            android:id="@+id/no_activity_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_activity_text"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/activity_type_pie_chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="-16dp" />
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/charts_step_count_text"
-        />
-
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/barChart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/charts_pie_chart_text"
-        />
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="-16dp" />
-
-</LinearLayout>
+</ScrollView>
