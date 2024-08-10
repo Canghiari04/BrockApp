@@ -104,15 +104,16 @@ class CalendarActivity : AppCompatActivity() {
         var myDateId: String
         val list = getList(date)
 
-        do {
-            try {
+        try {
+            do {
                 i++
-                myDateId = i.toString() + DATE_SEPARATOR + date.monthValue.toString() + DATE_SEPARATOR + date.year.toString()
+                myDateId = date.withDayOfMonth(i).toString()
                 list.add(myDateId)
-            } catch (e: Exception) {
-                Log.d("CALENDAR", e.toString())
-            }
-        } while(i < date.month.length(false))
+
+            } while(i < date.month.length(false))
+        } catch (e: Exception) {
+            Log.d("CALENDAR", e.toString())
+        }
 
         return list
     }
@@ -139,7 +140,7 @@ class CalendarActivity : AppCompatActivity() {
 
     private fun onItemClick(date: String) {
         val tokens = date.split(DATE_SEPARATOR).toList()
-        val item = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
+        val item = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
 
         setDate(item)
     }
