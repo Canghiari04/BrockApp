@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.brockapp.CHARTS_DATE_FORMAT
+import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.R
 import com.example.brockapp.activity.CalendarActivity.Companion.user
 import com.example.brockapp.database.BrockDB
@@ -232,7 +233,7 @@ class ChartsActivity : AppCompatActivity() {
         val endOfMonth = date.atTime(23, 59, 59)
 
         // Formatter per la data di output nel formato richiesto
-        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         // Restituiamo la coppia di date
         return Pair(
@@ -245,7 +246,7 @@ class ChartsActivity : AppCompatActivity() {
         val startOfMonth = date.withDayOfMonth(1).atStartOfDay()
 
         val endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59)
-        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         // Restituiamo la coppia di date
         return Pair(

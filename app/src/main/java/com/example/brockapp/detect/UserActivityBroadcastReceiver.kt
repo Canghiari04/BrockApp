@@ -9,6 +9,7 @@ import java.time.ZoneOffset
 import android.content.Intent
 import android.content.Context
 import android.content.BroadcastReceiver
+import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserStillActivityEntity
 import com.example.brockapp.database.UserVehicleActivityEntity
@@ -29,7 +30,7 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm:ss")
+            .ofPattern(ISO_DATE_FORMAT)
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 

@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.brockapp.ISO_DATE_FORMAT
 
 class DailyActivity : AppCompatActivity() {
     private val user = User.getInstance()
@@ -41,9 +42,9 @@ class DailyActivity : AppCompatActivity() {
 
     private fun getPrettyDate(strDate: String?): String {
         val tokens = strDate!!.split("-")
-        val date = LocalDate.of(tokens[2].toInt(), tokens[1].toInt(), tokens[0].toInt())
+        val date = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
 
-        return "${date.dayOfWeek}, ${tokens[0]} ${date.month}".lowercase()
+        return "${date.dayOfWeek}, ${tokens[2]} ${date.month}".lowercase()
     }
 
     /**
@@ -82,12 +83,12 @@ class DailyActivity : AppCompatActivity() {
      * dall'utente.
      */
     private fun getDayRange(dateStr: String?): Pair<String, String> {
-        val date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(UNIVERSAL_DATE))
+        val date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
-        val startOfDay = date.atStartOfDay()
+        val startOfDay = date.atStartOfDay().withSecond(0)
         val endOfDay = startOfDay.plusDays(1).minusSeconds(1)
 
-        val outputFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT)
+        val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         return Pair(startOfDay.format(outputFormatter), endOfDay.format(outputFormatter))
     }
