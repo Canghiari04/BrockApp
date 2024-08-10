@@ -4,44 +4,52 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center" >
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@color/grey">
 
     <Chronometer
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="time"
-        android:textSize="20sp" />
+        android:textSize="24sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:id="@+id/vehicle_distance_travelled_label"
-        android:layout_width="156dp"
-        android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/distance_label"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
 
+    <TextView
+        android:id="@+id/vehicle_distance_travelled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/initial_distance_travelled"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="25dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/vehicle_distance_travelled"
-            android:text="@string/initial_distance_travelled">
-        </TextView>
+    <Button
+        android:id="@+id/vehicle_button_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_button"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/uni_red"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"/>
 
-        <Button
-            android:id="@+id/vehicle_button_stop"
-            android:text="@string/stop_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red" />
-
-        <Button
-            android:id="@+id/vehicle_button_start"
-            android:text="@string/start_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red" />
+    <Button
+        android:id="@+id/vehicle_button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_button"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/uni_red"
+        android:padding="12dp"/>
 </LinearLayout>

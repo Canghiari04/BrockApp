@@ -32,16 +32,14 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
-
 class ChartsActivity : AppCompatActivity() {
-
 
     private val db = BrockDB.getInstance(this)
     private lateinit var stepCountBarChart: BarChart
     private lateinit var distanceTravelledBarChart: BarChart
     private lateinit var activityTypePieChart: PieChart
 
-    val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
+    private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,11 +56,7 @@ class ChartsActivity : AppCompatActivity() {
 
         setButtonOnClickListener(buttonBack, buttonForward)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            setupCharts()
-
-        }
-
+        setupCharts()
     }
 
     private fun setButtonOnClickListener(
@@ -70,193 +64,176 @@ class ChartsActivity : AppCompatActivity() {
         buttonForward: ImageButton
     ) {
         buttonBack.setOnClickListener {
-            val strDate = findViewById<TextView>(R.id.charts_date_text_view).text
-
-            var date = YearMonth.parse(strDate, formatter)
-
-            date = date.minusMonths(1)
-
+            val date = getDateFromTextView().minusMonths(1)
             setDate(date)
-
-            CoroutineScope(Dispatchers.IO).launch {
-                setupCharts()
-
-            }
+            setupCharts()
         }
 
         buttonForward.setOnClickListener {
-            val strDate = findViewById<TextView>(R.id.charts_date_text_view).text
-
-
-            var date = YearMonth.parse(strDate, formatter)
-
-            date = date.plusMonths(1)
-
+            val date = getDateFromTextView().plusMonths(1)
             setDate(date)
-
-            CoroutineScope(Dispatchers.IO).launch {
-                setupCharts()
-
-            }
+            setupCharts()
         }
     }
 
-    private fun setDate(date: YearMonth) {
-        findViewById<TextView>(R.id.charts_date_text_view).text = date.format(DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)).toString()
+    private fun getDateFromTextView(): YearMonth {
+        val strDate = findViewById<TextView>(R.id.charts_date_text_view).text
+        return YearMonth.parse(strDate, formatter)
     }
 
-    private suspend fun ChartsActivity.setupCharts() {
-        setupStepCountBarChart()
-        setupDistanceTravelledBarChart()
-        setupActivityTypePieChart()
+    private fun setDate(date: YearMonth) {
+        findViewById<TextView>(R.id.charts_date_text_view).text = date.format(formatter)
+    }
 
+    private fun setupCharts() {
+        CoroutineScope(Dispatchers.IO).launch {
+            setupStepCountBarChart()
+            setupDistanceTravelledBarChart()
+            setupActivityTypePieChart()
+        }
     }
 
     private suspend fun setupStepCountBarChart() {
-
-        val entries = ArrayList<BarEntry>()
-        val dateStr : String = findViewById<TextView>(R.id.charts_date_text_view).text.toString()
-
-        val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
-
+        val entries = mutableListOf<BarEntry>()
+        val yearMonth = getDateFromTextView()
         val currentDate = yearMonth.atDay(1)
 
         for (day in 1..currentDate.lengthOfMonth()) {
-
             val date = currentDate.withDayOfMonth(day)
-
             val (startOfDay, endOfDay) = getDayRange(date)
-
-            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-
-            // Sommiamo il numero di passi per il giorno corrente
-            val totalSteps = listWalkingActivities.map { it.stepNumber }.sum()
+            val totalSteps = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+                .sumOf { it.stepNumber }
 
             entries.add(BarEntry(day.toFloat(), totalSteps.toFloat()))
         }
 
-        val dataSet = BarDataSet(entries, "Numero di passi")
-        dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+        val dataSet = getDataSet(entries, "Numero di passi")
 
-        val data = BarData(dataSet)
-        stepCountBarChart.data = data
+        val data = BarData(dataSet).apply {
+            barWidth = 0.9f // Adjust bar width
+        }
 
-        stepCountBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() }) // Etichette asse x come giorni del mese
-        stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        stepCountBarChart.invalidate()
+        //Usa context main poichè solo il main thread può modificare oggetti nella view
+        withContext(Dispatchers.Main) {
+            stepCountBarChart.apply {
+                this.data = data
+                xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
+                xAxis.position = XAxis.XAxisPosition.BOTTOM
+                stepCountBarChart.getAxisLeft().setDrawGridLines(false)
+                stepCountBarChart.getXAxis().setDrawGridLines(false)
+                stepCountBarChart.legend.isEnabled = false
+                stepCountBarChart.description.isEnabled = false
+                invalidate()
+            }
+        }
     }
 
-    private suspend fun setupDistanceTravelledBarChart(){
 
-        val entries = ArrayList<BarEntry>()
-        val dateStr : String = findViewById<TextView>(R.id.charts_date_text_view).text.toString()
 
-        val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
-
+    private suspend fun setupDistanceTravelledBarChart() {
+        val entries = mutableListOf<BarEntry>()
+        val yearMonth = getDateFromTextView()
         val currentDate = yearMonth.atDay(1)
 
         for (day in 1..currentDate.lengthOfMonth()) {
-
             val date = currentDate.withDayOfMonth(day)
-
             val (startOfDay, endOfDay) = getDayRange(date)
-
-            val listVehicleActivity = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-
-            // Sommiamo il numero di passi per il giorno corrente
-            val totalDistanceTravelled = listVehicleActivity.sumOf { it.distanceTravelled!! }
+            val totalDistanceTravelled = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+                .sumOf { it.distanceTravelled ?: 0.0 }
 
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
 
-        val dataSet = BarDataSet(entries, "Distanza percorsa su veicoli")
-        dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+        val dataSet = getDataSet(entries, "Distanza percorsa")
 
-        val data = BarData(dataSet)
-        distanceTravelledBarChart.data = data
+        val data = BarData(dataSet).apply{
+            barWidth = 0.9f // Adjust bar width
+        }
 
-        distanceTravelledBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
-        distanceTravelledBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        distanceTravelledBarChart.invalidate()
-
+        withContext(Dispatchers.Main) {
+            distanceTravelledBarChart.apply {
+                this.data = data
+                xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
+                xAxis.position = XAxis.XAxisPosition.BOTTOM
+                distanceTravelledBarChart.getAxisLeft().setDrawGridLines(false)
+                distanceTravelledBarChart.getXAxis().setDrawGridLines(false)
+                distanceTravelledBarChart.legend.isEnabled = false
+                distanceTravelledBarChart.description.isEnabled = false
+                invalidate()
+            }
+        }
     }
 
+    private fun getDataSet(entries: MutableList<BarEntry>, label: String): BarDataSet {
+
+        return BarDataSet(entries, label).apply {
+
+            colors = entries.map {
+                val valueToColor = when {
+                    it.y > 10000 -> 1f
+                    else -> {
+                        it.y / 10
+                    }
+                }
+                val green = valueToColor
+                val blue = 1 - green
+
+                // Crea il colore ARGB
+                android.graphics.Color.argb(255,0, (green * 255).toInt(), (blue * 255).toInt())
+            }
+        }
+    }
+
+
     private suspend fun setupActivityTypePieChart() {
-        val entries = ArrayList<PieEntry>()
+        val entries = mutableListOf<PieEntry>()
+        val yearMonth = getDateFromTextView()
+        val (startOfMonth, endOfMonth) = getMonthRange(yearMonth.atDay(1))
 
-        val dateStr = findViewById<TextView>(R.id.charts_date_text_view).text
-        val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
-        val currentDate = yearMonth.atDay(1)
-
-        val (startOfMonth, endOfMonth) = getMonthRange(currentDate)
-        Log.d("start", startOfMonth)
-        Log.d("end", endOfMonth)
-
-        val userWalkActivities: List<UserWalkActivityEntity> = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-        val userWalkActivityCount = userWalkActivities.size
-
+        val userWalkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
         val userStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-        val userStillActivityCount = userStillActivities.size
-
         val userVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-        val userVehicleActivityCount = userVehicleActivities.size
 
-        // Spostiamo l'aggiornamento dell'interfaccia utente sul thread principale
+        entries.apply {
+            add(PieEntry(userVehicleActivities.size.toFloat(), "Vehicle activity"))
+            add(PieEntry(userStillActivities.size.toFloat(), "Still activity"))
+            add(PieEntry(userWalkActivities.size.toFloat(), "Walk activity"))
+        }
+
+        val dataSet = PieDataSet(entries, "Dati").apply {
+            colors = ColorTemplate.PASTEL_COLORS.toList()
+        }
+
+        val data = PieData(dataSet)
+
         withContext(Dispatchers.Main) {
+            activityTypePieChart.apply {
+                this.data = data
+                invalidate()
+            }
+
             val noActivityMessage = findViewById<TextView>(R.id.no_activity_message)
-            val activityTypePieChart = findViewById<PieChart>(R.id.activity_type_pie_chart)
-
-            if (userWalkActivityCount > 0 || userStillActivityCount > 0 || userVehicleActivityCount > 0) {
-                // Aggiungi dati al grafico
-                entries.add(PieEntry(userVehicleActivityCount.toFloat(), "Vehicle activity"))
-                entries.add(PieEntry(userStillActivityCount.toFloat(), "Still activity"))
-                entries.add(PieEntry(userWalkActivityCount.toFloat(), "Walk activity"))
-
-                val dataSet = PieDataSet(entries, "Dati")
-                dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
-
-                val data = PieData(dataSet)
-                activityTypePieChart.data = data
-                activityTypePieChart.invalidate()
-
-                // Nascondi il messaggio
+            if (entries.isNotEmpty()) {
                 noActivityMessage.visibility = View.GONE
                 activityTypePieChart.visibility = View.VISIBLE
             } else {
-                // Mostra il messaggio
                 noActivityMessage.visibility = View.VISIBLE
                 activityTypePieChart.visibility = View.GONE
             }
         }
     }
 
-
     private fun getDayRange(date: LocalDate): Pair<String, String> {
-
-        val startOfMonth = date.atTime(0, 0, 0)
-
-        val endOfMonth = date.atTime(23, 59, 59)
-
-        // Formatter per la data di output nel formato richiesto
+        val startOfDay = date.atTime(0, 0, 0)
+        val endOfDay = date.atTime(23, 59, 59)
         val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
-
-        // Restituiamo la coppia di date
-        return Pair(
-            startOfMonth.format(outputFormatter),
-            endOfMonth.format(outputFormatter)
-        )
+        return Pair(startOfDay.format(outputFormatter), endOfDay.format(outputFormatter))
     }
 
     private fun getMonthRange(date: LocalDate): Pair<String, String> {
         val startOfMonth = date.withDayOfMonth(1).atStartOfDay()
-
         val endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59)
         val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
-
-        // Restituiamo la coppia di date
-        return Pair(
-            startOfMonth.format(outputFormatter),
-            endOfMonth.format(outputFormatter)
-        )
+        return Pair(startOfMonth.format(outputFormatter), endOfMonth.format(outputFormatter))
     }
 }

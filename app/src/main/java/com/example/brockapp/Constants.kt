@@ -16,3 +16,5 @@ const val CHARTS_DATE_FORMAT = "MM-yyyy"
 const val DATE_SEPARATOR = "-"
 const val CALENDAR_DATE_FORMAT = "yyyy-MM-dd"
 
+const val POSITION_UPDATE_INTERVAL_MILLIS = 3000
+

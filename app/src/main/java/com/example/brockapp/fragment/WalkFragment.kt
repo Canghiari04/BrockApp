@@ -100,27 +100,6 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     }
 
-//    private fun startDetection(transitionManager: UserActivityTransitionManager) {
-//        val request = transitionManager.getRequest()
-//        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
-//
-//        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
-//        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-//            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-//
-//            task.addOnSuccessListener {
-//                Log.d("DETECT", "Connesso all'API activity recognition")
-//            }
-//
-//            task.addOnFailureListener {
-//                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-//            }
-//
-//            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-//        } else {
-//            Log.d("WTF", "WTF")
-//        }
-//    }
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount : Long) {
         // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.

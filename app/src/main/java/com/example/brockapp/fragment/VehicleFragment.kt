@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
 import com.example.brockapp.R
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
@@ -34,7 +35,7 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
     private var running = false
     private var pauseOffset: Long = 0
 
-    private lateinit var distanceTravelledText : String
+    private lateinit var distanceTravelled : TextView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,48 +44,66 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         setupLocationUpdates()
 
-        distanceTravelledText = view.findViewById<TextView>(R.id.vehicle_distance_travelled).text.toString()
+        distanceTravelled = view.findViewById(R.id.vehicle_distance_travelled)
 
-        view.findViewById<Button>(R.id.vehicle_button_start).setOnClickListener {
+        val vehicleButtonStart = view.findViewById<Button>(R.id.vehicle_button_start)
+        val vehicleButtonStop = view.findViewById<Button>(R.id.vehicle_button_stop)
+
+        setOnClickListeners(vehicleButtonStart, chronometer, vehicleButtonStop)
+
+        vehicleButtonStart.isEnabled = true
+        vehicleButtonStop.isEnabled = false
+    }
+
+    private fun setOnClickListeners(
+        vehicleButtonStart: Button,
+        chronometer: Chronometer,
+        vehicleButtonStop: Button
+    ) {
+        vehicleButtonStart.setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
                 chronometer.start()
                 running = true
 
-                view.findViewById<Button>(R.id.vehicle_button_start).isEnabled = false
-                view.findViewById<Button>(R.id.vehicle_button_stop).isEnabled = true
+                vehicleButtonStart.isEnabled = false
+                vehicleButtonStop.isEnabled = true
 
                 // Start location updates
                 startLocationUpdates()
             }
-            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER, 0.0)
+            registerActivity(
+                DetectedActivity.IN_VEHICLE,
+                ActivityTransition.ACTIVITY_TRANSITION_ENTER,
+                0.0
+            )
         }
 
-        view.findViewById<Button>(R.id.vehicle_button_stop).setOnClickListener {
+        vehicleButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
                 pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
-                view.findViewById<Button>(R.id.vehicle_button_start).isEnabled = true
-                view.findViewById<Button>(R.id.vehicle_button_stop).isEnabled = false
+                vehicleButtonStart.isEnabled = true
+                vehicleButtonStop.isEnabled = false
 
-                // Stop location updates
                 stopLocationUpdates()
+                chronometer.base = SystemClock.elapsedRealtime()
 
-                // Register final distance
-                registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_EXIT, totalDistance)
+                registerActivity(
+                    DetectedActivity.IN_VEHICLE,
+                    ActivityTransition.ACTIVITY_TRANSITION_EXIT,
+                    totalDistance
+                )
             }
         }
-
-        view.findViewById<Button>(R.id.vehicle_button_start).isEnabled = true
-        view.findViewById<Button>(R.id.vehicle_button_stop).isEnabled = false
     }
 
     private fun setupLocationUpdates() {
         // Crea una nuova richiesta di aggiornamento della posizione
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
-            .setMinUpdateIntervalMillis(5000) // Intervallo minimo di aggiornamento
+            .setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong())
             .build()
 
         // Configura il callback per gestire i risultati della posizione
@@ -93,13 +112,13 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
                 // Gestisce i risultati della posizione
                 val locations = locationResult.locations
                 if (locations.isNotEmpty()) {
-                    val newLocation = locations.last() // Ottieni l'ultima posizione
+                    val newLocation = locations.last()
                     if (startLocation == null) {
                         startLocation = newLocation
                     } else {
                         startLocation?.let {
                             totalDistance += it.distanceTo(newLocation).toDouble()
-                            distanceTravelledText = totalDistance.toString()
+                            distanceTravelled.text = String.format("%.2f meters", totalDistance)
                         }
                         startLocation = newLocation
                     }
