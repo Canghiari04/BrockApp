@@ -102,7 +102,6 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount : Long) {
-        // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.
 
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)

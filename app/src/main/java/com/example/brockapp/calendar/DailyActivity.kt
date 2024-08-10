@@ -11,6 +11,7 @@ import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.data.UserActivity
 import com.example.brockapp.database.BrockDB
+import com.github.mikephil.charting.charts.PieChart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -99,6 +100,10 @@ class DailyActivity : AppCompatActivity() {
 
         dailyList.adapter = adapterActivities
         dailyList.layoutManager = layoutManager
+
+        val piechart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
+
+        //TODO leggere attività da db per calcoare durata
     }
 
     private fun onItemClick(activityId: Long, type: String) {

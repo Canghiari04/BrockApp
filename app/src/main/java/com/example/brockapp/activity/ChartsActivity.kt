@@ -123,6 +123,7 @@ class ChartsActivity : AppCompatActivity() {
                 stepCountBarChart.getXAxis().setDrawGridLines(false)
                 stepCountBarChart.legend.isEnabled = false
                 stepCountBarChart.description.isEnabled = false
+                stepCountBarChart.animateY(500)
                 invalidate()
             }
         }
@@ -144,6 +145,7 @@ class ChartsActivity : AppCompatActivity() {
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
 
+        //TODO usare altro metodo per ottenere dataset con giusta colorazione
         val dataSet = getDataSet(entries, "Distanza percorsa")
 
         val data = BarData(dataSet).apply{
@@ -159,6 +161,7 @@ class ChartsActivity : AppCompatActivity() {
                 distanceTravelledBarChart.getXAxis().setDrawGridLines(false)
                 distanceTravelledBarChart.legend.isEnabled = false
                 distanceTravelledBarChart.description.isEnabled = false
+                distanceTravelledBarChart.animateY(500)
                 invalidate()
             }
         }
