@@ -6,6 +6,7 @@ import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
+import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.activity.AuthenticatorActivity
 
@@ -19,8 +20,8 @@ import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
-import android.widget.TextView
 import android.content.Context
+import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.provider.Settings
 import androidx.fragment.app.Fragment
@@ -29,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
-import com.example.brockapp.activity.MainActivity
 import androidx.activity.result.contract.ActivityResultContracts
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
@@ -66,6 +66,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                         user.username = username
                         user.password = password
 
+
                         checkLocationPermissions()
                     }
                 }
@@ -88,7 +89,35 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                 showPermissionsRationaleDialog(requireContext())
             }
             else -> {
-                permissionsLocationLauncher.launch(com.example.brockapp.PERMISSIONS_LOCATION)
+                permissionsLocationLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            }
+        }
+    }
+
+    private fun checkBackgroundPermission() {
+        when {
+            hasBackgroundPermission(requireContext()) -> {
+                checkNotificationPermission()
+            }
+            shouldShowBackgroundPermissionRationaleDialog() -> {
+                showPermissionsRationaleDialog(requireContext())
+            }
+            else -> {
+                permissionBackGroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
+        }
+    }
+
+    private fun checkNotificationPermission() {
+        when {
+            hasNotificationPermission(requireContext()) -> {
+                startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+            }
+            shouldShowNotificationPermissionRationaleDialog() -> {
+                showPermissionsRationaleDialog(requireContext())
+            }
+            else -> {
+                permissionNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
@@ -99,57 +128,26 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         }
     }
 
+    private fun hasBackgroundPermission(context: Context): Boolean {
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun hasNotificationPermission(context: Context): Boolean {
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun shouldShowLocationPermissionsRationaleDialog(permissions: Array<String>): Boolean {
         return permissions.any {
             ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), it)
         }
     }
 
-    private fun checkBackgroundPermission() {
-        when {
-            hasBackgroundPermission(requireContext()) -> {
-                // DEVO FAR PARTIRE IL GEOFENCE
-                startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
-            }
-            shouldShowBackgroundPermissionRationaleDialog() -> {
-                showPermissionsRationaleDialog(requireContext())
-            }
-            else -> {
-                permissionBackGroundLauncher.launch(com.example.brockapp.PERMISSION_BACKGROUND)
-            }
-        }
-    }
-
-    private fun hasBackgroundPermission(context: Context): Boolean {
-        return ActivityCompat.checkSelfPermission(context,
-            com.example.brockapp.PERMISSION_BACKGROUND
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
     private fun shouldShowBackgroundPermissionRationaleDialog(): Boolean {
-        return ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-            com.example.brockapp.PERMISSION_BACKGROUND
-        )
+        return ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
-    private fun showPermissionsRationaleDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permissions_title)
-            .setMessage(R.string.permissions_message)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-                startActivity(Intent(context, MainActivity::class.java))
-            }
-            .create()
-            .show()
+    private fun shouldShowNotificationPermissionRationaleDialog(): Boolean {
+        return ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.POST_NOTIFICATIONS)
     }
 
     /**
@@ -176,7 +174,23 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         if(listPermissions.isNotEmpty()) {
             showLocationPermissionsDialog(requireContext())
         } else {
-            permissionBackGroundLauncher.launch(com.example.brockapp.PERMISSION_BACKGROUND)
+            permissionBackGroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    }
+
+    private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if(isGranted) {
+            permissionNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            showBackgroundPermissionDialog(requireContext())
+        }
+    }
+
+    private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if(isGranted) {
+            startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+        } else {
+            showNotificationPermissionDialog(requireContext())
         }
     }
 
@@ -187,7 +201,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun showLocationPermissionsDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
-            .setMessage(R.string.permissions_message)
+            .setMessage(R.string.permissions_location)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
                 checkLocationPermissions()
@@ -200,22 +214,50 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             .show()
     }
 
-    private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if(isGranted) {
-            // DEVO FAR PARTIRE IL GEOFENCE
-            startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
-        } else {
-            showBackgroundPermissionDialog(requireContext())
-        }
+    private fun showBackgroundPermissionDialog(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_background)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                checkBackgroundPermission()
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+                startActivity(Intent(context, MainActivity::class.java))
+            }
+            .create()
+            .show()
     }
 
-    private fun showBackgroundPermissionDialog(context: Context) {
+    private fun showNotificationPermissionDialog(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_notification)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                checkNotificationPermission()
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+                startActivity(Intent(context, MainActivity::class.java))
+            }
+            .create()
+            .show()
+    }
+
+    /**
+     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
+     * richiesti.
+     */
+    private fun showPermissionsRationaleDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                checkBackgroundPermission()
+                Toast.makeText(context, R.string.permissions_toast, Toast.LENGTH_LONG).show()
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
