@@ -1,18 +1,17 @@
 package com.example.brockapp.activity
 
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
-
-import android.util.Log
-import android.os.Bundle
-import android.content.Intent
-import android.app.AlertDialog
 import kotlinx.coroutines.launch
-import androidx.cardview.widget.CardView
-import androidx.lifecycle.lifecycleScope
-import androidx.appcompat.app.AppCompatActivity
 
 class MoreActivity : AppCompatActivity() {
     private val user = User.getInstance()

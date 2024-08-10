@@ -1,11 +1,10 @@
 package com.example.brockapp.calendar
 
-import com.example.brockapp.R
-
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
 
 class DailyActivityViewHolder(itemView: View, private val onItemClick: (Long, String) -> Unit) : RecyclerView.ViewHolder(itemView) {
     private val activityTextView = itemView.findViewById<TextView>(R.id.activity_cell_text)

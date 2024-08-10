@@ -3,8 +3,8 @@ package com.example.brockapp.fragment
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import com.example.brockapp.R
 import androidx.fragment.app.Fragment
+import com.example.brockapp.R
 
 class PageLoaderActivityFragment : Fragment(R.layout.page_loader_activity_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

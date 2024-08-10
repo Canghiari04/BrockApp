@@ -1,25 +1,23 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.detect.UserActivityTransitionManager
-
+import android.content.Context
+import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import android.os.Bundle
 import android.widget.Button
-import android.os.SystemClock
-import android.content.Intent
-import android.content.Context
-import android.hardware.Sensor
-import android.widget.TextView
 import android.widget.Chronometer
-import android.hardware.SensorEvent
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import android.hardware.SensorManager
-import android.hardware.SensorEventListener
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.R
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 

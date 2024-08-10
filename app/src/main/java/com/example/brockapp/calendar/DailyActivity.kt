@@ -1,23 +1,20 @@
 package com.example.brockapp.calendar
 
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.R
 import com.example.brockapp.User
-import com.example.brockapp.DATE_FORMAT
-import com.example.brockapp.UNIVERSAL_DATE
-import com.example.brockapp.database.BrockDB
 import com.example.brockapp.data.UserActivity
-
-import android.os.Bundle
-import java.time.LocalDate
-import android.widget.TextView
-import kotlinx.coroutines.launch
+import com.example.brockapp.database.BrockDB
 import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.brockapp.ISO_DATE_FORMAT
 
 class DailyActivity : AppCompatActivity() {
     private val user = User.getInstance()

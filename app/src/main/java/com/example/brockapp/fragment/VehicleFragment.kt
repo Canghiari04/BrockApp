@@ -1,7 +1,6 @@
 package com.example.brockapp.fragment
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -13,15 +12,15 @@ import android.widget.Chronometer
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.R
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.R
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.Priority
 
 class VehicleFragment : Fragment(R.layout.vehicle_fragment) {

@@ -1,21 +1,20 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.R
-import com.example.brockapp.fragment.PageLoaderActivityFragment
-import com.example.brockapp.detect.UserActivityBroadcastReceiver
-import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-
-import android.util.Log
 import android.Manifest
-import android.os.Bundle
-import android.content.Intent
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.IntentFilter
-import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
+import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
+import com.example.brockapp.detect.UserActivityBroadcastReceiver
+import com.example.brockapp.fragment.PageLoaderActivityFragment
 
 class NewUserActivity: AppCompatActivity() {
     companion object {

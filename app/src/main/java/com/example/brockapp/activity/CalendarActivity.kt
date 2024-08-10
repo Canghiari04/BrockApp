@@ -1,27 +1,26 @@
 package com.example.brockapp.activity
 
 import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.CALENDAR_DATE_FORMAT
+import com.example.brockapp.DATE_SEPARATOR
 import com.example.brockapp.R
 import com.example.brockapp.User
-import com.example.brockapp.DATE_SEPARATOR
-import com.example.brockapp.CALENDAR_DATE_FORMAT
-import com.example.brockapp.calendar.DailyActivity
 import com.example.brockapp.calendar.CalendarAdapter
-
-import java.time.Month
-import android.util.Log
-import android.os.Bundle
-import java.time.YearMonth
+import com.example.brockapp.calendar.DailyActivity
 import java.time.DayOfWeek
 import java.time.LocalDate
-import android.widget.TextView
-import android.widget.ImageButton
-import java.time.temporal.ChronoUnit
+import java.time.Month
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.GridLayoutManager
 
 class CalendarActivity : AppCompatActivity() {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)

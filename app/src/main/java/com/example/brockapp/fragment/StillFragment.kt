@@ -1,23 +1,22 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.detect.UserActivityTransitionManager
-
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import android.os.Bundle
 import android.widget.Button
-import android.os.SystemClock
-import android.content.Intent
 import android.widget.Chronometer
-import androidx.fragment.app.Fragment
-import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityRecognition
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.R
+import com.example.brockapp.detect.UserActivityTransitionManager
+import com.google.android.gms.location.ActivityRecognition
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
