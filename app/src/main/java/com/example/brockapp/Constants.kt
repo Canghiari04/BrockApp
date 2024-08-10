@@ -12,7 +12,6 @@ const val REQUEST_CODE_BROADCAST_RECEIVER = 1010
 
 const val CHARTS_DATE_FORMAT = "MM-yyyy"
 
-
 const val DATE_FORMAT = "dd-MM-yyyy HH:mm:ss"
 const val DATE_SEPARATOR = "-"
 const val CALENDAR_DATE_FORMAT = "yyyy-MM-dd"

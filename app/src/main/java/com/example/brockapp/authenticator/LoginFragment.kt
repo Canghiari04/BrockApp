@@ -25,8 +25,10 @@ import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.brockapp.activity.AuthenticatorActivity
 
 class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = ArrayList<String>()
@@ -79,6 +81,10 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
             }
+        }
+
+        view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
+            startActivity(Intent(activity, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", "Signin"))
         }
     }
 
