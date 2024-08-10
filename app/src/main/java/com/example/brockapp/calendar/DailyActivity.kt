@@ -8,7 +8,6 @@ import com.example.brockapp.database.BrockDB
 import com.example.brockapp.data.UserActivity
 
 import android.os.Bundle
-import android.util.Log
 import java.time.LocalDate
 import android.widget.TextView
 import kotlinx.coroutines.launch
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity : AppCompatActivity() {
-    private val user = User.getInstance()
     private val db = BrockDB.getInstance(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +32,7 @@ class DailyActivity : AppCompatActivity() {
         textView.text = getPrettyDate(date)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val sortedActivities = getUserActivities(date)
+            val sortedActivities = getUserActivities(date, User.getInstance())
 
             populateDailyActivitiesRecyclerView(sortedActivities, dailyList)
         }
@@ -51,15 +49,18 @@ class DailyActivity : AppCompatActivity() {
      * In base al range temporale, è restituita la lista delle attività effettuate dall'utente in
      * ordine temporale.
      */
-    private suspend fun getUserActivities(date: String?): List<UserActivity> {
+    private suspend fun getUserActivities(date: String?, user: User): List<UserActivity> {
+        val userStillActivityDao = db.UserStillActivityDao()
+        val userVehicleActivityDao = db.UserVehicleActivityDao()
+        val userWalkActivityDao = db.UserWalkActivityDao()
+
         val (startOfDay, endOfDay) = getDayRange(date)
         val listActivities = ArrayList<UserActivity>()
 
-        val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
-        val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
-        val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listStillActivities = userStillActivityDao.getStillActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listVehicleActivities = userVehicleActivityDao.getVehicleActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
+        val listWalkingActivities = userWalkActivityDao.getWalkActivitiesByUserIdAndDay(user.id, startOfDay, endOfDay)
 
-        // TODO -> TROVARE IL MODO PER MIGLIORARE QUESTA SCHIFEZZA
         for(activity in listStillActivities) {
             val newActivity = UserActivity(activity.id, activity.userId, activity.timestamp, "STILL")
             listActivities.add(newActivity)
@@ -105,7 +106,6 @@ class DailyActivity : AppCompatActivity() {
     }
 
     private fun onItemClick(activityId: Long, type: String) {
-
         // PRENDERE IL DIALOG
         // PASSARGLI I DATI
         // DIALOG INTERNAMENTE QUERY AL DB ROOM

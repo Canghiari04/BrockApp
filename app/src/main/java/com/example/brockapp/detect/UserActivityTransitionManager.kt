@@ -5,6 +5,7 @@ import com.example.brockapp.REQUEST_CODE_BROADCAST_RECEIVER
 import android.content.Intent
 import android.content.Context
 import android.app.PendingIntent
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest

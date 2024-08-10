@@ -26,8 +26,12 @@
     <string name="permission_positive_button">Concedi</string>
     <string name="permission_negative_button">Annulla</string>
     <string name="permission_setting_button">Settings</string>
+    <string name="permission_background">Concedi il permesso di accedere alla tua posizione anche quando l\'app è in background per garantire il corretto funzionamento di tutte le funzionalità.</string>
+    <string name="permission_notification">Concedi il permesso di inviarti notifiche per tenerti aggiornato e garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
+    <string name="permissions_location">Concedi il permesso di accedere alla tua posizione per garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
     <string name="permissions_title">Permessi richiesti</string>
-    <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere alla tua posizione per fornire tutte le funzionalità.</string>
+    <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere a tutte le funzionalità richieste.</string>
+    <string name="permissions_toast">Clicca su "Concedi sempre".</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_activity">Attività</string>

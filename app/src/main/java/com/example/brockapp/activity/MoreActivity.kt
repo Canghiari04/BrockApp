@@ -5,17 +5,17 @@ import com.example.brockapp.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
 
-import android.util.Log
 import android.os.Bundle
 import android.content.Intent
 import android.app.AlertDialog
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AppCompatActivity
 
 class MoreActivity : AppCompatActivity() {
-    private val user = User.getInstance()
     private val db = BrockDB.getInstance(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +27,7 @@ class MoreActivity : AppCompatActivity() {
         }
 
         findViewById<CardView>(R.id.card_view_logout).setOnClickListener {
-            user.logoutUser(user)
+            User.getInstance().logoutUser(User.getInstance())
 
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -39,6 +39,7 @@ class MoreActivity : AppCompatActivity() {
     }
 
     private fun showDangerousDialog(user: User) {
+        val userId = user.id
         val userDao = db.UserDao()
 
         AlertDialog.Builder(this)
@@ -48,10 +49,8 @@ class MoreActivity : AppCompatActivity() {
                 dialog.dismiss()
                 user.logoutUser(user)
                 lifecycleScope.launch {
-                    try {
-                        userDao.deleteUserById(user.id)
-                    } catch (e: Exception) {
-                        Log.d("WTF", "WTF")
+                    withContext(Dispatchers.IO) {
+                        userDao.deleteUserById(userId)
                     }
                 }
                 startActivity(Intent(this, MainActivity::class.java))
