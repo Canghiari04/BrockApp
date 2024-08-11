@@ -23,8 +23,6 @@ class UserActivityBroadcastReceiver : BroadcastReceiver() {
         val user = User.getInstance()
         val db = BrockDB.getInstance(context)
 
-        // TODO -> CONTROLLO SULLE ACTITIVITY DI INTERESSE
-
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
