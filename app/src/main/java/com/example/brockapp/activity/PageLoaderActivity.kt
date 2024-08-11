@@ -12,7 +12,7 @@ class PageLoaderActivity : AppCompatActivity()  {
         setContentView(R.layout.page_loader_activity)
 
         /*
-         * Dall'intent acquisisco la tipologia di fragment che dovrà essere posta in primo piano.
+         * Dall'intent acquisisco la tipologia di activity che dovrà essere posta in primo piano.
          */
         findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
             when (item.itemId) {

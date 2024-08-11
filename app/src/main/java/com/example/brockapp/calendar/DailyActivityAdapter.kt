@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.R
 import com.example.brockapp.data.UserActivity
 
-class DailyActivityAdapter(private val activities: List<UserActivity>, private val onItemClick: (Long, String) -> Unit) : RecyclerView.Adapter<DailyActivityViewHolder>() {
+class DailyActivityAdapter(private val activities: List<UserActivity>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
         val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.activity_calendar_cell, parent, false)
 
-        return DailyActivityViewHolder(activityItem, onItemClick)
+        return DailyActivityViewHolder(activityItem)
     }
 
     override fun getItemCount(): Int {
@@ -18,6 +18,6 @@ class DailyActivityAdapter(private val activities: List<UserActivity>, private v
     }
 
     override fun onBindViewHolder(holder: DailyActivityViewHolder, position: Int) {
-        holder.bindActivity(activities[position].activityId, activities[position].type)
+        holder.bindActivity(activities[position].type, activities[position].timestamp, activities[position].info)
     }
 }
