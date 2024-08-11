@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.R
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
 import com.example.brockapp.data.UserActivity
 
 class DailyActivityAdapter(private val activities: List<UserActivity>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
@@ -18,6 +20,19 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
     }
 
     override fun onBindViewHolder(holder: DailyActivityViewHolder, position: Int) {
-        holder.bindActivity(activities[position].type, activities[position].timestamp, activities[position].info)
+
+        val orario = activities[position].timestamp!!.split(" ")[1]
+        when(activities[position].type) {
+            WALK_ACTIVITY_TYPE -> {
+                holder.bindActivity(WALK_ACTIVITY_TYPE, "Finito alle " + orario, "Passi fatti: " + activities[position].info)
+            }
+            VEHICLE_ACTIVITY_TYPE-> {
+                holder.bindActivity(VEHICLE_ACTIVITY_TYPE, "Finito alle " + orario, "Distanza percorsa: " + activities[position].info + " metri")
+            }
+            else -> {
+                holder.bindActivity(activities[position].type, "Finito alle " + orario, activities[position].info)
+            }
+        }
+
     }
 }

@@ -154,7 +154,8 @@ class DailyActivity : AppCompatActivity() {
             val beginActivityTime = LocalDateTime.parse(userActivities[i].timestamp, dateFormatter)
             val nextActivity = if (i < userActivities.size - 1) userActivities[i + 1] else null
 
-            if(nextActivity == null) break
+            if(nextActivity == null)
+                break
 
             val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
 
