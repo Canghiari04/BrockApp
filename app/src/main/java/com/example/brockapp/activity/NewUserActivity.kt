@@ -13,12 +13,14 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.R
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
+import com.example.brockapp.activity.notification.NotificationBroadcastReceiver
 import com.example.brockapp.detect.UserActivityBroadcastReceiver
 import com.example.brockapp.fragment.PageLoaderActivityFragment
 
 class NewUserActivity: AppCompatActivity() {
     companion object {
         val userActivityBroadcastReceiver = UserActivityBroadcastReceiver()
+        val notificationBroadcastReceiver = NotificationBroadcastReceiver()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +35,7 @@ class NewUserActivity: AppCompatActivity() {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showNewActivityPage()
                 registerActivityRecognition()
+
             }
         }
     }
@@ -99,6 +102,9 @@ class NewUserActivity: AppCompatActivity() {
             Log.d("BROADCAST RECEIVER", userActivityBroadcastReceiver.toString())
         }
     }
+
+
+
 
     /**
      * Metodo attuato per mostrare la finestra di dialogo necessaria per accettare i permessi

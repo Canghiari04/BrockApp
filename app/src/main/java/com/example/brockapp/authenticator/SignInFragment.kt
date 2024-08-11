@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
@@ -17,12 +18,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.R
 import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.User
 import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.activity.MainActivity
+import com.example.brockapp.activity.NewUserActivity.Companion.notificationBroadcastReceiver
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
@@ -73,6 +76,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
                         if (hasPermissions(requireContext(), PERMISSIONS)) {
                             startActivity(Intent(activity, PageLoaderActivity::class.java))
+                            registerNotificationBroadcastReceiver()
                         } else {
                             if (shouldShowRationaleDialog(PERMISSIONS)) {
                                 showLocationPermissionRationaleDialog(requireContext())
@@ -95,6 +99,16 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
         return permissions.all {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun registerNotificationBroadcastReceiver() {
+        try{
+            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+                notificationBroadcastReceiver, IntentFilter("NOTIFICATION")
+            )
+        } catch (e: Exception) {
+            Log.d("BROADCAST RECEIVER", notificationBroadcastReceiver.toString())
         }
     }
 

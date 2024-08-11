@@ -1,6 +1,7 @@
 package com.example.brockapp.fragment
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,6 +10,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Chronometer
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -58,6 +61,14 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
             }
         }
 
+        chronometer.setOnChronometerTickListener {
+            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+            val seconds = (elapsedTime / 1000).toInt()
+            if (seconds == 60) {
+                sendLazyUserNotification(requireContext())
+            }
+        }
+
         view.findViewById<Button>(R.id.button_start).isEnabled = true
         view.findViewById<Button>(R.id.button_stop).isEnabled = false
     }
@@ -88,6 +99,31 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
+        }
+
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+    }
+
+    private fun sendLazyUserNotification(context: Context) {
+        val channelId = "1"
+
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.baseline_chair_24)
+            .setContentTitle("Pigrone!")
+            .setContentText("Sei fermo da più di un minuto!")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        val intent = Intent("NOTIFICATION").apply {
+            putExtra("notification", notification)
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
         }
 
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)

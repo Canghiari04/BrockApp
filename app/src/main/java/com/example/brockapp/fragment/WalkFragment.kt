@@ -98,13 +98,6 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
     private fun sendWalkNotification(context: Context) {
         val channelId = "1"
 
-        // Verifica se il canale di notifica è necessario
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(channelId, "MyChannelName", importance)
-        channel.description = "My description"
-        notificationManager.createNotificationChannel(channel)
-
-        // Costruisci la notifica
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.baseline_directions_walk_24)
             .setContentTitle("Bravo!")
@@ -112,8 +105,9 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
-        // Invia la notifica
-        val notificationManager = NotificationManagerCompat.from(context)
+        val intent = Intent("NOTIFICATION").apply {
+            putExtra("notification", notification)
+        }
 
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -122,8 +116,8 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
         ) {
             return
         }
-        notificationManager.notify(1, notification)
 
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 
     private fun startStepCounting() {
