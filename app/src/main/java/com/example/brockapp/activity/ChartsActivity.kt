@@ -143,7 +143,6 @@ class ChartsActivity : AppCompatActivity() {
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
 
-        //TODO usare altro metodo per ottenere dataset con giusta colorazione
         val dataSet = getDataSet(entries, "Distanza percorsa")
 
         val data = BarData(dataSet).apply{
