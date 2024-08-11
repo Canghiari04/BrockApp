@@ -29,6 +29,8 @@ class MoreActivity : AppCompatActivity() {
         findViewById<CardView>(R.id.card_view_logout).setOnClickListener {
             User.getInstance().logoutUser(User.getInstance())
 
+            // TODO STOPPARE GEOFENCING
+
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
@@ -53,6 +55,7 @@ class MoreActivity : AppCompatActivity() {
                         userDao.deleteUserById(userId)
                     }
                 }
+                // TODO STOPPARE GEOFENCING
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }

@@ -8,7 +8,7 @@ import android.os.Bundle
 import com.example.brockapp.R
 import androidx.appcompat.app.AppCompatActivity
 
-class AuthenticatorActivity : AppCompatActivity() {
+class AuthenticatorActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.authenticator_activity)

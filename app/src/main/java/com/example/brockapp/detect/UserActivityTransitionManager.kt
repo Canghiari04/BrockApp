@@ -5,7 +5,6 @@ import com.example.brockapp.REQUEST_CODE_BROADCAST_RECEIVER
 import android.content.Intent
 import android.content.Context
 import android.app.PendingIntent
-import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest
@@ -14,7 +13,7 @@ class UserActivityTransitionManager(context: Context?) {
     /**
      * Restituisce il pending intent necessario per risvegliare il broadcast receiver.
      */
-    fun getPendingIntent(context: Context) : PendingIntent {
+    fun getPendingIntent(context: Context): PendingIntent {
         val intent = Intent(context, UserActivityBroadcastReceiver::class.java)
 
         return PendingIntent.getBroadcast(
@@ -25,14 +24,14 @@ class UserActivityTransitionManager(context: Context?) {
         )
     }
 
-    fun getRequest() : ActivityTransitionRequest {
+    fun getRequest(): ActivityTransitionRequest {
         return ActivityTransitionRequest(getTransitions())
     }
 
     /**
      * Restituisce la lista delle transition activity di interesse.
      */
-    private fun getTransitions() : List<ActivityTransition> {
+    private fun getTransitions(): List<ActivityTransition> {
         val transitions = mutableListOf<ActivityTransition>()
 
         transitions +=

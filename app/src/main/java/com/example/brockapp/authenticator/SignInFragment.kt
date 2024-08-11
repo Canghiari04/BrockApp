@@ -31,9 +31,11 @@ import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.location.GeofencingClient
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = ArrayList<String>()
+    private lateinit var geofencingClient: GeofencingClient
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
