@@ -1,10 +1,15 @@
 package com.example.brockapp
 
+
+const val STILL_ACTIVITY_TYPE = "STILL"
+const val WALK_ACTIVITY_TYPE = "WALK"
+const val VEHICLE_ACTIVITY_TYPE = "VEHICLE"
+
 const val SIGN_IN_ERROR = "Credenziali già presenti, passa a Login."
 const val LOGIN_ERROR = "Credenziali errate, riprova."
 const val BLANK_ERROR = "Inserisci le credenziali."
 
-const val ROOM_DATABASE_VERSION = 14
+const val ROOM_DATABASE_VERSION = 15
 
 const val REQUEST_CODE_PERMISSION_ACCESS_LOCATION = 1000
 const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1001

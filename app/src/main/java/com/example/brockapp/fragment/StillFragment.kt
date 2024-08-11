@@ -52,6 +52,8 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
                 view.findViewById<Button>(R.id.button_start).isEnabled = true
                 view.findViewById<Button>(R.id.button_stop).isEnabled = false
 
+                chronometer.base = SystemClock.elapsedRealtime()
+
                 registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
             }
         }

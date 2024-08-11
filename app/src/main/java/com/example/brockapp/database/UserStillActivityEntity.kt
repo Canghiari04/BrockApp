@@ -17,6 +17,6 @@ import androidx.room.PrimaryKey
 data class UserStillActivityEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "user_id") val userId: Long?,
-    @ColumnInfo(name = "transition_type") val transitionType: Int?,
+    @ColumnInfo(name = "transition_type") val transitionType: Int,
     val timestamp: String?,
 )

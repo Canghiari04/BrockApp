@@ -1,7 +1,6 @@
 package com.example.brockapp.activity
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -11,7 +10,6 @@ import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.R
 import com.example.brockapp.activity.CalendarActivity.Companion.user
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.UserWalkActivityEntity
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
@@ -101,7 +99,7 @@ class ChartsActivity : AppCompatActivity() {
         for (day in 1..currentDate.lengthOfMonth()) {
             val date = currentDate.withDayOfMonth(day)
             val (startOfDay, endOfDay) = getDayRange(date)
-            val totalSteps = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val totalSteps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
                 .sumOf { it.stepNumber }
 
             entries.add(BarEntry(day.toFloat(), totalSteps.toFloat()))
@@ -139,7 +137,7 @@ class ChartsActivity : AppCompatActivity() {
         for (day in 1..currentDate.lengthOfMonth()) {
             val date = currentDate.withDayOfMonth(day)
             val (startOfDay, endOfDay) = getDayRange(date)
-            val totalDistanceTravelled = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val totalDistanceTravelled = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
                 .sumOf { it.distanceTravelled ?: 0.0 }
 
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
@@ -172,17 +170,9 @@ class ChartsActivity : AppCompatActivity() {
         return BarDataSet(entries, label).apply {
 
             colors = entries.map {
-                val valueToColor = when {
-                    it.y > 10000 -> 1f
-                    else -> {
-                        it.y / 10
-                    }
-                }
-                val green = valueToColor
-                val blue = 1 - green
 
-                // Crea il colore ARGB
-                android.graphics.Color.argb(255,0, (green * 255).toInt(), (blue * 255).toInt())
+                //colore rosso uni_red
+                android.graphics.Color.argb(255, 187, 34, 34)
             }
         }
     }
@@ -193,9 +183,9 @@ class ChartsActivity : AppCompatActivity() {
         val yearMonth = getDateFromTextView()
         val (startOfMonth, endOfMonth) = getMonthRange(yearMonth.atDay(1))
 
-        val userWalkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-        val userStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-        val userVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
+        val userWalkActivities = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
+        val userStillActivities = db.UserStillActivityDao().getEndingStillActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
+        val userVehicleActivities = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
 
         entries.apply {
             add(PieEntry(userVehicleActivities.size.toFloat(), "Vehicle activity"))
@@ -212,6 +202,7 @@ class ChartsActivity : AppCompatActivity() {
         withContext(Dispatchers.Main) {
             activityTypePieChart.apply {
                 this.data = data
+                setDrawEntryLabels(false)
                 invalidate()
             }
 

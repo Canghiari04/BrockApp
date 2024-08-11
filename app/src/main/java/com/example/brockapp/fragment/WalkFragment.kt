@@ -25,13 +25,13 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
     private var stepCounterSensor: Sensor? = null
     private var running = false
     private var stepCount = 0
+    private var initialStepCount = 0 // Variabile per memorizzare il conteggio dei passi all'inizio della registrazione
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         activity?.let { context ->
             sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            // Ottieni il sensore di tipo Step Counter
             stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         }
 
@@ -47,7 +47,7 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
                 view.findViewById<Button>(R.id.walk_button_start).isEnabled = false
                 view.findViewById<Button>(R.id.walk_button_stop).isEnabled = true
 
-                // Avvia il contapassi
+                // Salva il valore attuale del contapassi come passo iniziale
                 startStepCounting()
             }
 
@@ -65,9 +65,13 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 
                 // Ferma il contapassi
                 stopStepCounting()
+                chronometer.base = SystemClock.elapsedRealtime()
+
+                // Calcola i passi totali e invia i dati
+                val totalSteps = stepCount - initialStepCount
+                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, totalSteps.toLong())
             }
 
-            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, stepCount.toLong())
         }
 
         view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
@@ -76,7 +80,10 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     private fun startStepCounting() {
         stepCounterSensor?.also { stepSensor ->
+            // Salva il valore iniziale dei passi quando inizia il conteggio
             sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            // Inizializza il conteggio dei passi iniziali
+            initialStepCount = stepCount
         }
     }
 
@@ -87,12 +94,11 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
 
-            // Il valore del contapassi è il primo elemento nell'array values
             stepCount = event.values[0].toInt()
             Log.d("StepCount", "Passi: $stepCount")
 
-            view?.findViewById<TextView>(R.id.step_count)?.text = stepCount.toString()
-
+            val stepsDuringSession = stepCount - initialStepCount
+            view?.findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
         }
     }
 
@@ -100,9 +106,7 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     }
 
-
-    private fun registerActivity(activityType: Int, transitionType: Int, stepCount : Long) {
-
+    private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long) {
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
