@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
@@ -18,10 +17,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
-import com.example.brockapp.NOTIFICATION_INTENT_FILTER
 import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.activity.AuthenticatorActivity

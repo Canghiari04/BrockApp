@@ -13,14 +13,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.Chronometer
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.NOTIFICATION_INTENT_FILTER
 import com.example.brockapp.R
-import com.example.brockapp.notification.NotificationService
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
 
@@ -73,13 +70,18 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
             }
         }
 
-        // Esempio di notifica che viene mandata dopo 30 secondi di camminata
+         var notificationSent = false
+
         chronometer.setOnChronometerTickListener {
-            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val seconds = (elapsedTime / 1000).toInt()
-            if (seconds == 10) {
-                sendWalkNotification("Bravo!", "Stai camminando da più di 30 secondi!")
+            val elapsedMillis = SystemClock.elapsedRealtime() - chronometer.base
+
+            val elapsedSeconds = elapsedMillis / 1000 / 60 / 60
+
+            if (elapsedSeconds >= 1 && !notificationSent) {
+                sendWalkNotification("Bravo!", "Stai camminando da più di un'ora!")
+                notificationSent = true
             }
+
         }
 
         view.findViewById<Button>(R.id.walk_button_start).isEnabled = true

@@ -101,9 +101,6 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-
-
-
     /**
      * Metodo attuato per mostrare la finestra di dialogo necessaria per accettare i permessi
      * richiesti.
