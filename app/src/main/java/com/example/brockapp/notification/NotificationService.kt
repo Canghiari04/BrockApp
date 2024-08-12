@@ -1,6 +1,8 @@
 package com.example.brockapp.notification
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,6 +13,7 @@ import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.NOTIFICATION_INTENT_FILTER
 import com.example.brockapp.R
 
@@ -22,21 +25,19 @@ class NotificationService : Service() {
         super.onCreate()
         receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                if(intent.action == NOTIFICATION_INTENT_FILTER) {
-
-                }
                 val notificationManager = NotificationManagerCompat.from(context)
-
-                // Assicurati che il canale di notifica sia creato
-                notificationManager.getNotificationChannel("1")
+                getNotificationChannel(context, notificationManager)
 
                 val channelId = "1"
+
                 val title = intent.getStringExtra("title")
                 val content = intent.getStringExtra("content")
                 val type = intent.getStringExtra("type")
-                val icon = when (type) {
-                    "walk" -> R.drawable.baseline_directions_walk_24
-                    else -> R.drawable.circle
+                var icon = 0
+                when (type) {
+                    "walk" -> {
+                        icon = R.drawable.baseline_directions_walk_24
+                    }
                 }
 
                 val notification = NotificationCompat.Builder(context, channelId)
@@ -54,10 +55,23 @@ class NotificationService : Service() {
                     return
                 }
                 notificationManager.notify(1, notification)
+
+            }
+
+            private fun getNotificationChannel(
+                context: Context,
+                notificationManager: NotificationManagerCompat
+            ) {
+
+                val channelId = "1"
+                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(channelId, "MyChannelName", importance)
+                channel.description = "My description"
+                notificationManager.createNotificationChannel(channel)
             }
         }
         val filter = IntentFilter(NOTIFICATION_INTENT_FILTER)
-        registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

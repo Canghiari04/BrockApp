@@ -88,14 +88,13 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     private fun sendWalkNotification(title: String, content: String) {
         val intent = Intent(NOTIFICATION_INTENT_FILTER)
+            .putExtra("title", title)
+            .putExtra("content", content)
+            .putExtra("type", "walk")
 
-//        val intent = Intent(requireContext(), NotificationService::class.java).apply {
-//            putExtra("title", title)
-//            putExtra("content", content)
-//            putExtra("type", "walk")
-//        }
 
-        activity?.sendBroadcast(intent)
+        //activity?.sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 
 
