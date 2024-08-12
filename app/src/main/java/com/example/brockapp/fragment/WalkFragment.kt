@@ -30,13 +30,11 @@ import com.google.android.gms.location.DetectedActivity
 class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
-    private var stepCounterSensor: Sensor? = null
+    private var stepDetectorSensor: Sensor? = null
     private var running = false
     private var stepCount = 0
     private var initialStepCount = 0
     private lateinit var notificationManager: NotificationManagerCompat
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,15 +44,13 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
         notificationManager = NotificationManagerCompat.from(context)
 
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         val chronometer = view.findViewById<Chronometer>(R.id.walk_chronometer)
 
         view.findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
-
                 chronometer.start()
-
                 running = true
 
                 view.findViewById<Button>(R.id.walk_button_start).isEnabled = false
@@ -62,8 +58,6 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
 
                 startStepCounting()
             }
-
-            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, -1L)
         }
 
         view.findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
@@ -82,33 +76,30 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
             }
         }
 
-            //esempio di notifica che viene mandata dopo 30 secondi di camminata
-            chronometer.setOnChronometerTickListener {
-                val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-                val seconds = (elapsedTime / 1000).toInt()
-                if (seconds == 30) {
-                    sendWalkNotification("Bravo!", "Stai camminando da più di 30 secondi!")
-                }
+        // Esempio di notifica che viene mandata dopo 30 secondi di camminata
+        chronometer.setOnChronometerTickListener {
+            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+            val seconds = (elapsedTime / 1000).toInt()
+            if (seconds == 30) {
+                sendWalkNotification("Bravo!", "Stai camminando da più di 30 secondi!")
+            }
         }
 
         view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
         view.findViewById<Button>(R.id.walk_button_stop).isEnabled = false
     }
 
-    private fun sendWalkNotification(title : String, content : String) {
-
-
+    private fun sendWalkNotification(title: String, content: String) {
         val intent = Intent("NOTIFICATION").apply {
             putExtra("title", title)
             putExtra("content", content)
             putExtra("type", "walk")
         }
-
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 
     private fun startStepCounting() {
-        stepCounterSensor?.also { stepSensor ->
+        stepDetectorSensor?.also { stepSensor ->
             sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
             initialStepCount = stepCount
         }
@@ -125,9 +116,8 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
 
             val stepsDuringSession = stepCount - initialStepCount
 
-            if(stepsDuringSession == 100){
+            if (stepsDuringSession == 100) {
                 sendWalkNotification("Bravo!", "Hai fatto 100 passi!")
-
             }
             view?.findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
         }
@@ -141,7 +131,6 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
             putExtra("transitionType", transitionType)
             putExtra("stepNumber", stepCount)
         }
-
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 }
