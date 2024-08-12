@@ -21,12 +21,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
+import com.example.brockapp.NOTIFICATION_INTENT_FILTER
 import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.activity.MainActivity
-import com.example.brockapp.activity.NewUserActivity.Companion.notificationBroadcastReceiver
-import com.example.brockapp.activity.NewUserActivity.Companion.userActivityBroadcastReceiver
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.database.BrockDB
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +69,6 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
 
                         if (hasPermissions(requireContext(), PERMISSIONS)) {
                             startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
-                            registerNotificationBroadcastReceiver()
                         } else {
                             if (shouldShowRationaleDialog(SignInFragment.PERMISSIONS)) {
                                 showLocationPermissionRationaleDialog(requireContext())
@@ -105,13 +103,6 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
         }
     }
 
-    private fun registerNotificationBroadcastReceiver() {
-        try{
-            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(notificationBroadcastReceiver, IntentFilter("NOTIFICATION"))
-        } catch (e: Exception) {
-            Log.d("BROADCAST RECEIVER", notificationBroadcastReceiver.toString())
-        }
-    }
 
     /**
      * Variabile privata di tipo ActivityResultLauncher, utilizzata per accertarsi se l'utente abbia

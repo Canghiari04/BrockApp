@@ -1,31 +1,30 @@
 package com.example.brockapp.calendar
 
-import com.example.brockapp.R
-import com.example.brockapp.User
-import com.example.brockapp.ISO_DATE_FORMAT
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-
 import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.R
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.User
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
-import android.widget.TextView
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.lifecycleScope
 import java.time.format.DateTimeFormatter
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.charts.PieChart
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.mikephil.charting.utils.ColorTemplate
 
 class DailyActivity : AppCompatActivity() {
     private val user = User.getInstance()

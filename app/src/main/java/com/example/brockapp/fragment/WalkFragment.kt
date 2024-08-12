@@ -1,16 +1,11 @@
 package com.example.brockapp.fragment
 
-import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -19,11 +14,13 @@ import android.widget.Button
 import android.widget.Chronometer
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.NOTIFICATION_INTENT_FILTER
 import com.example.brockapp.R
+import com.example.brockapp.notification.NotificationService
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
 
@@ -80,7 +77,7 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
             val seconds = (elapsedTime / 1000).toInt()
-            if (seconds == 30) {
+            if (seconds == 10) {
                 sendWalkNotification("Bravo!", "Stai camminando da più di 30 secondi!")
             }
         }
@@ -90,13 +87,19 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
     }
 
     private fun sendWalkNotification(title: String, content: String) {
-        val intent = Intent("NOTIFICATION").apply {
+        val intent = Intent(requireContext(), NotificationService::class.java).apply {
             putExtra("title", title)
             putExtra("content", content)
             putExtra("type", "walk")
         }
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+
+        intent.action = NOTIFICATION_INTENT_FILTER
+
+        // Avvia il Service
+        activity?.startForegroundService(intent)
+        activity?.sendBroadcast(intent)
     }
+
 
     private fun startStepCounting() {
         stepDetectorSensor?.also { stepSensor ->

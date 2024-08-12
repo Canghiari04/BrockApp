@@ -13,14 +13,12 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.R
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-import com.example.brockapp.activity.notification.NotificationBroadcastReceiver
 import com.example.brockapp.detect.UserActivityBroadcastReceiver
 import com.example.brockapp.fragment.PageLoaderActivityFragment
 
 class NewUserActivity: AppCompatActivity() {
     companion object {
         val userActivityBroadcastReceiver = UserActivityBroadcastReceiver()
-        val notificationBroadcastReceiver = NotificationBroadcastReceiver()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

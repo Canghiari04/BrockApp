@@ -25,7 +25,6 @@ import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.User
 import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.activity.MainActivity
-import com.example.brockapp.activity.NewUserActivity.Companion.notificationBroadcastReceiver
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
@@ -76,7 +75,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
                         if (hasPermissions(requireContext(), PERMISSIONS)) {
                             startActivity(Intent(activity, PageLoaderActivity::class.java))
-                            registerNotificationBroadcastReceiver()
                         } else {
                             if (shouldShowRationaleDialog(PERMISSIONS)) {
                                 showLocationPermissionRationaleDialog(requireContext())
@@ -102,15 +100,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         }
     }
 
-    private fun registerNotificationBroadcastReceiver() {
-        try{
-            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
-                notificationBroadcastReceiver, IntentFilter("NOTIFICATION")
-            )
-        } catch (e: Exception) {
-            Log.d("BROADCAST RECEIVER", notificationBroadcastReceiver.toString())
-        }
-    }
 
     private fun shouldShowRationaleDialog(permissions: Array<String>): Boolean {
         return permissions.any {
