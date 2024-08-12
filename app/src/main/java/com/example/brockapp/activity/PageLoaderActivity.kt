@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.content.Intent
 import com.example.brockapp.R
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PageLoaderActivity : AppCompatActivity()  {

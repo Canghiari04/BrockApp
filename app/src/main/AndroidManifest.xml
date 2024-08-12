@@ -55,5 +55,7 @@
             android:name=".calendar.DailyActivity"
             android:parentActivityName=".activity.CalendarActivity">
         </activity>
+        <service android:name=".service.GeofenceService">
+        </service>
     </application>
 </manifest>

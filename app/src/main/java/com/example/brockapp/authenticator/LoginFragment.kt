@@ -5,12 +5,16 @@ import com.example.brockapp.User
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.example.brockapp.activity.MainActivity
+import com.example.brockapp.geofencing.GeofenceManager
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.activity.AuthenticatorActivity
+import com.example.brockapp.geofencing.GeofenceBroadcastReceiver
 
 import android.net.Uri
 import android.Manifest
+import android.util.Log
 import android.view.View
 import android.os.Bundle
 import android.widget.Toast
@@ -19,25 +23,21 @@ import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
 import android.content.Context
-import android.content.IntentFilter
 import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.provider.Settings
+import android.content.IntentFilter
 import kotlinx.coroutines.withContext
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.lifecycle.lifecycleScope
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
-import com.example.brockapp.activity.NewUserActivity.Companion.userActivityBroadcastReceiver
-import com.example.brockapp.geofencing.GeofenceBroadcastReceiver
-import com.example.brockapp.geofencing.GeofenceManager
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.service.GeofenceService
 
 class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = ArrayList<String>()
@@ -271,13 +271,17 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
             .show()
     }
 
+    /**
+     * Se il client si connette all'API remota, viene registrato e messo in ascolto il broadcast
+     * receiver relativo al geofencing.
+     */
     private fun startGeofenceBroadcast(manager: GeofenceManager) {
         geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(manager.getRequest(), manager.getPendingIntent()).run {
                 addOnSuccessListener {
-                    LocalBroadcastManager.getInstance(requireContext()).registerReceiver(GeofenceBroadcastReceiver(), IntentFilter(GEOFENCE_INTENT_TYPE))
+                    activity?.startService(Intent(activity, GeofenceService::class.java))
                 }
                 addOnFailureListener {
                     Log.d("GEOFENCING", "Errore di connessione all'API.")

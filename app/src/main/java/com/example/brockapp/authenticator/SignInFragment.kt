@@ -21,6 +21,7 @@ import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
 import android.content.Context
+import android.content.IntentFilter
 import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.provider.Settings
@@ -30,8 +31,13 @@ import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
-import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.location.GeofencingClient
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
+import com.example.brockapp.geofencing.GeofenceBroadcastReceiver
+import com.example.brockapp.geofencing.GeofenceManager
+import com.google.android.gms.location.LocationServices
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = ArrayList<String>()
@@ -113,6 +119,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun checkNotificationPermission() {
         when {
             hasNotificationPermission(requireContext()) -> {
+                startGeofenceBroadcast(GeofenceManager(requireContext()))
                 startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
             }
             shouldShowNotificationPermissionRationaleDialog() -> {
@@ -190,6 +197,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
     private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
+            startGeofenceBroadcast(GeofenceManager(requireContext()))
             startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
         } else {
             showNotificationPermissionDialog(requireContext())
@@ -267,5 +275,26 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             }
             .create()
             .show()
+    }
+
+    /**
+     * Se il client si connette all'API remota, viene registrato e messo in ascolto il broadcast
+     * receiver relativo al geofencing.
+     */
+    private fun startGeofenceBroadcast(manager: GeofenceManager) {
+        geofencingClient = LocationServices.getGeofencingClient(requireContext())
+
+        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            geofencingClient.addGeofences(manager.getRequest(), manager.getPendingIntent()).run {
+                addOnSuccessListener {
+                    LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+                        GeofenceBroadcastReceiver(), IntentFilter(GEOFENCE_INTENT_TYPE)
+                    )
+                }
+                addOnFailureListener {
+                    Log.d("GEOFENCING", "Errore di connessione all'API.")
+                }
+            }
+        }
     }
 }
