@@ -11,6 +11,7 @@ import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.brockapp.NOTIFICATION_INTENT_FILTER
 import com.example.brockapp.R
 
 class NotificationService : Service() {
@@ -21,6 +22,9 @@ class NotificationService : Service() {
         super.onCreate()
         receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                if(intent.action == NOTIFICATION_INTENT_FILTER) {
+
+                }
                 val notificationManager = NotificationManagerCompat.from(context)
 
                 // Assicurati che il canale di notifica sia creato
@@ -52,7 +56,7 @@ class NotificationService : Service() {
                 notificationManager.notify(1, notification)
             }
         }
-        val filter = IntentFilter("NOTIFICATION")
+        val filter = IntentFilter(NOTIFICATION_INTENT_FILTER)
         registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
     }
 
