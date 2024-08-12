@@ -69,7 +69,6 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
                 vehicleButtonStart.isEnabled = false
                 vehicleButtonStop.isEnabled = true
 
-                // Start location updates
                 startLocationUpdates()
             }
             registerActivity(
@@ -100,16 +99,17 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
         }
     }
 
+    /**
+     * Costruisce una richiesta di aggiornamento di posizione.
+     * Gestisce l'aggiornamento della posizione in background e mostra a schermo la distanza percorsa
+     */
     private fun setupLocationUpdates() {
-        // Crea una nuova richiesta di aggiornamento della posizione
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong())
             .build()
 
-        // Configura il callback per gestire i risultati della posizione
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                // Gestisce i risultati della posizione
                 val locations = locationResult.locations
                 if (locations.isNotEmpty()) {
                     val newLocation = locations.last()
@@ -128,6 +128,9 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
     }
 
 
+    /**
+     * Controlla se i permessi sono stati garantiti e richiama la funzione per iniziare l'aggiornamento della posizione
+     */
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
@@ -136,6 +139,9 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
+    /**
+     * Ferma l'aggiornamento della posizione
+     */
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
