@@ -11,7 +11,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.brockapp.R
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
@@ -19,7 +21,24 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
         val notificationManager = NotificationManagerCompat.from(context)
         getNotificationChannel(context, notificationManager)
 
-        val notification = intent.getParcelableExtra("notification", Notification::class.java)
+        val channelId = "1"
+
+        val title = intent.getStringExtra("title")
+        val content = intent.getStringExtra("content")
+        val type = intent.getStringExtra("type")
+        var icon = 0
+        when (type) {
+            "walk" -> {
+                icon = R.drawable.baseline_directions_walk_24
+            }
+        }
+
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(icon)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
 
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -28,9 +47,8 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
         ) {
             return
         }
-        if (notification != null) {
-            notificationManager.notify(1, notification)
-        }
+        notificationManager.notify(1, notification)
+
     }
 
     private fun getNotificationChannel(context: Context, notificationManager : NotificationManagerCompat){

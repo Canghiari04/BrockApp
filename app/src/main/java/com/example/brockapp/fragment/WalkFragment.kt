@@ -36,6 +36,8 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
     private var initialStepCount = 0
     private lateinit var notificationManager: NotificationManagerCompat
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -47,11 +49,10 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
         val chronometer = view.findViewById<Chronometer>(R.id.walk_chronometer)
-        var pauseOffset: Long = 0
 
         view.findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
-                //chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
+
                 chronometer.start()
 
                 running = true
@@ -68,7 +69,6 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
         view.findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
             if (running) {
                 chronometer.stop()
-                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
                 view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
@@ -87,7 +87,7 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
                 val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
                 val seconds = (elapsedTime / 1000).toInt()
                 if (seconds == 30) {
-                    sendWalkNotification(context)
+                    sendWalkNotification("Bravo!", "Stai camminando da più di 30 secondi!")
                 }
         }
 
@@ -95,26 +95,13 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
         view.findViewById<Button>(R.id.walk_button_stop).isEnabled = false
     }
 
-    private fun sendWalkNotification(context: Context) {
-        val channelId = "1"
+    private fun sendWalkNotification(title : String, content : String) {
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.baseline_directions_walk_24)
-            .setContentTitle("Bravo!")
-            .setContentText("Stai camminando da più di 30 secondi!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .build()
 
         val intent = Intent("NOTIFICATION").apply {
-            putExtra("notification", notification)
-        }
-
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
+            putExtra("title", title)
+            putExtra("content", content)
+            putExtra("type", "walk")
         }
 
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
@@ -132,11 +119,16 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-            stepCount = event.values[0].toInt()
+        if (event.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
+            stepCount++
             Log.d("StepCount", "Passi: $stepCount")
 
             val stepsDuringSession = stepCount - initialStepCount
+
+            if(stepsDuringSession == 100){
+                sendWalkNotification("Bravo!", "Hai fatto 100 passi!")
+
+            }
             view?.findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
         }
     }
