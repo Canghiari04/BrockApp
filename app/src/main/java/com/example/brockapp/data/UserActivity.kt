@@ -4,5 +4,7 @@ data class UserActivity(
     val activityId: Long,
     val userId: Long?,
     val timestamp: String?,
-    val type: String
+    val transitionType : Int,
+    val type: String,
+    val info: String
 )

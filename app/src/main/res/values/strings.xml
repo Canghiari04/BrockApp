@@ -12,9 +12,9 @@
 
     <string name="login_welcome_text_view">Login</string>
     <string name="message_to_signin">Non hai un account?</string>
-    <string name="on_click_signin">Signin</string>
+    <string name="on_click_signin">Sign In</string>
 
-    <string name="signin_welcome_text_view">Signin</string>
+    <string name="signin_welcome_text_view">Sign In</string>
     <string name="message_to_login">Hai già un account?</string>
     <string name="on_click_login">Login</string>
 
@@ -61,12 +61,20 @@
 
     <string name="description_icon_activity">Activity icon</string>
 
+    <string name="charts_step_count_text">Numero di passi giornaliero</string>
+    <string name="charts_distance_travelled_text">Distanza percorsa giornaliera</string>
+    <string name="charts_pie_chart_text">Suddivisione delle attività nel mese</string>
+    <string name="no_activity_text">Nessuna attività compiuta nel mese</string>
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="activity_main_text">Le tue attività</string>
     <string name="historical_main_text">Il tuo storico</string>
     <string name="calendar_main_text">Il tuo calendario</string>
     <string name="charts_main_text">I tuoi grafici</string>
     <string name="friends_main_text">I tuoi amici</string>
+
+    <string name="vehicle_distance_travelled">Distanza percorsa</string>
+    <string name="initial_distance_travelled">0.0</string>
 
     <string name="account_text_view">Account</string>
     <string name="description_icon_account">Account icon</string>
@@ -83,4 +91,7 @@
     <string name="password_account_dialog">Password:</string>
 
     <string name="exit_dialog_button">ESCI</string>
+    <string name="distance_label">Distanza percorsa</string>
+    <string name="insert_username_text">Inserisci lo username:</string>
+    <string name="insert_password_text">Inserisci la password:</string>
 </resources>

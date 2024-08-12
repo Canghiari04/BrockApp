@@ -21,11 +21,19 @@
             android:textColor="@color/black" >
         </TextView>
 
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/daily_activity_pie_chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:gravity="center"
+            android:layout_margin="10dp" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/activities_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:background="@color/grey" />
     </LinearLayout>
 </LinearLayout>

@@ -1,11 +1,10 @@
 package com.example.brockapp.database
 
-import com.example.brockapp.ROOM_DATABASE_VERSION
-
-import androidx.room.Room
-import androidx.room.Database
 import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.brockapp.ROOM_DATABASE_VERSION
 
 @Database(
     entities = [UserEntity::class, UserStillActivityEntity::class, UserVehicleActivityEntity::class, UserWalkActivityEntity::class],

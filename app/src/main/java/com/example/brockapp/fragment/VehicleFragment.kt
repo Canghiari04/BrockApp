@@ -1,90 +1,157 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.detect.UserActivityTransitionManager
-
-import android.view.View
-import android.os.Bundle
-import android.widget.Button
-import android.os.SystemClock
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
+import android.widget.Button
 import android.widget.Chronometer
+import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
+import com.example.brockapp.R
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
-class VehicleFragment() : Fragment(R.layout.start_stop_activity_fragment) {
+class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private var startLocation: Location? = null
+    private var totalDistance = 0.0
+
+    private var running = false
+    private var pauseOffset: Long = 0
+
+    private lateinit var distanceTravelled : TextView
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val transitionManager = UserActivityTransitionManager(requireContext())
         val chronometer = view.findViewById<Chronometer>(R.id.chronometer)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        setupLocationUpdates()
 
-        var running = false
-        var pauseOffset: Long = 0
+        distanceTravelled = view.findViewById(R.id.vehicle_distance_travelled)
 
-        view.findViewById<Button>(R.id.button_start).setOnClickListener {
+        val vehicleButtonStart = view.findViewById<Button>(R.id.vehicle_button_start)
+        val vehicleButtonStop = view.findViewById<Button>(R.id.vehicle_button_stop)
+
+        setOnClickListeners(vehicleButtonStart, chronometer, vehicleButtonStop)
+
+        vehicleButtonStart.isEnabled = true
+        vehicleButtonStop.isEnabled = false
+    }
+
+    private fun setOnClickListeners(
+        vehicleButtonStart: Button,
+        chronometer: Chronometer,
+        vehicleButtonStop: Button
+    ) {
+        vehicleButtonStart.setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
                 chronometer.start()
                 running = true
 
-                view.findViewById<Button>(R.id.button_start).isEnabled = false
-                view.findViewById<Button>(R.id.button_stop).isEnabled = true
-            }
+                vehicleButtonStart.isEnabled = false
+                vehicleButtonStop.isEnabled = true
 
-            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER, -1.0)
+                startLocationUpdates()
+            }
+            registerActivity(
+                DetectedActivity.IN_VEHICLE,
+                ActivityTransition.ACTIVITY_TRANSITION_ENTER,
+                0.0
+            )
         }
 
-        view.findViewById<Button>(R.id.button_stop).setOnClickListener {
+        vehicleButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
                 pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
-                view.findViewById<Button>(R.id.button_start).isEnabled = true
-                view.findViewById<Button>(R.id.button_stop).isEnabled = false
-            }
-            //TODO implementare lettura distanza percorsa
-            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_EXIT, 1.0)
-        }
+                vehicleButtonStart.isEnabled = true
+                vehicleButtonStop.isEnabled = false
 
-        view.findViewById<Button>(R.id.button_start).isEnabled = true
-        view.findViewById<Button>(R.id.button_stop).isEnabled = false
+                stopLocationUpdates()
+                chronometer.base = SystemClock.elapsedRealtime()
+
+                registerActivity(
+                    DetectedActivity.IN_VEHICLE,
+                    ActivityTransition.ACTIVITY_TRANSITION_EXIT,
+                    totalDistance
+                )
+            }
+        }
     }
 
-//    private fun startDetection(transitionManager: UserActivityTransitionManager) {
-//        val request = transitionManager.getRequest()
-//        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
-//
-//        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
-//        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-//            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-//
-//            task.addOnSuccessListener {
-//                Log.d("DETECT", "Connesso all'API activity recognition")
-//            }
-//
-//            task.addOnFailureListener {
-//                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-//            }
-//
-//            registerActivity(DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-//        } else {
-//            Log.d("WTF", "WTF")
-//        }
-//    }
+    /**
+     * Costruisce una richiesta di aggiornamento di posizione.
+     * Gestisce l'aggiornamento della posizione in background e mostra a schermo la distanza percorsa
+     */
+    private fun setupLocationUpdates() {
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+            .setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong())
+            .build()
 
-    private fun registerActivity(activityType: Int, transitionType: Int, distanceTravelled : Double) {
-        // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val locations = locationResult.locations
+                if (locations.isNotEmpty()) {
+                    val newLocation = locations.last()
+                    if (startLocation == null) {
+                        startLocation = newLocation
+                    } else {
+                        startLocation?.let {
+                            totalDistance += it.distanceTo(newLocation).toDouble()
+                            distanceTravelled.text = String.format("%.2f meters", totalDistance)
+                        }
+                        startLocation = newLocation
+                    }
+                }
+            }
+        }
+    }
 
+
+    /**
+     * Controlla se i permessi sono stati garantiti e richiama la funzione per iniziare l'aggiornamento della posizione
+     */
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+    }
+
+    /**
+     * Ferma l'aggiornamento della posizione
+     */
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun registerActivity(activityType: Int, transitionType: Int, distanceTravelled: Double) {
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
             putExtra("distanceTravelled", distanceTravelled)
         }
-
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 }

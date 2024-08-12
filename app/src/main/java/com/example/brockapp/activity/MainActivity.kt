@@ -1,10 +1,10 @@
 package com.example.brockapp.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.content.Intent
-import com.example.brockapp.R
 import androidx.activity.ComponentActivity
+import com.example.brockapp.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

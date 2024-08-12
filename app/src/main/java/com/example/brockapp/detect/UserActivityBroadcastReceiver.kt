@@ -1,35 +1,32 @@
 package com.example.brockapp.detect
 
-import com.example.brockapp.User
-import com.example.brockapp.DATE_FORMAT
-
-import android.util.Log
-import java.time.Instant
-import java.time.ZoneOffset
-import android.content.Intent
-import android.content.Context
 import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserStillActivityEntity
 import com.example.brockapp.database.UserVehicleActivityEntity
 import com.example.brockapp.database.UserWalkActivityEntity
-import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class UserActivityBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val user = User.getInstance()
         val db = BrockDB.getInstance(context)
 
-        // TODO -> CONTROLLO SULLE ACTITIVITY DI INTERESSE
-
         val activityType = intent.getIntExtra("activityType", -1)
         val transitionType = intent.getIntExtra("transitionType", -1)
         val timestamp = DateTimeFormatter
-            .ofPattern(DATE_FORMAT)
+            .ofPattern(ISO_DATE_FORMAT)
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
 

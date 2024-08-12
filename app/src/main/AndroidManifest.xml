@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -52,6 +55,9 @@
             android:name=".calendar.DailyActivity"
             android:parentActivityName=".activity.CalendarActivity">
         </activity>
+
         <receiver android:name=".geofencing.GeofenceBroadcastReceiver"/>
+
+        <service android:name=".notification.NotificationService"/>
     </application>
 </manifest>

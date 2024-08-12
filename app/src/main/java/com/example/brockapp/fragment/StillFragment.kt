@@ -1,23 +1,23 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.detect.UserActivityTransitionManager
-
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import android.os.Bundle
 import android.widget.Button
-import android.os.SystemClock
-import android.content.Intent
 import android.widget.Chronometer
-import androidx.fragment.app.Fragment
-import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityRecognition
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.NOTIFICATION_INTENT_FILTER
+import com.example.brockapp.R
+import com.example.brockapp.detect.UserActivityTransitionManager
+import com.google.android.gms.location.ActivityRecognition
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -29,36 +29,70 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
         var running = false
         var pauseOffset: Long = 0
 
+        setButtonListeners(view, running, chronometer, pauseOffset, transitionManager)
+
+        setChronometerListener(chronometer)
+
+        view.findViewById<Button>(R.id.button_start).isEnabled = true
+        view.findViewById<Button>(R.id.button_stop).isEnabled = false
+    }
+
+    private fun setChronometerListener(chronometer: Chronometer) {
+        var notificationSent = false
+        chronometer.setOnChronometerTickListener {
+            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+            val hours = (elapsedTime / 1000 ).toInt()
+            if (hours == 10 && !notificationSent) {
+                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
+                notificationSent = true
+            }
+        }
+    }
+
+    private fun setButtonListeners(
+        view: View,
+        running: Boolean,
+        chronometer: Chronometer,
+        pauseOffset: Long,
+        transitionManager: UserActivityTransitionManager
+    ) {
+        var running1 = running
+        var pauseOffset1 = pauseOffset
         view.findViewById<Button>(R.id.button_start).setOnClickListener {
-            if (!running) {
-                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
+            if (!running1) {
+                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset1
                 chronometer.start()
-                running = true
+                running1 = true
 
                 view.findViewById<Button>(R.id.button_start).isEnabled = false
                 view.findViewById<Button>(R.id.button_stop).isEnabled = true
 
-                registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                registerTransition(
+                    DetectedActivity.STILL,
+                    ActivityTransition.ACTIVITY_TRANSITION_ENTER
+                )
             }
 
             startDetection(transitionManager)
         }
 
         view.findViewById<Button>(R.id.button_stop).setOnClickListener {
-            if (running) {
+            if (running1) {
                 chronometer.stop()
-                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
-                running = false
+                pauseOffset1 = SystemClock.elapsedRealtime() - chronometer.base
+                running1 = false
 
                 view.findViewById<Button>(R.id.button_start).isEnabled = true
                 view.findViewById<Button>(R.id.button_stop).isEnabled = false
 
-                registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+                chronometer.base = SystemClock.elapsedRealtime()
+
+                registerTransition(
+                    DetectedActivity.STILL,
+                    ActivityTransition.ACTIVITY_TRANSITION_EXIT
+                )
             }
         }
-
-        view.findViewById<Button>(R.id.button_start).isEnabled = true
-        view.findViewById<Button>(R.id.button_stop).isEnabled = false
     }
 
     private fun startDetection(transitionManager: UserActivityTransitionManager) {
@@ -89,6 +123,18 @@ class StillFragment() : Fragment(R.layout.start_stop_activity_fragment) {
             putExtra("transitionType", transitionType)
         }
 
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+    }
+
+    private fun sendLazyUserNotification(title : String, content : String) {
+
+        val intent = Intent(NOTIFICATION_INTENT_FILTER)
+            .putExtra("title", title)
+            .putExtra("content", content)
+            .putExtra("type", "walk")
+
+
+        //activity?.sendBroadcast(intent)
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 }

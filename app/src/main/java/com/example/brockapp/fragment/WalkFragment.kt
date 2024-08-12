@@ -1,85 +1,109 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.detect.UserActivityTransitionManager
-
+import android.content.Context
+import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import android.os.Bundle
 import android.widget.Button
-import android.os.SystemClock
-import android.content.Intent
-import android.content.Context
-import android.hardware.Sensor
-import android.widget.TextView
 import android.widget.Chronometer
-import android.hardware.SensorEvent
+import android.widget.TextView
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
-import android.hardware.SensorManager
-import android.hardware.SensorEventListener
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.NOTIFICATION_INTENT_FILTER
+import com.example.brockapp.R
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
-class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
+class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
-    private var stepCounterSensor: Sensor? = null
+    private var stepDetectorSensor: Sensor? = null
     private var running = false
     private var stepCount = 0
+    private var initialStepCount = 0
+    private lateinit var notificationManager: NotificationManagerCompat
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.let { context ->
-            sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            // Ottieni il sensore di tipo Step Counter
-            stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        }
+        // Assicurati che il contesto sia disponibile
+        val context = requireContext()  // Ora sicuro di essere chiamato nel momento giusto
+        notificationManager = NotificationManagerCompat.from(context)
 
-        val transitionManager = UserActivityTransitionManager(requireContext())
+        sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+
         val chronometer = view.findViewById<Chronometer>(R.id.walk_chronometer)
-        var pauseOffset: Long = 0
 
         view.findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
-                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
                 chronometer.start()
                 running = true
 
                 view.findViewById<Button>(R.id.walk_button_start).isEnabled = false
                 view.findViewById<Button>(R.id.walk_button_stop).isEnabled = true
 
-                // Avvia il contapassi
                 startStepCounting()
             }
-
-            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, -1L)
         }
 
         view.findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
             if (running) {
                 chronometer.stop()
-                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
                 view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
                 view.findViewById<Button>(R.id.walk_button_stop).isEnabled = false
 
-                // Ferma il contapassi
                 stopStepCounting()
+                chronometer.setBase(SystemClock.elapsedRealtime())
+
+                val totalSteps = stepCount - initialStepCount
+                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, totalSteps.toLong())
+            }
+        }
+
+         var notificationSent = false
+
+        chronometer.setOnChronometerTickListener {
+            val elapsedMillis = SystemClock.elapsedRealtime() - chronometer.base
+
+            val elapsedSeconds = elapsedMillis / 1000 / 60 / 60
+
+            if (elapsedSeconds >= 1 && !notificationSent) {
+                sendWalkNotification("Bravo!", "Stai camminando da più di un'ora!")
+                notificationSent = true
             }
 
-            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, stepCount.toLong())
         }
 
         view.findViewById<Button>(R.id.walk_button_start).isEnabled = true
         view.findViewById<Button>(R.id.walk_button_stop).isEnabled = false
     }
 
+    private fun sendWalkNotification(title: String, content: String) {
+        val intent = Intent(NOTIFICATION_INTENT_FILTER)
+            .putExtra("title", title)
+            .putExtra("content", content)
+            .putExtra("type", "walk")
+
+
+        //activity?.sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+    }
+
+
     private fun startStepCounting() {
-        stepCounterSensor?.also { stepSensor ->
+        stepDetectorSensor?.also { stepSensor ->
             sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            initialStepCount = stepCount
         }
     }
 
@@ -88,46 +112,22 @@ class WalkFragment() : Fragment(R.layout.walk_fragment), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-
-            // Il valore del contapassi è il primo elemento nell'array values
-            stepCount = event.values[0].toInt()
+        if (event.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
+            stepCount++
             Log.d("StepCount", "Passi: $stepCount")
 
-            view?.findViewById<TextView>(R.id.step_count)?.text = stepCount.toString()
+            val stepsDuringSession = stepCount - initialStepCount
 
+            if (stepsDuringSession == 100) {
+                sendWalkNotification("Bravo!", "Hai fatto 100 passi!")
+            }
+            view?.findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 
-    }
-
-//    private fun startDetection(transitionManager: UserActivityTransitionManager) {
-//        val request = transitionManager.getRequest()
-//        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(requireContext())
-//
-//        // Check richiesto obbligatoriamente prima di poter richiedere update su transitions activity.
-//        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-//            val task = ActivityRecognition.getClient(requireContext()).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-//
-//            task.addOnSuccessListener {
-//                Log.d("DETECT", "Connesso all'API activity recognition")
-//            }
-//
-//            task.addOnFailureListener {
-//                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-//            }
-//
-//            registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-//        } else {
-//            Log.d("WTF", "WTF")
-//        }
-//    }
-
-    private fun registerActivity(activityType: Int, transitionType: Int, stepCount : Long) {
-        // TODO --> PUT EXTRA ALL'INTENT PER DIVERSIFICARE LA TIPOLOGIA DI ACTIVITY RECOGNITION DA CONDURRE.
-
+    private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long) {
         val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)

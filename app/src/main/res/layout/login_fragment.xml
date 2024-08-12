@@ -25,6 +25,19 @@
             app:layout_constraintTop_toTopOf="parent">
         </TextView>
 
+        <TextView
+            android:id="@+id/login_insert_username_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="124dp"
+            android:text="@string/insert_username_text"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
         <EditText
             android:id="@+id/text_username"
             android:hint="@string/authenticator_username"
@@ -39,6 +52,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_message_text_view" />
+
+        <TextView
+            android:id="@+id/login_insert_password_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="204dp"
+            android:text="@string/insert_password_text"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/text_password"
