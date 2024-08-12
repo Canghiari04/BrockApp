@@ -8,13 +8,18 @@ import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT
 import com.google.android.gms.location.GeofencingEvent
+import java.util.Locale
 
 class GeofenceService: Service() {
     private lateinit var receiver: BroadcastReceiver
@@ -27,28 +32,28 @@ class GeofenceService: Service() {
                 if(intent.action == GEOFENCE_INTENT_TYPE) {
                     val event = GeofencingEvent.fromIntent(intent)
 
-                    if(event!!.hasError()) {
-                        Log.d("BROADCAST_RECEIVER_GEOFENCING", event.errorCode.toString())
-                        return
-                    }
+                    if(event != null) {
+                        if(event.hasError()) {
+                            Log.d("GEOFENCE_BROADCAST", event.errorCode.toString())
+                        } else {
+                            val geofenceTransition = event.geofenceTransition
+                            val geofenceLocation = event.triggeringLocation
+                            val geofences = event.triggeringGeofences
 
-                    val transition = event.geofenceTransition
-
-                    // Indipendentemente dalla tipologia di evento a cui sono interessato, vado a gestire
-                    // il tutto notificando l'utente.
-                    when {
-                        transition == GEOFENCE_TRANSITION_ENTER -> {
-                            val trigger = event.triggeringGeofences
+                            when {
+                                geofenceTransition == GEOFENCE_TRANSITION_ENTER -> {
+                                    handleGeofencingTransition(geofenceTransition, geofenceLocation, geofences)
+                                }
+                                geofenceTransition == GEOFENCE_TRANSITION_DWELL -> {
+                                    handleGeofencingTransition(geofenceTransition, geofenceLocation, geofences)
+                                }
+                                else -> {
+                                    Log.d("GEOFENCE_BROADCAST", "Geofence non necessario.")
+                                }
+                            }
                         }
-                        transition == GEOFENCE_TRANSITION_EXIT -> {
-                            val trigger = event.triggeringGeofences
-                        }
-                        transition == GEOFENCE_TRANSITION_DWELL -> {
-                            val trigger = event.triggeringGeofences
-                        }
-                        else -> {
-                            Log.d("WTF", "WTF")
-                        }
+                    } else {
+                        Log.d("GEOFENCE_BROADCAST", "Evento null.")
                     }
                 }
             }
@@ -65,5 +70,10 @@ class GeofenceService: Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    private fun handleGeofencingTransition(geofenceTransition: Int, geofenceLocation: Location?, geofences: List<Geofence>?) {
+        // DOVREI INVIARE UNA NOTIFICA
+        Log.d("GEOFENCE_BROADCAST", "I'm in.")
     }
 }

@@ -1,14 +1,15 @@
-package com.example.brockapp.geofencing
+package com.example.brockapp.manager
 
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.example.brockapp.REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER
+import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.data.Locality
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
-class GeofenceManager(private val context: Context?) {
+class GeofenceManager(private val context: Context) {
     companion object {
         const val longitude = 44.4827194
         const val latitude = 11.3498368
@@ -17,9 +18,9 @@ class GeofenceManager(private val context: Context?) {
     }
 
     fun getPendingIntent(): PendingIntent {
-        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(context, GeofenceService::class.java)
 
-        return PendingIntent.getBroadcast(
+        return PendingIntent.getService(
             context,
             REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER,
             intent,
@@ -46,7 +47,7 @@ class GeofenceManager(private val context: Context?) {
                     .setRequestId(entry.id)
                     .setCircularRegion(entry.longitude, entry.latitude, r.toFloat())
                     .setExpirationDuration(day)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                     .build()
             )
         }

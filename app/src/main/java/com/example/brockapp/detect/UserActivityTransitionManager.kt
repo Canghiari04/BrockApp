@@ -1,6 +1,6 @@
 package com.example.brockapp.detect
 
-import com.example.brockapp.REQUEST_CODE_BROADCAST_RECEIVER
+import com.example.brockapp.REQUEST_CODE_ACTIVITY_BROADCAST_RECEIVER
 
 import android.content.Intent
 import android.content.Context
@@ -18,7 +18,7 @@ class UserActivityTransitionManager(context: Context?) {
 
         return PendingIntent.getBroadcast(
             context,
-            REQUEST_CODE_BROADCAST_RECEIVER,
+            REQUEST_CODE_ACTIVITY_BROADCAST_RECEIVER,
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
