@@ -58,5 +58,6 @@
 
         <receiver android:name=".geofencing.GeofenceBroadcastReceiver"/>
 
+        <service android:name=".notification.NotificationService"/>
     </application>
 </manifest>

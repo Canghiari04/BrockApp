@@ -53,7 +53,7 @@ class NotificationService : Service() {
             }
         }
         val filter = IntentFilter("NOTIFICATION")
-        registerReceiver(receiver, filter)
+        registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

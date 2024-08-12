@@ -28,6 +28,7 @@ import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.notification.NotificationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,6 +69,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
                         user.password = password
 
                         if (hasPermissions(requireContext(), PERMISSIONS)) {
+                            activity?.startService(Intent(activity, NotificationService::class.java))
                             startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
                         } else {
                             if (shouldShowRationaleDialog(SignInFragment.PERMISSIONS)) {

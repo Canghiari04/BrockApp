@@ -95,8 +95,6 @@ class WalkFragment : Fragment(R.layout.walk_fragment), SensorEventListener {
 
         intent.action = NOTIFICATION_INTENT_FILTER
 
-        // Avvia il Service
-        activity?.startForegroundService(intent)
         activity?.sendBroadcast(intent)
     }
 
