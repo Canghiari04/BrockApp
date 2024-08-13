@@ -23,21 +23,8 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
-
-
-        <TextView
-            android:id="@+id/signin_insert_username_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="124dp"
-            android:text="@string/insert_username_text"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
+        </TextView>
 
         <EditText
             android:id="@+id/text_username"
@@ -54,25 +41,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/signup_welcome_text_view" />
 
-
-        <TextView
-            android:id="@+id/singin_insert_password_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="224dp"
-            android:text="@string/insert_password_text"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
         <EditText
             android:id="@+id/text_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
+            android:layout_marginTop="50dp"
             android:backgroundTint="@color/uni_red"
             android:ems="10"
             android:hint="@string/authenticator_password"
@@ -80,7 +53,6 @@
             android:padding="15dp"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_username" />
 
@@ -106,10 +78,10 @@
             app:layout_constraintTop_toBottomOf="@+id/button_sign_in">
 
             <TextView
+                android:text="@string/message_to_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/message_to_login"
                 android:textAlignment="textEnd"
                 android:textSize="18sp"
                 android:textStyle="bold|italic"
@@ -124,6 +96,7 @@
                 android:text="@string/on_click_login"
                 android:textAlignment="textStart"
                 android:textColor="@color/uni_red"
+                android:layout_marginStart="5dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:layout_editor_absoluteX="231dp"

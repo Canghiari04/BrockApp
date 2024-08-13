@@ -18,7 +18,7 @@
         android:theme="@style/Theme.BrockApp"
         tools:targetApi="31">
         <activity
-            android:name=".activity.MainActivity" android:exported="true">
+            android:name=".activity.AuthenticatorActivity" android:exported="true">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
@@ -30,34 +30,14 @@
             android:name=".activity.PageLoaderActivity">
         </activity>
         <activity
-            android:name=".activity.AuthenticatorActivity" />
-        <activity
-            android:name=".activity.HomeActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
-        </activity>
-        <activity
-            android:name=".activity.CalendarActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
-        </activity>
-        <activity
             android:name=".activity.NewUserActivity"
             android:parentActivityName=".activity.PageLoaderActivity">
         </activity>
         <activity
-            android:name=".activity.ChartsActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
-        </activity>
-        <activity
-            android:name=".activity.MoreActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
-        </activity>
-        <activity
             android:name=".calendar.DailyActivity"
-            android:parentActivityName=".activity.CalendarActivity">
+            android:parentActivityName=".activity.PageLoaderActivity">
         </activity>
-
         <receiver android:name=".geofencing.GeofenceBroadcastReceiver"/>
-
         <service android:name=".notification.NotificationService"/>
     </application>
 </manifest>

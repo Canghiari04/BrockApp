@@ -30,9 +30,10 @@
     <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere alla tua posizione per fornire tutte le funzionalità.</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_activity">Attività</string>
+    <string name="menu_activity">Calendario</string>
+    <string name="menu_register">Registra</string>
     <string name="menu_plot">Grafici</string>
-    <string name="menu_more">More</string>
+    <string name="menu_friends">Amici</string>
 
     <string name="historical_text_view">IL TUO STORICO</string>
     <string name="calendar_text_view">CALENDARIO</string>

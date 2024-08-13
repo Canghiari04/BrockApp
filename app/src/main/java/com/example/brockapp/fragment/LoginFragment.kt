@@ -1,4 +1,4 @@
-package com.example.brockapp.authenticator
+package com.example.brockapp.fragment
 
 import android.Manifest
 import android.app.AlertDialog
@@ -18,19 +18,19 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.BLANK_ERROR
+import com.example.brockapp.LOGIN_ERROR
 import com.example.brockapp.R
-import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.User
 import com.example.brockapp.activity.AuthenticatorActivity
-import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.UserEntity
+import com.example.brockapp.fragment.SignInFragment.OnFragmentInteractionListener
+import com.example.brockapp.notification.NotificationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SignInFragment : Fragment(R.layout.sign_in_fragment) {
+class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = ArrayList<String>()
 
     companion object {
@@ -40,10 +40,20 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         )
     }
 
+    /**
+     * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
+     * activity "ospitante".
+     */
+    interface OnFragmentInteractionListener {
+        fun showSignInFragment()
+    }
+
+    private var listener: OnFragmentInteractionListener? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
+        view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             val db = BrockDB.getInstance(requireContext())
             val userDao = db.UserDao()
 
@@ -53,16 +63,10 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val userAlreadyExists = withContext(Dispatchers.IO) {
-                            userDao.checkIfUserIsPresent(username, password)
+                        userDao.checkIfUserIsPresent(username, password)
                     }
 
                     if (userAlreadyExists) {
-                        Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
-                    } else {
-                        withContext(Dispatchers.IO) {
-                            userDao.insertUser(UserEntity(username = username, password = password))
-                        }
-
                         val user = User.getInstance()
 
                         user.id = withContext(Dispatchers.IO) {
@@ -72,14 +76,17 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                         user.password = password
 
                         if (hasPermissions(requireContext(), PERMISSIONS)) {
-                            startActivity(Intent(activity, PageLoaderActivity::class.java))
+                            activity?.startService(Intent(activity, NotificationService::class.java))
+                            startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
                         } else {
-                            if (shouldShowRationaleDialog(PERMISSIONS)) {
+                            if (shouldShowRationaleDialog(SignInFragment.PERMISSIONS)) {
                                 showLocationPermissionRationaleDialog(requireContext())
                             } else {
-                                permissionLauncher.launch(PERMISSIONS)
+                                permissionLauncher.launch(SignInFragment.PERMISSIONS)
                             }
                         }
+                    } else {
+                        Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
                     }
                 }
             } else {
@@ -87,9 +94,20 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             }
         }
 
-        view.findViewById<TextView>(R.id.login_text_view).setOnClickListener {
-            startActivity(Intent(activity, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", "Login"))
+        view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
+            listener?.showSignInFragment()
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnFragmentInteractionListener)
+            listener = context
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 
     private fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
@@ -97,7 +115,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     }
-
 
     private fun shouldShowRationaleDialog(permissions: Array<String>): Boolean {
         return permissions.any {
@@ -137,26 +154,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
      * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
      * richiesti.
      */
-    private fun showLocationPermissionRationaleDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permissions_title)
-            .setMessage(R.string.permissions_message)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-                startActivity(Intent(context, MainActivity::class.java))
-            }
-            .create()
-            .show()
-    }
-
-    /**
-     * Metodo attuato per mostrare la finesta di dialogo successiva a differenti eventi "Deny"
-     * dei permessi richiesti. Il metodo risveglierà l'activity settings del dispositivo.
-     */
     private fun showLocationPermissionDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
@@ -167,7 +164,25 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(context, MainActivity::class.java))
+            }
+            .create()
+            .show()
+    }
+
+    /**
+     * Metodo attuato per mostrare la finesta di dialogo successiva a differenti eventi "Deny"
+     * dei permessi richiesti. Il metodo risveglierà l'activity settings del dispositivo.
+     */
+    private fun showLocationPermissionRationaleDialog(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.permissions_title)
+            .setMessage(R.string.permissions_message)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
             }
             .create()
             .show()

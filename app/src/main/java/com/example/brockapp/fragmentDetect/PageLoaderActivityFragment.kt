@@ -1,4 +1,4 @@
-package com.example.brockapp.fragment
+package com.example.brockapp.fragmentDetect
 
 import android.os.Bundle
 import android.view.View
@@ -6,7 +6,7 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.brockapp.R
 
-class PageLoaderActivityFragment : Fragment(R.layout.page_loader_activity_fragment) {
+class PageLoaderActivityFragment: Fragment(R.layout.page_loader_activity_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

@@ -14,7 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.R
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 import com.example.brockapp.detect.UserActivityBroadcastReceiver
-import com.example.brockapp.fragment.PageLoaderActivityFragment
+import com.example.brockapp.fragmentDetect.PageLoaderActivityFragment
 
 class NewUserActivity: AppCompatActivity() {
     companion object {

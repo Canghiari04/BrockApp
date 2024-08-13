@@ -1,11 +1,12 @@
-package com.example.brockapp.activity
+package com.example.brockapp.fragment
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.CALENDAR_DATE_FORMAT
@@ -22,27 +23,27 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 
-class CalendarActivity : AppCompatActivity() {
+class CalendarFragment(): Fragment(R.layout.calendar_activity) {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
     companion object {
         val user: User = User.getInstance()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.calendar_activity)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setDate(LocalDate.of(2024, 8, 31))
 
-        val calendar = findViewById<RecyclerView>(R.id.calendar_recycler_view)
+        val calendar = view.findViewById<RecyclerView>(R.id.calendar_recycler_view)
 
         populateCalendarRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), calendar)
 
-        val buttonBack = findViewById<ImageButton>(R.id.button_back_month)
-        val buttonForward = findViewById<ImageButton>(R.id.button_forward_month)
+        val buttonBack = view.findViewById<ImageButton>(R.id.button_back_month)
+        val buttonForward = view.findViewById<ImageButton>(R.id.button_forward_month)
 
         buttonBack.setOnClickListener {
-            val tokens = (findViewById<TextView>(R.id.date_text_view).text).split(" ")
+            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
 
             var date = getDateByTokens(tokens)
             date = date.minusMonths(1)
@@ -53,7 +54,7 @@ class CalendarActivity : AppCompatActivity() {
         }
 
         buttonForward.setOnClickListener {
-            val tokens = (findViewById<TextView>(R.id.date_text_view).text).split(" ")
+            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
 
             var date = getDateByTokens(tokens)
             date = date.plusMonths(1)
@@ -69,12 +70,12 @@ class CalendarActivity : AppCompatActivity() {
      */
     private fun setDate(date: LocalDate) {
         val strDate = "${date.month}" + " ${date.year}"
-        findViewById<TextView>(R.id.date_text_view).text = strDate.lowercase()
+        view?.findViewById<TextView>(R.id.date_text_view)?.text = strDate.lowercase()
     }
 
     private fun populateCalendarRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
         val adapterCalendar = CalendarAdapter(days, dates, { date -> onItemClick(date) }, {date -> showActivityOfDay(date)})
-        val layoutManager = GridLayoutManager(this, 7)
+        val layoutManager = GridLayoutManager(requireContext(), 7)
 
         calendar.adapter = adapterCalendar
         calendar.layoutManager = layoutManager
@@ -145,7 +146,7 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun showActivityOfDay(date: String) {
-        val intent = Intent(this, DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
+        val intent = Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
 
         startActivity(intent)
     }

@@ -1,4 +1,4 @@
-package com.example.brockapp.fragment
+package com.example.brockapp.fragmentDetect
 
 import android.Manifest
 import android.content.Intent
