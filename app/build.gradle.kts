@@ -62,4 +62,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     kapt("androidx.room:room-compiler:2.6.1")
+    
+    // scope view model
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }

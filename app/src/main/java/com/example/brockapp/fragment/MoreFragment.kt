@@ -1,23 +1,26 @@
-package com.example.brockapp.fragment
+package com.example.brockapp.activity
 
-import android.app.AlertDialog
-import android.content.Intent
-import android.os.Bundle
-import android.util.Log
-import android.view.View
-import androidx.cardview.widget.CardView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.R
 import com.example.brockapp.User
 import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
 import com.google.android.gms.auth.api.Auth
+
+import android.os.Bundle
+import android.content.Intent
+import android.app.AlertDialog
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.cardview.widget.CardView
+import androidx.lifecycle.lifecycleScope
+import androidx.appcompat.app.AppCompatActivity
 
 class MoreFragment(): Fragment(R.layout.more_activity) {
     private val user = User.getInstance()
+class MoreActivity : AppCompatActivity() {
+    private val db = BrockDB.getInstance(this)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

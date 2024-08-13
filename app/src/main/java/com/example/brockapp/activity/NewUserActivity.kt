@@ -5,6 +5,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
+import androidx.core.content.ContextCompat
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -23,17 +26,21 @@ class NewUserActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkDetectActivity()
+        checkActivityPermission()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if(requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showNewActivityPage()
-                registerActivityRecognition()
-
+            when {
+                grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
+                    showNewActivityPage()
+                    registerActivityRecognition()
+                }
+                else -> {
+                    showDetectPermissionDialog()
+                }
             }
         }
     }
@@ -44,7 +51,7 @@ class NewUserActivity: AppCompatActivity() {
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(userActivityBroadcastReceiver)
         } catch (e: Exception) {
-            Log.d("BROADCAST RECEIVER", e.toString())
+            Log.d("BROADCAST_RECEIVER", e.toString())
         }
     }
 
@@ -54,7 +61,7 @@ class NewUserActivity: AppCompatActivity() {
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(userActivityBroadcastReceiver)
         } catch (e: Exception) {
-            Log.d("BROADCAST RECEIVER", e.toString())
+            Log.d("BROADCAST_RECEIVER", e.toString())
         }
     }
 
@@ -62,7 +69,7 @@ class NewUserActivity: AppCompatActivity() {
      * Metodo attuato per definire se il permesso di activity recognition sia stato accettato
      * oppure negato.
      */
-    private fun checkDetectActivity() {
+    private fun checkActivityPermission() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             showNewActivityPage()
             registerActivityRecognition()
@@ -111,15 +118,13 @@ class NewUserActivity: AppCompatActivity() {
             .setMessage(R.string.permission_message)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
-                    REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-                )
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)))
+                finish()
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
                 startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("TYPE_PAGE", "HOME"))
+                finish()
             }
             .create()
             .show()

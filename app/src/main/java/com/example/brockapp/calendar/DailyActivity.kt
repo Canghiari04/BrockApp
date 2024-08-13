@@ -7,6 +7,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.ISO_DATE_FORMAT
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.R
 import com.example.brockapp.STILL_ACTIVITY_TYPE
 import com.example.brockapp.User
