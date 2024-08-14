@@ -1,73 +1,64 @@
 package com.example.brockapp.fragment
 
-import android.content.Intent
-import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.CALENDAR_DATE_FORMAT
-import com.example.brockapp.DATE_SEPARATOR
 import com.example.brockapp.R
 import com.example.brockapp.User
+import com.example.brockapp.DATE_SEPARATOR
+import com.example.brockapp.util.CalendarUtil
+import com.example.brockapp.CALENDAR_DATE_FORMAT
+import com.example.brockapp.activity.DailyActivity
 import com.example.brockapp.calendar.CalendarAdapter
-import com.example.brockapp.calendar.DailyActivity
-import java.time.DayOfWeek
+
+import android.os.Bundle
+import android.view.View
 import java.time.LocalDate
-import java.time.Month
-import java.time.YearMonth
+import android.content.Intent
+import android.widget.TextView
+import android.widget.ImageButton
+import androidx.fragment.app.Fragment
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalAdjusters
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
 
-class CalendarFragment(): Fragment(R.layout.calendar_activity) {
+class CalendarFragment: Fragment(R.layout.calendar_fragment) {
+    private lateinit var user: User
+    private lateinit var utilCalendar: CalendarUtil
+
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
-
-    companion object {
-        val user: User = User.getInstance()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setDate(LocalDate.of(2024, 8, 31))
-
         val calendar = view.findViewById<RecyclerView>(R.id.calendar_recycler_view)
 
-        populateCalendarRecyclerView(getCurrentDays(LocalDate.now()), getDates(LocalDate.now()), calendar)
+        user = User.getInstance()
+        utilCalendar = CalendarUtil()
 
-        val buttonBack = view.findViewById<ImageButton>(R.id.button_back_month)
-        val buttonForward = view.findViewById<ImageButton>(R.id.button_forward_month)
+        setDate(LocalDate.of(2024, 8, 31))
+        populateCalendarRecyclerView(utilCalendar.getCurrentDays(LocalDate.now()), utilCalendar.getDates(LocalDate.now()), calendar)
 
-        buttonBack.setOnClickListener {
+        view.findViewById<ImageButton>(R.id.button_back_month).setOnClickListener {
             val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
 
-            var date = getDateByTokens(tokens)
+            var date = utilCalendar.getDateByTokens(formatter, tokens)
             date = date.minusMonths(1)
             date.format(formatter)
 
-            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
+            populateCalendarRecyclerView(utilCalendar.getCurrentDays(date), utilCalendar.getDates(date), calendar)
         }
 
-        buttonForward.setOnClickListener {
+        view.findViewById<ImageButton>(R.id.button_forward_month).setOnClickListener {
             val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
 
-            var date = getDateByTokens(tokens)
+            var date = utilCalendar.getDateByTokens(formatter, tokens)
             date = date.plusMonths(1)
             date.format(formatter)
 
-            populateCalendarRecyclerView(getCurrentDays(date), getDates(date), calendar)
             setDate(date)
+            populateCalendarRecyclerView(utilCalendar.getCurrentDays(date), utilCalendar.getDates(date), calendar)
         }
     }
 
-    /**
-     * Metodo attuato per modificare la visualizzazione grafica della data corrente.
-     */
     private fun setDate(date: LocalDate) {
         val strDate = "${date.month}" + " ${date.year}"
         view?.findViewById<TextView>(R.id.date_text_view)?.text = strDate.lowercase()
@@ -82,62 +73,9 @@ class CalendarFragment(): Fragment(R.layout.calendar_activity) {
     }
 
     /**
-     * Funzione attuata per ottenere tutti i giorni di un determinato mese.
+     * Metodo associato alle singole ViewHolder per garantire la possibilità di impostare la data
+     * corretta successivo all'evento click.
      */
-    private fun getCurrentDays(date: LocalDate) : ArrayList<String> {
-        var i = 0
-        val list = getList(date)
-
-        do {
-            i++
-            list.add(i.toString())
-        } while(i < date.month.length(false))
-
-        return list
-    }
-
-    /**
-     * Funzione attuata per ottenere tutte le date complete da associare alle molteplici view holder.
-     */
-    private fun getDates(date: LocalDate) : ArrayList<String> {
-        var i = 0
-        var myDateId: String
-        val list = getList(date)
-
-        try {
-            do {
-                i++
-                myDateId = date.withDayOfMonth(i).toString()
-                list.add(myDateId)
-
-            } while(i < date.month.length(false))
-        } catch (e: Exception) {
-            Log.d("CALENDAR", e.toString())
-        }
-
-        return list
-    }
-
-    private fun getList(date: LocalDate): ArrayList<String> {
-        val firstDayOfMonth = LocalDate.of(date.year, date.month, 1)
-        val startOfWeek = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        val daysDistance = ChronoUnit.DAYS.between(startOfWeek, firstDayOfMonth)
-
-        return ArrayList(MutableList(daysDistance.toInt()) {""})
-    }
-
-    /**
-     * Funzione attuata per ricavare l'ultimo giorno del mese. La LocalDate restituita è utilizzata
-     * per navigare tra i mesi dell'anno circoscritto.
-     */
-    private fun getDateByTokens(tokens: List<String>): LocalDate {
-        val year = tokens[1].toInt()
-        val month = Month.valueOf(tokens[0].uppercase()).value
-        val lastDay = YearMonth.of(year, month).atEndOfMonth()
-
-        return LocalDate.parse(lastDay.toString(), formatter)
-    }
-
     private fun onItemClick(date: String) {
         val tokens = date.split(DATE_SEPARATOR).toList()
         val item = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
@@ -145,9 +83,11 @@ class CalendarFragment(): Fragment(R.layout.calendar_activity) {
         setDate(item)
     }
 
+    /**
+     * Metodo attuato per attuare lo start di una nuova attività per visualizzare le informazioni
+     * rispetto alla data corrente passata come parametro.
+     */
     private fun showActivityOfDay(date: String) {
-        val intent = Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
-
-        startActivity(intent)
+        startActivity(Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date))
     }
 }

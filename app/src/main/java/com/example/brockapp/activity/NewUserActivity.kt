@@ -1,32 +1,45 @@
 package com.example.brockapp.activity
 
-import android.Manifest
-import android.app.AlertDialog
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
-import androidx.core.content.ContextCompat
-import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.brockapp.R
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-import com.example.brockapp.detect.UserActivityBroadcastReceiver
-import com.example.brockapp.fragmentDetect.PageLoaderActivityFragment
+
+import android.net.Uri
+import android.Manifest
+import android.os.Bundle
+import android.view.MenuItem
+import android.widget.Button
+import android.content.Intent
+import android.app.AlertDialog
+import android.provider.Settings
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.service.ActivityRecognitionService
 
 class NewUserActivity: AppCompatActivity() {
-    companion object {
-        val userActivityBroadcastReceiver = UserActivityBroadcastReceiver()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         checkActivityPermission()
+
+        findViewById<Button>(R.id.button_daily_detect).setOnClickListener {
+            // TODO --> ACTIVITY DAILY DETECT
+        }
+
+        findViewById<Button>(R.id.button_still).setOnClickListener {
+            startActivity(Intent(this, StillActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.button_vehicle).setOnClickListener {
+            startActivity(Intent(this, VehicleActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.button_walk).setOnClickListener {
+            startActivity(Intent(this, WalkActivity::class.java))
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -45,23 +58,17 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(userActivityBroadcastReceiver)
-        } catch (e: Exception) {
-            Log.d("BROADCAST_RECEIVER", e.toString())
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(userActivityBroadcastReceiver)
-        } catch (e: Exception) {
-            Log.d("BROADCAST_RECEIVER", e.toString())
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
+                finish()
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+                false
+            }
         }
     }
 
@@ -90,22 +97,11 @@ class NewUserActivity: AppCompatActivity() {
      */
     private fun showNewActivityPage() {
         setContentView(R.layout.new_user_activity)
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.detect_fragment, PageLoaderActivityFragment())
-            commit()
-        }
-    }
 
-    /**
-     * Metodo attuato per registrare il broadcast receiver, affinchè possa ricevere updates relativi
-     * ad activity recognition.
-     */
-    private fun registerActivityRecognition() {
-        try {
-            LocalBroadcastManager.getInstance(this).registerReceiver(userActivityBroadcastReceiver, IntentFilter("TRANSITIONS_RECEIVER_ACTION"))
-        } catch (e: Exception) {
-            Log.d("BROADCAST RECEIVER", userActivityBroadcastReceiver.toString())
-        }
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     /**
@@ -128,5 +124,13 @@ class NewUserActivity: AppCompatActivity() {
             }
             .create()
             .show()
+    }
+
+    /**
+     * Metodo attuato per registrare il broadcast receiver, affinchè possa ricevere updates relativi
+     * ad activity recognition.
+     */
+    private fun registerActivityRecognition() {
+        startService(Intent(this, ActivityRecognitionService::class.java))
     }
 }

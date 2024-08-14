@@ -1,26 +1,24 @@
-package com.example.brockapp.activity
+package com.example.brockapp.fragment
 
 import com.example.brockapp.R
 import com.example.brockapp.User
-import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
-import com.google.android.gms.auth.api.Auth
 
 import android.os.Bundle
+import android.view.View
 import android.content.Intent
 import android.app.AlertDialog
+import android.util.Log
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import com.example.brockapp.activity.AuthenticatorActivity
 
-class MoreFragment(): Fragment(R.layout.more_activity) {
+class MoreFragment(): Fragment(R.layout.more_fragment) {
     private val user = User.getInstance()
-class MoreActivity : AppCompatActivity() {
-    private val db = BrockDB.getInstance(this)
+    private val db = BrockDB.getInstance(requireContext())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,8 +29,8 @@ class MoreActivity : AppCompatActivity() {
 
         view.findViewById<CardView>(R.id.card_view_logout).setOnClickListener {
             user.logoutUser(user)
-
             startActivity(Intent(requireContext(), AuthenticatorActivity::class.java))
+            requireActivity().finish()
         }
 
         view.findViewById<CardView>(R.id.card_view_delete).setOnClickListener {

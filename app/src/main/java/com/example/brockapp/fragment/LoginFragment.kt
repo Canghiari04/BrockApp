@@ -5,44 +5,35 @@ import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.manager.GeofenceManager
 import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 
+import android.util.Log
 import android.Manifest
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import android.widget.Button
+import android.content.Intent
 import android.app.AlertDialog
 import android.content.Context
 import android.widget.TextView
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
-import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.example.brockapp.BLANK_ERROR
-import com.example.brockapp.LOGIN_ERROR
-import com.example.brockapp.R
-import com.example.brockapp.User
-import com.example.brockapp.activity.AuthenticatorActivity
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.fragment.SignInFragment.OnFragmentInteractionListener
-import com.example.brockapp.notification.NotificationService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.brockapp.service.NotificationService
 
 class LoginFragment: Fragment(R.layout.login_fragment) {
     private val listPermissions = mutableListOf<String>()
+    private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var viewModelUser: UserViewModel
     private lateinit var utilPermission: PermissionUtil
@@ -51,13 +42,11 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
-     * activity "ospitante".
+     * activity owner.
      */
     interface OnFragmentInteractionListener {
         fun showSignInFragment()
     }
-
-    private var listener: OnFragmentInteractionListener? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,14 +58,13 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 val db = BrockDB.getInstance(requireContext())
                 val factoryViewModelUser = UserViewModelFactory(db)
+
                 viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
-                // Eseguo la query su db tramite viewmodel
                 viewModelUser.authLogin(username, password)
 
-                // Acquisisco il risultato dal live data
                 viewModelUser.auth.observe(viewLifecycleOwner) { item ->
-                    if (item) {
+                    if(item) {
                         utilPermission = PermissionUtil(requireContext(), requireActivity())
                         geofenceManager = GeofenceManager(requireContext())
 
@@ -138,6 +126,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
         when {
             utilPermission.hasNotificationPermission(requireContext()) -> {
                 startGeofenceBroadcast()
+                startNotificationBroadcast()
                 goToHome()
             }
             utilPermission.shouldShowNotificationPermissionRationaleDialog() -> {
@@ -187,6 +176,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
     private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
             startGeofenceBroadcast()
+            startNotificationBroadcast()
             goToHome()
         } else {
             showNotificationPermissionDialog(requireContext())
@@ -222,7 +212,6 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(context, MainActivity::class.java))
             }
             .create()
             .show()
@@ -244,7 +233,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
     }
 
     private fun goToHome() {
-        startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
     }
 
     /**
@@ -263,6 +252,16 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
                     // TODO -> GESTIONE QUALORA NON SIA ABBIA CONNESSIONE AD INTERNET
                 }
             }
+        } else {
+            Log.d("WTF", "WTF")
+        }
+    }
+
+    private fun startNotificationBroadcast() {
+        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            activity?.startService(Intent(activity, NotificationService::class.java))
+        } else {
+            Log.d("WTF", "WTF")
         }
     }
 }

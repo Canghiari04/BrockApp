@@ -5,24 +5,19 @@ import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.manager.GeofenceManager
 import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 
-import android.Manifest
-import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
+import android.Manifest
+import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
+import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
 import android.content.Context
@@ -34,26 +29,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.GeofencingClient
 import androidx.activity.result.contract.ActivityResultContracts
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.example.brockapp.BLANK_ERROR
-import com.example.brockapp.R
-import com.example.brockapp.SIGN_IN_ERROR
-import com.example.brockapp.User
-import com.example.brockapp.activity.AuthenticatorActivity
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.UserEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.brockapp.service.NotificationService
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = mutableListOf<String>()
+    private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var viewModelUser: UserViewModel
     private lateinit var utilPermission: PermissionUtil
@@ -62,13 +42,11 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
-     * activity "ospitante".
+     * activity owner.
      */
     interface OnFragmentInteractionListener {
         fun showLoginFragment()
     }
-
-    private var listener: OnFragmentInteractionListener? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,6 +58,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 val db = BrockDB.getInstance(requireContext())
                 val factoryViewModelUser = UserViewModelFactory(db)
+
                 viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
                 viewModelUser.authSignIn(username, password)
@@ -100,24 +79,18 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         }
 
         view.findViewById<TextView>(R.id.login_text_view).setOnClickListener {
-            startActivity(Intent(activity, AuthenticatorActivity::class.java).putExtra("TYPE_PAGE", "Login"))
+            listener?.showLoginFragment()
         }
     }
 
-    // Acquisisco al momento dell'associazione del fragment all'attività il listener,
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        // Controlla se l'activity abbia o meno implementato il metodo richiesto.
         if(context is OnFragmentInteractionListener)
-            // Se verificato prendo il riferimento.
             listener = context
-
     }
 
     override fun onDetach() {
         super.onDetach()
-
         listener = null
     }
 
@@ -153,6 +126,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         when {
             utilPermission.hasNotificationPermission(requireContext()) -> {
                 startGeofenceBroadcast()
+                startNotificationBroadcast()
                 goToHome()
             }
             utilPermission.shouldShowNotificationPermissionRationaleDialog() -> {
@@ -168,7 +142,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
      * Variabile privata di tipo ActivityResultLauncher, utilizzata per accertarsi se l'utente abbia
      * accettato o meno i permessi richiesti.
      */
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+    private val permissionsLocationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         listPermissions.clear()
 
         for (permission in permissions) {
@@ -202,6 +176,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
             startGeofenceBroadcast()
+            startNotificationBroadcast()
             goToHome()
         } else {
             showNotificationPermissionDialog(requireContext())
@@ -237,7 +212,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(context, MainActivity::class.java))
             }
             .create()
             .show()
@@ -259,7 +233,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     }
 
     private fun goToHome() {
-        startActivity(Intent(requireContext(), PageLoaderActivity::class.java))
+        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
     }
 
     /**
@@ -278,6 +252,16 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                     // TODO -> GESTIONE QUALORA NON SIA ABBIA CONNESSIONE AD INTERNET
                 }
             }
+        } else {
+            Log.d("WTF", "WTF")
+        }
+    }
+
+    private fun startNotificationBroadcast() {
+        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            activity?.startService(Intent(activity, NotificationService::class.java))
+        } else {
+            Log.d("WTF", "WTF")
         }
     }
 }

@@ -1,17 +1,18 @@
 package com.example.brockapp.util
 
-import android.Manifest
-import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentActivity
 import com.example.brockapp.R
-import com.example.brockapp.activity.MainActivity
+import com.example.brockapp.activity.AuthenticatorActivity
+
+import android.net.Uri
+import android.Manifest
+import android.widget.Toast
+import android.content.Intent
+import android.content.Context
+import android.app.AlertDialog
+import android.provider.Settings
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import androidx.fragment.app.FragmentActivity
 
 class PermissionUtil(private val context: Context, private val activity: FragmentActivity) {
     fun hasLocationPermissions(context: Context, permissions: Array<String>): Boolean {
@@ -57,7 +58,7 @@ class PermissionUtil(private val context: Context, private val activity: Fragmen
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
-                context.startActivity(Intent(context, MainActivity::class.java))
+                context.startActivity(Intent(context, AuthenticatorActivity::class.java))
             }
             .create()
             .show()

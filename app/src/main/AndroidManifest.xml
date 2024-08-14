@@ -28,17 +28,32 @@
         </activity>
         <activity
             android:name=".activity.PageLoaderActivity">
+            </activity>
+        <activity
+            android:name=".activity.DailyActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
             android:name=".activity.NewUserActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
-            android:name=".calendar.DailyActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
+            android:name=".activity.StillActivity"
+            android:parentActivityName=".activity.NewUserActivity">
         </activity>
-        <service android:name=".notification.NotificationService"/>
-        <service android:name=".service.GeofenceService">
-        </service>
+        <activity
+            android:name=".activity.VehicleActivity"
+            android:parentActivityName=".activity.NewUserActivity">
+        </activity>
+        <activity
+            android:name=".activity.WalkActivity"
+            android:parentActivityName=".activity.NewUserActivity">
+        </activity>
+        <service
+            android:name=".service.ActivityRecognitionService"
+            android:enabled="true"
+            android:exported="false" />
+        <service android:name=".service.NotificationService" />
+        <service android:name=".service.GeofenceService" />
     </application>
 </manifest>

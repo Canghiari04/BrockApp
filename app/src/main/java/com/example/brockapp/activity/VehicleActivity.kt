@@ -1,53 +1,54 @@
-package com.example.brockapp.fragmentDetect
+package com.example.brockapp.activity
+
+import com.example.brockapp.R
+import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
 
 import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
-import android.os.SystemClock
-import android.view.View
+import android.view.MenuItem
 import android.widget.Button
-import android.widget.Chronometer
+import android.os.SystemClock
+import android.content.Intent
 import android.widget.TextView
+import android.location.Location
+import android.widget.Chronometer
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
-import com.example.brockapp.R
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+import android.content.pm.PackageManager
 import com.google.android.gms.location.Priority
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.FusedLocationProviderClient
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
-
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+class VehicleActivity: AppCompatActivity() {
+    private lateinit var distanceTravelled: TextView
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
-    private var startLocation: Location? = null
-    private var totalDistance = 0.0
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var running = false
+    private var totalDistance = 0.0
     private var pauseOffset: Long = 0
+    private var startLocation: Location? = null
 
-    private lateinit var distanceTravelled : TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.vehicle_activity)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val chronometer = view.findViewById<Chronometer>(R.id.chronometer)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        val chronometer = findViewById<Chronometer>(R.id.chronometer)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         setupLocationUpdates()
 
-        distanceTravelled = view.findViewById(R.id.vehicle_distance_travelled)
+        distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
 
-        val vehicleButtonStart = view.findViewById<Button>(R.id.vehicle_button_start)
-        val vehicleButtonStop = view.findViewById<Button>(R.id.vehicle_button_stop)
+        val vehicleButtonStart = findViewById<Button>(R.id.vehicle_button_start)
+        val vehicleButtonStop = findViewById<Button>(R.id.vehicle_button_stop)
 
         setOnClickListeners(vehicleButtonStart, chronometer, vehicleButtonStop)
 
@@ -55,11 +56,7 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
         vehicleButtonStop.isEnabled = false
     }
 
-    private fun setOnClickListeners(
-        vehicleButtonStart: Button,
-        chronometer: Chronometer,
-        vehicleButtonStop: Button
-    ) {
+    private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
         vehicleButtonStart.setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
@@ -99,6 +96,20 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+                false
+            }
+        }
+    }
+
     /**
      * Costruisce una richiesta di aggiornamento di posizione.
      * Gestisce l'aggiornamento della posizione in background e mostra a schermo la distanza percorsa
@@ -127,16 +138,13 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
         }
     }
 
-
     /**
      * Controlla se i permessi sono stati garantiti e richiama la funzione per iniziare l'aggiornamento della posizione
      */
     private fun startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-            return
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
     /**
@@ -147,11 +155,13 @@ class VehicleFragment : Fragment(R.layout.vehicle_fragment) {
     }
 
     private fun registerActivity(activityType: Int, transitionType: Int, distanceTravelled: Double) {
-        val intent = Intent("TRANSITIONS_RECEIVER_ACTION").apply {
+        val intent = Intent().apply {
+            setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
             putExtra("distanceTravelled", distanceTravelled)
         }
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+
+        sendBroadcast(intent)
     }
 }

@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 
-class UserViewModel(val db: BrockDB): ViewModel() {
+class UserViewModel(private val db: BrockDB): ViewModel() {
     private var _auth = MutableLiveData<Boolean>()
     val auth: LiveData<Boolean> get() = _auth
 
