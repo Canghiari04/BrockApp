@@ -1,14 +1,14 @@
 package com.example.brockapp
 
+// Errori visualizzati nei Toast delle attività iniziali.
 const val SIGN_IN_ERROR = "Credenziali già presenti, passa a Login."
 const val LOGIN_ERROR = "Credenziali errate, riprova."
 const val BLANK_ERROR = "Inserisci le credenziali."
 const val CONNECTION_ERROR = "Nessuna connessione rilevata."
 
-const val ROOM_DATABASE_VERSION = 16
+const val ROOM_DATABASE_VERSION = 17
 
 const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1
-
 const val REQUEST_CODE_ACTIVITY_BROADCAST_RECEIVER = 10
 const val REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER = 11
 

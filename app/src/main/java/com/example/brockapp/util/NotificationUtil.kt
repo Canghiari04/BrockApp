@@ -19,16 +19,34 @@ class NotificationUtil {
         }
     }
 
+    fun getGeofenceIntent(location: String): Intent {
+        return Intent().apply {
+            setAction(NOTIFICATION_INTENT_TYPE)
+            putExtra("title", "BrockApp")
+            putExtra("content", "Ti trovi nei pressi di ${location}. È ora di registrare un'attività!")
+            putExtra("typeNotify", ACTIVITY_RECOGNITION_NOTIFY)
+        }
+    }
+
     fun getActivityRecognitionNotification(channelId: String, context: Context, intent: Intent): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
-            setSmallIcon(getIcon(intent.getStringExtra("type")))
+            setSmallIcon(getActivityRecognitionIcon(intent.getStringExtra("type")))
             setContentTitle(intent.getStringExtra("title"))
             setContentText(intent.getStringExtra("content"))
             setPriority(NotificationCompat.PRIORITY_DEFAULT)
         }
     }
 
-    private fun getIcon(type: String?): Int {
+    fun getGeofenceNotification(channelId: String, context: Context, intent: Intent): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, channelId).apply {
+            setSmallIcon(R.drawable.baseline_directions_run_24)
+            setContentTitle(intent.getStringExtra("title"))
+            setContentText(intent.getStringExtra("content"))
+            setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        }
+    }
+
+    private fun getActivityRecognitionIcon(type: String?): Int {
         return when (type) {
             "3" -> {
                 R.drawable.baseline_chair_24

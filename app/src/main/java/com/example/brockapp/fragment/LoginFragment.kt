@@ -76,7 +76,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
                         observeGeofenceAreas()
                     } else {
-                        Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {

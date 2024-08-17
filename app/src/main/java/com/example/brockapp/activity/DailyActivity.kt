@@ -28,8 +28,8 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
-    private lateinit var user: User
     private lateinit var viewModelDaily: DailyViewModel
+    private lateinit var user: User
     private lateinit var utilCalendar: CalendarUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +60,7 @@ class DailyActivity: AppCompatActivity() {
                 populateDailyActivitiesChart(pieChart, item)
                 populateDailyActivitiesRecyclerView(dailyList, item)
             } else {
-                setContentView(R.layout.daily_empty_activity)
+                setContentView(R.layout.empty_page)
             }
 
             setUpActionBar()

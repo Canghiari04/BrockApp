@@ -25,9 +25,9 @@ import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionService : Service() {
+    private lateinit var receiver: BroadcastReceiver
     private lateinit var user: User
     private lateinit var db: BrockDB
-    private lateinit var receiver: BroadcastReceiver
     private lateinit var utilNotification: NotificationUtil
 
     override fun onCreate() {
@@ -89,9 +89,7 @@ class ActivityRecognitionService : Service() {
                                 }
                             }
 
-                            // Definito il momento in cui è inviata una notifica.
-                            val intent = utilNotification.getActivityRecognitionIntent(activityType)
-                            sendBroadcast(intent)
+                            sendActivityNotify(activityType)
                         } catch (e: Exception) {
                             Log.d("ACTIVITY_RECOGNITION_DATABASE", e.toString())
                         }
@@ -110,5 +108,10 @@ class ActivityRecognitionService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+    }
+
+    private fun sendActivityNotify(type: Int) {
+        val intent = utilNotification.getActivityRecognitionIntent(type)
+        sendBroadcast(intent)
     }
 }

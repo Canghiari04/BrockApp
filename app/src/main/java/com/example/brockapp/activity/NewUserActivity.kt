@@ -26,10 +26,6 @@ class NewUserActivity : AppCompatActivity() {
 
         checkActivityPermission()
 
-        findViewById<Button>(R.id.button_daily_detect).setOnClickListener {
-            // TODO --> ACTIVITY DAILY DETECT
-        }
-
         findViewById<Button>(R.id.button_still).setOnClickListener {
             startActivity(Intent(this, StillActivity::class.java))
         }
@@ -38,8 +34,13 @@ class NewUserActivity : AppCompatActivity() {
             startActivity(Intent(this, VehicleActivity::class.java))
         }
 
+
         findViewById<Button>(R.id.button_walk).setOnClickListener {
             startActivity(Intent(this, WalkActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.button_run_activity).setOnClickListener {
+
         }
 
         sendBroadcast(Intent(GEOFENCE_INTENT_TYPE))

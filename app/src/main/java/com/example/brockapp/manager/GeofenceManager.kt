@@ -13,7 +13,7 @@ import com.google.android.gms.location.GeofencingRequest
 
 class GeofenceManager(private val context: Context, private val areas: List<GeofenceAreaEntry>?) {
     companion object {
-        const val r = 1000
+        const val r = 100
         const val day = 24 * 60 * 60 * 1000L
     }
 
@@ -47,7 +47,8 @@ class GeofenceManager(private val context: Context, private val areas: List<Geof
                     .setRequestId(entry.id)
                     .setCircularRegion(entry.longitude, entry.latitude, r.toFloat())
                     .setExpirationDuration(day)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+                    .setLoiteringDelay(5000)
                     .build()
             )
         }

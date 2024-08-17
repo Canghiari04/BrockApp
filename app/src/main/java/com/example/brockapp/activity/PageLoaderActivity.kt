@@ -2,8 +2,8 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.fragment.HomeFragment
-import com.example.brockapp.fragment.ChartFragment
-import com.example.brockapp.fragment.FriendFragment
+import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 
 import android.os.Bundle
@@ -16,8 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class PageLoaderActivity : AppCompatActivity() {
     private lateinit var homeFragment: HomeFragment
     private lateinit var calendarFragment: CalendarFragment
-    private lateinit var chartFragment: ChartFragment
-    private lateinit var friendFragment: FriendFragment
+    private lateinit var chartsFragment: ChartsFragment
+    private lateinit var friendsFragment: FriendsFragment
 
     private var mapFragments = mutableMapOf<String, Fragment>()
 
@@ -27,22 +27,22 @@ class PageLoaderActivity : AppCompatActivity() {
 
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
-        chartFragment = ChartFragment()
-        friendFragment = FriendFragment()
+        chartsFragment = ChartsFragment()
+        friendsFragment = FriendsFragment()
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
             add(R.id.page_loader_fragment, calendarFragment)
-            add(R.id.page_loader_fragment, chartFragment)
-            add(R.id.page_loader_fragment, friendFragment)
+            add(R.id.page_loader_fragment, chartsFragment)
+            add(R.id.page_loader_fragment, friendsFragment)
             commit()
         }
 
         mapFragments.apply {
             put("home", homeFragment)
             put("calendar", calendarFragment)
-            put("chart", chartFragment)
-            put("friend", friendFragment)
+            put("charts", chartsFragment)
+            put("friends", friendsFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
@@ -66,11 +66,11 @@ class PageLoaderActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navbar_item_charts -> {
-                    switchFragment(chartFragment)
+                    switchFragment(chartsFragment)
                     true
                 }
                 R.id.navbar_item_friends -> {
-                    switchFragment(friendFragment)
+                    switchFragment(friendsFragment)
                     true
                 }
                 else -> {

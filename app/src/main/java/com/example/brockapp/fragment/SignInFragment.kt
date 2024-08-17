@@ -76,7 +76,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
                         observeGeofenceAreas()
                     } else {
-                        Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {

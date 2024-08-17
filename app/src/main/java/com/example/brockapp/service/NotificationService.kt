@@ -32,20 +32,19 @@ class NotificationService : Service() {
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if(intent.action == NOTIFICATION_INTENT_TYPE) {
-                    utilNotification = NotificationUtil()
                     notificationManager = NotificationManagerCompat.from(context)
+                    utilNotification = NotificationUtil()
 
-                    getNotificationChannel(notificationManager)
-
-                    val channelId = "1"
                     val type = intent.getStringExtra("typeNotify")
 
                     when (type) {
                         ACTIVITY_RECOGNITION_NOTIFY -> {
-                            notification = utilNotification.getActivityRecognitionNotification(channelId, context, intent).build()
+                            getNotificationChannel(ACTIVITY_RECOGNITION_NOTIFY, ACTIVITY_RECOGNITION_NOTIFY, notificationManager)
+                            notification = utilNotification.getActivityRecognitionNotification(ACTIVITY_RECOGNITION_NOTIFY, context, intent).build()
                         }
                         GEOFENCE_NOTIFY -> {
-
+                            getNotificationChannel(GEOFENCE_NOTIFY, GEOFENCE_NOTIFY, notificationManager)
+                            notification = utilNotification.getGeofenceNotification(GEOFENCE_NOTIFY, context, intent).build()
                         }
                     }
 
@@ -65,12 +64,11 @@ class NotificationService : Service() {
         return null
     }
 
-    private fun getNotificationChannel(notificationManager: NotificationManagerCompat) {
-        val channelId = "1"
+    private fun getNotificationChannel(id: String, description: String, notificationManager: NotificationManagerCompat) {
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(channelId, "ChannelNotificationByBrockApp", importance)
+        val channel = NotificationChannel(id, id, importance)
 
-        channel.description = "Notifiche da tutto il mondo!"
+        channel.description = description
         notificationManager.createNotificationChannel(channel)
     }
 }
