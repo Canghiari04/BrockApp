@@ -6,11 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_daily_activity"
+        android:theme="?attr/actionBarTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextColor="@color/white"
+        android:background="@color/uni_red" />
+
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="428dp"
+        android:layout_height="275dp"
         android:layout_margin="50dp"
-        android:src="@drawable/baseline_signal_wifi_statusbar_null_24"
+        android:src="@drawable/baseline_directions_run_24"
         app:tint="@color/grey">
     </ImageView>
 

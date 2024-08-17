@@ -1,7 +1,7 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.User
+import com.example.brockapp.singleton.User
 import com.example.brockapp.DATE_SEPARATOR
 import com.example.brockapp.util.CalendarUtil
 import com.example.brockapp.CALENDAR_DATE_FORMAT
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 
-class CalendarFragment: Fragment(R.layout.calendar_fragment) {
+class CalendarFragment : Fragment(R.layout.calendar_fragment) {
     private lateinit var user: User
     private lateinit var utilCalendar: CalendarUtil
 

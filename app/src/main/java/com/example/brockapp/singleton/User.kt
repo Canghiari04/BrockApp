@@ -1,4 +1,4 @@
-package com.example.brockapp
+package com.example.brockapp.singleton
 
 /**
  * Singoletto utilizzato per mantenere durante il run dell'applicazione il riferimento ad una sola istanza User.

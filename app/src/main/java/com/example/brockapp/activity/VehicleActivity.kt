@@ -26,7 +26,7 @@ import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.FusedLocationProviderClient
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class VehicleActivity: AppCompatActivity() {
+class VehicleActivity : AppCompatActivity() {
     private lateinit var distanceTravelled: TextView
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback

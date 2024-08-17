@@ -3,13 +3,17 @@ package com.example.brockapp.fragment
 import com.example.brockapp.R
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.SIGN_IN_ERROR
+import com.example.brockapp.CONNECTION_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
 import com.example.brockapp.manager.GeofenceManager
 import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.service.NotificationService
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.util.Log
 import android.Manifest
@@ -29,7 +33,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.GeofencingClient
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.brockapp.service.NotificationService
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = mutableListOf<String>()
@@ -39,6 +42,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private lateinit var utilPermission: PermissionUtil
     private lateinit var geofenceManager: GeofenceManager
     private lateinit var geofencingClient: GeofencingClient
+    private lateinit var viewModelGeofence: GeofenceViewModel
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -58,17 +62,19 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 val db = BrockDB.getInstance(requireContext())
                 val factoryViewModelUser = UserViewModelFactory(db)
+                val factoryViewModelGeofence = GeofenceViewModelFactory(db)
 
                 viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
+                viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
                 viewModelUser.authSignIn(username, password)
 
                 viewModelUser.auth.observe(viewLifecycleOwner) { item ->
                     if(item) {
                         utilPermission = PermissionUtil(requireContext(), requireActivity())
-                        geofenceManager = GeofenceManager(requireContext())
+                        viewModelGeofence.getGeofenceAreas()
 
-                        checkLocationPermissions()
+                        observeGeofenceAreas()
                     } else {
                         Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_LONG).show()
                     }
@@ -92,6 +98,19 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    private fun observeGeofenceAreas() {
+        viewModelGeofence.observeGeofenceAreasLiveData().observe(viewLifecycleOwner) {
+            geofenceManager = GeofenceManager(requireContext(), it)
+            checkLocationPermissions()
+        }
+    }
+
+    private fun defineGeofenceManager() {
+        viewModelGeofence.observeGeofenceAreasLiveData().observe(viewLifecycleOwner) {
+            geofenceManager = GeofenceManager(requireContext(), it)
+        }
     }
 
     private fun checkLocationPermissions() {
@@ -232,10 +251,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             .show()
     }
 
-    private fun goToHome() {
-        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
-    }
-
     /**
      * Connesso alla REMOTE API è "risvegliato" il service contenente il broadcast receiver per
      * gestire eventi di geofencing.
@@ -249,7 +264,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                     activity?.startService(Intent(activity, GeofenceService::class.java))
                 }
                 addOnFailureListener {
-                    // TODO -> GESTIONE QUALORA NON SIA ABBIA CONNESSIONE AD INTERNET
+                    Toast.makeText(requireContext(), CONNECTION_ERROR, Toast.LENGTH_LONG).show()
                 }
             }
         } else {
@@ -263,5 +278,9 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         } else {
             Log.d("WTF", "WTF")
         }
+    }
+
+    private fun goToHome() {
+        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
     }
 }

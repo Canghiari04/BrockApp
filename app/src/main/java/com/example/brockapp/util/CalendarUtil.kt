@@ -1,12 +1,17 @@
 package com.example.brockapp.util
 
-import android.util.Log
-import java.time.DayOfWeek
-import java.time.LocalDate
+import com.example.brockapp.DATE_SEPARATOR
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.data.UserActivity
+
 import java.time.Month
+import java.time.DayOfWeek
+import java.time.Duration
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class CalendarUtil {
@@ -50,5 +55,37 @@ class CalendarUtil {
         val daysDistance = ChronoUnit.DAYS.between(startOfWeek, firstDayOfMonth)
 
         return ArrayList(MutableList(daysDistance.toInt()) {""})
+    }
+
+    fun getPrettyDate(strDate: String?): String {
+        val tokens = strDate!!.split(DATE_SEPARATOR)
+        val date = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
+
+        return "${date.dayOfWeek}, ${tokens[2]} ${date.month}".lowercase()
+    }
+
+    fun computeTimeSpent(userActivities: List<UserActivity>): Long {
+        var timeSpentWalking = 0L
+        val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
+
+        for(i in userActivities.indices) {
+            if(userActivities[i].transitionType == 1)
+                continue
+
+            val beginActivityTime = LocalDateTime.parse(userActivities[i].timestamp, dateFormatter)
+            val nextActivity = if (i < userActivities.size - 1) userActivities[i + 1] else null
+
+            if(nextActivity == null)
+                break
+
+            val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
+
+            val duration = Duration.between(beginActivityTime, endActivityTime)
+            val durationInMinutes = duration.toMinutes()
+
+            timeSpentWalking += durationInMinutes
+        }
+
+        return timeSpentWalking
     }
 }

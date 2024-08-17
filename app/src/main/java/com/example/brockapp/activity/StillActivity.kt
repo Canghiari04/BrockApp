@@ -20,7 +20,7 @@ import com.google.android.gms.location.ActivityRecognition
 import com.example.brockapp.manager.ActivityRecognitionManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class StillActivity: AppCompatActivity() {
+class StillActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.still_activity)

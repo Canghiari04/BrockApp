@@ -14,6 +14,7 @@ import android.location.Location
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.example.brockapp.util.NotificationUtil
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
@@ -21,8 +22,9 @@ import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT
 import com.google.android.gms.location.GeofencingEvent
 import java.util.Locale
 
-class GeofenceService: Service() {
+class GeofenceService : Service() {
     private lateinit var receiver: BroadcastReceiver
+    private lateinit var utilNotification: NotificationUtil
 
     override fun onCreate() {
         super.onCreate()

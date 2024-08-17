@@ -1,6 +1,6 @@
 package com.example.brockapp.service
 
-import com.example.brockapp.User
+import com.example.brockapp.singleton.User
 import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.NotificationUtil
@@ -24,7 +24,7 @@ import android.content.BroadcastReceiver
 import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 
-class ActivityRecognitionService: Service() {
+class ActivityRecognitionService : Service() {
     private lateinit var user: User
     private lateinit var db: BrockDB
     private lateinit var receiver: BroadcastReceiver
@@ -89,7 +89,8 @@ class ActivityRecognitionService: Service() {
                                 }
                             }
 
-                            val intent = utilNotification.getIntent(activityType)
+                            // Definito il momento in cui è inviata una notifica.
+                            val intent = utilNotification.getActivityRecognitionIntent(activityType)
                             sendBroadcast(intent)
                         } catch (e: Exception) {
                             Log.d("ACTIVITY_RECOGNITION_DATABASE", e.toString())

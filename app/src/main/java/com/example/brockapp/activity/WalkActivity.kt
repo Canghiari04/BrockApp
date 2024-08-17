@@ -22,7 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 
-class WalkActivity: AppCompatActivity() {
+class WalkActivity : AppCompatActivity() {
     private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
 

@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.brockapp.R
-import com.example.brockapp.User
+import com.example.brockapp.singleton.User
 
 class AccountDialog: DialogFragment() {
     private val user = User.getInstance()

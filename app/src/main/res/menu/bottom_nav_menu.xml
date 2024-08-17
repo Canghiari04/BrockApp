@@ -6,7 +6,7 @@
         android:title="@string/menu_home" />
     <item
         android:id="@+id/navbar_item_calendar"
-        android:icon="@drawable/baseline_directions_run_24"
+        android:icon="@drawable/baseline_calendar_month_24"
         android:title="@string/menu_activity" />
     <item
         android:id="@+id/navbar_item_plus"
@@ -18,6 +18,6 @@
         android:title="@string/menu_plot" />
     <item
         android:id="@+id/navbar_item_friends"
-        android:icon="@drawable/baseline_more_horiz_24"
+        android:icon="@drawable/baseline_people_24"
         android:title="@string/menu_friends" />
 </menu>

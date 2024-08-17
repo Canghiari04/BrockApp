@@ -1,8 +1,8 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.User
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.User
 import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.database.BrockDB
 import com.example.brockapp.data.UserActivity
 import com.example.brockapp.WALK_ACTIVITY_TYPE
 import com.example.brockapp.STILL_ACTIVITY_TYPE

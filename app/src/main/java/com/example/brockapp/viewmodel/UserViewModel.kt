@@ -1,6 +1,6 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.User
+import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
 

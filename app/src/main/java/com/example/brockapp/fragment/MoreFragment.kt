@@ -1,7 +1,7 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.User
+import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
 
@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.cardview.widget.CardView
 import com.example.brockapp.activity.AuthenticatorActivity
 
-class MoreFragment(): Fragment(R.layout.more_fragment) {
+class MoreFragment : Fragment(R.layout.more_fragment) {
     private val user = User.getInstance()
     private val db = BrockDB.getInstance(requireContext())
 

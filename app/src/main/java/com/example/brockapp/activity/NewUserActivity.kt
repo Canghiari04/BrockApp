@@ -17,9 +17,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.example.brockapp.service.ActivityRecognitionService
 
-class NewUserActivity: AppCompatActivity() {
+class NewUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,6 +41,8 @@ class NewUserActivity: AppCompatActivity() {
         findViewById<Button>(R.id.button_walk).setOnClickListener {
             startActivity(Intent(this, WalkActivity::class.java))
         }
+
+        sendBroadcast(Intent(GEOFENCE_INTENT_TYPE))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class PageLoaderActivity: AppCompatActivity()  {
+class PageLoaderActivity : AppCompatActivity() {
     private lateinit var homeFragment: HomeFragment
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var chartFragment: ChartFragment

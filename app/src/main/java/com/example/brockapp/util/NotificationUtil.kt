@@ -9,7 +9,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 
 class NotificationUtil {
-    fun getIntent(activityType: Int): Intent {
+    fun getActivityRecognitionIntent(activityType: Int): Intent {
         return Intent().apply {
             setAction(NOTIFICATION_INTENT_TYPE)
             putExtra("title", "BrockApp")

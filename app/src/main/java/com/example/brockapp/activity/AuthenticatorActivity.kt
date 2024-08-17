@@ -7,7 +7,7 @@ import com.example.brockapp.fragment.SignInFragment
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
-class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener {
+class AuthenticatorActivity : AppCompatActivity(), LoginFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener {
     private lateinit var signInFragment: SignInFragment
     private lateinit var loginFragment: LoginFragment
 

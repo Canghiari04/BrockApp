@@ -9,12 +9,12 @@ interface UserDao {
     @Insert()
     suspend fun insertUser(user: UserEntity)
 
-    @Query("SELECT COUNT(*)>0 FROM user WHERE username=:username AND password=:password")
+    @Query("SELECT COUNT(*)>0 FROM User WHERE username=:username AND password=:password")
     suspend fun checkIfUserIsPresent(username: String, password: String): Boolean
 
-    @Query("SELECT id FROM user WHERE username=:username AND password=:password")
+    @Query("SELECT id FROM User WHERE username=:username AND password=:password")
     suspend fun getIdFromUsernameAndPassword(username: String, password: String): Long
 
-    @Query("DELETE FROM user WHERE id=:id")
+    @Query("DELETE FROM User WHERE id=:id")
     suspend fun deleteUserById(id: Long)
 }
