@@ -9,45 +9,21 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_new_user_activity"
-        android:theme="?attr/actionBarTheme"
+        app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         app:titleTextColor="@color/white"
-        android:background="@color/uni_red" />
-
-    <TextView
-        android:text="@string/activity_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="25dp" >
-    </TextView>
+        android:background="@color/uni_red"
+        android:theme="?attr/actionBarTheme"/>
 
     <LinearLayout
         android:id="@+id/layout_static"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
         android:layout_margin="10dp">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="@color/uni_red" >
-
-            <Button
-                android:id="@+id/button_daily_detect"
-                android:text="@string/daily_detect_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:textStyle="bold"
-                android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/uni_red">
-            </Button>
-        </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -59,7 +35,7 @@
                 android:id="@+id/button_still"
                 android:text="@string/still_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
@@ -78,7 +54,7 @@
                 android:id="@+id/button_walk"
                 android:text="@string/walk_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
@@ -97,12 +73,31 @@
                 android:id="@+id/button_vehicle"
                 android:text="@string/vehicle_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:padding="25dp"
                 android:textStyle="bold"
                 android:textAlignment="textStart"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/uni_red">
+            </Button>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/uni_red" >
+
+            <Button
+                android:id="@+id/button_run_activity"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/uni_red"
+                android:padding="25dp"
+                android:text="@string/run_button"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textStyle="bold">
             </Button>
         </androidx.cardview.widget.CardView>
     </LinearLayout>

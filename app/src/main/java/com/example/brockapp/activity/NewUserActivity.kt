@@ -42,8 +42,6 @@ class NewUserActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_run_activity).setOnClickListener {
 
         }
-
-        sendBroadcast(Intent(GEOFENCE_INTENT_TYPE))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -65,7 +63,7 @@ class NewUserActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
+                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home"))
                 finish()
                 true
             }
@@ -103,6 +101,7 @@ class NewUserActivity : AppCompatActivity() {
         setContentView(R.layout.new_user_activity)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
+        toolbar.title = ""
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

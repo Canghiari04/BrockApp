@@ -6,7 +6,7 @@ import com.example.brockapp.DATE_SEPARATOR
 import com.example.brockapp.util.CalendarUtil
 import com.example.brockapp.CALENDAR_DATE_FORMAT
 import com.example.brockapp.activity.DailyActivity
-import com.example.brockapp.calendar.CalendarAdapter
+import com.example.brockapp.adapter.CalendarAdapter
 
 import android.os.Bundle
 import android.view.View
@@ -20,10 +20,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 
 class CalendarFragment : Fragment(R.layout.calendar_fragment) {
+    private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
+
     private lateinit var user: User
     private lateinit var utilCalendar: CalendarUtil
-
-    private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -33,7 +33,7 @@ class CalendarFragment : Fragment(R.layout.calendar_fragment) {
         user = User.getInstance()
         utilCalendar = CalendarUtil()
 
-        setDate(LocalDate.of(2024, 8, 31))
+        setDate(LocalDate.now())
         populateCalendarRecyclerView(utilCalendar.getCurrentDays(LocalDate.now()), utilCalendar.getDates(LocalDate.now()), calendar)
 
         view.findViewById<ImageButton>(R.id.button_back_month).setOnClickListener {

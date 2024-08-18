@@ -31,18 +31,17 @@ import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.GeofencingClient
 import androidx.activity.result.contract.ActivityResultContracts
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = mutableListOf<String>()
     private var listener: OnFragmentInteractionListener? = null
 
+    private lateinit var db: BrockDB
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var utilPermission: PermissionUtil
     private lateinit var geofenceManager: GeofenceManager
-    private lateinit var geofencingClient: GeofencingClient
-    private lateinit var viewModelGeofence: GeofenceViewModel
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -60,7 +59,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if(username.isNotEmpty() && password.isNotEmpty()) {
-                val db = BrockDB.getInstance(requireContext())
+                db = BrockDB.getInstance(requireContext())
                 val factoryViewModelUser = UserViewModelFactory(db)
                 val factoryViewModelGeofence = GeofenceViewModelFactory(db)
 
@@ -256,7 +255,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
      * gestire eventi di geofencing.
      */
     private fun startGeofenceBroadcast() {
-        geofencingClient = LocationServices.getGeofencingClient(requireContext())
+        val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(geofenceManager.getRequest(), geofenceManager.getPendingIntent()).run {

@@ -1,4 +1,4 @@
-package com.example.brockapp.calendar
+package com.example.brockapp.adapter
 
 import com.example.brockapp.R
 
@@ -14,7 +14,6 @@ class CalendarViewHolder(itemView: View, private val onItemClick: (String) -> Un
 
         if(date.isEmpty()) {
             dayOfMonth.isClickable = false
-            dayOfMonth.setBackgroundResource(R.color.grey)
         } else {
             itemView.setOnClickListener {
                 onItemClick(date)

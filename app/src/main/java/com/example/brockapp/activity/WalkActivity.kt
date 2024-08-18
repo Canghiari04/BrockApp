@@ -23,13 +23,13 @@ import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 
 class WalkActivity : AppCompatActivity() {
-    private lateinit var sensorManager: SensorManager
-    private lateinit var notificationManager: NotificationManagerCompat
-
     private var stepCount = 0
     private var running = false
     private var initialStepCount = 0
     private var stepDetectorSensor: Sensor? = null
+
+    private lateinit var sensorManager: SensorManager
+    private lateinit var notificationManager: NotificationManagerCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

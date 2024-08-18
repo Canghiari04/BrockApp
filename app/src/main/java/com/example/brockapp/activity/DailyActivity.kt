@@ -9,9 +9,9 @@ import com.example.brockapp.util.CalendarUtil
 import com.example.brockapp.WALK_ACTIVITY_TYPE
 import com.example.brockapp.STILL_ACTIVITY_TYPE
 import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.viewmodel.DailyViewModel
-import com.example.brockapp.calendar.DailyActivityAdapter
-import com.example.brockapp.viewmodel.DailyViewModelFactory
+import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.adapter.DailyActivityAdapter
+import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -28,7 +28,7 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
-    private lateinit var viewModelDaily: DailyViewModel
+    private lateinit var viewModel: ActivitiesViewModel
     private lateinit var user: User
     private lateinit var utilCalendar: CalendarUtil
 
@@ -38,14 +38,14 @@ class DailyActivity: AppCompatActivity() {
         val date: String? = intent.getStringExtra("ACTIVITY_DATE")
 
         val db = BrockDB.getInstance(this)
-        val factoryViewModelDaily = DailyViewModelFactory(db)
+        val factoryViewModelDaily = ActivitiesViewModelFactory(db)
 
-        viewModelDaily = ViewModelProvider(this, factoryViewModelDaily)[DailyViewModel::class.java]
+        viewModel = ViewModelProvider(this, factoryViewModelDaily)[ActivitiesViewModel::class.java]
         user = User.getInstance()
 
-        viewModelDaily.getUserActivities(date, user)
+        viewModel.getDayUserActivities(date, user)
 
-        viewModelDaily.sortedList.observe(this) { item ->
+        viewModel.sortedDayActivitiesList.observe(this) { item ->
             if(item.isNotEmpty()) {
                 setContentView(R.layout.daily_activity_activity)
 
@@ -63,14 +63,14 @@ class DailyActivity: AppCompatActivity() {
                 setContentView(R.layout.empty_page)
             }
 
-            setUpActionBar()
+            setUpToolBar()
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "calendar"))
+                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Calendar"))
                 finish()
                 true
             }
@@ -123,7 +123,7 @@ class DailyActivity: AppCompatActivity() {
     /**
      * Metodo attuato per personalizzare il comportamento dell'action bar dell'activity.
      */
-    private fun setUpActionBar() {
+    private fun setUpToolBar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar_daily_activity)
         setSupportActionBar(toolbar)
 

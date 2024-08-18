@@ -27,15 +27,15 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VehicleActivity : AppCompatActivity() {
-    private lateinit var distanceTravelled: TextView
-    private lateinit var locationRequest: LocationRequest
-    private lateinit var locationCallback: LocationCallback
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-
     private var running = false
     private var totalDistance = 0.0
     private var pauseOffset: Long = 0
     private var startLocation: Location? = null
+
+    private lateinit var distanceTravelled: TextView
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

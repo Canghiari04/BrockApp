@@ -13,22 +13,14 @@
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         app:titleTextColor="@color/white"
-        android:background="@color/uni_red" />
+        android:background="@color/uni_red"/>
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="275dp"
-        android:layout_margin="50dp"
+        android:contentDescription="@string/empty_icon_description"
         android:src="@drawable/baseline_directions_run_24"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="50dp"
         app:tint="@color/grey">
     </ImageView>
-
-    <TextView
-        android:text="@string/empty_vie"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="18sp"
-        android:textColor="@color/black">
-    </TextView>
 </LinearLayout>

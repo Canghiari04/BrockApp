@@ -23,7 +23,7 @@ class CalendarUtil {
         return LocalDate.parse(lastDay.toString(), formatter)
     }
 
-    fun getCurrentDays(date: LocalDate) : ArrayList<String> {
+    fun getCurrentDays(date: LocalDate): ArrayList<String> {
         var i = 0
         val list = getInitialEmptyList(date)
 
@@ -35,7 +35,7 @@ class CalendarUtil {
         return list
     }
 
-    fun getDates(date: LocalDate) : ArrayList<String> {
+    fun getDates(date: LocalDate): ArrayList<String> {
         var i = 0
         var myDateId: String
         val list = getInitialEmptyList(date)
@@ -65,7 +65,7 @@ class CalendarUtil {
     }
 
     fun computeTimeSpent(userActivities: List<UserActivity>): Long {
-        var timeSpentWalking = 0L
+        var timeSpent = 0L
         val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         for(i in userActivities.indices) {
@@ -83,9 +83,9 @@ class CalendarUtil {
             val duration = Duration.between(beginActivityTime, endActivityTime)
             val durationInMinutes = duration.toMinutes()
 
-            timeSpentWalking += durationInMinutes
+            timeSpent += durationInMinutes
         }
 
-        return timeSpentWalking
+        return timeSpent
     }
 }

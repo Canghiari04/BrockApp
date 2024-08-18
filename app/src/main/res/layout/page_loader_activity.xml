@@ -7,6 +7,14 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_page_loader"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:titleTextColor="@color/white"
+        android:background="@color/uni_red"
+        android:theme="@style/NoActionBar"/>
+
     <FrameLayout
         android:id="@+id/page_loader_fragment"
         android:layout_width="match_parent"

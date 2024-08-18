@@ -1,4 +1,4 @@
-package com.example.brockapp.calendar
+package com.example.brockapp.adapter
 
 import com.example.brockapp.R
 import com.example.brockapp.data.UserActivity
@@ -34,6 +34,5 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                 holder.bindActivity(activities[position].type, "Finito alle " + time, activities[position].info)
             }
         }
-
     }
 }

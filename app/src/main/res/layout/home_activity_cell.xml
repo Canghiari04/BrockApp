@@ -48,15 +48,6 @@
                 android:textSize="16sp"
                 android:textColor="@color/black">
             </TextView>
-
-            <TextView
-                android:id="@+id/info_activity_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:textSize="14sp"
-                android:textColor="@color/black">
-            </TextView>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -1,4 +1,4 @@
-package com.example.brockapp.calendar
+package com.example.brockapp.adapter
 
 import com.example.brockapp.R
 

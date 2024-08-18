@@ -30,7 +30,6 @@ import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -38,11 +37,11 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     private val listPermissions = mutableListOf<String>()
     private var listener: OnFragmentInteractionListener? = null
 
+    private lateinit var db: BrockDB
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var utilPermission: PermissionUtil
     private lateinit var geofenceManager: GeofenceManager
-    private lateinit var geofencingClient: GeofencingClient
-    private lateinit var viewModelGeofence: GeofenceViewModel
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -60,7 +59,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                val db = BrockDB.getInstance(requireContext())
+                db = BrockDB.getInstance(requireContext())
                 val factoryViewModelUser = UserViewModelFactory(db)
                 val factoryViewModelGeofence = GeofenceViewModelFactory(db)
 
@@ -138,8 +137,8 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     private fun checkNotificationPermission() {
         when {
             utilPermission.hasNotificationPermission(requireContext()) -> {
-                startGeofenceBroadcast()
-                startNotificationBroadcast()
+                startGeofenceService()
+                startNotificationService()
                 goToHome()
             }
             utilPermission.shouldShowNotificationPermissionRationaleDialog() -> {
@@ -188,8 +187,8 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
     private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
-            startGeofenceBroadcast()
-            startNotificationBroadcast()
+            startGeofenceService()
+            startNotificationService()
             goToHome()
         } else {
             showNotificationPermissionDialog(requireContext())
@@ -249,8 +248,8 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
      * Connesso alla REMOTE API è "risvegliato" il service contenente il broadcast receiver per
      * gestire eventi di geofencing.
      */
-    private fun startGeofenceBroadcast() {
-        geofencingClient = LocationServices.getGeofencingClient(requireContext())
+    private fun startGeofenceService() {
+        val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(geofenceManager.getRequest(), geofenceManager.getPendingIntent()).run {
@@ -266,7 +265,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         }
     }
 
-    private fun startNotificationBroadcast() {
+    private fun startNotificationService() {
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             activity?.startService(Intent(activity, NotificationService::class.java))
         } else {
@@ -275,6 +274,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     }
 
     private fun goToHome() {
-        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "home"))
+        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home"))
     }
 }

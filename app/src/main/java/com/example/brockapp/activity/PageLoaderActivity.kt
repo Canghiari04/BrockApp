@@ -9,17 +9,19 @@ import com.example.brockapp.fragment.CalendarFragment
 import android.os.Bundle
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PageLoaderActivity : AppCompatActivity() {
+    private var mapFragments = mutableMapOf<String, Fragment>()
+
+    private lateinit var toolbar: Toolbar
     private lateinit var homeFragment: HomeFragment
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
-
-    private var mapFragments = mutableMapOf<String, Fragment>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +32,8 @@ class PageLoaderActivity : AppCompatActivity() {
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
 
+        toolbar = findViewById(R.id.toolbar_page_loader)
+
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
             add(R.id.page_loader_fragment, calendarFragment)
@@ -39,25 +43,25 @@ class PageLoaderActivity : AppCompatActivity() {
         }
 
         mapFragments.apply {
-            put("home", homeFragment)
-            put("calendar", calendarFragment)
-            put("charts", chartsFragment)
-            put("friends", friendsFragment)
+            put("Home", homeFragment)
+            put("Calendar", calendarFragment)
+            put("Charts", chartsFragment)
+            put("Friends", friendsFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
-            val typeFragment = intent.getStringExtra("FRAGMENT_TO_SHOW")
-            switchFragment(mapFragments[typeFragment]!!)
+            val name = intent.getStringExtra("FRAGMENT_TO_SHOW")
+            switchFragment(name!!, mapFragments[name]!!)
         }
 
         findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navbar_item_home -> {
-                    switchFragment(homeFragment)
+                    switchFragment("Home", homeFragment)
                     true
                 }
                 R.id.navbar_item_calendar -> {
-                    switchFragment(calendarFragment)
+                    switchFragment("Calendar", calendarFragment)
                     true
                 }
                 R.id.navbar_item_plus -> {
@@ -66,11 +70,11 @@ class PageLoaderActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navbar_item_charts -> {
-                    switchFragment(chartsFragment)
+                    switchFragment("Charts", chartsFragment)
                     true
                 }
                 R.id.navbar_item_friends -> {
-                    switchFragment(friendsFragment)
+                    switchFragment("Friends", friendsFragment)
                     true
                 }
                 else -> {
@@ -83,8 +87,10 @@ class PageLoaderActivity : AppCompatActivity() {
     /**
      * Metodo necessario per rimpiazzare il fragment corrente con quello nuovo.
      */
-    private fun switchFragment(fragment: Fragment) {
+    private fun switchFragment(name: String, fragment: Fragment) {
         hideAllFragment(supportFragmentManager)
+
+        toolbar.title = name
 
         supportFragmentManager.beginTransaction().apply {
             show(fragment)

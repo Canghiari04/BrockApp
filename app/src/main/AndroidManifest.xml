@@ -28,8 +28,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.PageLoaderActivity">
-            </activity>
+            android:name=".activity.PageLoaderActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        </activity>
         <activity
             android:name=".activity.DailyActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
