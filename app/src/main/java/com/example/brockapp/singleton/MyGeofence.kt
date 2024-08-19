@@ -13,6 +13,7 @@ import android.content.Context
 import android.app.PendingIntent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
@@ -72,7 +73,7 @@ object MyGeofence {
         val list = getAreas()
 
         request = GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
             addGeofences(list)
         }.build()
     }
@@ -85,9 +86,9 @@ object MyGeofence {
             listGeofence.add(
                 Geofence.Builder()
                     .setRequestId(entry.id)
-                    .setCircularRegion(entry.longitude, entry.latitude, radius.toFloat())
+                    .setCircularRegion(entry.latitude, entry.longitude, radius.toFloat())
                     .setExpirationDuration(duration)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL or Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
                     .setLoiteringDelay(5000)
                     .build()
             )
@@ -109,7 +110,9 @@ object MyGeofence {
     }
 
     private fun definePendingIntent(context: Context) {
-        val intent = Intent(context, GeofenceService::class.java)
+        val intent = Intent(context, GeofenceService::class.java).apply {
+            action = GEOFENCE_INTENT_TYPE
+        }
 
         pendingIntent = PendingIntent.getService(
             context,

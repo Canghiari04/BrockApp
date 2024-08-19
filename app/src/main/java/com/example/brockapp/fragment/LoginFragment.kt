@@ -249,10 +249,12 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     }
 
     /**
-     * Provare a migrare il codice all'interno di GeofenceManager.
+     * Provare a migrare il codice all'interno di qualche util.
      */
     private fun startGeofenceService() {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
+
+        val c = geofence.pendingIntent
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
@@ -260,7 +262,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                     activity?.startService(Intent(activity, GeofenceService::class.java))
                 }
                 addOnFailureListener {
-                    Toast.makeText(requireContext(), GEOFENCE_ERROR, Toast.LENGTH_SHORT).show()
+                    Log.d("GEOFENCING_RECEIVER", "Unsuccessful connection.")
                 }
             }
         } else {

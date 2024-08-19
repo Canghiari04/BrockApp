@@ -27,16 +27,16 @@ class GeofenceService : Service() {
 
         receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                Log.d("GEOFENCING", "Fuori dalla condizione.")
+                Log.d("GEOFENCING_SERVICE", "Outside the if.")
 
                 if(intent.action == GEOFENCE_INTENT_TYPE) {
                     val event = GeofencingEvent.fromIntent(intent)
 
-                    Log.d("GEOFENCING", "Sono dentro al receiver.")
+                    Log.d("GEOFENCING_SERVICE", "Inside the receiver.")
 
                     if(event != null) {
                         if(event.hasError()) {
-                            Log.d("GEOFENCING", event.errorCode.toString())
+                            Log.d("GEOFENCING_SERVICE", event.errorCode.toString())
                         } else {
                             val geofenceTransition = event.geofenceTransition
                             val geofenceLocation = event.triggeringLocation
@@ -44,21 +44,21 @@ class GeofenceService : Service() {
                             when (geofenceTransition) {
                                 GEOFENCE_TRANSITION_ENTER -> {
                                     val location = getLocation(geofenceLocation!!)
-                                    Log.d("GEOFENCING", "Invio la notifica dopo ENTER.")
+                                    Log.d("GEOFENCING_SERVICE", "Send notify after ENTERING in a fence.")
                                     sendGeofenceNotify(location)
                                 }
                                 GEOFENCE_TRANSITION_DWELL -> {
                                     val location = getLocation(geofenceLocation!!)
-                                    Log.d("GEOFENCING", "Invio la notifica dopo DWELL.")
+                                    Log.d("GEOFENCING_SERVICE", "Send notify after DWELLING in a fence..")
                                     sendGeofenceNotify(location)
                                 }
                                 else -> {
-                                    Log.d("GEOFENCING", "Transition non riconosciuta.")
+                                    Log.d("GEOFENCING_SERVICE", "Fence not recognize.")
                                 }
                             }
                         }
                     } else {
-                        Log.d("GEOFENCING", "Evento null.")
+                        Log.d("GEOFENCING_SERVICE", "Null event.")
                     }
                 }
             }

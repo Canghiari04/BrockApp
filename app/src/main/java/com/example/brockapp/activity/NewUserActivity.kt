@@ -1,6 +1,7 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
+import com.example.brockapp.service.ActivityRecognitionService
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 
 import android.net.Uri
@@ -16,10 +17,6 @@ import android.content.pm.PackageManager
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.CONNECTIVITY_INTENT_TYPE
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
-import com.example.brockapp.service.ActivityRecognitionService
 
 class NewUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +47,6 @@ class NewUserActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_run_activity).setOnClickListener {
 
         }
-
-        sendBroadcast(Intent(GEOFENCE_INTENT_TYPE))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
