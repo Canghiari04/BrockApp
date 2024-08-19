@@ -19,6 +19,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 
@@ -148,6 +149,6 @@ class WalkActivity : AppCompatActivity() {
             putExtra("stepNumber", stepCount)
         }
 
-        sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 }

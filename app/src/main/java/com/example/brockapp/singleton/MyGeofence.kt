@@ -118,7 +118,7 @@ object MyGeofence {
             context,
             REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
     }
 }

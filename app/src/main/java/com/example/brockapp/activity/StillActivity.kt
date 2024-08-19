@@ -70,7 +70,6 @@ class StillActivity : AppCompatActivity() {
                 registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
             }
 
-            startDetection(transitionManager)
         }
 
         findViewById<Button>(R.id.button_stop).setOnClickListener {
@@ -131,7 +130,7 @@ class StillActivity : AppCompatActivity() {
             putExtra("transitionType", transitionType)
         }
 
-        sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun sendLazyUserNotification(title : String, content : String) {
@@ -140,8 +139,6 @@ class StillActivity : AppCompatActivity() {
             .putExtra("content", content)
             .putExtra("type", "walk")
 
-
-        //activity?.sendBroadcast(intent)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 }

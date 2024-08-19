@@ -61,7 +61,7 @@ class NotificationService : Service() {
             }
         }
 
-        registerReceiver(receiver, IntentFilter(NOTIFICATION_INTENT_TYPE))
+        registerReceiver(receiver, IntentFilter(NOTIFICATION_INTENT_TYPE), RECEIVER_NOT_EXPORTED)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

@@ -21,6 +21,7 @@ import android.content.IntentFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import android.content.BroadcastReceiver
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 
@@ -100,7 +101,7 @@ class ActivityRecognitionService : Service() {
             }
         }
 
-        registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
     }
 
     override fun onBind(intent: Intent?): IBinder? {

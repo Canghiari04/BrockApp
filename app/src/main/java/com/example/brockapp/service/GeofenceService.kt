@@ -64,7 +64,7 @@ class GeofenceService : Service() {
             }
         }
 
-        registerReceiver(receiver, IntentFilter(GEOFENCE_INTENT_TYPE))
+        registerReceiver(receiver, IntentFilter(GEOFENCE_INTENT_TYPE), RECEIVER_NOT_EXPORTED)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

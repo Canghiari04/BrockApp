@@ -162,6 +162,6 @@ class VehicleActivity : AppCompatActivity() {
             putExtra("distanceTravelled", distanceTravelled)
         }
 
-        sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 }
