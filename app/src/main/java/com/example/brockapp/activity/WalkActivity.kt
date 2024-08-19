@@ -16,6 +16,7 @@ import android.content.Context
 import android.widget.TextView
 import android.widget.Chronometer
 import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
@@ -23,11 +24,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 
-class WalkActivity : AppCompatActivity() {
+class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var running = false
     private var initialStepCount = 0
-    private var stepDetectorSensor: Sensor? = null
+    private lateinit var stepDetectorSensor: Sensor
+
 
     private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
@@ -39,7 +41,7 @@ class WalkActivity : AppCompatActivity() {
         notificationManager = NotificationManagerCompat.from(this)
 
         sensorManager = this.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)!!
 
         val chronometer = findViewById<Chronometer>(R.id.walk_chronometer)
 
@@ -52,6 +54,8 @@ class WalkActivity : AppCompatActivity() {
                 findViewById<Button>(R.id.walk_button_stop).isEnabled = true
 
                 startStepCounting()
+
+                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, 0L)
             }
         }
 
@@ -104,17 +108,17 @@ class WalkActivity : AppCompatActivity() {
     }
 
     private fun startStepCounting() {
-        stepDetectorSensor?.also { stepSensor ->
-            // sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        stepDetectorSensor.also { stepSensor ->
+            sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
             initialStepCount = stepCount
         }
     }
 
     private fun stopStepCounting() {
-        // sensorManager.unregisterListener(this)
+        sensorManager.unregisterListener(this)
     }
 
-    fun onSensorChanged(event: SensorEvent) {
+    override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
             stepCount++
             Log.d("StepCount", "Passi: $stepCount")
@@ -127,6 +131,10 @@ class WalkActivity : AppCompatActivity() {
 
             findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
         }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        TODO("Not yet implemented")
     }
 
     private fun sendWalkNotification(title: String, content: String) {

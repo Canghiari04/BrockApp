@@ -20,6 +20,7 @@ import com.google.android.gms.location.GeofencingRequest
 object MyGeofence {
     private lateinit var geofences: List<GeofenceAreaEntry>
 
+    // 1 giorno in millisecondi
     private var duration = 86400000L
     private val instance = MyGeofence
 
