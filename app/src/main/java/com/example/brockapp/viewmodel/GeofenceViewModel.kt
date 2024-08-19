@@ -39,7 +39,7 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
     }
 
     fun getGeofenceAreas() {
-        areas = db.GeofenceAreaDao().getAllGeofenceArea()
+        areas = db.GeofenceAreaDao().getAllLiveGeofenceAreas()
     }
 
     fun observeGeofenceAreasLiveData(): LiveData<List<GeofenceAreaEntry>> {

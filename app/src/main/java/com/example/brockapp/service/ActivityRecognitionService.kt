@@ -25,10 +25,10 @@ import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionService : Service() {
-    private lateinit var receiver: BroadcastReceiver
     private lateinit var user: User
     private lateinit var db: BrockDB
-    private lateinit var utilNotification: NotificationUtil
+    private lateinit var receiver: BroadcastReceiver
+    private lateinit var util: NotificationUtil
 
     override fun onCreate() {
         super.onCreate()
@@ -38,7 +38,7 @@ class ActivityRecognitionService : Service() {
                 if(intent.action == ACTIVITY_RECOGNITION_INTENT_TYPE) {
                     user = User.getInstance()
                     db = BrockDB.getInstance(context)
-                    utilNotification = NotificationUtil()
+                    util = NotificationUtil()
 
                     val activityType = intent.getIntExtra("activityType", -1)
                     val transitionType = intent.getIntExtra("transitionType", -1)
@@ -89,9 +89,11 @@ class ActivityRecognitionService : Service() {
                                 }
                             }
 
-                            sendActivityNotify(activityType)
+                            // Notifica utilizzata come prova, da migliorare,
+                            if (transitionType == 1)
+                                sendActivityNotify(activityType)
                         } catch (e: Exception) {
-                            Log.d("ACTIVITY_RECOGNITION_DATABASE", e.toString())
+                            Log.d("ACTIVITY_RECOGNITION", e.toString())
                         }
                     }
                 }
@@ -111,7 +113,7 @@ class ActivityRecognitionService : Service() {
     }
 
     private fun sendActivityNotify(type: Int) {
-        val intent = utilNotification.getActivityRecognitionIntent(type)
+        val intent = util.getActivityRecognitionIntent(type)
         sendBroadcast(intent)
     }
 }

@@ -3,10 +3,8 @@ package com.example.brockapp.fragment
 import com.example.brockapp.R
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.SIGN_IN_ERROR
-import com.example.brockapp.CONNECTION_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.manager.GeofenceManager
 import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
@@ -32,16 +30,18 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.brockapp.GEOFENCE_ERROR
+import com.example.brockapp.singleton.MyGeofence
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private val listPermissions = mutableListOf<String>()
     private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var db: BrockDB
+    private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
-    private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var utilPermission: PermissionUtil
-    private lateinit var geofenceManager: GeofenceManager
+    private lateinit var viewModelGeofence: GeofenceViewModel
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -101,14 +101,9 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
     private fun observeGeofenceAreas() {
         viewModelGeofence.observeGeofenceAreasLiveData().observe(viewLifecycleOwner) {
-            geofenceManager = GeofenceManager(requireContext(), it)
+            geofence = MyGeofence.getInstance()
+            geofence.init(requireContext(), it)
             checkLocationPermissions()
-        }
-    }
-
-    private fun defineGeofenceManager() {
-        viewModelGeofence.observeGeofenceAreasLiveData().observe(viewLifecycleOwner) {
-            geofenceManager = GeofenceManager(requireContext(), it)
         }
     }
 
@@ -208,7 +203,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun showLocationPermissionsDialog(context: Context) {
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
-            .setMessage(R.string.permissions_message)
+            .setMessage(R.string.permissions_location)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
                 checkLocationPermissions()
@@ -258,12 +253,12 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofencingClient.addGeofences(geofenceManager.getRequest(), geofenceManager.getPendingIntent()).run {
+            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
                 addOnSuccessListener {
                     activity?.startService(Intent(activity, GeofenceService::class.java))
                 }
                 addOnFailureListener {
-                    Toast.makeText(requireContext(), CONNECTION_ERROR, Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), GEOFENCE_ERROR, Toast.LENGTH_LONG).show()
                 }
             }
         } else {

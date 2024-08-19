@@ -12,7 +12,10 @@ interface GeofenceAreaDao {
     suspend fun insertGeofenceArea(area: GeofenceAreaEntry)
 
     @Query("SELECT * FROM GeofenceArea")
-    fun getAllGeofenceArea(): LiveData<List<GeofenceAreaEntry>>
+    fun getAllGeofenceAreas(): List<GeofenceAreaEntry>
+
+    @Query("SELECT * FROM GeofenceArea")
+    fun getAllLiveGeofenceAreas(): LiveData<List<GeofenceAreaEntry>>
 
     @Query("SELECT COUNT(*) FROM GeofenceArea")
     suspend fun countAllGeofenceAreas(): Int

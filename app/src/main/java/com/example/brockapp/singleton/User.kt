@@ -1,8 +1,5 @@
 package com.example.brockapp.singleton
 
-/**
- * Singoletto utilizzato per mantenere durante il run dell'applicazione il riferimento ad una sola istanza User.
- */
 object User {
     private val instance = User
 
@@ -10,7 +7,7 @@ object User {
     var username: String = ""
     var password: String = ""
 
-    fun getInstance() : User {
+    fun getInstance(): User {
         return instance
     }
 

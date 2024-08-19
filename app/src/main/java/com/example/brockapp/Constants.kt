@@ -4,7 +4,7 @@ package com.example.brockapp
 const val SIGN_IN_ERROR = "Credenziali già presenti, passa a Login."
 const val LOGIN_ERROR = "Credenziali errate, riprova."
 const val BLANK_ERROR = "Inserisci le credenziali."
-const val CONNECTION_ERROR = "Nessuna connessione rilevata."
+const val GEOFENCE_ERROR = "Impossibile connettersi al servizio."
 
 const val ROOM_DATABASE_VERSION = 17
 
@@ -26,7 +26,12 @@ const val VEHICLE_ACTIVITY_TYPE = "VEHICLE"
 const val NOTIFICATION_INTENT_TYPE = "NOTIFICATION_TRANSITION_ACTION"
 const val GEOFENCE_INTENT_TYPE = "GEOFENCE_TRANSITION_ACTION"
 const val ACTIVITY_RECOGNITION_INTENT_TYPE = "ACTIVITY_TRANSITION_ACTION"
+const val CONNECTIVITY_INTENT_TYPE = "CONNECTIVITY_TRANSITION_ACTION"
 
 const val ACTIVITY_RECOGNITION_NOTIFY = "ACTIVITY_RECOGNITION"
 const val GEOFENCE_NOTIFY = "GEOFENCE_RECOGNITION"
-const val WIFI_NOTIFY = "WI-FI"
+const val CONNECTIVITY_NOTIFY = "CONNECTIVITY_RECOGNITION"
+
+const val WI_FI_TYPE_CONNECTION = "WI-FI"
+const val CELLULAR_TYPE_CONNECTION = "CELLULAR"
+const val NO_CONNECTION_TYPE_CONNECTION = "CONNECTION"

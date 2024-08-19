@@ -1,6 +1,7 @@
 package com.example.brockapp.service
 
 import com.example.brockapp.GEOFENCE_NOTIFY
+import com.example.brockapp.CONNECTIVITY_NOTIFY
 import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.NOTIFICATION_INTENT_TYPE
 import com.example.brockapp.ACTIVITY_RECOGNITION_NOTIFY
@@ -45,6 +46,9 @@ class NotificationService : Service() {
                         GEOFENCE_NOTIFY -> {
                             getNotificationChannel(GEOFENCE_NOTIFY, GEOFENCE_NOTIFY, notificationManager)
                             notification = utilNotification.getGeofenceNotification(GEOFENCE_NOTIFY, context, intent).build()
+                        }
+                        CONNECTIVITY_NOTIFY -> {
+
                         }
                     }
 

@@ -17,14 +17,22 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.CONNECTIVITY_INTENT_TYPE
 import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.example.brockapp.service.ActivityRecognitionService
 
 class NewUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.new_user_activity)
 
         checkActivityPermission()
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
+        toolbar.title = ""
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         findViewById<Button>(R.id.button_still).setOnClickListener {
             startActivity(Intent(this, StillActivity::class.java))
@@ -42,6 +50,8 @@ class NewUserActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_run_activity).setOnClickListener {
 
         }
+
+        sendBroadcast(Intent(GEOFENCE_INTENT_TYPE))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -50,8 +60,7 @@ class NewUserActivity : AppCompatActivity() {
         if(requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
             when {
                 grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
-                    showNewActivityPage()
-                    registerActivityRecognition()
+                    startActivityRecognitionService()
                 }
                 else -> {
                     showDetectPermissionDialog()
@@ -80,8 +89,7 @@ class NewUserActivity : AppCompatActivity() {
      */
     private fun checkActivityPermission() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            showNewActivityPage()
-            registerActivityRecognition()
+            startActivityRecognitionService()
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)) {
             showDetectPermissionDialog()
         } else {
@@ -91,20 +99,6 @@ class NewUserActivity : AppCompatActivity() {
                 REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
             )
         }
-    }
-
-    /**
-     * Metodo richiamato quando i permessi sono accettati. Imposta il corretto fragment all'interno
-     * del frame layout dell'activity.
-     */
-    private fun showNewActivityPage() {
-        setContentView(R.layout.new_user_activity)
-
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
-        toolbar.title = ""
-        setSupportActionBar(toolbar)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     /**
@@ -118,12 +112,10 @@ class NewUserActivity : AppCompatActivity() {
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
                 startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)))
-                finish()
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
                 startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("TYPE_PAGE", "HOME"))
-                finish()
             }
             .create()
             .show()
@@ -133,7 +125,7 @@ class NewUserActivity : AppCompatActivity() {
      * Metodo attuato per registrare il broadcast receiver, affinchè possa ricevere updates relativi
      * ad activity recognition.
      */
-    private fun registerActivityRecognition() {
+    private fun startActivityRecognitionService() {
         startService(Intent(this, ActivityRecognitionService::class.java))
     }
 }

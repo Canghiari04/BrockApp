@@ -51,7 +51,7 @@ class PermissionUtil(private val context: Context, private val activity: Fragmen
         AlertDialog.Builder(context)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+            .setPositiveButton(R.string.settings_positive_button) { dialog, _ ->
                 dialog.dismiss()
                 Toast.makeText(context, R.string.permissions_toast, Toast.LENGTH_LONG).show()
                 context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))

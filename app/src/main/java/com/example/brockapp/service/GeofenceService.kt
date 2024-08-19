@@ -27,16 +27,16 @@ class GeofenceService : Service() {
 
         receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                Log.d("GEOFENCE_BROADCAST", "Fuori dalla condizione.")
+                Log.d("GEOFENCING", "Fuori dalla condizione.")
 
                 if(intent.action == GEOFENCE_INTENT_TYPE) {
                     val event = GeofencingEvent.fromIntent(intent)
 
-                    Log.d("GEOFENCE_BROADCAST", "Sono dentro al receiver.")
+                    Log.d("GEOFENCING", "Sono dentro al receiver.")
 
                     if(event != null) {
                         if(event.hasError()) {
-                            Log.d("GEOFENCE_BROADCAST", event.errorCode.toString())
+                            Log.d("GEOFENCING", event.errorCode.toString())
                         } else {
                             val geofenceTransition = event.geofenceTransition
                             val geofenceLocation = event.triggeringLocation
@@ -44,25 +44,24 @@ class GeofenceService : Service() {
                             when (geofenceTransition) {
                                 GEOFENCE_TRANSITION_ENTER -> {
                                     val location = getLocation(geofenceLocation!!)
-                                    Log.d("GEOFENCE_BROADCAST", "Invio la notifica dopo ENTER.")
+                                    Log.d("GEOFENCING", "Invio la notifica dopo ENTER.")
                                     sendGeofenceNotify(location)
                                 }
                                 GEOFENCE_TRANSITION_DWELL -> {
                                     val location = getLocation(geofenceLocation!!)
-                                    Log.d("GEOFENCE_BROADCAST", "Invio la notifica dopo DWELL.")
+                                    Log.d("GEOFENCING", "Invio la notifica dopo DWELL.")
                                     sendGeofenceNotify(location)
                                 }
                                 else -> {
-                                    Log.d("GEOFENCE_BROADCAST", "Transition non riconosciuta.")
+                                    Log.d("GEOFENCING", "Transition non riconosciuta.")
                                 }
                             }
                         }
                     } else {
-                        Log.d("GEOFENCE_BROADCAST", "Evento null.")
+                        Log.d("GEOFENCING", "Evento null.")
                     }
                 }
             }
-
         }
 
         registerReceiver(receiver, IntentFilter(GEOFENCE_INTENT_TYPE))
