@@ -18,6 +18,7 @@ const val REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER = 58
 const val DATE_SEPARATOR = "-"
 const val CALENDAR_DATE_FORMAT = "yyyy-MM-dd"
 const val ISO_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
+const val CHARTS_DATE_FORMAT = "MM-yyyy"
 const val POSITION_UPDATE_INTERVAL_MILLIS = 10000
 
 // Suddivisione della tipologia di attività condotta dall'utente.
