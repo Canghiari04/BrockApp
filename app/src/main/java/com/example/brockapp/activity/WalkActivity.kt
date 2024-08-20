@@ -28,8 +28,8 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var running = false
     private var initialStepCount = 0
-    private lateinit var stepDetectorSensor: Sensor
 
+    private var stepDetectorSensor : Sensor? = null
 
     private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
@@ -40,8 +40,17 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
         notificationManager = NotificationManagerCompat.from(this)
 
-        sensorManager = this.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)!!
+        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        if (stepDetectorSensor == null) {
+            Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
+            // Informare l'utente che il sensore non è disponibile
+            findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
+            findViewById<Button>(R.id.walk_button_start).isEnabled = false
+            return // Esci da onCreate() poiché non puoi continuare senza il sensore
+        }
+
 
         val chronometer = findViewById<Chronometer>(R.id.walk_chronometer)
 
