@@ -14,6 +14,7 @@ import android.app.PendingIntent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.example.brockapp.GEOFENCE_INTENT_TYPE
+import com.example.brockapp.receiver.GeofenceReceiver
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
@@ -88,7 +89,7 @@ object MyGeofence {
                     .setRequestId(entry.id)
                     .setCircularRegion(entry.latitude, entry.longitude, radius.toFloat())
                     .setExpirationDuration(duration)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL or Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_DWELL)
                     .setLoiteringDelay(5000)
                     .build()
             )
@@ -110,15 +111,15 @@ object MyGeofence {
     }
 
     private fun definePendingIntent(context: Context) {
-        val intent = Intent(context, GeofenceService::class.java).apply {
+        val intent = Intent(context, GeofenceReceiver::class.java).apply {
             action = GEOFENCE_INTENT_TYPE
         }
 
-        pendingIntent = PendingIntent.getService(
+        pendingIntent = PendingIntent.getBroadcast(
             context,
             REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER,
             intent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
     }
 }

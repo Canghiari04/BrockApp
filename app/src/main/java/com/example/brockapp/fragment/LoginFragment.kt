@@ -139,9 +139,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     private fun checkNotificationPermission() {
         when {
             utilPermission.hasNotificationPermission(requireContext()) -> {
-                startGeofenceService()
-                startNotificationService()
-                startConnectivityService()
+                startGeofence()
                 goToHome()
             }
             utilPermission.shouldShowNotificationPermissionRationaleDialog() -> {
@@ -190,9 +188,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
     private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
-            startGeofenceService()
-            startNotificationService()
-            startConnectivityService()
             goToHome()
         } else {
             showNotificationPermissionDialog(requireContext())
@@ -248,18 +243,13 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             .show()
     }
 
-    /**
-     * Provare a migrare il codice all'interno di qualche util.
-     */
-    private fun startGeofenceService() {
+    private fun startGeofence() {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
-
-        val c = geofence.pendingIntent
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
                 addOnSuccessListener {
-                    activity?.startService(Intent(activity, GeofenceService::class.java))
+                    Log.d("GEOFENCING_RECEIVER", "Successful connection.")
                 }
                 addOnFailureListener {
                     Log.d("GEOFENCING_RECEIVER", "Unsuccessful connection.")
@@ -268,14 +258,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         } else {
             Log.d("WTF", "WTF")
         }
-    }
-
-    private fun startNotificationService() {
-        activity?.startService(Intent(activity, NotificationService::class.java))
-    }
-
-    private fun startConnectivityService() {
-        activity?.startService(Intent(activity, ConnectivityService::class.java))
     }
 
     private fun goToHome() {

@@ -19,7 +19,10 @@ import android.app.NotificationChannel
 import androidx.core.app.ActivityCompat
 import android.content.BroadcastReceiver
 import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 
 class NotificationService : Service() {
     private lateinit var notification: Notification
@@ -43,10 +46,6 @@ class NotificationService : Service() {
                             getNotificationChannel(ACTIVITY_RECOGNITION_NOTIFY, ACTIVITY_RECOGNITION_NOTIFY, notificationManager)
                             notification = utilNotification.getActivityRecognitionNotification(ACTIVITY_RECOGNITION_NOTIFY, context, intent).build()
                         }
-                        GEOFENCE_NOTIFY -> {
-                            getNotificationChannel(GEOFENCE_NOTIFY, GEOFENCE_NOTIFY, notificationManager)
-                            notification = utilNotification.getGeofenceNotification(GEOFENCE_NOTIFY, context, intent).build()
-                        }
                         CONNECTIVITY_NOTIFY -> {
 
                         }
@@ -61,16 +60,16 @@ class NotificationService : Service() {
             }
         }
 
-        registerReceiver(receiver, IntentFilter(NOTIFICATION_INTENT_TYPE), RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(this, receiver, IntentFilter(NOTIFICATION_INTENT_TYPE), ContextCompat.RECEIVER_EXPORTED)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
-    private fun getNotificationChannel(id: String, description: String, notificationManager: NotificationManagerCompat) {
+    private fun getNotificationChannel(name: String, description: String, notificationManager: NotificationManagerCompat) {
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(id, id, importance)
+        val channel = NotificationChannel(name, name, importance)
 
         channel.description = description
         notificationManager.createNotificationChannel(channel)

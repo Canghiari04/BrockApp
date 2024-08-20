@@ -138,8 +138,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun checkNotificationPermission() {
         when {
             utilPermission.hasNotificationPermission(requireContext()) -> {
-                startGeofenceBroadcast()
-                startNotificationBroadcast()
+                startGeofence()
                 goToHome()
             }
             utilPermission.shouldShowNotificationPermissionRationaleDialog() -> {
@@ -188,8 +187,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
     private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if(isGranted) {
-            startGeofenceBroadcast()
-            startNotificationBroadcast()
+            startGeofence()
             goToHome()
         } else {
             showNotificationPermissionDialog(requireContext())
@@ -249,26 +247,18 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
      * Connesso alla REMOTE API è "risvegliato" il service contenente il broadcast receiver per
      * gestire eventi di geofencing.
      */
-    private fun startGeofenceBroadcast() {
+    private fun startGeofence() {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
                 addOnSuccessListener {
-                    activity?.startService(Intent(activity, GeofenceService::class.java))
+                    Log.d("GEOFENCING_RECEIVER", "Successful connection.")
                 }
                 addOnFailureListener {
-                    Toast.makeText(requireContext(), GEOFENCE_ERROR, Toast.LENGTH_LONG).show()
+                    Log.d("GEOFENCING_RECEIVER", "Unsuccessful connection.")
                 }
             }
-        } else {
-            Log.d("WTF", "WTF")
-        }
-    }
-
-    private fun startNotificationBroadcast() {
-        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            activity?.startService(Intent(activity, NotificationService::class.java))
         } else {
             Log.d("WTF", "WTF")
         }

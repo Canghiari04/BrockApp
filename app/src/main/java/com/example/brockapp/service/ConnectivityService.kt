@@ -23,56 +23,49 @@ import com.google.android.gms.location.LocationServices
 class ConnectivityService: Service() {
     private lateinit var db: BrockDB
     private lateinit var geofence: MyGeofence
-    private lateinit var receiver: BroadcastReceiver
 
     override fun onCreate() {
         super.onCreate()
 
-        receiver = object: BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == ConnectivityManager.CONNECTIVITY_ACTION) {
-                    geofence = MyGeofence.getInstance()
+        db = BrockDB.getInstance(this)
+        geofence = MyGeofence.getInstance()
+    }
 
-                    val (significantChange, typeNetwork) = handleSignificantConnectivityChange(context)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val (significantChange, typeNetwork) = handleSignificantConnectivityChange(this)
 
-                    if (significantChange) {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            geofence.typeNetwork = typeNetwork
-                            db = BrockDB.getInstance(context)
-                            val areas = db.GeofenceAreaDao().getAllGeofenceAreas()
-
-                            if (areas.isEmpty()) {
-                                Log.d("WTF", "WTF")
-                            } else {
-                                val geofenceClient = LocationServices.getGeofencingClient(context)
-                                geofenceClient.removeGeofences(geofence.pendingIntent).run {
-                                    addOnSuccessListener {
-                                        Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
-                                        geofence.init(context, areas)
-                                    }
-                                    addOnFailureListener {
-                                        Log.d("CONNECTIVITY_SERVICE", "Geofence not removed.")
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        Log.d("CONNECTIVITY_SERVICE", "Change insignificant.")
-                    }
-                }
-            }
+        if (significantChange) {
+//        TODO -> Gestione dei fences a seconda della tipologia di rete presente.
+//        val geofenceClient = LocationServices.getGeofencingClient(this)
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//            geofence.typeNetwork = typeNetwork
+//
+//            val areas = db.GeofenceAreaDao().getAllGeofenceAreas()
+//
+//            if (areas.isEmpty()) {
+//                Log.d("WTF", "WTF")
+//            } else {
+//                geofenceClient.removeGeofences(geofence.pendingIntent).run {
+//                    addOnSuccessListener {
+//                        Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
+//                        geofence.init(context, areas)
+//                    }
+//                    addOnFailureListener {
+//                        Log.d("CONNECTIVITY_SERVICE", "Geofence not removed.")
+//                    }
+//                }
+//            }
+//        }
+        } else {
+            Log.d("CONNECTIVITY_SERVICE", "Insignificant change.")
         }
 
-        registerReceiver(receiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(receiver)
     }
 
     private fun handleSignificantConnectivityChange(context: Context): Pair<Boolean, String> {

@@ -57,6 +57,14 @@
             android:enabled="true"
             android:exported="false">
         </service>
+        <receiver
+            android:name=".receiver.GeofenceReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="GEOFENCE_TRANSITION_ACTION" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".service.GeofenceService"
             android:enabled="true"

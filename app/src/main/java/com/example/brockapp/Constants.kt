@@ -12,7 +12,7 @@ const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1
 
 // Request code utilizzati per i Pending Intent.
 const val REQUEST_CODE_ACTIVITY_BROADCAST_RECEIVER = 10
-const val REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER = 11
+const val REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER = 58
 
 // Costanti utilizzate per definire al corretta visualizzazione grafica del calendario.
 const val DATE_SEPARATOR = "-"

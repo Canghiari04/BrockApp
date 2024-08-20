@@ -18,67 +18,51 @@ import com.google.android.gms.location.GeofencingEvent
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
 
-class GeofenceService : Service() {
-    private lateinit var receiver: BroadcastReceiver
+class GeofenceService: Service() {
     private lateinit var utilNotification: NotificationUtil
 
     override fun onCreate() {
         super.onCreate()
+        utilNotification = NotificationUtil()
+    }
 
-        receiver = object: BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Log.d("GEOFENCING_SERVICE", "Outside the if.")
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if(intent != null) {
+            val geofenceTransition = intent.getIntExtra("TRANSITION", 0)
+            val latitude = intent.getDoubleExtra("LATITUDE", 0.0)
+            val longitude = intent.getDoubleExtra("LONGITUDE", 0.0)
 
-                if(intent.action == GEOFENCE_INTENT_TYPE) {
-                    val event = GeofencingEvent.fromIntent(intent)
+            when (geofenceTransition) {
+                GEOFENCE_TRANSITION_ENTER -> {
+                    val location = getLocation(latitude, longitude)
+                    Log.d("GEOFENCING_SERVICE", "Send notify after ENTERING in a fence.")
+                    sendGeofenceNotify(location)
+                }
 
-                    Log.d("GEOFENCING_SERVICE", "Inside the receiver.")
+                GEOFENCE_TRANSITION_DWELL -> {
+                    val location = getLocation(latitude, longitude)
+                    Log.d("GEOFENCING_SERVICE", "Send notify after DWELLING in a fence..")
+                    sendGeofenceNotify(location)
+                }
 
-                    if(event != null) {
-                        if(event.hasError()) {
-                            Log.d("GEOFENCING_SERVICE", event.errorCode.toString())
-                        } else {
-                            val geofenceTransition = event.geofenceTransition
-                            val geofenceLocation = event.triggeringLocation
-
-                            when (geofenceTransition) {
-                                GEOFENCE_TRANSITION_ENTER -> {
-                                    val location = getLocation(geofenceLocation!!)
-                                    Log.d("GEOFENCING_SERVICE", "Send notify after ENTERING in a fence.")
-                                    sendGeofenceNotify(location)
-                                }
-                                GEOFENCE_TRANSITION_DWELL -> {
-                                    val location = getLocation(geofenceLocation!!)
-                                    Log.d("GEOFENCING_SERVICE", "Send notify after DWELLING in a fence..")
-                                    sendGeofenceNotify(location)
-                                }
-                                else -> {
-                                    Log.d("GEOFENCING_SERVICE", "Fence not recognize.")
-                                }
-                            }
-                        }
-                    } else {
-                        Log.d("GEOFENCING_SERVICE", "Null event.")
-                    }
+                else -> {
+                    Log.d("GEOFENCING_SERVICE", "Fence not recognize.")
                 }
             }
+        } else {
+            Log.d("GEOFENCING_SERVICE", "Null intent.")
         }
 
-        registerReceiver(receiver, IntentFilter(GEOFENCE_INTENT_TYPE), RECEIVER_NOT_EXPORTED)
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(receiver)
-    }
-
-    private fun getLocation(item: Location): String {
+    private fun getLocation(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(this, Locale.getDefault())
-        val coordinates = Pair(item.latitude, item.longitude)
+        val coordinates = Pair(latitude, longitude)
         var location = ""
 
         try {
