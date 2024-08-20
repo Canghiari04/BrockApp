@@ -1,5 +1,6 @@
 package com.example.brockapp.service
 
+import android.app.NotificationChannel
 import com.example.brockapp.R
 import com.example.brockapp.GEOFENCE_NOTIFY
 import com.example.brockapp.util.NotificationUtil
@@ -12,6 +13,7 @@ import android.app.PendingIntent
 import androidx.work.WorkerParameters
 import android.app.NotificationManager
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 
 class GeofenceWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private lateinit var utilNotification: NotificationUtil
@@ -48,6 +50,16 @@ class GeofenceWorker(context: Context, workerParams: WorkerParameters) : Worker(
             setAutoCancel(true)
         }
 
-        notificationManager.notify(58, notification.build())
+        getNotificationChannel(GEOFENCE_NOTIFY, GEOFENCE_NOTIFY, notificationManager)
+
+        notificationManager.notify(0, notification.build())
+    }
+
+    private fun getNotificationChannel(name: String, description: String, notificationManager: NotificationManager) {
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(name, name, importance)
+
+        channel.description = description
+        notificationManager.createNotificationChannel(channel)
     }
 }

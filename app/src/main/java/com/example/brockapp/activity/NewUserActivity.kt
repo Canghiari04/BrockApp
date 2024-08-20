@@ -55,6 +55,11 @@ class NewUserActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        receiver = ActivityRecognitionReceiver()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -74,7 +79,6 @@ class NewUserActivity : AppCompatActivity() {
         return when (item.itemId) {
             android.R.id.home -> {
                 startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home"))
-                finish()
                 true
             }
             else -> {
