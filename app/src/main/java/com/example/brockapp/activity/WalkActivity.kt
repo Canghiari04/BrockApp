@@ -1,9 +1,7 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.NOTIFICATION_INTENT_TYPE
-import com.example.brockapp.ACTIVITY_RECOGNITION_NOTIFY
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
 
 import android.util.Log
 import android.os.Bundle
@@ -50,7 +48,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
 
 
-        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         if (stepDetectorSensor == null) {
@@ -102,7 +100,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             val elapsedSeconds = elapsedMillis / 1000 / 60 / 60
 
             if (elapsedSeconds >= 1 && !notificationSent) {
-                sendWalkNotification("Bravo!", "Stai camminando da più di un'ora!")
+                // Deve richiamare il worker per Activity Recognition
                 notificationSent = true
             }
 
@@ -145,7 +143,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             val stepsDuringSession = stepCount - initialStepCount
 
             if (stepsDuringSession == 100) {
-                sendWalkNotification("Bravo!", "Hai fatto 100 passi!")
+                // Deve richiamare il worker per Activity Recognition
             }
 
             findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
@@ -154,18 +152,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         TODO("Not yet implemented")
-    }
-
-    private fun sendWalkNotification(title: String, content: String) {
-        val intent = Intent().apply {
-            setAction(NOTIFICATION_INTENT_TYPE)
-            putExtra("title", title)
-            putExtra("content", content)
-            putExtra("type", "WALK")
-            putExtra("typeNotify", ACTIVITY_RECOGNITION_NOTIFY)
-        }
-
-        sendBroadcast(intent)
     }
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long) {

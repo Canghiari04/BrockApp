@@ -3,15 +3,12 @@ package com.example.brockapp.fragment
 import com.example.brockapp.R
 import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.LOGIN_ERROR
-import com.example.brockapp.GEOFENCE_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.service.ConnectivityService
 import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.service.NotificationService
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory

@@ -1,5 +1,8 @@
 package com.example.brockapp.service
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.NotificationUtil
@@ -10,7 +13,21 @@ import com.example.brockapp.database.UserVehicleActivityEntity
 import android.util.Log
 import android.os.IBinder
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import com.example.brockapp.CHANNEL_ID_ACTIVITY_NOTIFY
+import com.example.brockapp.CHANNEL_ID_CONNECTIVITY_NOTIFY
+import com.example.brockapp.DESCRIPTION_CHANNEL_ACTIVITY_NOTIFY
+import com.example.brockapp.DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
+import com.example.brockapp.ID_ACTIVITY_NOTIFY
+import com.example.brockapp.ID_CONNECTIVITY_NOTIFY
+import com.example.brockapp.NAME_CHANNEL_ACTIVITY_NOTIFY
+import com.example.brockapp.NAME_CHANNEL_CONNECTIVITY_NOTIFY
+import com.example.brockapp.worker.ActivityRecognitionWorker
+import com.example.brockapp.worker.GeofenceWorker
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +37,7 @@ class ActivityRecognitionService : Service() {
     private lateinit var user: User
     private lateinit var db: BrockDB
     private lateinit var util: NotificationUtil
+    private lateinit var manager: NotificationManager
 
     override fun onCreate() {
         super.onCreate()
@@ -76,14 +94,8 @@ class ActivityRecognitionService : Service() {
                         )
                     }
                 }
-
-                if (transitionType == 1) {
-                    sendActivityNotify(activityType)
-                } else {
-                    Log.d("ACTIVITY_NOTIFICATION", "Notify not request.")
-                }
             } catch (e: Exception) {
-                Log.d("ACTIVITY_NOTIFICATION", e.toString())
+                Log.e("ACTIVITY_SERVICE", e.toString())
             }
         }
 
@@ -92,10 +104,5 @@ class ActivityRecognitionService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
-    }
-
-    private fun sendActivityNotify(type: Int) {
-        val intent = util.getActivityRecognitionIntent(type)
-        sendBroadcast(intent)
     }
 }

@@ -8,8 +8,6 @@ import android.app.Application
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.core.content.ContextCompat
-import com.example.brockapp.receiver.GeofenceReceiver
-import com.google.android.gms.location.Geofence
 
 class MyApplication: Application() {
     private lateinit var db: BrockDB

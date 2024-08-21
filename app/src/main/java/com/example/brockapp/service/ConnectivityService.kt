@@ -1,62 +1,66 @@
 package com.example.brockapp.service
 
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.*
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.WI_FI_TYPE_CONNECTION
-import com.example.brockapp.CELLULAR_TYPE_CONNECTION
-import com.example.brockapp.NO_CONNECTION_TYPE_CONNECTION
+import com.example.brockapp.util.NotificationUtil
 
+import android.Manifest
 import android.util.Log
 import android.os.IBinder
 import android.app.Service
 import android.content.Intent
 import android.content.Context
-import kotlinx.coroutines.launch
-import android.content.IntentFilter
-import kotlinx.coroutines.Dispatchers
 import android.net.NetworkCapabilities
+import android.app.NotificationManager
 import android.net.ConnectivityManager
-import kotlinx.coroutines.CoroutineScope
-import android.content.BroadcastReceiver
+import android.app.NotificationChannel
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
 import com.google.android.gms.location.LocationServices
 
 class ConnectivityService: Service() {
-    private lateinit var db: BrockDB
     private lateinit var geofence: MyGeofence
+    private lateinit var util: NotificationUtil
+    private lateinit var manager: NotificationManager
 
     override fun onCreate() {
         super.onCreate()
 
-        db = BrockDB.getInstance(this)
         geofence = MyGeofence.getInstance()
+        util = NotificationUtil()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val (significantChange, typeNetwork) = handleSignificantConnectivityChange(this)
 
         if (significantChange) {
-//        TODO -> Gestione dei fences a seconda della tipologia di rete presente.
-//        val geofenceClient = LocationServices.getGeofencingClient(this)
-//
-//        CoroutineScope(Dispatchers.IO).launch {
-//            geofence.typeNetwork = typeNetwork
-//
-//            val areas = db.GeofenceAreaDao().getAllGeofenceAreas()
-//
-//            if (areas.isEmpty()) {
-//                Log.d("WTF", "WTF")
-//            } else {
-//                geofenceClient.removeGeofences(geofence.pendingIntent).run {
-//                    addOnSuccessListener {
-//                        Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
-//                        geofence.init(context, areas)
-//                    }
-//                    addOnFailureListener {
-//                        Log.d("CONNECTIVITY_SERVICE", "Geofence not removed.")
-//                    }
-//                }
-//            }
-//        }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                val geofenceClient = LocationServices.getGeofencingClient(this)
+
+                geofenceClient.removeGeofences(geofence.pendingIntent).run {
+                    addOnSuccessListener {
+                        Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
+                    }
+                    addOnFailureListener {
+                        sendErrorNotification()
+                    }
+                }
+
+                geofence.typeNetwork = typeNetwork
+                geofence.defineRadius(this)
+                geofence.defineRequest()
+
+                geofenceClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+                    addOnSuccessListener {
+                        Log.d("CONNECTIVITY_SERVICE", "Geofence added.")
+                    }
+                    addOnFailureListener {
+                        sendErrorNotification()
+                    }
+                }
+            } else {
+                Log.e("WTF", "WTF.")
+            }
         } else {
             Log.d("CONNECTIVITY_SERVICE", "Insignificant change.")
         }
@@ -89,5 +93,30 @@ class ConnectivityService: Service() {
         }
 
         return Pair(currentTypeNetwork != geofence.typeNetwork, currentTypeNetwork)
+    }
+
+    private fun sendErrorNotification() {
+        manager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val pendingIntent = util.getConnectivityPendingIntent(this)
+        val notification = util.getConnectivityNotification(CHANNEL_ID_CONNECTIVITY_NOTIFY, pendingIntent, this)
+
+        getNotificationChannel()
+
+        manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
+    }
+
+    private fun getNotificationChannel() {
+        val channel = NotificationChannel(
+            CHANNEL_ID_CONNECTIVITY_NOTIFY,
+            NAME_CHANNEL_CONNECTIVITY_NOTIFY,
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        channel.apply {
+            description = DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
+        }
+
+        manager.createNotificationChannel(channel)
     }
 }

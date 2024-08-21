@@ -1,8 +1,8 @@
 package com.example.brockapp.singleton
 
 import com.example.brockapp.data.Locality
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.example.brockapp.WI_FI_TYPE_CONNECTION
-import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.CELLULAR_TYPE_CONNECTION
 import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.NO_CONNECTION_TYPE_CONNECTION
@@ -13,20 +13,18 @@ import android.content.Context
 import android.app.PendingIntent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
-import com.example.brockapp.receiver.GeofenceReceiver
 import com.google.android.gms.location.Geofence
+import com.example.brockapp.receiver.GeofenceReceiver
 import com.google.android.gms.location.GeofencingRequest
 
 object MyGeofence {
     private lateinit var geofences: List<GeofenceAreaEntry>
 
-    // 1 giorno in millisecondi
     private var duration = 86400000L
     private val instance = MyGeofence
 
-    lateinit var pendingIntent: PendingIntent
     lateinit var request: GeofencingRequest
+    lateinit var pendingIntent: PendingIntent
 
     private var radius = 0
 
@@ -43,7 +41,7 @@ object MyGeofence {
         return instance
     }
 
-    private fun defineRadius(context: Context) {
+    fun defineRadius(context: Context) {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val network = connectivityManager.activeNetwork
@@ -71,7 +69,7 @@ object MyGeofence {
         }
     }
 
-    private fun defineRequest() {
+    fun defineRequest() {
         val list = getAreas()
 
         request = GeofencingRequest.Builder().apply {

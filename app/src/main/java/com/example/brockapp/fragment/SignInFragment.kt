@@ -5,10 +5,8 @@ import com.example.brockapp.BLANK_ERROR
 import com.example.brockapp.SIGN_IN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.service.NotificationService
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
@@ -30,7 +28,6 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.brockapp.GEOFENCE_ERROR
 import com.example.brockapp.singleton.MyGeofence
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {

@@ -79,6 +79,7 @@ class NewUserActivity : AppCompatActivity() {
         return when (item.itemId) {
             android.R.id.home -> {
                 startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home"))
+                finish()
                 true
             }
             else -> {
@@ -90,7 +91,6 @@ class NewUserActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(receiver)
     }
 
     /**

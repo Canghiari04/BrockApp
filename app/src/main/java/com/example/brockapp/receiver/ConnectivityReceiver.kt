@@ -14,7 +14,7 @@ class ConnectivityReceiver: BroadcastReceiver() {
             val serviceIntent = Intent(context, ConnectivityService::class.java)
             context.startService(serviceIntent)
         } else {
-            Log.d("CONNECTIVITY_SERVICE", "Foreign intent.")
+            Log.d("CONNECTIVITY_SERVICE", "Weird intent.")
         }
     }
 }
