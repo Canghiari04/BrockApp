@@ -81,9 +81,9 @@ class CalendarUtil {
             val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
 
             val duration = Duration.between(beginActivityTime, endActivityTime)
-            val durationInMinutes = duration.toMinutes()
+            val durationInSeconds = duration.toMinutes() * 60
 
-            timeSpent += durationInMinutes
+            timeSpent += durationInSeconds
         }
 
         return timeSpent

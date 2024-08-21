@@ -93,10 +93,13 @@ class DailyActivity: AppCompatActivity() {
         val userVehicleActivities = activities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp }
         val timeSpentVehicle = utilCalendar.computeTimeSpent(userVehicleActivities)
 
+        val unknownTime = 60 * 60 * 24 - timeSpentWalking - timeSpentStill - timeSpentVehicle
+
         entries.apply {
             add(PieEntry(timeSpentWalking.toFloat(), "CAMMINO"))
             add(PieEntry(timeSpentStill.toFloat(), "STAZIONARIO"))
             add(PieEntry(timeSpentVehicle.toFloat(), "VEICOLO"))
+            add(PieEntry(unknownTime.toFloat(), "Sconosciuto"))
         }
 
         val dataSet = PieDataSet(entries, "Dati").apply {

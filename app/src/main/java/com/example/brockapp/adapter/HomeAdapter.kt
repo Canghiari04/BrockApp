@@ -15,7 +15,13 @@ class HomeAdapter(private val activities: List<UserActivity>): RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
-        holder.bindActivity(activities[position].type, "Data: ${activities[position].timestamp}")
+        val timestamp = activities[position].timestamp
+
+        val tokens = timestamp?.split(" ")
+
+        val date = tokens?.get(0)
+        val time = tokens?.get(1)
+        holder.bindActivity(activities[position].type, "Finito in data $date alle $time")
     }
 
     override fun getItemCount(): Int {
