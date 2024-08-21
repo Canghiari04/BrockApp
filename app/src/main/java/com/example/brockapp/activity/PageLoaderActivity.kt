@@ -1,26 +1,38 @@
 package com.example.brockapp.activity
 
+import android.Manifest
 import com.example.brockapp.R
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.fragment.HomeFragment
 import com.example.brockapp.fragment.ChartsFragment
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.receiver.ConnectivityReceiver
 
+import android.util.Log
 import android.os.Bundle
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
 import androidx.fragment.app.Fragment
+import android.net.ConnectivityManager
+import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.example.brockapp.receiver.ConnectivityReceiver
+import com.google.android.gms.location.LocationServices
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class PageLoaderActivity : AppCompatActivity() {
+class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
 
+    private lateinit var geofence: MyGeofence
+    private lateinit var view: GeofenceViewModel
     private lateinit var toolbar: Toolbar
     private lateinit var homeFragment: HomeFragment
     private lateinit var calendarFragment: CalendarFragment
@@ -30,6 +42,8 @@ class PageLoaderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.page_loader_activity)
+
+        startBackgroundOperations()
 
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
@@ -45,10 +59,6 @@ class PageLoaderActivity : AppCompatActivity() {
             add(R.id.page_loader_fragment, friendsFragment)
             commit()
         }
-
-        val connectivityReceiver = ConnectivityReceiver()
-        ContextCompat.registerReceiver(this, connectivityReceiver, IntentFilter(
-            ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
 
         mapFragments.apply {
             put("Home", homeFragment)
@@ -90,6 +100,54 @@ class PageLoaderActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun startBackgroundOperations() {
+        val db = BrockDB.getInstance(this)
+        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
+
+        view = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
+        view.getGeofenceAreas()
+
+        observeGeofenceAreas()
+    }
+
+    private fun observeGeofenceAreas() {
+        view.observeGeofenceAreasLiveData().observe(this) {
+            geofence = MyGeofence.getInstance()
+            geofence.init(this, it)
+
+            startGeofence()
+            startConnectivity()
+        }
+    }
+
+    private fun startGeofence() {
+        val geofencingClient = LocationServices.getGeofencingClient(this)
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+                addOnSuccessListener {
+                    Log.d("GEOFENCING_RECEIVER", "Successful connection.")
+                }
+                addOnFailureListener {
+                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
+                }
+            }
+        } else {
+            Log.d("WTF", "WTF")
+        }
+    }
+
+    private fun startConnectivity() {
+        val receiver = ConnectivityReceiver()
+
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     /**
