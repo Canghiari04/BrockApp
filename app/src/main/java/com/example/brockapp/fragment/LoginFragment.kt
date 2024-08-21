@@ -22,14 +22,18 @@ import android.widget.Button
 import android.content.Intent
 import android.app.AlertDialog
 import android.content.Context
+import android.content.IntentFilter
 import android.widget.TextView
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.example.brockapp.receiver.ConnectivityReceiver
 
 class LoginFragment : Fragment(R.layout.login_fragment) {
     private val listPermissions = mutableListOf<String>()

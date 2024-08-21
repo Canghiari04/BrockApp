@@ -22,8 +22,6 @@ class MyApplication: Application() {
         viewModel = GeofenceViewModel(db)
         viewModel.insertStaticGeofenceAreas()
 
-        receiverConnectivity = ConnectivityReceiver()
-        ContextCompat.registerReceiver(this, receiverConnectivity, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onTerminate() {

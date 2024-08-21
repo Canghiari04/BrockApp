@@ -21,13 +21,17 @@ import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
 import android.content.Context
+import android.content.IntentFilter
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.example.brockapp.receiver.ConnectivityReceiver
 import com.example.brockapp.singleton.MyGeofence
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {

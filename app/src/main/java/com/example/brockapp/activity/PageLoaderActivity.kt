@@ -8,10 +8,14 @@ import com.example.brockapp.fragment.CalendarFragment
 
 import android.os.Bundle
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import androidx.fragment.app.Fragment
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.example.brockapp.receiver.ConnectivityReceiver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PageLoaderActivity : AppCompatActivity() {
@@ -41,6 +45,10 @@ class PageLoaderActivity : AppCompatActivity() {
             add(R.id.page_loader_fragment, friendsFragment)
             commit()
         }
+
+        val connectivityReceiver = ConnectivityReceiver()
+        ContextCompat.registerReceiver(this, connectivityReceiver, IntentFilter(
+            ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
 
         mapFragments.apply {
             put("Home", homeFragment)
