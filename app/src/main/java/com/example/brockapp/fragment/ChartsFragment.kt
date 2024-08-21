@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.CHARTS_DATE_FORMAT
 import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.database.BrockDB
@@ -100,9 +101,12 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
     }
 
     private suspend fun setupCharts() {
-        setupStepCountBarChart()
-        setupDistanceTravelledBarChart()
-        setupActivityTypePieChart()
+        lifecycleScope.launch (Dispatchers.Main){
+
+            setupStepCountBarChart()
+            setupDistanceTravelledBarChart()
+            setupActivityTypePieChart()
+        }
     }
 
     private suspend fun setupStepCountBarChart() {
@@ -134,6 +138,8 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         stepCountBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         stepCountBarChart.xAxis.setDrawGridLines(false)
+        stepCountBarChart.axisLeft.axisMinimum = 0f
+        stepCountBarChart.animateY(500)
         stepCountBarChart.description.isEnabled = false
         stepCountBarChart.legend.isEnabled = false
         stepCountBarChart.invalidate()
@@ -165,6 +171,8 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
         distanceTravelledBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         distanceTravelledBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        distanceTravelledBarChart.axisLeft.axisMinimum = 0f
+        distanceTravelledBarChart.animateY(500)
         distanceTravelledBarChart.xAxis.setDrawGridLines(false)
         distanceTravelledBarChart.description.isEnabled = false
         distanceTravelledBarChart.legend.isEnabled = false
@@ -204,6 +212,8 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
                 activityTypePieChart.data = data
                 activityTypePieChart.description?.isEnabled = false
 
+                activityTypePieChart.setUsePercentValues(true)
+                activityTypePieChart.setDrawEntryLabels(false)
                 activityTypePieChart.invalidate()
 
                 noActivityMessage?.visibility = View.GONE
