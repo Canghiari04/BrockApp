@@ -64,162 +64,41 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp">
 
-            <TextView
-                android:text="@string/subtitle_features"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:textAlignment="textStart"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/black">
-            </TextView>
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_number_home_text"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/steps_progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:max="10000"
+                    android:progress="0"
+                    android:progressTint="@color/uni_red"
+                    />
+
+                <TextView
+                    android:id="@+id/steps_count_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_counter_home_text"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <GridLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:columnCount="2"
-            android:rowCount="2"
-            android:layout_margin="10dp">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:text="@string/register_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        android:background="@color/uni_red"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@color/grey"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:text="@string/calendar_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        android:background="@color/uni_red"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@color/grey"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:text="@string/charts_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        android:background="@color/uni_red"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@color/grey"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_margin="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:text="@string/friends_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        android:background="@color/uni_red"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:padding="15dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:background="@color/grey"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </GridLayout>
     </LinearLayout>
 </ScrollView>

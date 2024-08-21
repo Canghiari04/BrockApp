@@ -1,5 +1,6 @@
 package com.example.brockapp.fragment
 
+
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
@@ -10,16 +11,27 @@ import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 import java.time.LocalDate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.brockapp.database.UserWalkActivityDao
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeFragment : Fragment(R.layout.home_fragment) {
     private lateinit var user: User
     private lateinit var db: BrockDB
     private lateinit var viewModel: ActivitiesViewModel
+
+    private lateinit var stepsProgressBar: ProgressBar
+    private lateinit var stepsCountText: TextView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,8 +49,23 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         viewModel.sortedWeekActivitiesDayList.observe(viewLifecycleOwner) { item ->
             if (item.isNotEmpty()) {
                 populateHomeRecyclerView(recyclerView, item)
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    populateStepProgressBar(view)
+
+                }
             }
         }
+    }
+
+    private suspend fun populateStepProgressBar(view: View) {
+        stepsProgressBar = view.findViewById(R.id.steps_progress_bar)
+        stepsCountText = view.findViewById(R.id.steps_count_text)
+
+        val steps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id,
+            LocalDate.now().atTime(0,0,0).toString(), LocalDate.now().atTime(23,59,59).toString()).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
+
+        updateSteps(steps)
     }
 
     private fun populateHomeRecyclerView(homeList: RecyclerView, activities: List<UserActivity>) {
@@ -47,5 +74,10 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
         homeList.adapter = adapterHome
         homeList.layoutManager = layoutManager
+    }
+
+    private fun updateSteps(steps: Int) {
+        stepsProgressBar.progress = steps
+        stepsCountText.text = "$steps/10000 passi"
     }
 }

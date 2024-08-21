@@ -103,4 +103,6 @@
     <string name="distance_label">Distanza percorsa</string>
     <string name="insert_username_text">Inserisci lo username:</string>
     <string name="insert_password_text">Inserisci la password:</string>
+    <string name="step_number_home_text">I tuoi passi oggi</string>
+    <string name="step_counter_home_text">0/10000 passi</string>
 </resources>
