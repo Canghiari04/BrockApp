@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.example.brockapp.CHARTS_DATE_FORMAT
 import com.example.brockapp.ISO_DATE_FORMAT
@@ -34,6 +35,7 @@ import java.time.temporal.TemporalAdjusters
 class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
     private lateinit var db : BrockDB
+    private lateinit var dateTextView: TextView
     private lateinit var stepCountBarChart: BarChart
     private lateinit var distanceTravelledBarChart: BarChart
     private lateinit var activityTypePieChart: PieChart
@@ -46,6 +48,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         stepCountBarChart = view.findViewById(R.id.step_count_bar_chart)
         distanceTravelledBarChart = view.findViewById(R.id.distance_travelled_bar_chart)
         activityTypePieChart = view.findViewById(R.id.activity_type_pie_chart)
+        dateTextView = view.findViewById(R.id.charts_date_text_view)
 
         val buttonBack = view.findViewById<ImageButton>(R.id.charts_button_back_month)
         val buttonForward = view.findViewById<ImageButton>(R.id.charts_button_forward_month)
@@ -72,10 +75,6 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
             date = date.minusMonths(1)
 
             setDate(date)
-
-            CoroutineScope(Dispatchers.IO).launch {
-                setupCharts()
-            }
         }
 
         buttonForward.setOnClickListener {
@@ -86,15 +85,18 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
             date = date.plusMonths(1)
 
             setDate(date)
-
-            CoroutineScope(Dispatchers.IO).launch {
-                setupCharts()
-            }
         }
+
+        dateTextView.addTextChangedListener(
+            afterTextChanged = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    setupCharts()
+                }
+            })
     }
 
     private fun setDate(date: YearMonth) {
-        view?.findViewById<TextView>(R.id.charts_date_text_view)?.text = date.format(DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)).toString()
+        dateTextView.text = date.format(DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)).toString()
     }
 
     private suspend fun setupCharts() {
@@ -105,7 +107,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
     private suspend fun setupStepCountBarChart() {
         val entries = ArrayList<BarEntry>()
-        val dateStr: String = view?.findViewById<TextView>(R.id.charts_date_text_view)?.text.toString()
+        val dateStr: String = dateTextView.text.toString()
 
         val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
 
@@ -131,12 +133,15 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
         stepCountBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        stepCountBarChart.xAxis.setDrawGridLines(false)
+        stepCountBarChart.description.isEnabled = false
+        stepCountBarChart.legend.isEnabled = false
         stepCountBarChart.invalidate()
     }
 
     private suspend fun setupDistanceTravelledBarChart() {
         val entries = ArrayList<BarEntry>()
-        val dateStr: String = view?.findViewById<TextView>(R.id.charts_date_text_view)?.text.toString()
+        val dateStr: String = dateTextView.text.toString()
 
         val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
 
@@ -147,9 +152,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
             val (startOfDay, endOfDay) = getDayRange(date)
 
-            val listVehicleActivity = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
-
-            val totalDistanceTravelled = listVehicleActivity.sumOf { it.distanceTravelled!! }
+            val totalDistanceTravelled = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay).parallelStream().mapToDouble { it.distanceTravelled!! }.sum()
 
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
@@ -162,13 +165,16 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
         distanceTravelledBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         distanceTravelledBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        distanceTravelledBarChart.xAxis.setDrawGridLines(false)
+        distanceTravelledBarChart.description.isEnabled = false
+        distanceTravelledBarChart.legend.isEnabled = false
         distanceTravelledBarChart.invalidate()
     }
 
     private suspend fun setupActivityTypePieChart() {
         val entries = ArrayList<PieEntry>()
 
-        val dateStr = view?.findViewById<TextView>(R.id.charts_date_text_view)?.text
+        val dateStr = dateTextView.text
         val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
         val currentDate = yearMonth.atDay(1)
 
@@ -185,7 +191,6 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
         withContext(Dispatchers.Main) {
             val noActivityMessage = view?.findViewById<TextView>(R.id.no_activity_message)
-            val activityTypePieChart = view?.findViewById<PieChart>(R.id.activity_type_pie_chart)
 
             if (userWalkActivityCount > 0 || userStillActivityCount > 0 || userVehicleActivityCount > 0) {
                 entries.add(PieEntry(userVehicleActivityCount.toFloat(), "Vehicle activity"))
@@ -196,14 +201,16 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
                 dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
 
                 val data = PieData(dataSet)
-                activityTypePieChart?.data = data
-                activityTypePieChart?.invalidate()
+                activityTypePieChart.data = data
+                activityTypePieChart.description?.isEnabled = false
+
+                activityTypePieChart.invalidate()
 
                 noActivityMessage?.visibility = View.GONE
-                activityTypePieChart?.visibility = View.VISIBLE
+                activityTypePieChart.visibility = View.VISIBLE
             } else {
                 noActivityMessage?.visibility = View.VISIBLE
-                activityTypePieChart?.visibility = View.GONE
+                activityTypePieChart.visibility = View.GONE
             }
         }
     }
