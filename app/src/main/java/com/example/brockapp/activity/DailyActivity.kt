@@ -45,7 +45,7 @@ class DailyActivity: AppCompatActivity() {
 
         viewModel.getDayUserActivities(date, user)
 
-        viewModel.sortedDayActivitiesList.observe(this) { item ->
+        viewModel.sortedDayExitActivitiesList.observe(this) { item ->
             if(item.isNotEmpty()) {
                 setContentView(R.layout.daily_activity_activity)
 
@@ -54,16 +54,19 @@ class DailyActivity: AppCompatActivity() {
                 val textView = findViewById<TextView>(R.id.date_text_view)
                 textView.text = utilCalendar.getPrettyDate(date)
 
-                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
                 val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
 
-                populateDailyActivitiesChart(pieChart, item)
                 populateDailyActivitiesRecyclerView(dailyList, item)
             } else {
                 setContentView(R.layout.empty_page)
             }
 
             setUpToolBar()
+        }
+
+        viewModel.sortedDayActivitiesList.observe(this) { item ->
+            val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
+            populateDailyActivitiesChart(pieChart, item)
         }
     }
 
@@ -93,13 +96,16 @@ class DailyActivity: AppCompatActivity() {
         val userVehicleActivities = activities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp }
         val timeSpentVehicle = utilCalendar.computeTimeSpent(userVehicleActivities)
 
-        val unknownTime = 60 * 60 * 24 - timeSpentWalking - timeSpentStill - timeSpentVehicle
+        val secondsInDay = 60 * 60 * 24
+        val totalRecordedTime = timeSpentWalking + timeSpentStill + timeSpentVehicle
+
+        val unknownTime = (secondsInDay - totalRecordedTime).toFloat()
 
         entries.apply {
             add(PieEntry(timeSpentWalking.toFloat(), "CAMMINO"))
             add(PieEntry(timeSpentStill.toFloat(), "STAZIONARIO"))
             add(PieEntry(timeSpentVehicle.toFloat(), "VEICOLO"))
-            add(PieEntry(unknownTime.toFloat(), "Sconosciuto"))
+            add(PieEntry(unknownTime, "Sconosciuto"))
         }
 
         val dataSet = PieDataSet(entries, "Dati").apply {
@@ -111,6 +117,8 @@ class DailyActivity: AppCompatActivity() {
         pieChart.apply {
             this.data = data
             setDrawEntryLabels(false)
+            setUsePercentValues(true)
+            description.isEnabled = false
             invalidate()
         }
     }

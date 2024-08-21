@@ -19,6 +19,9 @@ import java.time.DayOfWeek
 import java.time.temporal.TemporalAdjusters
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
+    private val _sortedDayExitActivitiesList = MutableLiveData<List<UserActivity>>()
+    val sortedDayExitActivitiesList: LiveData<List<UserActivity>> get() = _sortedDayExitActivitiesList
+
     private val _sortedDayActivitiesList = MutableLiveData<List<UserActivity>>()
     val sortedDayActivitiesList: LiveData<List<UserActivity>> get() = _sortedDayActivitiesList
 
@@ -29,26 +32,34 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         viewModelScope.launch {
             val (startOfDay, endOfDay) = getDayRange(date)
             val listActivities = ArrayList<UserActivity>()
+            val listExitActivities = ArrayList<UserActivity>()
 
-            val listStillActivities = db.UserStillActivityDao().getEndingStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-            val listVehicleActivities = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
             val listWalkingActivities = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
 
             listStillActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "METTERE DURATA STILL")
                 listActivities.add(newActivity)
+                if(it.transitionType == 1)
+                    listExitActivities.add(newActivity)
             }
 
             listVehicleActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, VEHICLE_ACTIVITY_TYPE, it.distanceTravelled.toString())
                 listActivities.add(newActivity)
+                if(it.transitionType == 1)
+                    listExitActivities.add(newActivity)
             }
 
             listWalkingActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, WALK_ACTIVITY_TYPE, it.stepNumber.toString())
                 listActivities.add(newActivity)
+                if(it.transitionType == 1)
+                    listExitActivities.add(newActivity)
             }
 
+            _sortedDayExitActivitiesList.value = listExitActivities.sortedBy { it.timestamp }
             _sortedDayActivitiesList.value = listActivities.sortedBy { it.timestamp }
         }
     }

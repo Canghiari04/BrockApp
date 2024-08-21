@@ -64,6 +64,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
         findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
+                chronometer.setBase(SystemClock.elapsedRealtime())
                 chronometer.start()
                 running = true
 
@@ -85,7 +86,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
                 findViewById<Button>(R.id.walk_button_stop).isEnabled = false
 
                 stopStepCounting()
-                chronometer.setBase(SystemClock.elapsedRealtime())
 
                 val totalSteps = stepCount - initialStepCount
                 registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, totalSteps.toLong())

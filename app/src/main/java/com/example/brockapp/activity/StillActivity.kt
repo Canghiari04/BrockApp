@@ -26,7 +26,7 @@ class StillActivity : AppCompatActivity() {
         setContentView(R.layout.still_activity)
 
         val transitionManager = ActivityRecognitionManager()
-        val chronometer = findViewById<Chronometer>(R.id.chronometer)
+        val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
 
         val pauseOffset: Long = 0
 

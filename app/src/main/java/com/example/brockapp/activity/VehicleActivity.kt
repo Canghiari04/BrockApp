@@ -29,7 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 class VehicleActivity : AppCompatActivity() {
     private var running = false
     private var totalDistance = 0.0
-    private var pauseOffset: Long = 0
+
     private var startLocation: Location? = null
 
     private lateinit var distanceTravelled: TextView
@@ -41,7 +41,7 @@ class VehicleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.vehicle_activity)
 
-        val chronometer = findViewById<Chronometer>(R.id.chronometer)
+        val chronometer = findViewById<Chronometer>(R.id.vehicle_chronometer)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         setupLocationUpdates()
 
@@ -59,7 +59,8 @@ class VehicleActivity : AppCompatActivity() {
     private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
         vehicleButtonStart.setOnClickListener {
             if (!running) {
-                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
+
+                chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
                 running = true
 
@@ -78,14 +79,12 @@ class VehicleActivity : AppCompatActivity() {
         vehicleButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
-                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
                 running = false
 
                 vehicleButtonStart.isEnabled = true
                 vehicleButtonStop.isEnabled = false
 
                 stopLocationUpdates()
-                chronometer.base = SystemClock.elapsedRealtime()
 
                 registerActivity(
                     DetectedActivity.IN_VEHICLE,

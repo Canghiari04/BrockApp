@@ -68,24 +68,21 @@ class CalendarUtil {
         var timeSpent = 0L
         val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
-        for(i in userActivities.indices) {
-            if(userActivities[i].transitionType == 1)
-                continue
+        for (i in userActivities.indices) {
+            if (userActivities[i].transitionType == 1) continue
 
             val beginActivityTime = LocalDateTime.parse(userActivities[i].timestamp, dateFormatter)
             val nextActivity = if (i < userActivities.size - 1) userActivities[i + 1] else null
 
-            if(nextActivity == null)
-                break
+            if (nextActivity == null) break
 
             val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
-
-            val duration = Duration.between(beginActivityTime, endActivityTime)
-            val durationInSeconds = duration.toMinutes() * 60
+            val durationInSeconds = Duration.between(beginActivityTime, endActivityTime).seconds
 
             timeSpent += durationInSeconds
         }
 
         return timeSpent
     }
+
 }

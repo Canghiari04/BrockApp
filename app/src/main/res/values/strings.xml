@@ -105,4 +105,9 @@
     <string name="insert_password_text">Inserisci la password:</string>
     <string name="step_number_home_text">I tuoi passi oggi</string>
     <string name="step_counter_home_text">0/10000 passi</string>
+    <string name="step_count_text">Passi fatti:</string>
+    <string name="step_count_initial_value">0</string>
+    <string name="walk_title">CAMMINATA</string>
+    <string name="vehicle_title">VEICOLO</string>
+    <string name="still_title">FERMO</string>
 </resources>
