@@ -26,6 +26,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
@@ -73,11 +74,31 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
                     )
 
                     viewModel.insertGeofenceArea(geofenceArea)
+                    addNewMarker(geofenceArea)
+
                 } else {
                     Toast.makeText(requireContext(), R.string.toast_error_map, Toast.LENGTH_LONG).show()
                 }
             }
         }
+    }
+
+    private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
+        val marker = LatLng(geofenceArea.latitude, geofenceArea.longitude)
+
+        map.addMarker(
+            MarkerOptions()
+                .position(marker)
+                .title(geofenceArea.name)
+        )
+
+        map.addCircle(
+            CircleOptions()
+                .center(marker)
+                .radius(geofence.radius.toDouble())
+                .strokeColor(Color.RED)
+                .strokeWidth(2.5f)
+        )
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
