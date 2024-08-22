@@ -1,5 +1,6 @@
 package com.example.brockapp.fragment
 
+import android.graphics.Color
 import com.example.brockapp.R
 
 import android.os.Bundle
@@ -130,10 +131,13 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         }
 
         val dataSet = BarDataSet(entries, "Numero di passi")
-        dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+
+        val color = Color.parseColor("#BB2222")
+        dataSet.color = color
 
         val data = BarData(dataSet)
         stepCountBarChart.data = data
+
 
         stepCountBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -164,7 +168,8 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         }
 
         val dataSet = BarDataSet(entries, "Distanza percorsa su veicoli")
-        dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+        val color = Color.parseColor("#BB2222")
+        dataSet.color = color
 
         val data = BarData(dataSet)
         distanceTravelledBarChart.data = data

@@ -23,18 +23,18 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.Manifest
+import android.widget.Toast
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 
 class WalkActivity : AppCompatActivity(), SensorEventListener {
-    private var stepCount = 0
     private var running = false
-    private var initialStepCount = 0
+    private var stepCount = 0f
+    private var currentSteps = 0f
 
-    private var stepDetectorSensor : Sensor? = null
-
-    private lateinit var sensorManager: SensorManager
+    private var stepDetectorSensor: Sensor? = null
+    private var sensorManager: SensorManager? = null
     private lateinit var notificationManager: NotificationManagerCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,24 +47,23 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION)
         }
 
-
-        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        stepDetectorSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
         if (stepDetectorSensor == null) {
-            Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
-            // Informare l'utente che il sensore non è disponibile
+            Log.e("WalkActivity", "Sensore TYPE_STEP_COUNTER non disponibile sul dispositivo.")
             findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
             findViewById<Button>(R.id.walk_button_start).isEnabled = false
             return
+        } else {
+            Toast.makeText(this, "Il sensore non è null", Toast.LENGTH_SHORT).show()
         }
-
 
         val chronometer = findViewById<Chronometer>(R.id.walk_chronometer)
 
         findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
-                chronometer.setBase(SystemClock.elapsedRealtime())
+                chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
                 running = true
 
@@ -72,6 +71,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
                 findViewById<Button>(R.id.walk_button_stop).isEnabled = true
 
                 startStepCounting()
+                Toast.makeText(this, "Iniziato conteggio passi", Toast.LENGTH_SHORT).show()
 
                 registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, 0L)
             }
@@ -87,8 +87,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
                 stopStepCounting()
 
-                val totalSteps = stepCount - initialStepCount
-                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, totalSteps.toLong())
+                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, currentSteps.toLong())
             }
         }
 
@@ -100,10 +99,9 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             val elapsedSeconds = elapsedMillis / 1000 / 60 / 60
 
             if (elapsedSeconds >= 1 && !notificationSent) {
-                // Deve richiamare il worker per Activity Recognition
                 notificationSent = true
+                // Deve richiamare il worker per Activity Recognition
             }
-
         }
 
         findViewById<Button>(R.id.walk_button_start).isEnabled = true
@@ -116,47 +114,40 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
                 finish()
                 true
             }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun startStepCounting() {
-        stepDetectorSensor.also { stepSensor ->
-            sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-            initialStepCount = stepCount
+        stepDetectorSensor?.let { stepSensor ->
+            sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            Toast.makeText(this, "Sensore registrato", Toast.LENGTH_SHORT).show()
+            stepCount = 0f // Resetta il contatore quando l'utente inizia a camminare
         }
     }
 
     private fun stopStepCounting() {
-        sensorManager.unregisterListener(this)
+        sensorManager?.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
-            stepCount++
-            Log.d("StepCount", "Passi: $stepCount")
-
-            val stepsDuringSession = stepCount - initialStepCount
-
-            if (stepsDuringSession == 100) {
-                // Deve richiamare il worker per Activity Recognition
+        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+            if (stepCount == 0f) {
+                stepCount = event.values[0]
             }
 
-            findViewById<TextView>(R.id.step_count)?.text = stepsDuringSession.toString()
+            currentSteps = event.values[0] - stepCount
+            findViewById<TextView>(R.id.step_count)?.text = currentSteps.toString()
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+
     }
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long) {
         val intent = Intent().apply {
-            setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
+            action = ACTIVITY_RECOGNITION_INTENT_TYPE
             putExtra("activityType", activityType)
             putExtra("transitionType", transitionType)
             putExtra("stepNumber", stepCount)
