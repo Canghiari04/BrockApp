@@ -1,23 +1,17 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
 
-import android.Manifest
-import android.util.Log
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.content.Intent
 import android.os.SystemClock
 import android.widget.Chronometer
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityRecognition
-import com.example.brockapp.manager.ActivityRecognitionManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class StillActivity : AppCompatActivity() {
@@ -25,12 +19,11 @@ class StillActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.still_activity)
 
-        val transitionManager = ActivityRecognitionManager()
         val chronometer = findViewById<Chronometer>(R.id.chronometer)
 
         val pauseOffset: Long = 0
 
-        setButtonListeners(false, chronometer, pauseOffset, transitionManager)
+        setButtonListeners(false, chronometer, pauseOffset)
 
         setChronometerListener(chronometer)
 
@@ -54,7 +47,6 @@ class StillActivity : AppCompatActivity() {
         running: Boolean,
         chronometer: Chronometer,
         pauseOffset: Long,
-        transitionManager: ActivityRecognitionManager
     ) {
         var running1 = running
         var pauseOffset1 = pauseOffset
@@ -99,27 +91,6 @@ class StillActivity : AppCompatActivity() {
                 super.onOptionsItemSelected(item)
                 false
             }
-        }
-    }
-
-    private fun startDetection(transitionManager: ActivityRecognitionManager) {
-        val request = transitionManager.getRequest()
-        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(this)
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            val task = ActivityRecognition.getClient(this).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-
-            task.addOnSuccessListener {
-                Log.d("DETECT", "Connesso all'API activity recognition")
-            }
-
-            task.addOnFailureListener {
-                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-            }
-
-            registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-        } else {
-            Log.d("WTF", "WTF")
         }
     }
 

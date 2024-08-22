@@ -36,9 +36,10 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_activity">Calendario</string>
-    <string name="menu_register">Registra</string>
+    <string name="menu_map">Mappa</string>
     <string name="menu_plot">Grafici</string>
     <string name="menu_friends">Amici</string>
+    <string name="menu_register">Registra</string>
 
     <string name="title_home_fragment">In primo piano</string>
     <string name="subtitle_activities">Le tue ultime attività</string>
@@ -105,4 +106,8 @@
     <string name="insert_password_text">Inserisci la password:</string>
     <string name="step_number_home_text">I tuoi passi oggi</string>
     <string name="step_counter_home_text">0/10000 passi</string>
+
+    <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
+    <string name="edit_text_map_fragment">Cerca una nuova area</string>
+    <string name="toast_error_map">Nessuna località individuata con questo nome</string>
 </resources>

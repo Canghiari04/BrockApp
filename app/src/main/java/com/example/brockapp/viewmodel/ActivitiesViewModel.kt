@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import java.time.format.DateTimeFormatter
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
 import java.time.DayOfWeek
 import java.time.temporal.TemporalAdjusters
 
@@ -26,7 +27,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     val sortedWeekActivitiesDayList: LiveData<List<UserActivity>> get() = _sortedWeekActivitiesList
 
     fun getDayUserActivities(date: String?, user: User) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val (startOfDay, endOfDay) = getDayRange(date)
             val listActivities = ArrayList<UserActivity>()
 
@@ -49,12 +50,12 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 listActivities.add(newActivity)
             }
 
-            _sortedDayActivitiesList.value = listActivities.sortedBy { it.timestamp }
+            _sortedDayActivitiesList.postValue(listActivities.sortedBy { it.timestamp })
         }
     }
 
     fun getWeekUserActivities(day: LocalDate, user: User) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val (startOfWeek, endOfWeek) = getWeekRange(day)
             val listActivities = mutableListOf<UserActivity>()
 
@@ -77,7 +78,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 listActivities.add(newActivity)
             }
 
-            _sortedWeekActivitiesList.value = listActivities.sortedBy { it.timestamp }
+            _sortedWeekActivitiesList.postValue(listActivities.sortedBy { it.timestamp })
         }
     }
 

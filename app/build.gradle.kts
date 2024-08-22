@@ -52,6 +52,7 @@ dependencies {
     }
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -63,7 +64,11 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     kapt("androidx.room:room-compiler:2.6.1")
-    
+
+
     // scope view model
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // maps
+    implementation(libs.play.services.maps)
 }

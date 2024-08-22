@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.fragment.MapFragment
 import com.google.android.gms.location.LocationServices
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -34,6 +35,7 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     private lateinit var homeFragment: HomeFragment
     private lateinit var calendarFragment: CalendarFragment
+    private lateinit var mapFragment: MapFragment
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
 
@@ -43,6 +45,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
+        mapFragment = MapFragment()
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
 
@@ -51,6 +54,7 @@ class PageLoaderActivity: AppCompatActivity() {
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
             add(R.id.page_loader_fragment, calendarFragment)
+            add(R.id.page_loader_fragment, mapFragment)
             add(R.id.page_loader_fragment, chartsFragment)
             add(R.id.page_loader_fragment, friendsFragment)
             commit()
@@ -59,6 +63,7 @@ class PageLoaderActivity: AppCompatActivity() {
         mapFragments.apply {
             put("Home", homeFragment)
             put("Calendar", calendarFragment)
+            put("Map", mapFragment)
             put("Charts", chartsFragment)
             put("Friends", friendsFragment)
         }
@@ -78,9 +83,8 @@ class PageLoaderActivity: AppCompatActivity() {
                     switchFragment("Calendar", calendarFragment)
                     true
                 }
-                R.id.navbar_item_plus -> {
-                    startActivity(Intent(this, NewUserActivity::class.java))
-                    finish()
+                R.id.navbar_item_map -> {
+                    switchFragment("Map", mapFragment)
                     true
                 }
                 R.id.navbar_item_charts -> {

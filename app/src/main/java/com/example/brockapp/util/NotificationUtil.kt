@@ -84,7 +84,6 @@ class NotificationUtil {
         }
     }
 
-
     private fun getActivityRecognitionIcon(type: Int?): Int {
         return when (type) {
             3 -> {

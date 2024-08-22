@@ -5,7 +5,6 @@ import com.example.brockapp.activity.AuthenticatorActivity
 
 import android.net.Uri
 import android.Manifest
-import android.widget.Toast
 import android.content.Intent
 import android.app.AlertDialog
 import android.provider.Settings

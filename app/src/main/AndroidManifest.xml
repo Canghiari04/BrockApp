@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BrockApp"
         tools:targetApi="31">
+
         <activity
             android:name=".activity.AuthenticatorActivity" android:exported="true">
             <intent-filter>
@@ -52,6 +53,7 @@
             android:name=".activity.WalkActivity"
             android:parentActivityName=".activity.NewUserActivity">
         </activity>
+
         <receiver
             android:name=".receiver.GeofenceReceiver"
             android:enabled="true"
@@ -60,6 +62,7 @@
                 <action android:name="GEOFENCE_TRANSITION_ACTION" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".service.ConnectivityService"
             android:enabled="true"
@@ -70,5 +73,9 @@
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAnPk3xVtkNq2nbIgwi3VLp1HkvpoPW4ig" />
     </application>
 </manifest>
