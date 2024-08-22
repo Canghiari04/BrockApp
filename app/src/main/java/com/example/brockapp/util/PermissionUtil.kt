@@ -7,58 +7,138 @@ import android.net.Uri
 import android.Manifest
 import android.widget.Toast
 import android.content.Intent
-import android.content.Context
 import android.app.AlertDialog
 import android.provider.Settings
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
 import androidx.fragment.app.FragmentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
-class PermissionUtil(private val context: Context, private val activity: FragmentActivity) {
-    fun hasLocationPermissions(context: Context, permissions: Array<String>): Boolean {
-        return permissions.all {
-            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+class PermissionUtil(private val activity: FragmentActivity, private val onPermissionGranted: () -> Unit) {
+    private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var requestBackgroundPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
+
+    init {
+        setupLaunchers()
+    }
+
+    private fun setupLaunchers() {
+        requestLocationPermissionsLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val deniedPermissions = permissions.filter { !it.value }.keys
+
+            if (deniedPermissions.isEmpty()) {
+                requestBackgroundPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            } else if (shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showPermissionsRationaleDialog()
+            } else {
+                showLocationPermissionsDeniedDialog()
+            }
+        }
+
+        requestBackgroundPermissionLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if(isGranted) {
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else if (shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                showPermissionsRationaleDialog()
+            } else {
+                showBackgroundPermissionDeniedDialog()
+            }
+        }
+
+        requestNotificationPermissionLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if(isGranted) {
+                onPermissionGranted()
+            } else if (shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS)) {
+                showPermissionsRationaleDialog()
+            } else {
+                showNotificationPermissionDeniedDialog()
+            }
         }
     }
 
-    fun hasBackgroundPermission(context: Context): Boolean {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+    fun requestPermissions() {
+        requestLocationPermissionsLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
-    fun hasNotificationPermission(context: Context): Boolean {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    fun shouldShowLocationPermissionsRationaleDialog(permissions: Array<String>): Boolean {
-        return permissions.any {
-            ActivityCompat.shouldShowRequestPermissionRationale(activity, it)
-        }
-    }
-
-    fun shouldShowBackgroundPermissionRationaleDialog(): Boolean {
-        return ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-    }
-
-    fun shouldShowNotificationPermissionRationaleDialog(): Boolean {
-        return ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS)
-    }
-    
     /**
      * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
      * richiesti.
      */
     fun showPermissionsRationaleDialog() {
-        AlertDialog.Builder(context)
+        AlertDialog.Builder(activity)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)
             .setPositiveButton(R.string.settings_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                Toast.makeText(context, R.string.permissions_toast, Toast.LENGTH_LONG).show()
-                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
+                activity.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", activity.packageName, null)))
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
-                context.startActivity(Intent(context, AuthenticatorActivity::class.java))
+                activity.startActivity(Intent(activity, AuthenticatorActivity::class.java))
+            }
+            .create()
+            .show()
+    }
+
+    /**
+     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
+     * richiesti.
+     */
+    private fun showLocationPermissionsDeniedDialog() {
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.permissions_title)
+            .setMessage(R.string.permissions_location)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                requestLocationPermissionsLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
+    private fun showBackgroundPermissionDeniedDialog() {
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_background)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                requestBackgroundPermissionLauncher.launch(
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
+    private fun showNotificationPermissionDeniedDialog() {
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_notification)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                requestNotificationPermissionLauncher.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
             }
             .create()
             .show()

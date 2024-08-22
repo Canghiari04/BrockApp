@@ -17,17 +17,29 @@ import android.content.Intent
 import android.widget.EditText
 import android.app.AlertDialog
 import android.content.Context
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.util.Log
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.google.android.gms.location.LocationServices
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
-    private val listPermissions = mutableListOf<String>()
     private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var util: PermissionUtil
+    private lateinit var geofence: MyGeofence
     private lateinit var viewModel: UserViewModel
+    private lateinit var viewModelGeofence: GeofenceViewModel
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -43,7 +55,10 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         val db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db)
 
-        util = PermissionUtil(requireContext(), requireActivity())
+        util = PermissionUtil(requireActivity()) {
+            startBackgroundOperations()
+        }
+
         viewModel = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         observeSignIn()
@@ -78,145 +93,62 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private fun observeSignIn() {
         viewModel.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
-                checkLocationPermissions()
+                util.requestPermissions()
             } else {
                 Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun checkLocationPermissions() {
-        when {
-            util.hasLocationPermissions(requireContext(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) -> {
-                checkBackgroundPermission()
-            }
-            util.shouldShowLocationPermissionsRationaleDialog(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) -> {
-                util.showPermissionsRationaleDialog()
-            }
-            else -> {
-                permissionsLocationLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    private fun startBackgroundOperations() {
+        val db = BrockDB.getInstance(requireContext())
+        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
+
+        viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
+
+        observeGeofenceAreas()
+    }
+
+    private fun observeGeofenceAreas() {
+        viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
+            if (areas.isNotEmpty()) {
+                geofence = MyGeofence.getInstance()
+                geofence.init(requireContext(), areas)
+
+                startGeofence()
+            } else {
+                viewModelGeofence.insertStaticGeofenceAreas()
             }
         }
     }
 
-    private fun checkBackgroundPermission() {
-        when {
-            util.hasBackgroundPermission(requireContext()) -> {
-                checkNotificationPermission()
-            }
-            util.shouldShowBackgroundPermissionRationaleDialog() -> {
-                util.showPermissionsRationaleDialog()
-            }
-            else -> {
-                permissionBackGroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            }
-        }
-    }
+    private fun startGeofence() {
+        val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
-    private fun checkNotificationPermission() {
-        when {
-            util.hasNotificationPermission(requireContext()) -> {
-                goToHome()
-            }
-            util.shouldShowNotificationPermissionRationaleDialog() -> {
-                util.showPermissionsRationaleDialog()
-            }
-            else -> {
-                permissionNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-    }
-
-    /**
-     * Variabile privata di tipo ActivityResultLauncher, utilizzata per accertarsi se l'utente abbia
-     * accettato o meno i permessi richiesti.
-     */
-    private val permissionsLocationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        listPermissions.clear()
-
-        for (permission in permissions) {
-            when (permission.key) {
-                Manifest.permission.ACCESS_FINE_LOCATION -> {
-                    if (!permission.value)
-                        listPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+                addOnSuccessListener {
+                    startConnectivity()
+                    goToHome()
                 }
-                Manifest.permission.ACCESS_COARSE_LOCATION -> {
-                    if (!permission.value)
-                        listPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+                addOnFailureListener {
+                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
                 }
             }
-        }
-
-        if(listPermissions.isNotEmpty()) {
-            showLocationPermissionsDialog(requireContext())
         } else {
-            permissionBackGroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            Log.d("WTF", "WTF")
         }
     }
 
-    private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if(isGranted) {
-            permissionNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            showBackgroundPermissionDialog(requireContext())
-        }
-    }
+    private fun startConnectivity() {
+        val receiver = ConnectivityReceiver()
 
-    private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if(isGranted) {
-            goToHome()
-        } else {
-            showNotificationPermissionDialog(requireContext())
-        }
-    }
-
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
-    private fun showLocationPermissionsDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permissions_title)
-            .setMessage(R.string.permissions_location)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                checkLocationPermissions()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
-    private fun showBackgroundPermissionDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_background)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                checkBackgroundPermission()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
-    private fun showNotificationPermissionDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_notification)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                checkNotificationPermission()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
+        ContextCompat.registerReceiver(
+            requireContext(),
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     private fun goToHome() {

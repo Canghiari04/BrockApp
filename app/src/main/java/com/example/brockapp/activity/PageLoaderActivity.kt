@@ -31,8 +31,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
 
-    private lateinit var geofence: MyGeofence
-    private lateinit var view: GeofenceViewModel
     private lateinit var toolbar: Toolbar
     private lateinit var homeFragment: HomeFragment
     private lateinit var calendarFragment: CalendarFragment
@@ -42,8 +40,6 @@ class PageLoaderActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.page_loader_activity)
-
-        startBackgroundOperations()
 
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
@@ -100,54 +96,6 @@ class PageLoaderActivity: AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun startBackgroundOperations() {
-        val db = BrockDB.getInstance(this)
-        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
-
-        view = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
-        view.getGeofenceAreas()
-
-        observeGeofenceAreas()
-    }
-
-    private fun observeGeofenceAreas() {
-        view.observeGeofenceAreasLiveData().observe(this) {
-            geofence = MyGeofence.getInstance()
-            geofence.init(this, it)
-
-            startGeofence()
-            startConnectivity()
-        }
-    }
-
-    private fun startGeofence() {
-        val geofencingClient = LocationServices.getGeofencingClient(this)
-
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
-                addOnSuccessListener {
-                    Log.d("GEOFENCING_RECEIVER", "Successful connection.")
-                }
-                addOnFailureListener {
-                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
-                }
-            }
-        } else {
-            Log.d("WTF", "WTF")
-        }
-    }
-
-    private fun startConnectivity() {
-        val receiver = ConnectivityReceiver()
-
-        ContextCompat.registerReceiver(
-            this,
-            receiver,
-            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
     }
 
     /**
