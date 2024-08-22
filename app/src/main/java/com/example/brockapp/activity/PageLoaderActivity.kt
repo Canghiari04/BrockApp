@@ -1,5 +1,6 @@
 package com.example.brockapp.activity
 
+import MapFragment
 import android.Manifest
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
@@ -24,10 +25,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
-import com.example.brockapp.fragment.MapFragment
-import com.google.android.gms.location.LocationServices
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
@@ -38,6 +38,8 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var mapFragment: MapFragment
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
+
+    private lateinit var newActivityButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +52,8 @@ class PageLoaderActivity: AppCompatActivity() {
         friendsFragment = FriendsFragment()
 
         toolbar = findViewById(R.id.toolbar_page_loader)
+
+        newActivityButton = findViewById<FloatingActionButton>(R.id.new_activity_button)
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
@@ -100,6 +104,10 @@ class PageLoaderActivity: AppCompatActivity() {
                 }
             }
         }
+
+        findViewById<FloatingActionButton>(R.id.new_activity_button).setOnClickListener {
+            startActivity(Intent(this, NewUserActivity::class.java))
+        }
     }
 
     /**
@@ -114,6 +122,9 @@ class PageLoaderActivity: AppCompatActivity() {
             show(fragment)
             commit()
         }
+
+        if (name == "Map")
+            newActivityButton.hide()
     }
 
     /**

@@ -1,17 +1,15 @@
-package com.example.brockapp.fragment
-
-import android.graphics.Camera
-import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
-import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.EditText
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
@@ -26,9 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,30 +54,92 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
 
         observeGeofenceAreas()
 
-        val input = view.findViewById<EditText>(R.id.text_new_area)
+        val input = view.findViewById<AutoCompleteTextView>(R.id.text_new_area)
 
-        view.findViewById<FloatingActionButton>(R.id.button_plus_geofence).setOnClickListener {
-            val newArea = input.text.toString()
+        input.addTextChangedListener {
+            val userInput = input.text.toString()
+            if (userInput.isNotEmpty() && userInput.length >= 3) {
+                showSuggestions(userInput)
+            }
+        }
 
-            if (newArea.isNotEmpty()) {
-                val (address, location) = getAddressAndLocation(newArea)
+        input.setOnItemClickListener { parent, _, position, _ ->
+            val selectedLocation = parent.getItemAtPosition(position) as String
+            val (address, location) = getAddressAndLocation(selectedLocation)
 
-                if (address != null && location != null) {
-                    val geofenceArea = GeofenceAreaEntry(
-                        longitude = location.longitude,
-                        latitude = location.latitude,
-                        name = address.featureName
-                    )
+            if (address != null && location != null) {
+                val geofenceArea = GeofenceAreaEntry(
+                    longitude = location.longitude,
+                    latitude = location.latitude,
+                    name = address.featureName
+                )
 
-                    viewModel.insertGeofenceArea(geofenceArea)
-                    addNewMarker(geofenceArea)
+                viewModel.insertGeofenceArea(geofenceArea)
+                addNewMarker(geofenceArea)
 
-                } else {
-                    Toast.makeText(requireContext(), R.string.toast_error_map, Toast.LENGTH_LONG).show()
+                // Svuota l'input e chiudi il dropdown
+                input.setText("")
+            } else {
+                Toast.makeText(requireContext(), R.string.toast_error_map, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun showSuggestions(query: String) {
+
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+
+            // Implementazione del GeocodeListener
+            val geocodeListener = Geocoder.GeocodeListener { addresses ->
+                val suggestions: MutableList<String> = mutableListOf()
+
+                addresses?.let {
+                    for (address in it) {
+                        suggestions.add(address.getAddressLine(0))
+                    }
+                }
+
+                // Aggiorna l'interfaccia utente sul thread principale
+                CoroutineScope(Dispatchers.Main).launch {
+                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
+                    val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
+                    input?.setAdapter(adapter)
+                    input?.showDropDown()
+                }
+            }
+
+            // Avvio della ricerca asincrona
+            geocoder.getFromLocationName(query, 3, geocodeListener)
+
+        } else {
+            // Gestione per versioni di Android inferiori a 13 (API 33)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val addresses = geocoder.getFromLocationName(query, 3)
+                    val suggestions: MutableList<String> = mutableListOf()
+
+                    addresses?.let {
+                        for (address in it) {
+                            suggestions.add(address.getAddressLine(0))
+                        }
+                    }
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
+                        val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
+                        input?.setAdapter(adapter)
+                        input?.showDropDown()
+                    }
+                } catch (e: Exception) {
+                    Log.e("MAP_FRAGMENT", e.toString())
                 }
             }
         }
     }
+
+
 
     private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
         val marker = LatLng(geofenceArea.latitude, geofenceArea.longitude)
@@ -96,9 +154,12 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
             CircleOptions()
                 .center(marker)
                 .radius(geofence.radius.toDouble())
-                .strokeColor(Color.RED)
+                .strokeColor(R.color.uni_red)
                 .strokeWidth(2.5f)
         )
+
+        // Centra la mappa sul nuovo marker
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(marker, 15f))
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -122,7 +183,7 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
             if (areas.isNotEmpty()) {
                 for (area in areas) {
                     val marker = LatLng(area.latitude, area.longitude)
-                    mapMarker.put(area.name, marker)
+                    mapMarker[area.name] = marker
                 }
             } else {
                 Log.d("MAP_FRAGMENT", "No geofence areas")
@@ -142,28 +203,28 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
                 CircleOptions()
                     .center(value)
                     .radius(geofence.radius.toDouble())
-                    .strokeColor(Color.RED)
+                    .strokeColor(R.color.uni_red)
                     .strokeWidth(2.5f)
             )
         }
     }
 
     private fun getAddressAndLocation(item: String): Pair<Address?, LatLng?> {
-        var address = Address(Locale.getDefault())
-        var location = LatLng(0.0, 0.0)
+        var address: Address? = null
+        var location: LatLng? = null
 
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
 
         try {
             val addresses = geocoder.getFromLocationName(item, 1)
 
-            if (addresses != null) {
+            if (addresses != null && addresses.isNotEmpty()) {
                 address = addresses[0]
                 location = LatLng(address.latitude, address.longitude)
             } else {
                 return Pair(null, null)
             }
-        } catch (e: Exception)  {
+        } catch (e: Exception) {
             Log.e("MAP_FRAGMENT", e.toString())
         }
 
