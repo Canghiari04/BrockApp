@@ -29,10 +29,11 @@ import com.github.mikephil.charting.utils.ColorTemplate
 class DailyActivity: AppCompatActivity() {
     private lateinit var viewModel: ActivitiesViewModel
     private lateinit var user: User
-    private lateinit var utilCalendar: CalendarUtil
+    private var utilCalendar: CalendarUtil = CalendarUtil()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.daily_activity_activity)
 
         val date: String? = intent.getStringExtra("ACTIVITY_DATE")
 
@@ -46,7 +47,6 @@ class DailyActivity: AppCompatActivity() {
 
         viewModel.sortedDayExitActivitiesList.observe(this) { item ->
             if(item.isNotEmpty()) {
-                setContentView(R.layout.daily_activity_activity)
 
                 utilCalendar = CalendarUtil()
 
@@ -57,14 +57,22 @@ class DailyActivity: AppCompatActivity() {
 
                 populateDailyActivitiesRecyclerView(dailyList, item)
 
-                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
-                populateDailyActivitiesChart(pieChart, item)
+
             } else {
                 setContentView(R.layout.empty_page)
             }
 
             setUpToolBar()
         }
+
+
+        viewModel.sortedDayActivitiesList.observe(this) { item ->
+            if(item.isNotEmpty()) {
+                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
+                populateDailyActivitiesChart(pieChart, item)
+            }
+        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

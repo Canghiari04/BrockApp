@@ -69,6 +69,7 @@ class StillActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.button_stop).setOnClickListener {
             if (running) {
+                chronometer.stop()
 
                 running = false
 

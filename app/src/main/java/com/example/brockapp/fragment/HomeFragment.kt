@@ -54,16 +54,16 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
             }
         }
 
-        viewModel.sortedDayExitActivitiesList.observe(viewLifecycleOwner) { item ->
-
-            val userWalkActivities = item.filter { it.type == WALK_ACTIVITY_TYPE}
-
-            val steps = userWalkActivities.parallelStream().mapToInt { it.info.toInt() }.sum()
-            CoroutineScope(Dispatchers.IO).launch {
-                updateSteps(steps)
-            }
-
-        }
+//        viewModel.sortedDayExitActivitiesList.observe(viewLifecycleOwner) { item ->
+//
+//            val userWalkActivities = item.filter { it.type == WALK_ACTIVITY_TYPE}
+//
+//            val steps = userWalkActivities.parallelStream().mapToInt { it.info.toInt() }.sum()
+//            CoroutineScope(Dispatchers.IO).launch {
+//                updateSteps(steps)
+//            }
+//
+//        }
     }
 
     private suspend fun populateStepProgressBar(view: View) {

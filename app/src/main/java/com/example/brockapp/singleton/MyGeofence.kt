@@ -17,7 +17,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
 object MyGeofence {
-    private lateinit var geofences: List<GeofenceAreaEntry>
+    var geofences: List<GeofenceAreaEntry> = mutableListOf()
 
     private var duration = 86400000L
     private val instance = MyGeofence
@@ -29,12 +29,16 @@ object MyGeofence {
 
     var typeNetwork: String ?= null
 
-    fun init(context: Context, geofences: List<GeofenceAreaEntry>) {
-        this.geofences = geofences
+    fun init(context: Context) {
         defineRadius(context)
-        defineRequest()
         definePendingIntent(context)
     }
+
+    fun initGeofences(areas: List<GeofenceAreaEntry>) {
+        geofences = areas
+        defineRequest()
+    }
+
 
     fun getInstance(): MyGeofence {
         return instance
@@ -108,7 +112,7 @@ object MyGeofence {
         return listLocalities
     }
 
-    private fun definePendingIntent(context: Context) {
+    fun definePendingIntent(context: Context) {
         val intent = Intent(context, GeofenceReceiver::class.java).apply {
             action = GEOFENCE_INTENT_TYPE
         }

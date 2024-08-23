@@ -1,6 +1,7 @@
 package com.example.brockapp.fragment
 
 import android.Manifest
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -111,7 +112,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
-                geofence.init(requireContext(), areas)
+                geofence.initGeofences(areas)
 
                 startGeofence()
             } else {
@@ -124,13 +125,15 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
-                addOnSuccessListener {
-                    startConnectivity()
-                    goToHome()
-                }
-                addOnFailureListener {
-                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
+            geofence.pendingIntent?.let {
+                geofencingClient.addGeofences(geofence.request, it).run {
+                    addOnSuccessListener {
+                        startConnectivity()
+                        goToHome()
+                    }
+                    addOnFailureListener {
+                        Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
+                    }
                 }
             }
         } else {
