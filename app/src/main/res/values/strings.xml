@@ -42,6 +42,9 @@
     <string name="menu_plot">Grafici</string>
     <string name="menu_friends">Amici</string>
     <string name="menu_register">Registra</string>
+    <string name="item_more_info">Info</string>
+    <string name="item_more_logout">Logout</string>
+    <string name="item_more_delete">Elimina account</string>
 
     <string name="title_home_fragment">In primo piano</string>
     <string name="subtitle_activities">Le tue ultime attività</string>

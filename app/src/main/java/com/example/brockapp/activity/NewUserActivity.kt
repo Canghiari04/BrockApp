@@ -78,7 +78,8 @@ class NewUserActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home"))
+                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home")
+                startActivity(intent)
                 finish()
                 true
             }
@@ -87,10 +88,6 @@ class NewUserActivity : AppCompatActivity() {
                 false
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     /**

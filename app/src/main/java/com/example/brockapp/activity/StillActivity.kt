@@ -13,15 +13,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.api.Page
 
-class StillActivity : AppCompatActivity() {
+class StillActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.still_activity)
 
-        val chronometer = findViewById<Chronometer>(R.id.chronometer)
-
         val pauseOffset: Long = 0
+        val chronometer = findViewById<Chronometer>(R.id.chronometer)
 
         setButtonListeners(false, chronometer, pauseOffset)
 
@@ -31,25 +31,40 @@ class StillActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_stop).isEnabled = false
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, NewUserActivity::class.java)
+                startActivity(intent)
+                finish()
+                true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+                false
+            }
+        }
+    }
+
     private fun setChronometerListener(chronometer: Chronometer) {
         var notificationSent = false
+
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
             val hours = (elapsedTime / 1000 ).toInt()
+
             if (hours == 10 && !notificationSent) {
-                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
+                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora")
                 notificationSent = true
             }
         }
     }
 
-    private fun setButtonListeners(
-        running: Boolean,
-        chronometer: Chronometer,
-        pauseOffset: Long,
-    ) {
+    private fun setButtonListeners(running: Boolean, chronometer: Chronometer, pauseOffset: Long) {
         var running1 = running
         var pauseOffset1 = pauseOffset
+
         findViewById<Button>(R.id.button_start).setOnClickListener {
             if (!running1) {
                 chronometer.base = SystemClock.elapsedRealtime() - pauseOffset1
@@ -80,20 +95,6 @@ class StillActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
-        }
-    }
-
     private fun registerTransition(activityType: Int, transitionType: Int) {
         val intent = Intent().apply {
             setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
@@ -104,7 +105,7 @@ class StillActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    private fun sendLazyUserNotification(title : String, content : String) {
+    private fun sendLazyUserNotification(title: String, content: String) {
         val intent = Intent(NOTIFICATION_SERVICE)
             .putExtra("title", title)
             .putExtra("content", content)

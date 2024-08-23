@@ -28,9 +28,9 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
-    private lateinit var viewModel: ActivitiesViewModel
     private lateinit var user: User
     private lateinit var utilCalendar: CalendarUtil
+    private lateinit var viewModel: ActivitiesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
