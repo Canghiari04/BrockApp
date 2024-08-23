@@ -14,13 +14,12 @@ import com.example.brockapp.receiver.GeofenceReceiver
 import com.google.android.gms.location.GeofencingRequest
 
 object MyGeofence {
-    private lateinit var geofences: List<GeofenceAreaEntry>
-
-    private var duration = 86400000L
     private val instance = MyGeofence
+    private var duration = 86400000L
 
     lateinit var request: GeofencingRequest
     lateinit var pendingIntent: PendingIntent
+    lateinit var geofences: List<GeofenceAreaEntry>
 
     var radius = 0
 
