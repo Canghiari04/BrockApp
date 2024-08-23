@@ -41,8 +41,8 @@ class StillActivity : AppCompatActivity() {
         var notificationSent = false
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val hours = (elapsedTime / 1000 ).toInt()
-            if (hours == 10 && !notificationSent) {
+            val hours = (elapsedTime / 1000 * 60 * 60).toInt()
+            if (hours == 1 && !notificationSent) {
                 sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
                 notificationSent = true
             }

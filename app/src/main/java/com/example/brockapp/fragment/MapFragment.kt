@@ -87,11 +87,10 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
     private fun showSuggestions(query: String) {
 
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
-
-            // Implementazione del GeocodeListener
-            val geocodeListener = Geocoder.GeocodeListener { addresses ->
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val addresses = geocoder.getFromLocationName(query, 3)
                 val suggestions: MutableList<String> = mutableListOf()
 
                 addresses?.let {
@@ -100,39 +99,13 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
                     }
                 }
 
-                // Aggiorna l'interfaccia utente sul thread principale
-                CoroutineScope(Dispatchers.Main).launch {
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
-                    val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
-                    input?.setAdapter(adapter)
-                    input?.showDropDown()
-                }
-            }
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
+                val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
+                input?.setAdapter(adapter)
+                input?.showDropDown()
 
-            // Avvio della ricerca asincrona
-            geocoder.getFromLocationName(query, 3, geocodeListener)
-
-        } else {
-            // Gestione per versioni di Android inferiori a 13 (API 33)
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val addresses = geocoder.getFromLocationName(query, 3)
-                    val suggestions: MutableList<String> = mutableListOf()
-
-                    addresses?.let {
-                        for (address in it) {
-                            suggestions.add(address.getAddressLine(0))
-                        }
-                    }
-
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
-                    val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
-                    input?.setAdapter(adapter)
-                    input?.showDropDown()
-
-                } catch (e: Exception) {
-                    Log.e("MAP_FRAGMENT", e.toString())
-                }
+            } catch (e: Exception) {
+                Log.e("MAP_FRAGMENT", e.toString())
             }
         }
     }
