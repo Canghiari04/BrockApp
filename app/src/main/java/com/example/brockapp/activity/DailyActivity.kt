@@ -45,7 +45,7 @@ class DailyActivity: AppCompatActivity() {
 
         viewModel.getDayUserActivities(date, user)
 
-        viewModel.sortedDayExitActivitiesList.observe(this) { item ->
+        viewModel.sortedDayActivitiesList.observe(this) { item ->
             if(item.isNotEmpty()) {
 
                 utilCalendar = CalendarUtil()
@@ -57,6 +57,8 @@ class DailyActivity: AppCompatActivity() {
 
                 populateDailyActivitiesRecyclerView(dailyList, item)
 
+                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
+                populateDailyActivitiesChart(pieChart, item)
 
             } else {
                 setContentView(R.layout.empty_page)
@@ -65,13 +67,6 @@ class DailyActivity: AppCompatActivity() {
             setUpToolBar()
         }
 
-
-        viewModel.sortedDayActivitiesList.observe(this) { item ->
-            if(item.isNotEmpty()) {
-                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
-                populateDailyActivitiesChart(pieChart, item)
-            }
-        }
 
     }
 
@@ -129,7 +124,7 @@ class DailyActivity: AppCompatActivity() {
     }
 
     private fun populateDailyActivitiesRecyclerView(dailyList: RecyclerView, activities: List<UserActivity>) {
-        val adapterActivities = DailyActivityAdapter(activities.filter { it.transitionType == 1 })
+        val adapterActivities = DailyActivityAdapter(activities)
         val layoutManager = LinearLayoutManager(this)
 
         dailyList.adapter = adapterActivities

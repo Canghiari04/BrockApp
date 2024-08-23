@@ -7,6 +7,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.R
@@ -27,7 +28,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
     private lateinit var db: BrockDB
     private lateinit var viewModel: ActivitiesViewModel
 
-    private lateinit var stepsProgressBar: ProgressBar
+    private lateinit var stepsProgressBar : ProgressBar
     private lateinit var stepsCountText: TextView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,12 +37,15 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.home_recycler_view)
 
         db = BrockDB.getInstance(requireContext())
+        stepsProgressBar = view.findViewById(R.id.steps_progress_bar)
+        stepsCountText = view.findViewById(R.id.steps_count_text)
         val factoryViewModelActivities = ActivitiesViewModelFactory(db)
 
         viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
 
         user = User.getInstance()
         viewModel.getWeekUserActivities(LocalDate.now(), user)
+        viewModel.getDayUserActivities(LocalDate.now().toString(), user)
 
         viewModel.sortedWeekActivitiesDayList.observe(viewLifecycleOwner) { item ->
             if (item.isNotEmpty()) {
@@ -54,21 +58,19 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
             }
         }
 
-//        viewModel.sortedDayExitActivitiesList.observe(viewLifecycleOwner) { item ->
-//
-//            val userWalkActivities = item.filter { it.type == WALK_ACTIVITY_TYPE}
-//
-//            val steps = userWalkActivities.parallelStream().mapToInt { it.info.toInt() }.sum()
-//            CoroutineScope(Dispatchers.IO).launch {
-//                updateSteps(steps)
-//            }
-//
-//        }
+        viewModel.sortedDayExitActivitiesList.observe(viewLifecycleOwner) { item ->
+
+            val userWalkActivities = item.filter { it.type == WALK_ACTIVITY_TYPE}
+
+            val steps = userWalkActivities.parallelStream().mapToInt { it.info.toInt() }.sum()
+            CoroutineScope(Dispatchers.Main).launch {
+                updateSteps(steps)
+            }
+
+        }
     }
 
     private suspend fun populateStepProgressBar(view: View) {
-        stepsProgressBar = view.findViewById(R.id.steps_progress_bar)
-        stepsCountText = view.findViewById(R.id.steps_count_text)
 
         val steps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id,
             LocalDate.now().atTime(0,0,0).toString(), LocalDate.now().atTime(23,59,59).toString()).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
