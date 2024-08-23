@@ -142,6 +142,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         stepCountBarChart.xAxis.setDrawGridLines(false)
         stepCountBarChart.axisLeft.axisMinimum = 0f
+        stepCountBarChart.axisRight.axisMinimum = 0f
         stepCountBarChart.animateY(500)
         stepCountBarChart.description.isEnabled = false
         stepCountBarChart.legend.isEnabled = false
@@ -171,11 +172,14 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         dataSet.color = color
 
         val data = BarData(dataSet)
+
+        data.setDrawValues(false)
         distanceTravelledBarChart.data = data
 
         distanceTravelledBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         distanceTravelledBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         distanceTravelledBarChart.axisLeft.axisMinimum = 0f
+        distanceTravelledBarChart.axisRight.axisMinimum = 0f
         distanceTravelledBarChart.animateY(500)
         distanceTravelledBarChart.xAxis.setDrawGridLines(false)
         distanceTravelledBarChart.description.isEnabled = false
@@ -213,6 +217,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
                 dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
 
                 val data = PieData(dataSet)
+                data.setDrawValues(false)
                 activityTypePieChart.data = data
                 activityTypePieChart.description?.isEnabled = false
 
