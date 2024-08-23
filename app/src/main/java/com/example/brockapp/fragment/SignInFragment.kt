@@ -1,36 +1,34 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.viewmodel.UserViewModelFactory
-
 import android.Manifest
-import android.os.Bundle
-import android.view.View
-import android.widget.Toast
-import android.widget.Button
-import android.content.Intent
-import android.widget.EditText
-import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.example.brockapp.BLANK_ERROR
+import com.example.brockapp.R
+import com.example.brockapp.SIGN_IN_ERROR
+import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.database.BrockDB
 import com.example.brockapp.receiver.ConnectivityReceiver
 import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.util.PermissionUtil
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.gms.location.LocationServices
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {

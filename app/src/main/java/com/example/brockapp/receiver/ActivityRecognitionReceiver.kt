@@ -8,9 +8,6 @@ import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
 import com.example.brockapp.ISO_DATE_FORMAT
 import com.example.brockapp.service.ActivityRecognitionService
 import com.google.android.gms.location.DetectedActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter

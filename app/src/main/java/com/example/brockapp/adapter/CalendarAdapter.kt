@@ -1,10 +1,9 @@
 package com.example.brockapp.adapter
 
-import com.example.brockapp.R
-
-import android.view.ViewGroup
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
 
 class CalendarAdapter(private val days: List<String>, private val dates: ArrayList<String>, private val onItemClick: (String) -> Unit, private val showActivityOfDay: (String) -> Unit): RecyclerView.Adapter<CalendarViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): CalendarViewHolder {

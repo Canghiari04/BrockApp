@@ -1,29 +1,26 @@
 package com.example.brockapp.fragment
 
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.adapter.HomeAdapter
-import com.example.brockapp.viewmodel.ActivitiesViewModel
-import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
-
 import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import java.time.LocalDate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.brockapp.database.UserWalkActivityDao
-import kotlinx.coroutines.CoroutineDispatcher
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.adapter.HomeAdapter
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.User
+import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class HomeFragment : Fragment(R.layout.home_fragment) {
     private lateinit var user: User
@@ -55,6 +52,17 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
                 }
             }
+        }
+
+        viewModel.sortedDayExitActivitiesList.observe(viewLifecycleOwner) { item ->
+
+            val userWalkActivities = item.filter { it.type == WALK_ACTIVITY_TYPE}
+
+            val steps = userWalkActivities.parallelStream().mapToInt { it.info.toInt() }.sum()
+            CoroutineScope(Dispatchers.IO).launch {
+                updateSteps(steps)
+            }
+
         }
     }
 

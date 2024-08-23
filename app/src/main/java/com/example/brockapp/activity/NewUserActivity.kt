@@ -1,25 +1,21 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.R
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-
-import android.net.Uri
 import android.Manifest
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import android.widget.Button
-import android.content.Intent
-import android.app.AlertDialog
-import android.content.IntentFilter
-import android.provider.Settings
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
 
 class NewUserActivity : AppCompatActivity() {
     private lateinit var receiver: ActivityRecognitionReceiver
@@ -50,14 +46,6 @@ class NewUserActivity : AppCompatActivity() {
             startActivity(Intent(this, WalkActivity::class.java))
         }
 
-        findViewById<Button>(R.id.button_run_activity).setOnClickListener {
-
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        receiver = ActivityRecognitionReceiver()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -66,7 +54,7 @@ class NewUserActivity : AppCompatActivity() {
         if(requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
             when {
                 grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
-                    registerActivityRecognitionReceiver()
+
                 }
                 else -> {
                     showDetectPermissionDialog()
@@ -89,17 +77,13 @@ class NewUserActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     /**
      * Metodo attuato per definire se il permesso di activity recognition sia stato accettato
      * oppure negato.
      */
     private fun checkActivityPermission() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            registerActivityRecognitionReceiver()
+
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)) {
             showDetectPermissionDialog()
         } else {
@@ -135,7 +119,5 @@ class NewUserActivity : AppCompatActivity() {
      * Metodo attuato per registrare il broadcast receiver, affinchè possa ricevere updates relativi
      * ad activity recognition.
      */
-    private fun registerActivityRecognitionReceiver() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
-    }
+
 }

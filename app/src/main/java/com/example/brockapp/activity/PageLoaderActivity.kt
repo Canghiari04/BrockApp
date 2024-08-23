@@ -1,31 +1,18 @@
 package com.example.brockapp.activity
 
+
 import MapFragment
-import android.Manifest
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.fragment.ChartsFragment
 import com.example.brockapp.fragment.FriendsFragment
-import com.example.brockapp.fragment.CalendarFragment
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.receiver.ConnectivityReceiver
-
-import android.util.Log
-import android.os.Bundle
-import android.content.Intent
-import android.content.IntentFilter
-import androidx.fragment.app.Fragment
-import android.net.ConnectivityManager
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.widget.Toolbar
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.fragment.app.FragmentManager
-import androidx.appcompat.app.AppCompatActivity
-
+import com.example.brockapp.fragment.HomeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -125,6 +112,8 @@ class PageLoaderActivity: AppCompatActivity() {
 
         if (name == "Map")
             newActivityButton.hide()
+        else
+            newActivityButton.show()
     }
 
     /**

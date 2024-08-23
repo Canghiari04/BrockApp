@@ -1,13 +1,12 @@
 package com.example.brockapp.adapter
 
-import com.example.brockapp.R
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-
-import android.view.ViewGroup
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.UserActivity
 
 class DailyActivityAdapter(private val activities: List<UserActivity>): RecyclerView.Adapter<DailyActivityViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {

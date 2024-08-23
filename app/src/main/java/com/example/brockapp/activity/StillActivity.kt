@@ -1,37 +1,35 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-
-import android.Manifest
-import android.util.Log
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.MenuItem
 import android.widget.Button
-import android.content.Intent
-import android.os.SystemClock
 import android.widget.Chronometer
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityRecognition
-import com.example.brockapp.manager.ActivityRecognitionManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+import com.example.brockapp.R
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class StillActivity : AppCompatActivity() {
+
+    private var running : Boolean = false
+
+    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.still_activity)
 
-        val transitionManager = ActivityRecognitionManager()
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
+
         val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
 
-        val pauseOffset: Long = 0
-
-        setButtonListeners(false, chronometer, pauseOffset, transitionManager)
+        setButtonListeners(chronometer)
 
         setChronometerListener(chronometer)
 
@@ -52,18 +50,14 @@ class StillActivity : AppCompatActivity() {
     }
 
     private fun setButtonListeners(
-        running: Boolean,
         chronometer: Chronometer,
-        pauseOffset: Long,
-        transitionManager: ActivityRecognitionManager
     ) {
-        var running1 = running
-        var pauseOffset1 = pauseOffset
+
         findViewById<Button>(R.id.button_start).setOnClickListener {
-            if (!running1) {
-                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset1
+            if (!running) {
+
                 chronometer.start()
-                running1 = true
+                running = true
 
                 findViewById<Button>(R.id.button_start).isEnabled = false
                 findViewById<Button>(R.id.button_stop).isEnabled = true
@@ -74,10 +68,9 @@ class StillActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.button_stop).setOnClickListener {
-            if (running1) {
-                chronometer.stop()
-                pauseOffset1 = SystemClock.elapsedRealtime() - chronometer.base
-                running1 = false
+            if (running) {
+
+                running = false
 
                 findViewById<Button>(R.id.button_start).isEnabled = true
                 findViewById<Button>(R.id.button_stop).isEnabled = false
@@ -103,27 +96,6 @@ class StillActivity : AppCompatActivity() {
         }
     }
 
-    private fun startDetection(transitionManager: ActivityRecognitionManager) {
-        val request = transitionManager.getRequest()
-        val myPendingIntentActivityRecognition = transitionManager.getPendingIntent(this)
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            val task = ActivityRecognition.getClient(this).requestActivityTransitionUpdates(request, myPendingIntentActivityRecognition)
-
-            task.addOnSuccessListener {
-                Log.d("DETECT", "Connesso all'API activity recognition")
-            }
-
-            task.addOnFailureListener {
-                Log.d("DETECT", "Errore di connessione con l'API activity recognition")
-            }
-
-            registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-        } else {
-            Log.d("WTF", "WTF")
-        }
-    }
-
     private fun registerTransition(activityType: Int, transitionType: Int) {
         val intent = Intent().apply {
             setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
@@ -141,5 +113,14 @@ class StillActivity : AppCompatActivity() {
             .putExtra("type", "walk")
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    private fun unregisterActivityRecognitionReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+    }
+
+    override fun onDestroy() {
+        unregisterActivityRecognitionReceiver()
+        super.onDestroy()
     }
 }

@@ -1,16 +1,10 @@
 package com.example.brockapp.activity
 
-import android.content.IntentFilter
-import android.net.ConnectivityManager
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.brockapp.R
 import com.example.brockapp.fragment.LoginFragment
 import com.example.brockapp.fragment.SignInFragment
-
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.util.PermissionUtil
 
 class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener {
     private lateinit var signInFragment: SignInFragment

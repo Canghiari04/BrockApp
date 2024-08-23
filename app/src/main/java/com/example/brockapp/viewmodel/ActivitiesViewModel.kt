@@ -1,22 +1,21 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.singleton.User
-import com.example.brockapp.ISO_DATE_FORMAT
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-
-import java.time.LocalDate
-import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import java.time.format.DateTimeFormatter
-import androidx.lifecycle.MutableLiveData
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {

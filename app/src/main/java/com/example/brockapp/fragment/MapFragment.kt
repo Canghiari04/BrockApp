@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -126,12 +125,11 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
                         }
                     }
 
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
-                        val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
-                        input?.setAdapter(adapter)
-                        input?.showDropDown()
-                    }
+                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions)
+                    val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
+                    input?.setAdapter(adapter)
+                    input?.showDropDown()
+
                 } catch (e: Exception) {
                     Log.e("MAP_FRAGMENT", e.toString())
                 }

@@ -1,20 +1,19 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.dialog.AccountDialog
-
-import android.os.Bundle
-import android.view.View
-import android.content.Intent
 import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
-import kotlinx.coroutines.launch
+import android.view.View
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.cardview.widget.CardView
+import com.example.brockapp.R
 import com.example.brockapp.activity.AuthenticatorActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.dialog.AccountDialog
+import com.example.brockapp.singleton.User
+import kotlinx.coroutines.launch
 
 class MoreFragment : Fragment(R.layout.more_fragment) {
     private val user = User.getInstance()

@@ -1,8 +1,6 @@
 package com.example.brockapp.fragment
 
 import android.graphics.Color
-import com.example.brockapp.R
-
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -12,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.CHARTS_DATE_FORMAT
 import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.User
 import com.github.mikephil.charting.charts.BarChart
