@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import java.time.format.DateTimeFormatter
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
 import java.time.DayOfWeek
 import java.time.temporal.TemporalAdjusters
 
@@ -29,7 +30,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     val sortedWeekActivitiesDayList: LiveData<List<UserActivity>> get() = _sortedWeekActivitiesList
 
     fun getDayUserActivities(date: String?, user: User) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val (startOfDay, endOfDay) = getDayRange(date)
             val listActivities = ArrayList<UserActivity>()
             val listExitActivities = ArrayList<UserActivity>()
@@ -41,22 +42,16 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             listStillActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "METTERE DURATA STILL")
                 listActivities.add(newActivity)
-                if(it.transitionType == 1)
-                    listExitActivities.add(newActivity)
             }
 
             listVehicleActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, VEHICLE_ACTIVITY_TYPE, it.distanceTravelled.toString())
                 listActivities.add(newActivity)
-                if(it.transitionType == 1)
-                    listExitActivities.add(newActivity)
             }
 
             listWalkingActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, WALK_ACTIVITY_TYPE, it.stepNumber.toString())
                 listActivities.add(newActivity)
-                if(it.transitionType == 1)
-                    listExitActivities.add(newActivity)
             }
 
             _sortedDayExitActivitiesList.value = listExitActivities.sortedBy { it.timestamp }
@@ -65,7 +60,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     }
 
     fun getWeekUserActivities(day: LocalDate, user: User) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val (startOfWeek, endOfWeek) = getWeekRange(day)
             val listActivities = mutableListOf<UserActivity>()
 
@@ -88,7 +83,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 listActivities.add(newActivity)
             }
 
-            _sortedWeekActivitiesList.value = listActivities.sortedBy { it.timestamp }
+            _sortedWeekActivitiesList.postValue(listActivities.sortedBy { it.timestamp })
         }
     }
 

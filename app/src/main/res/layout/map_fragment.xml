@@ -1,0 +1,35 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <AutoCompleteTextView
+        android:id="@+id/text_new_area"
+        android:hint="@string/edit_text_map_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_margin="16dp"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:elevation="25dp"
+        android:textColor="@color/black"
+        android:background="@color/white" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_plus_geofence"
+        android:src="@drawable/marker_icon"
+        android:contentDescription="@string/description_icon_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/uni_red" />
+</FrameLayout>

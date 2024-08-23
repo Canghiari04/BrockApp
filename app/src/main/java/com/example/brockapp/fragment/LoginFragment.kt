@@ -1,19 +1,13 @@
 package com.example.brockapp.fragment
 
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.BLANK_ERROR
-import com.example.brockapp.LOGIN_ERROR
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.service.ConnectivityService
-import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
-import android.util.Log
 import android.Manifest
 import android.os.Bundle
 import android.view.View
@@ -23,26 +17,28 @@ import android.content.Intent
 import android.app.AlertDialog
 import android.content.Context
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.util.Log
 import android.widget.TextView
 import android.widget.EditText
 import androidx.fragment.app.Fragment
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
-import android.net.ConnectivityManager
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.location.LocationServices
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.google.android.gms.location.LocationServices
 
 class LoginFragment : Fragment(R.layout.login_fragment) {
-    private val listPermissions = mutableListOf<String>()
     private var listener: OnFragmentInteractionListener? = null
 
-    private lateinit var db: BrockDB
+    private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
-    private lateinit var utilPermission: PermissionUtil
     private lateinit var viewModelGeofence: GeofenceViewModel
 
     /**
@@ -56,30 +52,23 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val db = BrockDB.getInstance(requireContext())
+        val factoryViewModelUser = UserViewModelFactory(db)
+
+        util = PermissionUtil(requireActivity()) {
+            startBackgroundOperations()
+        }
+
+        viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
+
+        observeLogin()
+
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
             val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                db = BrockDB.getInstance(requireContext())
-                val factoryViewModelUser = UserViewModelFactory(db)
-                val factoryViewModelGeofence = GeofenceViewModelFactory(db)
-
-                viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
-                viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
-
-                viewModelUser.authLogin(username, password)
-
-                viewModelUser.auth.observe(viewLifecycleOwner) { item ->
-                    if (item) {
-                        utilPermission = PermissionUtil(requireContext(), requireActivity())
-                        viewModelGeofence.getGeofenceAreas()
-
-                        observeGeofenceAreas()
-                    } else {
-                        Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_SHORT).show()
-                    }
-                }
+                viewModelUser.checkIfUserExists(username, password)
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
             }
@@ -101,147 +90,36 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         listener = null
     }
 
+    private fun observeLogin() {
+        viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
+            if (auth) {
+                util.requestPermissions()
+            } else {
+                Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun startBackgroundOperations() {
+        val db = BrockDB.getInstance(requireContext())
+        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
+
+        viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
+
+        observeGeofenceAreas()
+    }
+
     private fun observeGeofenceAreas() {
-        viewModelGeofence.observeGeofenceAreasLiveData().observe(viewLifecycleOwner) {
-            geofence = MyGeofence.getInstance()
-            geofence.init(requireContext(), it)
-            checkLocationPermissions()
-        }
-    }
+        viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
+            if (areas.isNotEmpty()) {
+                geofence = MyGeofence.getInstance()
+                geofence.init(requireContext(), areas)
 
-    private fun checkLocationPermissions() {
-        when {
-            utilPermission.hasLocationPermissions(requireContext(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) -> {
-                checkBackgroundPermission()
-            }
-            utilPermission.shouldShowLocationPermissionsRationaleDialog(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) -> {
-                utilPermission.showPermissionsRationaleDialog()
-            }
-            else -> {
-                permissionsLocationLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-            }
-        }
-    }
-
-    private fun checkBackgroundPermission() {
-        when {
-            utilPermission.hasBackgroundPermission(requireContext()) -> {
-                checkNotificationPermission()
-            }
-            utilPermission.shouldShowBackgroundPermissionRationaleDialog() -> {
-                utilPermission.showPermissionsRationaleDialog()
-            }
-            else -> {
-                permissionBackGroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            }
-        }
-    }
-
-    private fun checkNotificationPermission() {
-        when {
-            utilPermission.hasNotificationPermission(requireContext()) -> {
                 startGeofence()
-                goToHome()
-            }
-            utilPermission.shouldShowNotificationPermissionRationaleDialog() -> {
-                utilPermission.showPermissionsRationaleDialog()
-            }
-            else -> {
-                permissionNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                viewModelGeofence.insertStaticGeofenceAreas()
             }
         }
-    }
-
-    /**
-     * Variabile privata di tipo ActivityResultLauncher, utilizzata per accertarsi se l'utente abbia
-     * accettato o meno i permessi richiesti.
-     */
-    private val permissionsLocationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        listPermissions.clear()
-
-        for (permission in permissions) {
-            when (permission.key) {
-                Manifest.permission.ACCESS_FINE_LOCATION -> {
-                    if (!permission.value)
-                        listPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
-                Manifest.permission.ACCESS_COARSE_LOCATION -> {
-                    if (!permission.value)
-                        listPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-                }
-            }
-        }
-
-        if(listPermissions.isNotEmpty()) {
-            showLocationPermissionsDialog(requireContext())
-        } else {
-            permissionBackGroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
-    }
-
-    private val permissionBackGroundLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if(isGranted) {
-            permissionNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            showBackgroundPermissionDialog(requireContext())
-        }
-    }
-
-    private val permissionNotificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if(isGranted) {
-            goToHome()
-        } else {
-            showNotificationPermissionDialog(requireContext())
-        }
-    }
-
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
-    private fun showLocationPermissionsDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permissions_title)
-            .setMessage(R.string.permissions_location)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                checkLocationPermissions()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
-    private fun showBackgroundPermissionDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_background)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                checkBackgroundPermission()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
-    private fun showNotificationPermissionDialog(context: Context) {
-        AlertDialog.Builder(context)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_notification)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                checkNotificationPermission()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
     }
 
     private fun startGeofence() {
@@ -250,15 +128,27 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
                 addOnSuccessListener {
-                    Log.d("GEOFENCING_RECEIVER", "Successful connection.")
+                    startConnectivity()
+                    goToHome()
                 }
                 addOnFailureListener {
-                    Log.d("GEOFENCING_RECEIVER", "Unsuccessful connection.")
+                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
                 }
             }
         } else {
             Log.d("WTF", "WTF")
         }
+    }
+
+    private fun startConnectivity() {
+        val receiver = ConnectivityReceiver()
+
+        ContextCompat.registerReceiver(
+            requireContext(),
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     private fun goToHome() {

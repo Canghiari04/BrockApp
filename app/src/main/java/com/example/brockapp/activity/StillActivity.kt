@@ -1,5 +1,6 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
 

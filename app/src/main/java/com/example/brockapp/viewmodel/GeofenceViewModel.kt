@@ -8,15 +8,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
 
 class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
-    private val _inserted = MutableLiveData<Boolean>()
-    val insert: LiveData<Boolean> get() = _inserted
+    private val _areas = MutableLiveData<List<GeofenceAreaEntry>>()
+    val areas: LiveData<List<GeofenceAreaEntry>> get() = _areas
 
-    private lateinit var areas: LiveData<List<GeofenceAreaEntry>>
+    init {
+        fetchGeofenceAreas()
+    }
 
     fun insertStaticGeofenceAreas() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val count = db.GeofenceAreaDao().countAllGeofenceAreas()
 
             if (count == 0) {
@@ -31,18 +34,22 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
                     db.GeofenceAreaDao().insertGeofenceArea(area)
                 }
 
-                _inserted.value = true
-            } else {
-                _inserted.value = false
+                fetchGeofenceAreas()
             }
         }
     }
 
-    fun getGeofenceAreas() {
-        areas = db.GeofenceAreaDao().getAllLiveGeofenceAreas()
+    fun insertGeofenceArea(area: GeofenceAreaEntry) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.GeofenceAreaDao().insertGeofenceArea(area)
+            fetchGeofenceAreas()
+        }
     }
 
-    fun observeGeofenceAreasLiveData(): LiveData<List<GeofenceAreaEntry>> {
-        return areas
+    private fun fetchGeofenceAreas() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val items = db.GeofenceAreaDao().getAllGeofenceAreas()
+            _areas.postValue(items)
+        }
     }
 }
