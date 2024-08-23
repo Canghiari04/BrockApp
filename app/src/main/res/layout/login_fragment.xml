@@ -25,19 +25,6 @@
             app:layout_constraintTop_toTopOf="parent">
         </TextView>
 
-        <TextView
-            android:id="@+id/login_insert_username_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="124dp"
-            android:text="@string/insert_username_text"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
         <EditText
             android:id="@+id/text_username"
             android:hint="@string/authenticator_username"
@@ -53,26 +40,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_message_text_view" />
 
-        <TextView
-            android:id="@+id/login_insert_password_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="204dp"
-            android:text="@string/insert_password_text"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <EditText
             android:id="@+id/text_password"
             android:hint="@string/authenticator_password"
             android:inputType="textPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="50dp"
             android:padding="15dp"
             android:backgroundTint="@color/uni_red"
             android:ems="10"
@@ -106,7 +80,7 @@
                 android:id="@+id/text_view_sign_up"
                 android:text="@string/message_to_signin"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="24sp"
                 android:layout_weight="1"
                 android:textAlignment="textEnd"
                 android:textSize="18sp"
@@ -117,7 +91,7 @@
                 android:id="@+id/signin_text_view"
                 android:text="@string/on_click_signin"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="24sp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 android:textAlignment="textStart"

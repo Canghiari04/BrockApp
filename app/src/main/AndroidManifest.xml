@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,8 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BrockApp"
         tools:targetApi="31">
+
         <activity
-            android:name=".activity.MainActivity" android:exported="true">
+            android:name=".activity.AuthenticatorActivity" android:exported="true">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
@@ -27,37 +30,57 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.PageLoaderActivity">
+            android:name=".activity.PageLoaderActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
-            android:name=".activity.AuthenticatorActivity" />
-        <activity
-            android:name=".activity.HomeActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
-        </activity>
-        <activity
-            android:name=".activity.CalendarActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
+            android:name=".activity.DailyActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
             android:name=".activity.NewUserActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
-            android:name=".activity.ChartsActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
+            android:name=".activity.StillActivity"
+            android:parentActivityName=".activity.NewUserActivity">
         </activity>
         <activity
-            android:name=".activity.MoreActivity"
-            android:parentActivityName=".activity.PageLoaderActivity">
+            android:name=".activity.VehicleActivity"
+            android:parentActivityName=".activity.NewUserActivity">
         </activity>
         <activity
-            android:name=".calendar.DailyActivity"
-            android:parentActivityName=".activity.CalendarActivity">
+            android:name=".activity.WalkActivity"
+            android:parentActivityName=".activity.NewUserActivity">
         </activity>
 
-        <receiver android:name=".geofencing.GeofenceBroadcastReceiver"/>
+        <receiver
+            android:name=".receiver.GeofenceReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="GEOFENCE_TRANSITION_ACTION" />
+            </intent-filter>
+        </receiver>
 
-        <service android:name=".notification.NotificationService"/>
+        <service
+            android:name=".service.ConnectivityService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".service.ActivityRecognitionService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".service.MapService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAnPk3xVtkNq2nbIgwi3VLp1HkvpoPW4ig" />
     </application>
 </manifest>

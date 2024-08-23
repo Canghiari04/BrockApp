@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">BrockApp</string>
 
+    <string name="text_blank"> </string>
+
     <string name="main_message">Corri con RUNIBO</string>
     <string name="sign_in_button">SIGN IN</string>
     <string name="login_button">LOGIN</string>
@@ -24,20 +26,33 @@
     <string name="permission_title">Permesso richiesto</string>
     <string name="permission_message">Concedi il permesso dei tuoi spostamenti per usufruire di tutte le funzionalità.</string>
     <string name="permission_positive_button">Concedi</string>
+    <string name="settings_positive_button">Accedi</string>
     <string name="permission_negative_button">Annulla</string>
     <string name="permission_setting_button">Settings</string>
+    <string name="permission_background">Concedi il permesso di accedere alla tua posizione anche quando l\'app è in background per garantire il corretto funzionamento di tutte le funzionalità.</string>
+    <string name="permission_notification">Concedi il permesso di inviarti notifiche per tenerti aggiornato e garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
+    <string name="permissions_location">Concedi il permesso di accedere alla tua posizione per garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
     <string name="permissions_title">Permessi richiesti</string>
-    <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere alla tua posizione per fornire tutte le funzionalità.</string>
+    <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere a tutte le funzionalità richieste.</string>
+    <string name="permissions_toast">Clicca su "Concedi sempre".</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_activity">Attività</string>
+    <string name="menu_activity">Calendario</string>
+    <string name="menu_map">Mappa</string>
     <string name="menu_plot">Grafici</string>
-    <string name="menu_more">More</string>
+    <string name="menu_friends">Amici</string>
+    <string name="menu_register">Registra</string>
+    <string name="item_more_info">Info</string>
+    <string name="item_more_logout">Logout</string>
+    <string name="item_more_delete">Elimina account</string>
 
-    <string name="historical_text_view">IL TUO STORICO</string>
+    <string name="title_home_fragment">In primo piano</string>
+    <string name="subtitle_activities">Le tue ultime attività</string>
+    <string name="subtitle_features">Le funzionalità dell\'app</string>
+    <string name="register_text_view">REGISTRAZIONE</string>
     <string name="calendar_text_view">CALENDARIO</string>
-    <string name="activity_text_view">LE TUE ATTIVITÀ</string>
-    <string name="charts_text_view">I TUOI GRAFICI</string>
+    <string name="friends_text_view">AMICI</string>
+    <string name="charts_text_view">GRAFICI</string>
 
     <string name="description_back_month_button">Back arrow</string>
     <string name="description_forward_month_button">Forward arrow</string>
@@ -49,9 +64,9 @@
     <string name="sabato_text_view">SAB</string>
     <string name="domenica_text_view">DOM</string>
 
-    <string name="empty_vie">Wow, come è vuoto...</string>
+    <string name="empty_icon_description">Icona per empty page</string>
 
-    <string name="daily_detect_button">DAILY DETECT</string>
+    <string name="run_button">CORSETTA</string>
     <string name="walk_button">CAMMINATA</string>
     <string name="vehicle_button">VIAGGIO IN MACCHINA</string>
     <string name="still_button">STILL</string>
@@ -94,4 +109,11 @@
     <string name="distance_label">Distanza percorsa</string>
     <string name="insert_username_text">Inserisci lo username:</string>
     <string name="insert_password_text">Inserisci la password:</string>
+    <string name="step_number_home_text">I tuoi passi oggi</string>
+    <string name="step_counter_home_text">0/10000 passi</string>
+
+    <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
+    <string name="edit_text_map_fragment">Cerca una nuova area</string>
+    <string name="toast_error_map">Nessuna località individuata con questo nome.</string>
+    <string name="new_activity_icon_description">Bottone per registrare una nuova attività</string>
 </resources>
