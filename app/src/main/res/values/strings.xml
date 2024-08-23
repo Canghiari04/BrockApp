@@ -111,9 +111,15 @@
     <string name="insert_password_text">Inserisci la password:</string>
     <string name="step_number_home_text">I tuoi passi oggi</string>
     <string name="step_counter_home_text">0/10000 passi</string>
+    <string name="step_count_text">Passi fatti:</string>
+    <string name="step_count_initial_value">0</string>
+    <string name="walk_title">CAMMINATA</string>
+    <string name="vehicle_title">VEICOLO</string>
+    <string name="still_title">FERMO</string>
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
     <string name="toast_error_map">Nessuna località individuata con questo nome.</string>
     <string name="new_activity_icon_description">Bottone per registrare una nuova attività</string>
+    <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 </resources>

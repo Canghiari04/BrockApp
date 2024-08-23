@@ -1,21 +1,27 @@
 package com.example.brockapp.service
 
-import com.example.brockapp.*
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.IBinder
+import android.util.Log
+import androidx.core.app.ActivityCompat
+import com.example.brockapp.CELLULAR_TYPE_CONNECTION
+import com.example.brockapp.CHANNEL_ID_CONNECTIVITY_NOTIFY
+import com.example.brockapp.DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
+import com.example.brockapp.ID_CONNECTIVITY_NOTIFY
+import com.example.brockapp.NAME_CHANNEL_CONNECTIVITY_NOTIFY
+import com.example.brockapp.NO_CONNECTION_TYPE_CONNECTION
+import com.example.brockapp.WI_FI_TYPE_CONNECTION
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.util.NotificationUtil
-
-import android.Manifest
-import android.util.Log
-import android.os.IBinder
-import android.app.Service
-import android.content.Intent
-import android.content.Context
-import android.net.NetworkCapabilities
-import android.app.NotificationManager
-import android.net.ConnectivityManager
-import android.app.NotificationChannel
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
 import com.google.android.gms.location.LocationServices
 
 class ConnectivityService: Service() {

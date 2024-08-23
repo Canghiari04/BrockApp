@@ -1,36 +1,44 @@
 package com.example.brockapp.singleton
 
-import com.example.brockapp.*
-import com.example.brockapp.data.Locality
-import com.example.brockapp.database.GeofenceAreaEntry
-
-import android.content.Intent
-import android.content.Context
 import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.google.android.gms.location.Geofence
+import com.example.brockapp.CELLULAR_TYPE_CONNECTION
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
+import com.example.brockapp.NO_CONNECTION_TYPE_CONNECTION
+import com.example.brockapp.REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER
+import com.example.brockapp.WI_FI_TYPE_CONNECTION
+import com.example.brockapp.data.Locality
+import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.receiver.GeofenceReceiver
+import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
 object MyGeofence {
-    private val instance = MyGeofence
+    var geofences: List<GeofenceAreaEntry> = mutableListOf()
+
     private var duration = 86400000L
+    private val instance = MyGeofence
 
     lateinit var request: GeofencingRequest
     lateinit var pendingIntent: PendingIntent
-    lateinit var geofences: List<GeofenceAreaEntry>
 
     var radius = 0
 
     var typeNetwork: String ?= null
 
-    fun init(context: Context, geofences: List<GeofenceAreaEntry>) {
-        this.geofences = geofences
+    fun init(context: Context) {
         defineRadius(context)
-        defineRequest()
         definePendingIntent(context)
     }
+
+    fun initGeofences(areas: List<GeofenceAreaEntry>) {
+        geofences = areas
+        defineRequest()
+    }
+
 
     fun getInstance(): MyGeofence {
         return instance
@@ -83,7 +91,7 @@ object MyGeofence {
                     .setRequestId(entry.id)
                     .setCircularRegion(entry.latitude, entry.longitude, radius.toFloat())
                     .setExpirationDuration(duration)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_DWELL)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                     .setLoiteringDelay(5000)
                     .build()
             )
@@ -104,7 +112,7 @@ object MyGeofence {
         return listLocalities
     }
 
-    private fun definePendingIntent(context: Context) {
+    fun definePendingIntent(context: Context) {
         val intent = Intent(context, GeofenceReceiver::class.java).apply {
             action = GEOFENCE_INTENT_TYPE
         }

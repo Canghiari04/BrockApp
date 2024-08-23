@@ -1,12 +1,11 @@
 package com.example.brockapp.receiver
 
-import com.example.brockapp.service.ConnectivityService
-
-import android.util.Log
-import android.content.Intent
-import android.content.Context
-import android.net.ConnectivityManager
 import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.util.Log
+import com.example.brockapp.service.ConnectivityService
 
 class ConnectivityReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

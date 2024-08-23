@@ -1,23 +1,22 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.DATE_SEPARATOR
-import com.example.brockapp.util.CalendarUtil
-import com.example.brockapp.CALENDAR_DATE_FORMAT
-import com.example.brockapp.activity.DailyActivity
-import com.example.brockapp.adapter.CalendarAdapter
-
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import java.time.LocalDate
-import android.content.Intent
-import android.widget.TextView
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import java.time.format.DateTimeFormatter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.CALENDAR_DATE_FORMAT
+import com.example.brockapp.DATE_SEPARATOR
+import com.example.brockapp.R
+import com.example.brockapp.activity.DailyActivity
+import com.example.brockapp.adapter.CalendarAdapter
+import com.example.brockapp.singleton.User
+import com.example.brockapp.util.CalendarUtil
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class CalendarFragment : Fragment(R.layout.calendar_fragment) {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)

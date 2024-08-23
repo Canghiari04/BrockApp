@@ -1,17 +1,16 @@
 package com.example.brockapp.receiver
 
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
-
-import android.util.Log
-import android.content.Intent
-import android.content.Context
-import androidx.work.WorkManager
-import androidx.work.OneTimeWorkRequest
 import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import com.example.brockapp.GEOFENCE_INTENT_TYPE
 import com.example.brockapp.worker.GeofenceWorker
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
-import com.google.android.gms.location.GeofencingEvent
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
+import com.google.android.gms.location.GeofencingEvent
 
 class GeofenceReceiver: BroadcastReceiver() {
     private lateinit var workRequest: OneTimeWorkRequest
@@ -28,11 +27,6 @@ class GeofenceReceiver: BroadcastReceiver() {
 
                     when (geofenceTransition) {
                         GEOFENCE_TRANSITION_ENTER -> {
-                            workRequest = OneTimeWorkRequest.Builder(GeofenceWorker::class.java).build()
-                            WorkManager.getInstance(context).enqueue(workRequest)
-                        }
-
-                        GEOFENCE_TRANSITION_DWELL -> {
                             workRequest = OneTimeWorkRequest.Builder(GeofenceWorker::class.java).build()
                             WorkManager.getInstance(context).enqueue(workRequest)
                         }

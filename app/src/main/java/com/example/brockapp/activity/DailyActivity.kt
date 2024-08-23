@@ -16,24 +16,25 @@ import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import androidx.appcompat.app.AppCompatActivity
-import com.github.mikephil.charting.data.PieData
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
-import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
-    private lateinit var user: User
-    private lateinit var utilCalendar: CalendarUtil
     private lateinit var viewModel: ActivitiesViewModel
+    private lateinit var user: User
+    private var utilCalendar: CalendarUtil = CalendarUtil()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.daily_activity_activity)
 
         val date: String? = intent.getStringExtra("ACTIVITY_DATE")
 
@@ -47,24 +48,27 @@ class DailyActivity: AppCompatActivity() {
 
         viewModel.sortedDayActivitiesList.observe(this) { item ->
             if(item.isNotEmpty()) {
-                setContentView(R.layout.daily_activity_activity)
 
                 utilCalendar = CalendarUtil()
 
                 val textView = findViewById<TextView>(R.id.date_text_view)
                 textView.text = utilCalendar.getPrettyDate(date)
 
-                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
                 val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
 
-                populateDailyActivitiesChart(pieChart, item)
                 populateDailyActivitiesRecyclerView(dailyList, item)
+
+                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
+                populateDailyActivitiesChart(pieChart, item)
+
             } else {
                 setContentView(R.layout.empty_page)
             }
 
             setUpToolBar()
         }
+
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -93,13 +97,16 @@ class DailyActivity: AppCompatActivity() {
         val userVehicleActivities = activities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp }
         val timeSpentVehicle = utilCalendar.computeTimeSpent(userVehicleActivities)
 
-        val unknownTime = 60 * 60 * 24 - timeSpentWalking - timeSpentStill - timeSpentVehicle
+        val secondsInDay = 60 * 60 * 24
+        val totalRecordedTime = timeSpentWalking + timeSpentStill + timeSpentVehicle
+
+        val unknownTime = (secondsInDay - totalRecordedTime).toFloat()
 
         entries.apply {
             add(PieEntry(timeSpentWalking.toFloat(), "CAMMINO"))
             add(PieEntry(timeSpentStill.toFloat(), "STAZIONARIO"))
             add(PieEntry(timeSpentVehicle.toFloat(), "VEICOLO"))
-            add(PieEntry(unknownTime.toFloat(), "Sconosciuto"))
+            add(PieEntry(unknownTime, "Sconosciuto"))
         }
 
         val dataSet = PieDataSet(entries, "Dati").apply {
@@ -111,12 +118,14 @@ class DailyActivity: AppCompatActivity() {
         pieChart.apply {
             this.data = data
             setDrawEntryLabels(false)
+            setUsePercentValues(true)
+            description.isEnabled = false
             invalidate()
         }
     }
 
     private fun populateDailyActivitiesRecyclerView(dailyList: RecyclerView, activities: List<UserActivity>) {
-        val adapterActivities = DailyActivityAdapter(activities.filter { it.transitionType == 1 })
+        val adapterActivities = DailyActivityAdapter(activities)
         val layoutManager = LinearLayoutManager(this)
 
         dailyList.adapter = adapterActivities

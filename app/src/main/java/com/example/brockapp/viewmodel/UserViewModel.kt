@@ -1,14 +1,13 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.UserEntity
-
-import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.MutableLiveData
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.UserEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UserViewModel(private val db: BrockDB): ViewModel() {
     private var _auth = MutableLiveData<Boolean>()

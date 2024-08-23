@@ -1,14 +1,14 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.*
-import com.example.brockapp.R
 import android.app.PendingIntent
-import com.example.brockapp.activity.AuthenticatorActivity
-
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_CONNECTIVITY_NOTIFY
+import com.example.brockapp.REQUEST_CODE_GEOFENCE_NOTIFY
+import com.example.brockapp.activity.AuthenticatorActivity
 
 class NotificationUtil {
     fun getGeofencePendingIntent(context: Context): PendingIntent {

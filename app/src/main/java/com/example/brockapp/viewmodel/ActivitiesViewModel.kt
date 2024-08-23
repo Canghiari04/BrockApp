@@ -1,25 +1,27 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.singleton.User
-import com.example.brockapp.ISO_DATE_FORMAT
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-
-import java.time.LocalDate
-import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import java.time.format.DateTimeFormatter
-import androidx.lifecycle.MutableLiveData
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
+    private val _sortedDayExitActivitiesList = MutableLiveData<List<UserActivity>>()
+    val sortedDayExitActivitiesList: LiveData<List<UserActivity>> get() = _sortedDayExitActivitiesList
+
     private val _sortedDayActivitiesList = MutableLiveData<List<UserActivity>>()
     val sortedDayActivitiesList: LiveData<List<UserActivity>> get() = _sortedDayActivitiesList
 
@@ -31,8 +33,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val (startOfDay, endOfDay) = getDayRange(date)
             val listActivities = ArrayList<UserActivity>()
 
-            val listStillActivities = db.UserStillActivityDao().getEndingStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-            val listVehicleActivities = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
             val listWalkingActivities = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
 
             listStillActivities.parallelStream().forEach {
@@ -50,7 +52,10 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 listActivities.add(newActivity)
             }
 
+
             _sortedDayActivitiesList.postValue(listActivities.sortedBy { it.timestamp })
+            val listExitActivities = listActivities.filter { it.transitionType == 1 }
+            _sortedDayExitActivitiesList.postValue(listExitActivities)
         }
     }
 

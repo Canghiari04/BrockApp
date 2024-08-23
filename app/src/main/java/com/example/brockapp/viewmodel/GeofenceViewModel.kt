@@ -1,14 +1,13 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.GeofenceAreaEntry
-
-import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.MutableLiveData
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.GeofenceAreaEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
     private val _areas = MutableLiveData<List<GeofenceAreaEntry>>()

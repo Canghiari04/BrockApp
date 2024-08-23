@@ -9,8 +9,14 @@
     android:padding="16dp"
     android:background="@color/grey">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="@string/vehicle_title"
+        android:textSize="40sp" />
     <Chronometer
-        android:id="@+id/chronometer"
+        android:id="@+id/vehicle_chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"
@@ -35,22 +41,31 @@
         android:textColor="@color/black"
         android:layout_marginBottom="25dp" />
 
-    <Button
-        android:id="@+id/vehicle_button_stop"
+    <GridLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/stop_button"
-        android:textColor="@color/white"
-        android:backgroundTint="@color/uni_red"
-        android:layout_marginBottom="16dp"
-        android:padding="12dp"/>
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/vehicle_button_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stop_button"
+            android:layout_marginEnd="30dp"
+            android:textColor="@color/white"
+            android:background="@drawable/circle"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:padding="12dp"/>
 
-    <Button
-        android:id="@+id/vehicle_button_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start_button"
-        android:textColor="@color/white"
-        android:backgroundTint="@color/uni_red"
-        android:padding="12dp"/>
+        <Button
+            android:id="@+id/vehicle_button_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start_button"
+            android:textColor="@color/white"
+            android:background="@drawable/circle"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:padding="12dp"/>
+    </GridLayout>
+
 </LinearLayout>

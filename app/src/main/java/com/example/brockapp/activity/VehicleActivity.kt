@@ -42,7 +42,7 @@ class VehicleActivity: AppCompatActivity() {
 
         distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
 
-        val chronometer = findViewById<Chronometer>(R.id.chronometer)
+        val chronometer = findViewById<Chronometer>(R.id.vehicle_chronometer)
         val vehicleButtonStart = findViewById<Button>(R.id.vehicle_button_start)
         val vehicleButtonStop = findViewById<Button>(R.id.vehicle_button_stop)
 
