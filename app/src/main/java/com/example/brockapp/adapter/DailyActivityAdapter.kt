@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.R
+import com.example.brockapp.STILL_ACTIVITY_TYPE
 import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
 import com.example.brockapp.WALK_ACTIVITY_TYPE
 import com.example.brockapp.data.UserActivity
@@ -37,10 +38,8 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
             val enterActivity = activities[(2 * position)]
             val enterActivityTime = enterActivity.timestamp!!.split(" ")[1]
 
-
             val timeDifferenceInSeconds =
                 calculateTimeDifferenceInSeconds(enterActivityTime, exitActivityTime)
-
 
             when (exitActivity.type) {
                 WALK_ACTIVITY_TYPE -> {
@@ -50,12 +49,18 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
                         "Passi fatti: ${exitActivity.info}. \nDurata: $timeDifferenceInSeconds secondi"
                     )
                 }
-
                 VEHICLE_ACTIVITY_TYPE -> {
                     holder.bindActivity(
                         VEHICLE_ACTIVITY_TYPE,
                         "Finito alle $exitActivityTime",
                         "Distanza percorsa: ${exitActivity.info} metri.\nDurata: $timeDifferenceInSeconds secondi"
+                    )
+                }
+                STILL_ACTIVITY_TYPE -> {
+                    holder.bindActivity(
+                        STILL_ACTIVITY_TYPE,
+                        "Finito alle $exitActivityTime",
+                        "Durata: $timeDifferenceInSeconds secondi"
                     )
                 }
 
@@ -64,33 +69,6 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
                         exitActivity.type,
                         "Finito alle $exitActivityTime",
                         "\nDurata: $timeDifferenceInSeconds secondi"
-                    )
-                }
-            }
-        } else {
-            // Se non c'è attività successiva, mostriamo comunque le informazioni della currentActivity
-            when (exitActivity.type) {
-                WALK_ACTIVITY_TYPE -> {
-                    holder.bindActivity(
-                        WALK_ACTIVITY_TYPE,
-                        "Finito alle $exitActivityTime",
-                        "Passi fatti: ${exitActivity.info}"
-                    )
-                }
-
-                VEHICLE_ACTIVITY_TYPE -> {
-                    holder.bindActivity(
-                        VEHICLE_ACTIVITY_TYPE,
-                        "Finito alle $exitActivityTime",
-                        "Distanza percorsa: ${exitActivity.info} metri"
-                    )
-                }
-
-                else -> {
-                    holder.bindActivity(
-                        exitActivity.type,
-                        "Finito alle $exitActivityTime",
-                        exitActivity.info
                     )
                 }
             }

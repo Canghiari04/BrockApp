@@ -65,7 +65,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             // Informare l'utente che il sensore non è disponibile
             findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
             findViewById<Button>(R.id.walk_button_start).isEnabled = false
-            findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
 
             Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
 
@@ -139,6 +138,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
     private fun startStepCounting() {
         stepDetectorSensor.also { stepSensor ->
             sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            Toast.makeText(this, "Sensore registrato", Toast.LENGTH_SHORT).show()
             initialStepCount = stepCount
         }
     }
