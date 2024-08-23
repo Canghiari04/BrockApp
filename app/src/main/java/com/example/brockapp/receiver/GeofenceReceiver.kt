@@ -31,11 +31,6 @@ class GeofenceReceiver: BroadcastReceiver() {
                             WorkManager.getInstance(context).enqueue(workRequest)
                         }
 
-                        GEOFENCE_TRANSITION_DWELL -> {
-                            workRequest = OneTimeWorkRequest.Builder(GeofenceWorker::class.java).build()
-                            WorkManager.getInstance(context).enqueue(workRequest)
-                        }
-
                         else -> {
                             Log.d("GEOFENCE_RECEIVER", "Transition not recognize.")
                         }

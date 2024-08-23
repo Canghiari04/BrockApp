@@ -23,12 +23,14 @@ import androidx.appcompat.widget.Toolbar
 import android.content.pm.PackageManager
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.brockapp.dialog.AccountDialog
 import com.example.brockapp.fragment.MapFragment
 import com.example.brockapp.singleton.User
 
@@ -139,7 +141,6 @@ class PageLoaderActivity: AppCompatActivity() {
                 user.logoutUser(user)
 
                 goToAuthenticator()
-
                 true
             }
             R.id.item_more_delete -> {

@@ -23,8 +23,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.Manifest
+import android.content.IntentFilter
 import android.widget.Toast
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 
@@ -32,6 +34,8 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var running = false
     private var initialStepCount = 0
+
+    private var currentSteps = 0
 
     private var stepDetectorSensor : Sensor? = null
 
@@ -154,7 +158,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
                 // Deve richiamare il worker per Activity Recognition
             }
 
-            currentSteps = event.values[0] - stepCount
+            currentSteps = (event.values[0] - stepCount).toInt()
             findViewById<TextView>(R.id.step_count)?.text = currentSteps.toString()
         }
     }
@@ -163,16 +167,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
     }
 
-    private fun startStepCounting() {
-        stepDetectorSensor.also { stepSensor ->
-            sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-            initialStepCount = stepCount
-        }
-    }
-
-    private fun stopStepCounting() {
-        sensorManager.unregisterListener(this)
-    }
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long) {
         val intent = Intent().apply {

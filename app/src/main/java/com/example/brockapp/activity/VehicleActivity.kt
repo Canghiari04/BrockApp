@@ -1,40 +1,34 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
 
 import android.Manifest
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationRequest
 import android.os.Bundle
-import android.os.SystemClock
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.Chronometer
+import android.os.SystemClock
+import android.content.Intent
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Location
+import android.widget.Chronometer
 import androidx.core.app.ActivityCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
-import com.example.brockapp.R
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.FusedLocationProviderClient
+import android.content.pm.PackageManager
+import com.google.android.gms.location.Priority
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.FusedLocationProviderClient
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class VehicleActivity : AppCompatActivity() {
+class VehicleActivity: AppCompatActivity() {
     private var running = false
     private var totalDistance = 0.0
-
+    private var pauseOffset: Long = 0
     private var startLocation: Location? = null
 
     private lateinit var distanceTravelled: TextView
@@ -42,15 +36,13 @@ class VehicleActivity : AppCompatActivity() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.vehicle_activity)
 
         distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
 
-        val chronometer = findViewById<Chronometer>(R.id.chronometer)
+        val chronometer = findViewById<Chronometer>(R.id.vehicle_chronometer)
         val vehicleButtonStart = findViewById<Button>(R.id.vehicle_button_start)
         val vehicleButtonStop = findViewById<Button>(R.id.vehicle_button_stop)
 
@@ -83,8 +75,7 @@ class VehicleActivity : AppCompatActivity() {
     private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
         vehicleButtonStart.setOnClickListener {
             if (!running) {
-
-                chronometer.base = SystemClock.elapsedRealtime()
+                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
                 chronometer.start()
 
                 running = true
@@ -105,12 +96,15 @@ class VehicleActivity : AppCompatActivity() {
         vehicleButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
+                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
+
                 running = false
 
                 vehicleButtonStart.isEnabled = true
                 vehicleButtonStop.isEnabled = false
 
                 stopLocationUpdates()
+                chronometer.base = SystemClock.elapsedRealtime()
 
                 registerActivity(
                     DetectedActivity.IN_VEHICLE,
@@ -182,14 +176,4 @@ class VehicleActivity : AppCompatActivity() {
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
-
-    private fun unregisterActivityRecognitionReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-    }
-
-    override fun onDestroy() {
-        unregisterActivityRecognitionReceiver()
-        super.onDestroy()
-    }
-
 }

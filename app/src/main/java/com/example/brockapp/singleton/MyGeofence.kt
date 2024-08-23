@@ -91,7 +91,7 @@ object MyGeofence {
                     .setRequestId(entry.id)
                     .setCircularRegion(entry.latitude, entry.longitude, radius.toFloat())
                     .setExpirationDuration(duration)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_DWELL)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                     .setLoiteringDelay(5000)
                     .build()
             )

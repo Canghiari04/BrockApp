@@ -105,6 +105,8 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                 util.requestPermissions()
                 CoroutineScope(Dispatchers.IO).launch {
                     User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
+                    User.username = username
+                    User.password = password
                 }
 
             } else {
