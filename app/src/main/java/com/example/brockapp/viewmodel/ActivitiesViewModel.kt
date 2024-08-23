@@ -32,7 +32,6 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val (startOfDay, endOfDay) = getDayRange(date)
             val listActivities = ArrayList<UserActivity>()
-            val listExitActivities = ArrayList<UserActivity>()
 
             val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
             val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
@@ -53,8 +52,10 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 listActivities.add(newActivity)
             }
 
-            _sortedDayExitActivitiesList.value = listExitActivities.sortedBy { it.timestamp }
-            _sortedDayActivitiesList.value = listActivities.sortedBy { it.timestamp }
+
+            _sortedDayActivitiesList.postValue(listActivities.sortedBy { it.timestamp })
+            val listExitActivities = listActivities.filter { it.transitionType == 1 }
+            _sortedDayExitActivitiesList.postValue(listExitActivities)
         }
     }
 

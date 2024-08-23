@@ -56,16 +56,14 @@ class DailyActivity: AppCompatActivity() {
                 val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
 
                 populateDailyActivitiesRecyclerView(dailyList, item)
+
+                val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
+                populateDailyActivitiesChart(pieChart, item)
             } else {
                 setContentView(R.layout.empty_page)
             }
 
             setUpToolBar()
-        }
-
-        viewModel.sortedDayActivitiesList.observe(this) { item ->
-            val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
-            populateDailyActivitiesChart(pieChart, item)
         }
     }
 
