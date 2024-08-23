@@ -13,6 +13,9 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
     private val _areas = MutableLiveData<List<GeofenceAreaEntry>>()
     val areas: LiveData<List<GeofenceAreaEntry>> get() = _areas
 
+    private val _dynamicAreas = MutableLiveData<List<GeofenceAreaEntry>>()
+    val dynamicAreas: LiveData<List<GeofenceAreaEntry>> get() = _dynamicAreas
+
     init {
         fetchGeofenceAreas()
     }
@@ -25,8 +28,7 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
                 val geofenceAreas = listOf(
                     GeofenceAreaEntry(longitude = 11.352396, latitude = 44.482086, name = "Giardini Margherita"),
                     GeofenceAreaEntry(longitude = 11.346302, latitude = 44.502505, name = "Parco della Montagnola"),
-                    GeofenceAreaEntry(longitude = 11.326957, latitude = 44.476543, name = "Villa Ghigi"),
-                    GeofenceAreaEntry(longitude = 12.568575, latitude = 43.983542, name = "Ospedaletto")
+                    GeofenceAreaEntry(longitude = 11.326957, latitude = 44.476543, name = "Villa Ghigi")
                 )
 
                 for(area in geofenceAreas) {
@@ -41,7 +43,7 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
     fun insertGeofenceArea(area: GeofenceAreaEntry) {
         viewModelScope.launch(Dispatchers.IO) {
             db.GeofenceAreaDao().insertGeofenceArea(area)
-            fetchGeofenceAreas()
+            fetchDynamicGeofenceAreas()
         }
     }
 
@@ -49,6 +51,13 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val items = db.GeofenceAreaDao().getAllGeofenceAreas()
             _areas.postValue(items)
+        }
+    }
+
+    private fun fetchDynamicGeofenceAreas() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val items = db.GeofenceAreaDao().getAllGeofenceAreas()
+            _dynamicAreas.postValue(items)
         }
     }
 }

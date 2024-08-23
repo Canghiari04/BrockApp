@@ -12,10 +12,14 @@ import com.example.brockapp.activity.AuthenticatorActivity
 
 class NotificationUtil {
     fun getGeofencePendingIntent(context: Context): PendingIntent {
+        val intent = Intent(context, AuthenticatorActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
         return PendingIntent.getActivity(
             context,
             REQUEST_CODE_GEOFENCE_NOTIFY,
-            Intent(context, AuthenticatorActivity::class.java),
+            intent,
             PendingIntent.FLAG_IMMUTABLE
         )
     }

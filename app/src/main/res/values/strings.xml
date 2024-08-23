@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">BrockApp</string>
 
+    <string name="text_blank"> </string>
+
     <string name="main_message">Corri con RUNIBO</string>
     <string name="sign_in_button">SIGN IN</string>
     <string name="login_button">LOGIN</string>
@@ -40,6 +42,9 @@
     <string name="menu_plot">Grafici</string>
     <string name="menu_friends">Amici</string>
     <string name="menu_register">Registra</string>
+    <string name="item_more_info">Info</string>
+    <string name="item_more_logout">Logout</string>
+    <string name="item_more_delete">Elimina account</string>
 
     <string name="title_home_fragment">In primo piano</string>
     <string name="subtitle_activities">Le tue ultime attività</string>
@@ -114,7 +119,7 @@
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
-    <string name="toast_error_map">Nessuna località individuata con questo nome</string>
+    <string name="toast_error_map">Nessuna località individuata con questo nome.</string>
     <string name="new_activity_icon_description">Bottone per registrare una nuova attività</string>
     <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 </resources>

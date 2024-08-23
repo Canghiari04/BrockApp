@@ -167,6 +167,8 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     }
 
     private fun goToHome() {
-        startActivity(Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home"))
+        val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home")
+        startActivity(intent)
+        activity?.finish()
     }
 }

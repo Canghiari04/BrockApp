@@ -37,8 +37,25 @@ class StillActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_stop).isEnabled = false
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, NewUserActivity::class.java)
+                startActivity(intent)
+                finish()
+                true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+                false
+            }
+        }
+    }
+
     private fun setChronometerListener(chronometer: Chronometer) {
         var notificationSent = false
+
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
             val hours = (elapsedTime / 1000 * 60 * 60).toInt()
@@ -83,20 +100,6 @@ class StillActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
-        }
-    }
-
     private fun registerTransition(activityType: Int, transitionType: Int) {
         val intent = Intent().apply {
             setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
@@ -107,7 +110,7 @@ class StillActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    private fun sendLazyUserNotification(title : String, content : String) {
+    private fun sendLazyUserNotification(title: String, content: String) {
         val intent = Intent(NOTIFICATION_SERVICE)
             .putExtra("title", title)
             .putExtra("content", content)

@@ -1,10 +1,15 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.R
+import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+
 import android.Manifest
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationRequest
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.MenuItem
@@ -22,8 +27,7 @@ import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 
@@ -44,22 +48,36 @@ class VehicleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.vehicle_activity)
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
-
-
-        val chronometer = findViewById<Chronometer>(R.id.vehicle_chronometer)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        setupLocationUpdates()
-
         distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
 
+        val chronometer = findViewById<Chronometer>(R.id.chronometer)
         val vehicleButtonStart = findViewById<Button>(R.id.vehicle_button_start)
         val vehicleButtonStop = findViewById<Button>(R.id.vehicle_button_stop)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        setupLocationUpdates()
 
         setOnClickListeners(vehicleButtonStart, chronometer, vehicleButtonStop)
 
         vehicleButtonStart.isEnabled = true
         vehicleButtonStop.isEnabled = false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, NewUserActivity::class.java)
+                startActivity(intent)
+                finish()
+                true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+                false
+            }
+        }
     }
 
     private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
@@ -68,6 +86,7 @@ class VehicleActivity : AppCompatActivity() {
 
                 chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
+
                 running = true
 
                 vehicleButtonStart.isEnabled = false
@@ -75,6 +94,7 @@ class VehicleActivity : AppCompatActivity() {
 
                 startLocationUpdates()
             }
+
             registerActivity(
                 DetectedActivity.IN_VEHICLE,
                 ActivityTransition.ACTIVITY_TRANSITION_ENTER,
@@ -101,34 +121,25 @@ class VehicleActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
-        }
-    }
-
     /**
-     * Costruisce una richiesta di aggiornamento di posizione.
-     * Gestisce l'aggiornamento della posizione in background e mostra a schermo la distanza percorsa
+     * Costruisce una richiesta di aggiornamento di posizione.Gestisce l'aggiornamento della
+     * posizione in background e mostra a schermo la distanza percorsa.
      */
     private fun setupLocationUpdates() {
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
-            .setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong())
-            .build()
+        locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            10000
+        )
+        .setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong())
+        .build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 val locations = locationResult.locations
+
                 if (locations.isNotEmpty()) {
                     val newLocation = locations.last()
+
                     if (startLocation == null) {
                         startLocation = newLocation
                     } else {
@@ -136,6 +147,7 @@ class VehicleActivity : AppCompatActivity() {
                             totalDistance += it.distanceTo(newLocation).toDouble()
                             distanceTravelled.text = String.format("%.2f meters", totalDistance)
                         }
+
                         startLocation = newLocation
                     }
                 }
@@ -144,7 +156,8 @@ class VehicleActivity : AppCompatActivity() {
     }
 
     /**
-     * Controlla se i permessi sono stati garantiti e richiama la funzione per iniziare l'aggiornamento della posizione
+     * Controlla se i permessi sono stati garantiti e richiama la funzione per iniziare
+     * l'aggiornamento della posizione.
      */
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -153,7 +166,7 @@ class VehicleActivity : AppCompatActivity() {
     }
 
     /**
-     * Ferma l'aggiornamento della posizione
+     * Ferma l'aggiornamento della posizione.
      */
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)

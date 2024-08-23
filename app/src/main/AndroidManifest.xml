@@ -73,6 +73,11 @@
             android:enabled="true"
             android:exported="false">
         </service>
+        <service
+            android:name=".service.MapService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
