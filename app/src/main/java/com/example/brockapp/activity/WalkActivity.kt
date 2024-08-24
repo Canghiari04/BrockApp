@@ -39,7 +39,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
     private var stepDetectorSensor : Sensor? = null
 
-    private lateinit var sensorManager: SensorManager
+    private var sensorManager: SensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
 
     private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
@@ -57,7 +57,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
 
 
-        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         if (stepDetectorSensor == null) {

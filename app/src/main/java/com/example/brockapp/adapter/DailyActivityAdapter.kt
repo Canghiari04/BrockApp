@@ -8,6 +8,8 @@ import com.example.brockapp.STILL_ACTIVITY_TYPE
 import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
 import com.example.brockapp.WALK_ACTIVITY_TYPE
 import com.example.brockapp.data.UserActivity
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class DailyActivityAdapter(private val activities: List<UserActivity>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
@@ -79,7 +81,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
      * Calcola la differenza di tempo in secondi tra due timestamp nel formato "HH:mm:ss"
      */
     private fun calculateTimeDifferenceInSeconds(startTime: String, endTime: String): Long {
-        val timeFormat = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+        val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
 
         val startDate = timeFormat.parse(startTime)
         val endDate = timeFormat.parse(endTime)
