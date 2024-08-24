@@ -1,46 +1,46 @@
 package com.example.brockapp.fragment
 
+import com.example.brockapp.*
+import com.example.brockapp.R
+import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.util.PermissionUtil
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+
 import android.Manifest
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.os.Bundle
 import android.util.Log
+import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
+import android.content.Intent
+import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import kotlinx.coroutines.launch
+import android.content.IntentFilter
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
+import android.net.ConnectivityManager
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import kotlinx.coroutines.CoroutineScope
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import com.google.android.gms.location.LocationServices
+
+import java.io.File
+import org.json.JSONObject
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.PutObjectRequest
-import com.example.brockapp.BLANK_ERROR
-import com.example.brockapp.BUCKET_NAME
-import com.example.brockapp.R
-import com.example.brockapp.SIGN_IN_ERROR
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.singleton.User
-import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import org.json.JSONObject
-import java.io.File
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private var listener: OnFragmentInteractionListener? = null
@@ -193,7 +193,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         activity?.finish()
     }
 
-
+    // POSTICIPARE IL BUCKET SOLO NEL MOMENTO IN CUI SIA DATO IL PERMESSO IN ONCLICK FRIENDS
     private fun uploadUserDataToS3(username: String, password: String) {
         val userData = mapOf("username" to username, "password" to password)
         val json = JSONObject(userData).toString()

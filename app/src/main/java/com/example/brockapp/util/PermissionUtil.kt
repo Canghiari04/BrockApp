@@ -22,6 +22,15 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
         setupLaunchers()
     }
 
+    fun requestPermissions() {
+        requestLocationPermissionsLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
     private fun setupLaunchers() {
         requestLocationPermissionsLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val deniedPermissions = permissions.filter { !it.value }.keys
@@ -36,7 +45,7 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
         }
 
         requestBackgroundPermissionLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if(isGranted) {
+            if (isGranted) {
                 requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else if (shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                 showPermissionsRationaleDialog()
@@ -46,7 +55,7 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
         }
 
         requestNotificationPermissionLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if(isGranted) {
+            if (isGranted) {
                 onPermissionGranted()
             } else if (shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS)) {
                 showPermissionsRationaleDialog()
@@ -56,20 +65,11 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
         }
     }
 
-    fun requestPermissions() {
-        requestLocationPermissionsLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
-    }
-
     /**
      * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
      * richiesti.
      */
-    fun showPermissionsRationaleDialog() {
+    private fun showPermissionsRationaleDialog() {
         AlertDialog.Builder(activity)
             .setTitle(R.string.permissions_title)
             .setMessage(R.string.permissions_message)

@@ -45,19 +45,20 @@ dependencies {
 
     // chart
     implementation(libs.mpandroidchart)
-
-
+    
     implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
         exclude(group = "com.android.support")
     }
-    implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.play.services.location)
     implementation(libs.material)
+
+    // firebase
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 
     // room
     implementation(libs.androidx.room.runtime)
@@ -72,6 +73,7 @@ dependencies {
     // maps
     implementation(libs.play.services.maps)
 
-    implementation ("com.amazonaws:aws-android-sdk-s3:2.25.0")
-    implementation ("com.amazonaws:aws-android-sdk-core:2.25.0")
+    // aws
+    implementation(libs.aws.android.sdk.s3)
+    implementation(libs.aws.android.sdk.core)
 }

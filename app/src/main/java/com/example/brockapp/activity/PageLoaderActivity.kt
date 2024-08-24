@@ -1,5 +1,7 @@
 package com.example.brockapp.activity
 
+import android.Manifest
+import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.fragment.*
 import com.example.brockapp.singleton.User
@@ -15,7 +17,9 @@ import kotlinx.coroutines.launch
 import android.view.MenuInflater
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
+import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
+import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentManager
@@ -101,10 +105,14 @@ class PageLoaderActivity: AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.new_activity_button).setOnClickListener {
+        newActivityButton.setOnClickListener {
             val intent = Intent(this, NewUserActivity::class.java)
             startActivity(intent)
             finish()
+        }
+
+        syncDataFriendsButton.setOnClickListener {
+            // LOGICA PER SINCRONIZZARE DUMP DEL DATABASE
         }
     }
 
@@ -114,7 +122,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
         return super.onCreateOptionsMenu(menu)
     }
-
+    
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_more_info -> {
@@ -180,6 +188,20 @@ class PageLoaderActivity: AppCompatActivity() {
             }
             commit()
         }
+    }
+
+    private fun showShareDataDialog() {
+        android.app.AlertDialog.Builder(this)
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_share_data)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     private fun showDangerousDialog(user: User) {
