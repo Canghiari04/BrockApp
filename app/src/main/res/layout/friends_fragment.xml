@@ -60,7 +60,7 @@
         android:layout_margin="10dp">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/follow_recycler_view"
+            android:id="@+id/other_user_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"

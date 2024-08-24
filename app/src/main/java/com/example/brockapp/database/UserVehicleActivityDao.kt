@@ -6,6 +6,10 @@ import androidx.room.Query
 
 @Dao
 interface UserVehicleActivityDao {
+
+    @Query("SELECT * FROM UserVehicleActivity WHERE user_id=:userId ORDER BY TIMESTAMP")
+    suspend fun getVehicleActivitiesByUserId(userId: Long): List<UserVehicleActivityEntity>
+
     @Insert()
     suspend fun insertVehicleActivity(userVehicleActivity: UserVehicleActivityEntity)
 

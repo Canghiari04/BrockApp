@@ -67,7 +67,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val db = BrockDB.getInstance(requireContext())
+        db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db)
 
         credentialsProvider = CognitoCachingCredentialsProvider(

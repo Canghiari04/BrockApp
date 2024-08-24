@@ -1,6 +1,7 @@
 package com.example.brockapp.activity
 
 import android.Manifest
+import android.content.Context
 import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.fragment.*
@@ -24,8 +25,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3Client
+import com.example.brockapp.viewmodel.FriendsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
 
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
@@ -39,8 +45,22 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var newActivityButton: FloatingActionButton
     private lateinit var syncDataFriendsButton: FloatingActionButton
 
+    private lateinit var credentialsProvider: CognitoCachingCredentialsProvider
+
+    private lateinit var s3Client: AmazonS3Client
+    private lateinit var context : Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        credentialsProvider = CognitoCachingCredentialsProvider(
+            this,
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
+        s3Client = AmazonS3Client(credentialsProvider)
+
+        context = this
         setContentView(R.layout.page_loader_activity)
 
         homeFragment = HomeFragment()
@@ -48,6 +68,7 @@ class PageLoaderActivity: AppCompatActivity() {
         mapFragment = MapFragment()
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
+
 
         toolbar = findViewById(R.id.toolbar_page_loader)
         setSupportActionBar(toolbar)
@@ -111,10 +132,27 @@ class PageLoaderActivity: AppCompatActivity() {
             finish()
         }
 
-        syncDataFriendsButton.setOnClickListener {
-            // LOGICA PER SINCRONIZZARE DUMP DEL DATABASE
+        CoroutineScope(Dispatchers.IO).launch {
+            syncDataFriendsButton.setOnClickListener {
+                val db : BrockDB = BrockDB.getInstance(this@PageLoaderActivity)
+                val viewModel = FriendsViewModel(s3Client, db, context)
+                viewModel.uploadUserData()
+                //viewModel.updateFriendsData()
+
+                //observeFriends()
+            }
         }
+
+
     }
+
+//    private fun observeFriends() {
+//        friendsViewModel.friends.observe(viewLifecycleOwner) { friends ->
+//            if (friends.isNotEmpty()) {
+//                populateRecyclerView(friends)
+//            }
+//        }
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
