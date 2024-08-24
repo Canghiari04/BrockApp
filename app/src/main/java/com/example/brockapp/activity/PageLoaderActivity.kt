@@ -1,7 +1,5 @@
 package com.example.brockapp.activity
 
-import android.Manifest
-import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.fragment.*
 import com.example.brockapp.singleton.User
@@ -17,9 +15,7 @@ import kotlinx.coroutines.launch
 import android.view.MenuInflater
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
-import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
-import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentManager
@@ -37,7 +33,6 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
     private lateinit var newActivityButton: FloatingActionButton
-    private lateinit var syncDataFriendsButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +48,6 @@ class PageLoaderActivity: AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         newActivityButton = findViewById(R.id.new_activity_button)
-        syncDataFriendsButton = findViewById(R.id.friends_synchronized_button)
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
@@ -111,10 +105,6 @@ class PageLoaderActivity: AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
-        syncDataFriendsButton.setOnClickListener {
-            // LOGICA PER SINCRONIZZARE DUMP DEL DATABASE
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -166,15 +156,12 @@ class PageLoaderActivity: AppCompatActivity() {
         when (name) {
             "Map" -> {
                 newActivityButton.hide()
-                syncDataFriendsButton.hide()
             }
             "Friends" -> {
-                syncDataFriendsButton.show()
                 newActivityButton.hide()
             }
             else -> {
                 newActivityButton.show()
-                syncDataFriendsButton.hide()
             }
         }
     }
