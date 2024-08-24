@@ -16,6 +16,7 @@ import com.example.brockapp.activity.VehicleActivity
 import com.example.brockapp.activity.WalkActivity
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.FriendEntity
 import com.example.brockapp.singleton.User
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -26,14 +27,21 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context): ViewModel() {
-    private val _friends = MutableLiveData<List<Friend>>()
-    val friends: LiveData<List<Friend>> = _friends
+class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context, private val previousFriends : List<FriendEntity>): ViewModel() {
+
+    private val _friends = MutableLiveData<List<String>>()
+    val friends: LiveData<List<String>> = _friends
 
     private val _newUser = MutableLiveData<String>()
     val newUser: LiveData<String> = _newUser
 
+    private val currentFriends = mutableListOf<String>()
 
+    init {
+        // Convert FriendEntity list to String list (assuming FriendEntity has a property called friendName)
+        currentFriends.addAll(previousFriends.map { it.followedUsername })
+        _friends.value = currentFriends
+    }
 
     /*fun loadUserData() {
 
@@ -86,6 +94,15 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
 
      */
 
+    fun addFriend(user: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            if (!currentFriends.contains(user)) {
+                currentFriends.add(user)
+                _friends.value = currentFriends.toList()
+            }
+        }
+    }
+
     fun searchUser(user: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -109,42 +126,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
             }
         }
     }
-
-    /*private fun parseFriendFromJson(json: JSONObject): Friend {
-        val username = json.getString("username")
-
-        val walkActivities = mutableListOf<WalkActivity>()
-        val vehicleActivities = mutableListOf<VehicleActivity>()
-        val stillActivities = mutableListOf<StillActivity>()
-
-        val walkArray = json.optJSONArray("walkActivities")
-        val vehicleArray = json.optJSONArray("vehicleActivities")
-        val stillArray = json.optJSONArray("stillActivities")
-
-        walkArray?.let {
-            for (i in 0 until it.length()) {
-                var walkActivity = WalkActivity()
-                walkActivities.add(WalkActivity())
-            }
-        }
-
-        vehicleArray?.let {
-            for (i in 0 until it.length()) {
-                vehicleActivities.add(VehicleActivity(it.getJSONObject(i)))
-            }
-        }
-
-        stillArray?.let {
-            for (i in 0 until it.length()) {
-                stillActivities.add(StillActivity(it.getJSONObject(i)))
-            }
-        }
-
-        return Friend(username, walkActivities, vehicleActivities, stillActivities)
-    }
-
-     */
-
 
 
     fun uploadUserData() {

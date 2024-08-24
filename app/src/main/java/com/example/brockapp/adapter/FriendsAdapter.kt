@@ -5,7 +5,7 @@ import com.example.brockapp.R
 import com.example.brockapp.adapter.FriendViewHolder
 import com.example.brockapp.data.Friend
 
-class FriendsAdapter(private val friends: List<Friend>): RecyclerView.Adapter<FriendViewHolder>() {
+class FriendsAdapter(private val friends: List<String>): RecyclerView.Adapter<FriendViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -15,7 +15,7 @@ class FriendsAdapter(private val friends: List<Friend>): RecyclerView.Adapter<Fr
 
     override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
         val friend = friends[position]
-        holder.usernameTextView.text = friend.username
+        holder.usernameTextView.text = friend
     }
 
     override fun getItemCount(): Int = friends.size

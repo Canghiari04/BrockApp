@@ -39,6 +39,7 @@
             <Button
                 android:id="@+id/button_follow_friend"
                 android:text="@string/button_follow"
+                android:backgroundTint="@color/uni_red"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"

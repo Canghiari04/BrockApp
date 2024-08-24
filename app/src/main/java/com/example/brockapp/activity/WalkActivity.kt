@@ -156,7 +156,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
                 // Deve richiamare il worker per Activity Recognition
             }
 
-            currentSteps = (event.values[0] - stepCount).toInt()
+            currentSteps = stepCount
             findViewById<TextView>(R.id.step_count)?.text = currentSteps.toString()
         }
     }

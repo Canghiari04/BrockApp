@@ -26,7 +26,7 @@ const val SIGN_IN_ERROR = "Credenziali già presenti, passa a Login."
 const val LOGIN_ERROR = "Credenziali errate, riprova."
 const val BLANK_ERROR = "Inserisci le credenziali."
 
-const val ROOM_DATABASE_VERSION = 17
+const val ROOM_DATABASE_VERSION = 18
 
 // Request code utilizzati per i Pending Intent dei receiver.
 const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1
