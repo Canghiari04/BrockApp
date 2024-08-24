@@ -128,7 +128,8 @@
     <string name="friends_label_permission">Share your data</string>
     <string name="friends_description_permission">Allows the app to share the data registered. You can change the permission every time you want.</string>
     <string name="title_friends">I tuoi amici</string>
-    <string name="title_follow">Nuovi utenti per te</string>
+    <string name="search_user_text">Cerca un utente</string>
     <string name="button_view">Visualizza</string>
     <string name="button_follow">Segui</string>
+    <string name="search_user_button">Cerca</string>
 </resources>

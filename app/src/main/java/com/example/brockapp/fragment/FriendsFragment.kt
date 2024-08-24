@@ -3,6 +3,9 @@ package com.example.brockapp.fragment
 import FriendsAdapter
 import android.os.Bundle
 import android.view.View
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,19 +14,19 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.example.brockapp.R
+import com.example.brockapp.adapter.UsersAdapter
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class FriendsFragment: Fragment(R.layout.friends_fragment) {
     private lateinit var s3Client: AmazonS3Client
     private lateinit var friendsRecyclerView: RecyclerView
-    private lateinit var syncDataFriendsButton: FloatingActionButton
+    private lateinit var usersRecyclerView: RecyclerView
+    private lateinit var syncFriendsDataButton: FloatingActionButton
+    private lateinit var searchUserButton : Button
     private lateinit var credentialsProvider: CognitoCachingCredentialsProvider
     private lateinit var friendsViewModel : FriendsViewModel
 
@@ -41,10 +44,14 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         friendsViewModel = ViewModelProvider(this, friendsViewModelFactory)[FriendsViewModel::class.java]
 
 
-        syncDataFriendsButton = view.findViewById(R.id.friends_synchronized_button)
+        syncFriendsDataButton = view.findViewById(R.id.friends_synchronized_button)
+        searchUserButton = view.findViewById(R.id.search_user_button)
 
         friendsRecyclerView = view.findViewById(R.id.friends_recycler_view)
         friendsRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        usersRecyclerView = view.findViewById(R.id.users_recycler_view)
+        usersRecyclerView.layoutManager = LinearLayoutManager(context)
 
         /*
         1.chiamare metodo observe() per mettere in ascolto il fragment
@@ -52,18 +59,36 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         3. La lista viene aggiornata e sveglia il viewModel che aggiorna la view
          */
 
-        syncDataFriendsButton.setOnClickListener {
+        observeFriends()
+
+        observeOtherUsers()
+
+        syncFriendsDataButton.setOnClickListener {
 
             friendsViewModel.uploadUserData()
-            //viewModel.updateFriendsData()
 
-            syncDataFriendsButton.setEnabled(false)
+            syncFriendsDataButton.setEnabled(false)
 
             android.os.Handler().postDelayed( {
-                syncDataFriendsButton.setEnabled(true)
+                syncFriendsDataButton.setEnabled(true)
             }, 5000)
 
-            //observeFriends()
+        }
+
+        searchUserButton.setOnClickListener {
+
+            val usernameToSearch = view.findViewById<EditText>(R.id.search_user_text_area).text.toString()
+            friendsViewModel.searchUser(usernameToSearch)
+        }
+
+
+    }
+
+    private fun observeOtherUsers() {
+        friendsViewModel.newUser.observe(viewLifecycleOwner){ username ->
+            if(username.isNotEmpty()){
+                populateUsersRecyclerView(username)
+            }
         }
     }
 
@@ -74,12 +99,18 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
     private fun observeFriends() {
         friendsViewModel.friends.observe(viewLifecycleOwner) { friends ->
             if (friends.isNotEmpty()) {
-                populateRecyclerView(friends)
+                populateFriendsRecyclerView(friends)
             }
         }
     }
 
-    private fun populateRecyclerView(friends: List<Friend>) {
+    private fun populateUsersRecyclerView(user: String) {
+        val adapter = UsersAdapter(user)
+        usersRecyclerView.adapter = adapter
+
+    }
+
+    private fun populateFriendsRecyclerView(friends: List<Friend>) {
         val adapter = FriendsAdapter(friends)
         friendsRecyclerView.adapter = adapter
     }
