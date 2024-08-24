@@ -35,13 +35,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
-import java.io.File
-import org.json.JSONObject
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.model.PutObjectRequest
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
-
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
@@ -53,9 +46,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
-    private lateinit var credentialsProvider: CognitoCachingCredentialsProvider
-
-    private lateinit var s3Client: AmazonS3Client
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -70,14 +60,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
         db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db)
-
-        credentialsProvider = CognitoCachingCredentialsProvider(
-            requireContext(),
-            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-            Regions.EU_WEST_3
-        )
-
-        s3Client = AmazonS3Client(credentialsProvider)
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
