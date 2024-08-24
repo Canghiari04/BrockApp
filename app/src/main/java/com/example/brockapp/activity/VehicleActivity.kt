@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.os.SystemClock
 import android.content.Intent
+import android.content.IntentFilter
 import android.widget.TextView
 import android.location.Location
 import android.widget.Chronometer
@@ -24,6 +25,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.FusedLocationProviderClient
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
 
 class VehicleActivity: AppCompatActivity() {
     private var running = false
@@ -36,9 +38,13 @@ class VehicleActivity: AppCompatActivity() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.vehicle_activity)
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 
         distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
 
@@ -54,6 +60,15 @@ class VehicleActivity: AppCompatActivity() {
 
         vehicleButtonStart.isEnabled = true
         vehicleButtonStop.isEnabled = false
+    }
+
+    private fun unregisterActivityRecognitionReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+    }
+
+    override fun onDestroy() {
+        unregisterActivityRecognitionReceiver()
+        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

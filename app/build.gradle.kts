@@ -71,4 +71,7 @@ dependencies {
 
     // maps
     implementation(libs.play.services.maps)
+
+    implementation ("com.amazonaws:aws-android-sdk-s3:2.25.0")
+    implementation ("com.amazonaws:aws-android-sdk-core:2.25.0")
 }

@@ -51,7 +51,6 @@
             android:text="@string/stop_button"
             android:layout_marginEnd="30dp"
             android:textColor="@color/white"
-            android:background="@drawable/circle"
             android:layout_row="0"
             android:layout_column="0"
             android:padding="12dp"/>
@@ -62,7 +61,6 @@
             android:layout_height="wrap_content"
             android:text="@string/start_button"
             android:textColor="@color/white"
-            android:background="@drawable/circle"
             android:layout_row="0"
             android:layout_column="1"
             android:padding="12dp"/>
