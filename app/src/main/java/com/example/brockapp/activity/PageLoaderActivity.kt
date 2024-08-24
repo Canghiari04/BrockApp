@@ -1,43 +1,27 @@
 package com.example.brockapp.activity
 
-
-import android.Manifest
 import com.example.brockapp.R
+import com.example.brockapp.fragment.*
+import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.fragment.HomeFragment
-import com.example.brockapp.fragment.ChartsFragment
-import com.example.brockapp.fragment.FriendsFragment
-import com.example.brockapp.fragment.CalendarFragment
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.dialog.AccountDialog
 
 import android.util.Log
 import android.os.Bundle
-import android.content.Intent
-import android.content.IntentFilter
-import androidx.fragment.app.Fragment
-import android.net.ConnectivityManager
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.widget.Toolbar
-import android.content.pm.PackageManager
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
+import android.content.Intent
+import kotlinx.coroutines.launch
+import android.view.MenuInflater
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
+import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.example.brockapp.dialog.AccountDialog
-import com.example.brockapp.fragment.MapFragment
-import com.example.brockapp.singleton.User
-
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
@@ -48,8 +32,8 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var mapFragment: MapFragment
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
-
     private lateinit var newActivityButton: FloatingActionButton
+    private lateinit var syncDataFriendsButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +49,7 @@ class PageLoaderActivity: AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         newActivityButton = findViewById(R.id.new_activity_button)
+        syncDataFriendsButton = findViewById(R.id.friends_synchronized_button)
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
@@ -157,6 +142,7 @@ class PageLoaderActivity: AppCompatActivity() {
      * Metodo necessario per rimpiazzare il fragment corrente con quello nuovo.
      */
     private fun switchFragment(name: String, fragment: Fragment) {
+        hideButton(name)
         hideAllFragment(supportFragmentManager)
 
         toolbar.title = name
@@ -165,11 +151,23 @@ class PageLoaderActivity: AppCompatActivity() {
             show(fragment)
             commit()
         }
+    }
 
-        if (name == "Map")
-            newActivityButton.hide()
-        else
-            newActivityButton.show()
+    private fun hideButton(name: String) {
+        when (name) {
+            "Map" -> {
+                newActivityButton.hide()
+                syncDataFriendsButton.hide()
+            }
+            "Friends" -> {
+                syncDataFriendsButton.show()
+                newActivityButton.hide()
+            }
+            else -> {
+                newActivityButton.show()
+                syncDataFriendsButton.hide()
+            }
+        }
     }
 
     /**

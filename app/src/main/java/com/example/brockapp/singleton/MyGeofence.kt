@@ -1,47 +1,41 @@
 package com.example.brockapp.singleton
 
-import android.app.PendingIntent
-import android.content.Context
+import com.example.brockapp.*
+import com.example.brockapp.data.Locality
+import com.example.brockapp.receiver.GeofenceReceiver
+import com.example.brockapp.database.GeofenceAreaEntry
+
 import android.content.Intent
+import android.content.Context
+import android.app.PendingIntent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.example.brockapp.CELLULAR_TYPE_CONNECTION
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
-import com.example.brockapp.NO_CONNECTION_TYPE_CONNECTION
-import com.example.brockapp.REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER
-import com.example.brockapp.WI_FI_TYPE_CONNECTION
-import com.example.brockapp.data.Locality
-import com.example.brockapp.database.GeofenceAreaEntry
-import com.example.brockapp.receiver.GeofenceReceiver
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
 object MyGeofence {
-    var geofences: List<GeofenceAreaEntry> = mutableListOf()
-
-    private var duration = 86400000L
     private val instance = MyGeofence
+    private var duration = 86400000L
 
     lateinit var request: GeofencingRequest
     lateinit var pendingIntent: PendingIntent
 
+    var geofences: List<GeofenceAreaEntry> = mutableListOf()
+    var typeNetwork: String ?= null
     var radius = 0
 
-    var typeNetwork: String ?= null
+    fun getInstance(): MyGeofence {
+        return instance
+    }
 
-    fun init(context: Context) {
+    fun initPendingIntent(context: Context) {
         defineRadius(context)
         definePendingIntent(context)
     }
 
-    fun initGeofences(areas: List<GeofenceAreaEntry>) {
-        geofences = areas
+    fun initAreas(areas: List<GeofenceAreaEntry>) {
+        this.geofences = areas
         defineRequest()
-    }
-
-
-    fun getInstance(): MyGeofence {
-        return instance
     }
 
     fun defineRadius(context: Context) {
@@ -112,7 +106,7 @@ object MyGeofence {
         return listLocalities
     }
 
-    fun definePendingIntent(context: Context) {
+    private fun definePendingIntent(context: Context) {
         val intent = Intent(context, GeofenceReceiver::class.java).apply {
             action = GEOFENCE_INTENT_TYPE
         }

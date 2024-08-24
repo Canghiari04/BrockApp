@@ -1,54 +1,50 @@
 package com.example.brockapp.fragment
 
+import com.example.brockapp.*
+import com.example.brockapp.R
+import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.util.PermissionUtil
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+
 import android.Manifest
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.os.Bundle
 import android.util.Log
+import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
+import android.content.Intent
+import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.example.brockapp.BLANK_ERROR
-import com.example.brockapp.LOGIN_ERROR
-import com.example.brockapp.R
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.singleton.User
-import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import android.content.IntentFilter
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
+import android.net.ConnectivityManager
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import kotlinx.coroutines.CoroutineScope
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.LocationServices
 
-class LoginFragment : Fragment(R.layout.login_fragment) {
+class LoginFragment: Fragment(R.layout.login_fragment) {
     private var listener: OnFragmentInteractionListener? = null
 
+    private lateinit var db : BrockDB
+    private lateinit var username : String
+    private lateinit var password : String
     private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
-
-    private lateinit var db : BrockDB
-
-    private lateinit var username : String
-    private lateinit var password : String
-
 
     /**
      * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
@@ -103,12 +99,13 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
                 util.requestPermissions()
+
+                User.username = username
+                User.password = password
+
                 CoroutineScope(Dispatchers.IO).launch {
                     User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
-                    User.username = username
-                    User.password = password
                 }
-
             } else {
                 Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
             }
@@ -128,7 +125,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
-                geofence.initGeofences(areas)
+                geofence.initAreas(areas)
 
                 startGeofence()
             } else {
@@ -141,7 +138,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofence.pendingIntent?.let {
+            geofence.pendingIntent.let {
                 geofencingClient.addGeofences(geofence.request, it).run {
                     addOnSuccessListener {
                         startConnectivity()
@@ -153,7 +150,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                 }
             }
         } else {
-            Log.d("WTF", "WTF")
+            Log.e("GEOFENCE_PERMISSION", "Missing permission.")
         }
     }
 

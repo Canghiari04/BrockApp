@@ -37,15 +37,20 @@ import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
 import java.io.File
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private var listener: OnFragmentInteractionListener? = null
 
+    private lateinit var db : BrockDB
+    private lateinit var username : String
+    private lateinit var password : String
     private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
-    private lateinit var viewModel: UserViewModel
+    private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var credentialsProvider: CognitoCachingCredentialsProvider
 
@@ -77,19 +82,18 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             startBackgroundOperations()
         }
 
-        viewModel = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
+        viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         observeSignIn()
 
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
-
-
-            val username: String = view.findViewById<EditText>(R.id.text_username).text.toString()
-            val password: String = view.findViewById<EditText>(R.id.text_password).text.toString()
+            username = view.findViewById<EditText>(R.id.text_username).text.toString()
+            password = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if(username.isNotEmpty() && password.isNotEmpty()) {
+                viewModelUser.registerUser(username, password)
 
-                viewModel.registerUser(username, password)
+
                 uploadUserDataToS3(username, password)
 
             } else {
@@ -114,9 +118,16 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     }
 
     private fun observeSignIn() {
-        viewModel.auth.observe(viewLifecycleOwner) { auth ->
+        viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
                 util.requestPermissions()
+
+                User.username = username
+                User.password = password
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
+                }
             } else {
                 Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_SHORT).show()
             }
@@ -136,7 +147,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
-                geofence.initGeofences(areas)
+                geofence.initAreas(areas)
 
                 startGeofence()
             } else {
@@ -149,7 +160,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofence.pendingIntent?.let {
+            geofence.pendingIntent.let {
                 geofencingClient.addGeofences(geofence.request, it).run {
                     addOnSuccessListener {
                         startConnectivity()
@@ -161,7 +172,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                 }
             }
         } else {
-            Log.d("WTF", "WTF")
+            Log.e("GEOFENCE_PERMISSION", "Missing permission.")
         }
     }
 

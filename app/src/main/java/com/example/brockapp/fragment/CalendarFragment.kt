@@ -1,22 +1,22 @@
 package com.example.brockapp.fragment
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.CALENDAR_DATE_FORMAT
-import com.example.brockapp.DATE_SEPARATOR
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.activity.DailyActivity
-import com.example.brockapp.adapter.CalendarAdapter
 import com.example.brockapp.singleton.User
 import com.example.brockapp.util.CalendarUtil
+import com.example.brockapp.activity.DailyActivity
+import com.example.brockapp.adapter.CalendarAdapter
+
+import android.os.Bundle
+import android.view.View
 import java.time.LocalDate
+import android.content.Intent
+import android.widget.TextView
+import android.widget.ImageButton
+import androidx.fragment.app.Fragment
 import java.time.format.DateTimeFormatter
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
 
 class CalendarFragment : Fragment(R.layout.calendar_fragment) {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
@@ -87,6 +87,8 @@ class CalendarFragment : Fragment(R.layout.calendar_fragment) {
      * rispetto alla data corrente passata come parametro.
      */
     private fun showActivityOfDay(date: String) {
-        startActivity(Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date))
+        val intent = Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
+        startActivity(intent)
+        activity?.finish()
     }
 }

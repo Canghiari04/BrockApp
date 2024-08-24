@@ -1,14 +1,12 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import android.content.Intent
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.data.UserActivity
 import com.example.brockapp.util.CalendarUtil
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
 import com.example.brockapp.viewmodel.ActivitiesViewModel
 import com.example.brockapp.adapter.DailyActivityAdapter
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
@@ -16,21 +14,22 @@ import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
+import com.github.mikephil.charting.data.PieData
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.utils.ColorTemplate
 
 class DailyActivity: AppCompatActivity() {
+    private var utilCalendar: CalendarUtil = CalendarUtil()
+
     private lateinit var viewModel: ActivitiesViewModel
     private lateinit var user: User
-    private var utilCalendar: CalendarUtil = CalendarUtil()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,40 +40,36 @@ class DailyActivity: AppCompatActivity() {
         val db = BrockDB.getInstance(this)
         val factoryViewModelDaily = ActivitiesViewModelFactory(db)
 
-        viewModel = ViewModelProvider(this, factoryViewModelDaily)[ActivitiesViewModel::class.java]
         user = User.getInstance()
 
+        viewModel = ViewModelProvider(this, factoryViewModelDaily)[ActivitiesViewModel::class.java]
         viewModel.getDayUserActivities(date, user)
 
         viewModel.sortedDayActivitiesList.observe(this) { item ->
             if(item.isNotEmpty()) {
-
                 utilCalendar = CalendarUtil()
 
                 val textView = findViewById<TextView>(R.id.date_text_view)
                 textView.text = utilCalendar.getPrettyDate(date)
 
                 val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
-
                 populateDailyActivitiesRecyclerView(dailyList, item)
 
                 val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
                 populateDailyActivitiesChart(pieChart, item)
-
             } else {
                 setContentView(R.layout.empty_page)
             }
 
             setUpToolBar()
         }
-
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                startActivity(Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Calendar"))
+                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Calendar")
+                startActivity(intent)
                 finish()
                 true
             }

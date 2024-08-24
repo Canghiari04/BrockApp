@@ -1,18 +1,15 @@
 package com.example.brockapp.worker
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import com.example.brockapp.CHANNEL_ID_ACTIVITY_NOTIFY
-import com.example.brockapp.DESCRIPTION_CHANNEL_ACTIVITY_NOTIFY
-import com.example.brockapp.ID_ACTIVITY_NOTIFY
-import com.example.brockapp.NAME_CHANNEL_ACTIVITY_NOTIFY
+import com.example.brockapp.*
 import com.example.brockapp.util.NotificationUtil
 
-class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+import androidx.work.Worker
+import android.content.Context
+import androidx.work.WorkerParameters
+import android.app.NotificationManager
+import android.app.NotificationChannel
+
+class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
     private lateinit var util: NotificationUtil
     private lateinit var manager: NotificationManager
 
