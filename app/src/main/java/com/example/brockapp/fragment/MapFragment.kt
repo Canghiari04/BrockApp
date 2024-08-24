@@ -1,7 +1,5 @@
 package com.example.brockapp.fragment
 
-import android.content.Intent
-import android.graphics.Color
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.GeofenceAreaEntry
@@ -14,6 +12,8 @@ import android.util.Log
 import android.view.View
 import android.os.Bundle
 import android.widget.Toast
+import android.content.Intent
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import kotlinx.coroutines.launch

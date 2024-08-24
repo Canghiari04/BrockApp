@@ -1,16 +1,16 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.DATE_SEPARATOR
-import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.*
 import com.example.brockapp.data.UserActivity
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
+
 import java.time.Month
+import java.time.Duration
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class CalendarUtil {
@@ -68,12 +68,14 @@ class CalendarUtil {
         val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         for (i in userActivities.indices) {
-            if (userActivities[i].transitionType == 1) continue
+            if (userActivities[i].transitionType == 1)
+                continue
 
             val beginActivityTime = LocalDateTime.parse(userActivities[i].timestamp, dateFormatter)
             val nextActivity = if (i < userActivities.size - 1) userActivities[i + 1] else null
 
-            if (nextActivity == null) break
+            if (nextActivity == null)
+                break
 
             val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
             val durationInSeconds = Duration.between(beginActivityTime, endActivityTime).seconds
@@ -83,5 +85,4 @@ class CalendarUtil {
 
         return timeSpent
     }
-
 }

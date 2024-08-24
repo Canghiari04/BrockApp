@@ -37,10 +37,7 @@ class AccountDialog: DialogFragment() {
         usernameTextView.text = accountUsername
         passwordTextView.text = accountPassword
 
-        dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog?.window?.setGravity(Gravity.CENTER)
         dialog?.setCanceledOnTouchOutside(true)
 

@@ -9,11 +9,13 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_daily_activity"
+        app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
         app:titleTextColor="@color/white"
         android:background="@color/uni_red"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        android:theme="?attr/actionBarTheme" />
 
     <LinearLayout
         android:layout_width="match_parent"

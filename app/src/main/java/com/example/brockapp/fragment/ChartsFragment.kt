@@ -1,47 +1,46 @@
 package com.example.brockapp.fragment
 
-import android.graphics.Color
+import com.example.brockapp.*
+import com.example.brockapp.R
+import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.example.brockapp.CHARTS_DATE_FORMAT
-import com.example.brockapp.ISO_DATE_FORMAT
-import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.User
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
+import android.graphics.Color
+import android.widget.TextView
+import kotlinx.coroutines.launch
+import android.widget.ImageButton
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.PieEntry
+import androidx.core.widget.addTextChangedListener
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
 class ChartsFragment : Fragment(R.layout.charts_fragment) {
+    val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     private lateinit var db : BrockDB
     private lateinit var dateTextView: TextView
     private lateinit var stepCountBarChart: BarChart
-    private lateinit var distanceTravelledBarChart: BarChart
     private lateinit var activityTypePieChart: PieChart
-
-    val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
+    private lateinit var distanceTravelledBarChart: BarChart
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,17 +63,12 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         }
     }
 
-    private fun setButtonOnClickListener(
-        buttonBack: ImageButton,
-        buttonForward: ImageButton
-    ) {
+    private fun setButtonOnClickListener(buttonBack: ImageButton, buttonForward: ImageButton) {
         buttonBack.setOnClickListener {
             val strDate = view?.findViewById<TextView>(R.id.charts_date_text_view)?.text
 
             var date = YearMonth.parse(strDate, formatter)
-
             date = date.minusMonths(1)
-
             setDate(date)
         }
 
@@ -82,9 +76,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
             val strDate = view?.findViewById<TextView>(R.id.charts_date_text_view)?.text
 
             var date = YearMonth.parse(strDate, formatter)
-
             date = date.plusMonths(1)
-
             setDate(date)
         }
 
@@ -93,7 +85,8 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
                 CoroutineScope(Dispatchers.IO).launch {
                     setupCharts()
                 }
-            })
+            }
+        )
     }
 
     private fun setDate(date: YearMonth) {
@@ -102,7 +95,6 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
     private suspend fun setupCharts() {
         lifecycleScope.launch (Dispatchers.Main){
-
             setupStepCountBarChart()
             setupDistanceTravelledBarChart()
             setupActivityTypePieChart()
@@ -121,22 +113,18 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
             val date = currentDate.withDayOfMonth(day)
 
             val (startOfDay, endOfDay) = getDayRange(date)
-
             val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
 
             val totalSteps = listWalkingActivities.map { it.stepNumber }.sum()
-
             entries.add(BarEntry(day.toFloat(), totalSteps.toFloat()))
         }
 
         val dataSet = BarDataSet(entries, "Numero di passi")
-
         val color = Color.parseColor("#BB2222")
         dataSet.color = color
 
         val data = BarData(dataSet)
         stepCountBarChart.data = data
-
 
         stepCountBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -158,11 +146,9 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
 
         for (day in 1..currentDate.lengthOfMonth()) {
             val date = currentDate.withDayOfMonth(day)
-
             val (startOfDay, endOfDay) = getDayRange(date)
 
             val totalDistanceTravelled = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay).parallelStream().mapToDouble { it.distanceTravelled!! }.sum()
-
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
 

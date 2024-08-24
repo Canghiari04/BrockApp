@@ -1,11 +1,12 @@
 package com.example.brockapp.receiver
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.net.ConnectivityManager
-import android.util.Log
 import com.example.brockapp.service.ConnectivityService
+
+import android.util.Log
+import android.content.Intent
+import android.content.Context
+import android.net.ConnectivityManager
+import android.content.BroadcastReceiver
 
 class ConnectivityReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -13,7 +14,7 @@ class ConnectivityReceiver: BroadcastReceiver() {
             val serviceIntent = Intent(context, ConnectivityService::class.java)
             context.startService(serviceIntent)
         } else {
-            Log.d("CONNECTIVITY_SERVICE", "Weird intent.")
+            Log.d("CONNECTIVITY_RECEIVER", "Weird intent.")
         }
     }
 }
