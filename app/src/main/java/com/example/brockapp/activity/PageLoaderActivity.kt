@@ -33,6 +33,7 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
     private lateinit var newActivityButton: FloatingActionButton
+    private lateinit var syncDataFriendsButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class PageLoaderActivity: AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         newActivityButton = findViewById(R.id.new_activity_button)
+        syncDataFriendsButton = findViewById(R.id.friends_synchronized_button)
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
@@ -140,6 +142,7 @@ class PageLoaderActivity: AppCompatActivity() {
      * Metodo necessario per rimpiazzare il fragment corrente con quello nuovo.
      */
     private fun switchFragment(name: String, fragment: Fragment) {
+        hideButton(name)
         hideAllFragment(supportFragmentManager)
 
         toolbar.title = name
@@ -148,11 +151,23 @@ class PageLoaderActivity: AppCompatActivity() {
             show(fragment)
             commit()
         }
+    }
 
-        if (name == "Map")
-            newActivityButton.hide()
-        else
-            newActivityButton.show()
+    private fun hideButton(name: String) {
+        when (name) {
+            "Map" -> {
+                newActivityButton.hide()
+                syncDataFriendsButton.hide()
+            }
+            "Friends" -> {
+                syncDataFriendsButton.show()
+                newActivityButton.hide()
+            }
+            else -> {
+                newActivityButton.show()
+                syncDataFriendsButton.hide()
+            }
+        }
     }
 
     /**
