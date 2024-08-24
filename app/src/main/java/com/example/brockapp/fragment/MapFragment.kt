@@ -1,38 +1,37 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.GeofenceAreaEntry
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
-
-import java.util.Locale
-import android.util.Log
-import android.view.View
-import android.os.Bundle
-import android.widget.Toast
 import android.content.Intent
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
-import kotlinx.coroutines.launch
+import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
-import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
 import android.widget.AutoCompleteTextView
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.example.brockapp.R
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.service.MapService
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
     private lateinit var db: BrockDB

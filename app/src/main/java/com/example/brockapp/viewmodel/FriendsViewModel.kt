@@ -6,28 +6,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
 import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.model.ListObjectsRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.example.brockapp.BUCKET_NAME
-import com.example.brockapp.activity.StillActivity
-import com.example.brockapp.activity.WalkActivity
 import com.example.brockapp.data.Friend
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import com.example.brockapp.activity.VehicleActivity
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.User
-import kotlinx.coroutines.withContext
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
-class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context : Context): ViewModel() {
+class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context): ViewModel() {
     private val _friends = MutableLiveData<List<Friend>>()
     val friends: LiveData<List<Friend>> = _friends
 
@@ -115,13 +105,20 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
      */
 
     fun uploadUserData() {
-
         viewModelScope.launch(Dispatchers.IO) {
-            val walkActivites = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
+            val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
             val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
             val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
-            val userData = mapOf("username" to User.username, "walkActivities" to walkActivites, "vehicleActivities" to vehicleActivities, "stillActivities" to stillActivities)
-            val json = JSONObject(userData).toString()
+
+            val userData = mapOf(
+                "username" to User.username,
+                "walkActivities" to walkActivities,
+                "vehicleActivities" to vehicleActivities,
+                "stillActivities" to stillActivities
+            )
+
+            val gson = Gson()
+            val json = gson.toJson(userData)
 
             val file = File(context.filesDir, "user_data.json")
             file.writeText(json)
@@ -136,8 +133,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 }
             }
             thread.start()
-
         }
-
     }
+
 }

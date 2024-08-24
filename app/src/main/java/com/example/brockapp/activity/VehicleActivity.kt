@@ -1,31 +1,31 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-
 import android.Manifest
-import android.os.Bundle
-import android.view.MenuItem
-import android.widget.Button
-import android.os.SystemClock
 import android.content.Intent
 import android.content.IntentFilter
-import android.widget.TextView
-import android.location.Location
-import android.widget.Chronometer
-import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import com.google.android.gms.location.Priority
+import android.location.Location
+import android.os.Bundle
+import android.os.SystemClock
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.Chronometer
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.FusedLocationProviderClient
+import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
+import com.example.brockapp.R
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 class VehicleActivity: AppCompatActivity() {
     private var running = false
