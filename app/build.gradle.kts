@@ -76,4 +76,6 @@ dependencies {
     // aws
     implementation(libs.aws.android.sdk.s3)
     implementation(libs.aws.android.sdk.core)
+
+    implementation ("com.google.code.gson:gson:2.8.9")
 }

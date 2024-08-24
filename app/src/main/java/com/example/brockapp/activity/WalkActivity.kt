@@ -1,34 +1,33 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-
-import android.util.Log
-import android.os.Bundle
-import android.view.MenuItem
-import android.widget.Button
-import android.os.SystemClock
-import android.content.Intent
-import android.hardware.Sensor
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.widget.TextView
-import android.widget.Chronometer
+import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.Chronometer
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import android.Manifest
-import android.content.IntentFilter
-import android.widget.Toast
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+import com.example.brockapp.R
 import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0

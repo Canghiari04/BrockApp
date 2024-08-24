@@ -14,8 +14,13 @@ import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.Manifest
-import android.util.Log
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.Button
@@ -23,15 +28,12 @@ import android.content.Intent
 import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
-import kotlinx.coroutines.launch
-import android.content.IntentFilter
-import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
-import android.net.ConnectivityManager
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import kotlinx.coroutines.CoroutineScope
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 

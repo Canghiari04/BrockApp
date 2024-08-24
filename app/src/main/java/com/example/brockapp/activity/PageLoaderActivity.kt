@@ -1,27 +1,30 @@
 package com.example.brockapp.activity
 
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import com.example.brockapp.R
-import com.example.brockapp.fragment.*
-import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
-
-import android.util.Log
-import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.content.Intent
-import kotlinx.coroutines.launch
-import android.view.MenuInflater
-import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.lifecycleScope
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentManager
-import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.fragment.CalendarFragment
+import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.fragment.FriendsFragment
+import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.fragment.MapFragment
+import com.example.brockapp.singleton.User
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()

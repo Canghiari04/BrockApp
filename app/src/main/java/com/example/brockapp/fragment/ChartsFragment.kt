@@ -1,37 +1,37 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import java.time.LocalDate
-import java.time.YearMonth
-import android.graphics.Color
-import android.widget.TextView
-import kotlinx.coroutines.launch
 import android.widget.ImageButton
-import androidx.fragment.app.Fragment
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CoroutineScope
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.PieEntry
+import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.example.brockapp.CHARTS_DATE_FORMAT
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.R
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.User
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
 
 class ChartsFragment : Fragment(R.layout.charts_fragment) {
     val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
