@@ -20,7 +20,7 @@ class UserViewModel(private val db: BrockDB): ViewModel() {
             if (userAlreadyExists) {
                 _auth.postValue(false)
             } else {
-                db.UserDao().insertUser(UserEntity(username = username, password = password))
+                db.UserDao().insertUser(UserEntity(username = username, password = password, sharingFlag = false))
                 _auth.postValue(true)
             }
         }

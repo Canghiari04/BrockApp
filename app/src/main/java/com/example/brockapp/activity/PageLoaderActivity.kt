@@ -88,6 +88,7 @@ class PageLoaderActivity: AppCompatActivity() {
                     true
                 }
                 R.id.navbar_item_map -> {
+                    showShareDataDialog()
                     switchFragment("Map", mapFragment)
                     true
                 }
@@ -196,6 +197,7 @@ class PageLoaderActivity: AppCompatActivity() {
             .setMessage(R.string.permission_share_data)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
+
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()

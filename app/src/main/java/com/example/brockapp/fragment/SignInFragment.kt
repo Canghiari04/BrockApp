@@ -43,6 +43,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
+    private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var db : BrockDB
@@ -67,7 +68,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val db = BrockDB.getInstance(requireContext())
+        db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db)
 
         credentialsProvider = CognitoCachingCredentialsProvider(
@@ -92,10 +93,6 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
 
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.registerUser(username, password)
-
-
-                uploadUserDataToS3(username, password)
-
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
             }
@@ -122,11 +119,12 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
             if (auth) {
                 util.requestPermissions()
 
-                User.username = username
-                User.password = password
+                user.username = username
+                user.password = password
+                user.flag = false
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
+                    user.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
                 }
             } else {
                 Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_SHORT).show()
@@ -192,31 +190,4 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         startActivity(intent)
         activity?.finish()
     }
-
-    // POSTICIPARE IL BUCKET SOLO NEL MOMENTO IN CUI SIA DATO IL PERMESSO IN ONCLICK FRIENDS
-    private fun uploadUserDataToS3(username: String, password: String) {
-        val userData = mapOf("username" to username, "password" to password)
-        val json = JSONObject(userData).toString()
-
-        // Create a file in the app's private storage directory
-        val fileName = "user_data.json"
-        val file = File(requireContext().filesDir, fileName)
-        file.writeText(json)
-
-        // Define the key (path) under which the file will be stored in the bucket
-        val key = "user/$username.json"
-
-        // Start a background thread for the upload to avoid blocking the UI
-        val thread = Thread {
-            try {
-                val request = PutObjectRequest(BUCKET_NAME, key, file)
-                s3Client.putObject(request)
-                Log.d("S3Upload", "User data uploaded successfully")
-            } catch (e: Exception) {
-                Log.e("S3Upload", "Failed to upload user data", e)
-            }
-        }
-        thread.start()
-    }
-
 }

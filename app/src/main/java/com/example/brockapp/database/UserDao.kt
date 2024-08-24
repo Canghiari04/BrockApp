@@ -15,6 +15,9 @@ interface UserDao {
     @Query("SELECT id FROM User WHERE username=:username AND password=:password")
     suspend fun getIdFromUsernameAndPassword(username: String, password: String): Long
 
+    @Query("SELECT sharing_flag FROM User WHERE username=:username AND password=:password")
+    suspend fun getSharingFlagFromUsernameAndPassword(username: String, password: String): Boolean
+
     @Query("DELETE FROM User WHERE id=:id")
     suspend fun deleteUserById(id: Long)
 }

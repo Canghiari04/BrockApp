@@ -36,11 +36,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
 class LoginFragment: Fragment(R.layout.login_fragment) {
+    private val user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
 
-    private lateinit var db : BrockDB
-    private lateinit var username : String
-    private lateinit var password : String
+    private lateinit var db: BrockDB
+    private lateinit var username: String
+    private lateinit var password: String
     private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
@@ -70,7 +71,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
 
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
-            password= view.findViewById<EditText>(R.id.text_password).text.toString()
+            password = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.checkIfUserExists(username, password)
@@ -100,11 +101,12 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
             if (auth) {
                 util.requestPermissions()
 
-                User.username = username
-                User.password = password
+                user.username = username
+                user.password = password
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
+                    user.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
+                    user.flag = db.UserDao().getSharingFlagFromUsernameAndPassword(username, password)
                 }
             } else {
                 Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
