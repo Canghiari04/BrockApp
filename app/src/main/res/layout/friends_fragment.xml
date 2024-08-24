@@ -68,4 +68,14 @@
             android:layout_margin="10dp"/>
     </androidx.cardview.widget.CardView>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/friends_synchronized_button"
+        android:src="@drawable/baseline_sync_24"
+        android:contentDescription="@string/friends_synchronized_icon_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="96dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/uni_red" />
 </LinearLayout>

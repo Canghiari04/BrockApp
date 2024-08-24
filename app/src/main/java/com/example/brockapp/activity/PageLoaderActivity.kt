@@ -1,8 +1,5 @@
 package com.example.brockapp.activity
 
-import android.Manifest
-import android.content.Context
-import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.fragment.*
 import com.example.brockapp.singleton.User
@@ -18,20 +15,13 @@ import kotlinx.coroutines.launch
 import android.view.MenuInflater
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
-import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
-import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3Client
-import com.example.brockapp.viewmodel.FriendsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
 
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
@@ -43,24 +33,9 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
     private lateinit var newActivityButton: FloatingActionButton
-    private lateinit var syncDataFriendsButton: FloatingActionButton
-
-    private lateinit var credentialsProvider: CognitoCachingCredentialsProvider
-
-    private lateinit var s3Client: AmazonS3Client
-    private lateinit var context : Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        credentialsProvider = CognitoCachingCredentialsProvider(
-            this,
-            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-            Regions.EU_WEST_3
-        )
-        s3Client = AmazonS3Client(credentialsProvider)
-
-        context = this
         setContentView(R.layout.page_loader_activity)
 
         homeFragment = HomeFragment()
@@ -69,12 +44,10 @@ class PageLoaderActivity: AppCompatActivity() {
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
 
-
         toolbar = findViewById(R.id.toolbar_page_loader)
         setSupportActionBar(toolbar)
 
         newActivityButton = findViewById(R.id.new_activity_button)
-        syncDataFriendsButton = findViewById(R.id.friends_synchronized_button)
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
@@ -131,28 +104,7 @@ class PageLoaderActivity: AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            syncDataFriendsButton.setOnClickListener {
-                val db : BrockDB = BrockDB.getInstance(this@PageLoaderActivity)
-                val viewModel = FriendsViewModel(s3Client, db, context)
-                viewModel.uploadUserData()
-                //viewModel.updateFriendsData()
-
-                //observeFriends()
-            }
-        }
-
-
     }
-
-//    private fun observeFriends() {
-//        friendsViewModel.friends.observe(viewLifecycleOwner) { friends ->
-//            if (friends.isNotEmpty()) {
-//                populateRecyclerView(friends)
-//            }
-//        }
-//    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -203,15 +155,12 @@ class PageLoaderActivity: AppCompatActivity() {
         when (name) {
             "Map" -> {
                 newActivityButton.hide()
-                syncDataFriendsButton.hide()
             }
             "Friends" -> {
-                syncDataFriendsButton.show()
                 newActivityButton.hide()
             }
             else -> {
                 newActivityButton.show()
-                syncDataFriendsButton.hide()
             }
         }
     }

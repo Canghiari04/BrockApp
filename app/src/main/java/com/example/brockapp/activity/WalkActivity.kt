@@ -39,7 +39,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
     private var stepDetectorSensor : Sensor? = null
 
-    private var sensorManager: SensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
 
     private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
@@ -56,7 +56,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION)
         }
 
-
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         if (stepDetectorSensor == null) {
