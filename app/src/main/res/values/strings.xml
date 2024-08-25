@@ -132,4 +132,5 @@
     <string name="button_view">Visualizza</string>
     <string name="button_follow">Segui</string>
     <string name="search_user_button">Cerca</string>
+    <string name="friend_data_text_view">Attività dell\'utente</string>
 </resources>

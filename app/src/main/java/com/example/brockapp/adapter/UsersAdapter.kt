@@ -23,6 +23,7 @@ class UsersAdapter(val newUser : String, val viewModel: FriendsViewModel): Recyc
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         holder.usernameTextView.text = newUser
 
+
         holder.followButton.setOnClickListener {
 
             viewModel.addFriend(newUser)
