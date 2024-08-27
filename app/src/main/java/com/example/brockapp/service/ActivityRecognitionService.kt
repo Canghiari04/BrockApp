@@ -28,6 +28,7 @@ class ActivityRecognitionService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
         val transitionType = intent.getIntExtra("TRANSITION_TYPE", -1)
+
         val timestamp = intent.getStringExtra("TIMESTAMP")
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -62,13 +63,15 @@ class ActivityRecognitionService : Service() {
 
                     DetectedActivity.WALKING -> {
                         val stepNumber = intent.getLongExtra("STEP_NUMBER", -1)
+                        val heightDifference = intent.getFloatExtra("HEIGHT_DIFFERENCE", -1f)
 
                         userWalkActivityDao.insertWalkActivity(
                             UserWalkActivityEntity(
                                 userId = user.id,
                                 transitionType = transitionType,
                                 timestamp = timestamp,
-                                stepNumber = stepNumber
+                                stepNumber = stepNumber,
+                                heightDifference = heightDifference
                             )
                         )
                     }

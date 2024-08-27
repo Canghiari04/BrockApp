@@ -133,4 +133,5 @@
     <string name="button_follow">Segui</string>
     <string name="search_user_button">Cerca</string>
     <string name="friend_data_text_view">Attività dell\'utente</string>
+    <string name="height_difference_text">Dislivello:</string>
 </resources>

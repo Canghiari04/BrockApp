@@ -153,7 +153,7 @@ class VehicleActivity: AppCompatActivity() {
                     } else {
                         startLocation?.let {
                             totalDistance += it.distanceTo(newLocation).toDouble()
-                            distanceTravelled.text = String.format("%.2f meters", totalDistance)
+                            distanceTravelled.text = String.format("%.2f metri", totalDistance)
                         }
 
                         startLocation = newLocation

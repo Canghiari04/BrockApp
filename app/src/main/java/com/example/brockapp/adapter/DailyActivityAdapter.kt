@@ -52,10 +52,12 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
                     )
                 }
                 VEHICLE_ACTIVITY_TYPE -> {
+
+                    val distanceTravelled = String.format("%.2f", exitActivity.info)
                     holder.bindActivity(
                         VEHICLE_ACTIVITY_TYPE,
                         "Finito alle $exitActivityTime",
-                        "Distanza percorsa: ${exitActivity.info} metri.\nDurata: $timeDifferenceInSeconds secondi"
+                        "Distanza percorsa:  $distanceTravelled metri.\nDurata: $timeDifferenceInSeconds secondi"
                     )
                 }
                 STILL_ACTIVITY_TYPE -> {

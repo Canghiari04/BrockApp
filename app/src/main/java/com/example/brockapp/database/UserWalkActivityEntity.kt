@@ -19,5 +19,6 @@ data class UserWalkActivityEntity (
     @ColumnInfo(name = "user_id") val userId: Long?,
     @ColumnInfo(name = "transition_type") val transitionType: Int,
     val timestamp: String?,
-    @ColumnInfo(name = "step_number") val stepNumber: Long
+    @ColumnInfo(name = "step_number") val stepNumber: Long,
+    @ColumnInfo(name = "height_difference") val heightDifference: Float
 )
