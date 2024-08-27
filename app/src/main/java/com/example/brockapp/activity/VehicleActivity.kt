@@ -90,7 +90,7 @@ class VehicleActivity: AppCompatActivity() {
     private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
         vehicleButtonStart.setOnClickListener {
             if (!running) {
-                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
+                chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
 
                 running = true
@@ -111,7 +111,6 @@ class VehicleActivity: AppCompatActivity() {
         vehicleButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
-                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
 
                 running = false
 
@@ -119,7 +118,7 @@ class VehicleActivity: AppCompatActivity() {
                 vehicleButtonStop.isEnabled = false
 
                 stopLocationUpdates()
-                chronometer.base = SystemClock.elapsedRealtime()
+
 
                 registerActivity(
                     DetectedActivity.IN_VEHICLE,
