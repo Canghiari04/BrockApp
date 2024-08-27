@@ -94,7 +94,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
                 viewModelUser.registerUser(username, password)
 
 
-                uploadUserDataToS3(username, password)
+                uploadUserDataToS3(username)
 
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
@@ -194,19 +194,16 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     }
 
     // POSTICIPARE IL BUCKET SOLO NEL MOMENTO IN CUI SIA DATO IL PERMESSO IN ONCLICK FRIENDS
-    private fun uploadUserDataToS3(username: String, password: String) {
-        val userData = mapOf("username" to username, "password" to password)
+    private fun uploadUserDataToS3(username: String) {
+        val userData = mapOf("username" to username)
         val json = JSONObject(userData).toString()
 
-        // Create a file in the app's private storage directory
         val fileName = "user_data.json"
         val file = File(requireContext().filesDir, fileName)
         file.writeText(json)
 
-        // Define the key (path) under which the file will be stored in the bucket
         val key = "user/$username.json"
 
-        // Start a background thread for the upload to avoid blocking the UI
         val thread = Thread {
             try {
                 val request = PutObjectRequest(BUCKET_NAME, key, file)
