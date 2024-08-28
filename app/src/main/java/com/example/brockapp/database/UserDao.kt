@@ -1,8 +1,10 @@
 package com.example.brockapp.database
 
+import com.example.brockapp.singleton.User
+
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Insert
 
 @Dao
 interface UserDao {
@@ -15,8 +17,14 @@ interface UserDao {
     @Query("SELECT id FROM User WHERE username=:username AND password=:password")
     suspend fun getIdFromUsernameAndPassword(username: String, password: String): Long
 
+    @Query("SELECT * FROM User WHERE username=:username AND password=:password")
+    suspend fun getUserFromUsernameAndPassword(username: String, password: String): UserEntity?
+
     @Query("SELECT sharing_flag FROM User WHERE username=:username AND password=:password")
     suspend fun getSharingFlagFromUsernameAndPassword(username: String, password: String): Boolean
+
+    @Query("UPDATE User SET sharing_flag=1 WHERE username=:username AND password=:password")
+    suspend fun changeFlag(username: String, password: String)
 
     @Query("DELETE FROM User WHERE id=:id")
     suspend fun deleteUserById(id: Long)

@@ -15,27 +15,25 @@ import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
-import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     private var user = User.getInstance()
@@ -61,13 +59,13 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         super.onViewCreated(view, savedInstanceState)
 
         db = BrockDB.getInstance(requireContext())
+
         val factoryUserViewModel = UserViewModelFactory(db)
+        viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
         }
-
-        viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         observeSignIn()
 
@@ -117,9 +115,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     }
 
     private fun startBackgroundOperations() {
-        val db = BrockDB.getInstance(requireContext())
         val factoryViewModelGeofence = GeofenceViewModelFactory(db)
-
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
         observeGeofenceAreas()

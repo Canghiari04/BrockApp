@@ -21,7 +21,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     private val _friends = MutableLiveData<List<Friend>>()
     val friends: LiveData<List<Friend>> = _friends
 
-
     /*
     fun updateFriendsData() {
 

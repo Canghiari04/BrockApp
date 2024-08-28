@@ -21,8 +21,5 @@ class HomeViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         activityTimestamp.text = timestampActivity
 
         activityImageView.setImageResource(activityImageMap[typeActivity]!!)
-
-
-
     }
 }

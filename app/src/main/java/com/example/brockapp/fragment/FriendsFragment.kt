@@ -16,6 +16,8 @@ import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.User
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,7 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
     private lateinit var friendsRecyclerView: RecyclerView
     private lateinit var credentialsProvider: CognitoCachingCredentialsProvider
     private lateinit var friendsViewModel : FriendsViewModel
+    private lateinit var viewModelUser: UserViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,6 +44,9 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         val friendsViewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
         friendsViewModel = ViewModelProvider(this, friendsViewModelFactory)[FriendsViewModel::class.java]
 
+        val viewModelFactoryUser = UserViewModelFactory(db)
+        viewModelUser = ViewModelProvider(this, viewModelFactoryUser)[UserViewModel::class.java]
+
         friendsRecyclerView = view.findViewById(R.id.friends_recycler_view)
 
         /*
@@ -49,18 +55,21 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         3. La lista viene aggiornata e sveglia il viewModel che aggiorna la view
          */
 
-        syncDataFriendsButton.setOnClickListener {
+        view.findViewById<FloatingActionButton>(R.id.friends_synchronized_button).setOnClickListener {
+            if (user.flag) {
+                friendsViewModel.uploadUserData()
+                //viewModel.updateFriendsData()
 
-            friendsViewModel.uploadUserData()
-            //viewModel.updateFriendsData()
+                view.findViewById<RecyclerView>(R.id.friends_synchronized_button).setEnabled(false)
 
-            syncDataFriendsButton.setEnabled(false)
+                android.os.Handler().postDelayed( {
+                    view.findViewById<RecyclerView>(R.id.friends_synchronized_button).setEnabled(true)
+                }, 5000)
 
-            android.os.Handler().postDelayed( {
-                syncDataFriendsButton.setEnabled(true)
-            }, 5000)
-
-            //observeFriends()
+                //observeFriends()
+            } else {
+                showShareDataDialog()
+            }
         }
     }
 
@@ -82,7 +91,8 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
             .setMessage(R.string.permission_share_data)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                flag_sharing = true
+                user.flag = true
+                viewModelUser.changeSharingDataFlag(user.username, user.password)
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
