@@ -1,32 +1,32 @@
 package com.example.brockapp.fragment
 
-import android.os.Bundle
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.adapter.HomeAdapter
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.adapter.HomeAdapter
 import com.example.brockapp.viewmodel.ActivitiesViewModel
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.time.LocalDate
 
-class HomeFragment : Fragment(R.layout.home_fragment) {
+import android.os.Bundle
+import android.view.View
+import java.time.LocalDate
+import android.widget.TextView
+import kotlinx.coroutines.launch
+import android.widget.ProgressBar
+import kotlinx.coroutines.Dispatchers
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+
+class HomeFragment: Fragment(R.layout.home_fragment) {
     private lateinit var user: User
     private lateinit var db: BrockDB
     private lateinit var stepsCountText: TextView
     private lateinit var stepsProgressBar : ProgressBar
-    private lateinit var viewModel: ActivitiesViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,7 +39,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         stepsProgressBar = view.findViewById(R.id.steps_progress_bar)
         stepsCountText = view.findViewById(R.id.steps_count_text)
 
-        viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
+        val viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
 
         user = User.getInstance()
 
@@ -51,7 +51,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
                 populateHomeRecyclerView(recyclerView, item)
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    populateStepProgressBar(view)
+                    populateStepProgressBar()
                 }
             }
         }
@@ -67,7 +67,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         }
     }
 
-    private suspend fun populateStepProgressBar(view: View) {
+    private suspend fun populateStepProgressBar() {
         val steps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id,
             LocalDate.now().atTime(0,0,0).toString(), LocalDate.now().atTime(23,59,59).toString()).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
 

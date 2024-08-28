@@ -1,6 +1,5 @@
 package com.example.brockapp.fragment
 
-import FriendsAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,7 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.example.brockapp.R
+import com.example.brockapp.adapter.FriendsAdapter
 import com.example.brockapp.adapter.UsersAdapter
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
@@ -29,7 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FriendsFragment : Fragment(R.layout.friends_fragment) {
+class FriendsFragment: Fragment(R.layout.friends_fragment) {
     private lateinit var friendsAdapter: FriendsAdapter
     private lateinit var friendsRecyclerView: RecyclerView
     private lateinit var usersRecyclerView: RecyclerView
@@ -165,5 +165,4 @@ class FriendsFragment : Fragment(R.layout.friends_fragment) {
         }
         friendsRecyclerView.adapter = friendsAdapter
     }
-
 }
