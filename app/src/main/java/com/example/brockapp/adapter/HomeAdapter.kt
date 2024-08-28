@@ -1,10 +1,11 @@
 package com.example.brockapp.adapter
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.R
 import com.example.brockapp.data.UserActivity
+
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import androidx.recyclerview.widget.RecyclerView
 
 class HomeAdapter(private val activities: List<UserActivity>): RecyclerView.Adapter<HomeViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): HomeViewHolder {
@@ -15,11 +16,11 @@ class HomeAdapter(private val activities: List<UserActivity>): RecyclerView.Adap
 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         val timestamp = activities[position].timestamp
-
         val tokens = timestamp?.split(" ")
 
         val date = tokens?.get(0)
         val time = tokens?.get(1)
+
         holder.bindActivity(activities[position].type, "Finito in data $date alle $time")
     }
 
