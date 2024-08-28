@@ -49,7 +49,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
                     holder.bindActivity(
                         VEHICLE_ACTIVITY_TYPE,
                         "Finito alle $exitActivityTime",
-                        "Distanza percorsa:  $distanceTravelled metri.\nDurata: $timeDifferenceInSeconds secondi"
+                        "Distanza percorsa: $distanceTravelled metri.\nDurata: $timeDifferenceInSeconds secondi"
                     )
                 }
 

@@ -24,7 +24,7 @@ class UsersAdapter(private val newUser : String, private val viewModel: FriendsV
         holder.usernameTextView.text = newUser
 
         holder.followButton.setOnClickListener {
-            viewModel.addFriend(newUser)
+            // viewModel.addFriend(newUser)
             val db = BrockDB.getInstance(holder.usernameTextView.context)
 
             CoroutineScope(Dispatchers.IO).launch {

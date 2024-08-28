@@ -9,7 +9,5 @@ import androidx.recyclerview.widget.RecyclerView
 
 class UserViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
     val usernameTextView: TextView = itemView.findViewById(R.id.user_name_text_view)
-
     val followButton : Button = itemView.findViewById(R.id.follow_user_button)
-
 }
