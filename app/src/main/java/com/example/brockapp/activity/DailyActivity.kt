@@ -1,53 +1,71 @@
 package com.example.brockapp.activity
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.MenuItem
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.adapter.DailyActivityAdapter
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.CalendarUtil
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.adapter.DailyActivityAdapter
 import com.example.brockapp.viewmodel.ActivitiesViewModel
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
-import com.github.mikephil.charting.charts.PieChart
+
+import android.os.Bundle
+import android.view.MenuItem
+import android.content.Intent
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
     private var utilCalendar: CalendarUtil = CalendarUtil()
 
     private lateinit var viewModel: ActivitiesViewModel
-    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.daily_activity_activity)
 
+        val user = User.getInstance()
+        val db = BrockDB.getInstance(this)
+
         val date: String? = intent.getStringExtra("ACTIVITY_DATE")
 
-        val db = BrockDB.getInstance(this)
         val factoryViewModelDaily = ActivitiesViewModelFactory(db)
-
-        user = User.getInstance()
-
         viewModel = ViewModelProvider(this, factoryViewModelDaily)[ActivitiesViewModel::class.java]
-        viewModel.getDayUserActivities(date, user)
 
+        observeDayActivities(date)
+
+        viewModel.getDayUserActivities(date, user)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Calendar")
+                startActivity(intent)
+                finish()
+                true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+                false
+            }
+        }
+    }
+
+    private fun observeDayActivities(date: String?) {
         viewModel.sortedDayActivitiesList.observe(this) { item ->
-            if(item.isNotEmpty()) {
+            if (item.isNotEmpty()) {
                 utilCalendar = CalendarUtil()
 
                 val textView = findViewById<TextView>(R.id.date_text_view)
@@ -63,21 +81,6 @@ class DailyActivity: AppCompatActivity() {
             }
 
             setUpToolBar()
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Calendar")
-                startActivity(intent)
-                finish()
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
         }
     }
 

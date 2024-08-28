@@ -1,33 +1,33 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
+import com.example.brockapp.R
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
+
 import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
+import android.os.Bundle
+import android.widget.Toast
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.Chronometer
+import android.content.Intent
+import android.os.SystemClock
+import android.hardware.Sensor
+import android.content.Context
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Chronometer
+import android.content.IntentFilter
+import android.hardware.SensorEvent
+import android.hardware.SensorManager
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationManagerCompat
+import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.R
-import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.google.android.gms.location.ActivityTransition
+import android.hardware.SensorEventListener
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.ActivityTransition
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0

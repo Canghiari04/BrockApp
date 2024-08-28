@@ -1,24 +1,23 @@
 package com.example.brockapp.activity
 
-import android.content.Intent
-import android.content.IntentFilter
+import com.example.brockapp.*
+import com.example.brockapp.R
+
 import android.os.Bundle
-import android.os.SystemClock
 import android.view.MenuItem
 import android.widget.Button
+import android.content.Intent
+import android.os.SystemClock
 import android.widget.Chronometer
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.R
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.ActivityTransition
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class StillActivity : AppCompatActivity() {
-
     private var running : Boolean = false
-
     private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +29,6 @@ class StillActivity : AppCompatActivity() {
         val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
 
         setButtonListeners(chronometer)
-
         setChronometerListener(chronometer)
 
         findViewById<Button>(R.id.button_start).isEnabled = true
@@ -53,6 +51,11 @@ class StillActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        unregisterActivityRecognitionReceiver()
+        super.onDestroy()
+    }
+
     private fun setChronometerListener(chronometer: Chronometer) {
         var notificationSent = false
 
@@ -66,13 +69,9 @@ class StillActivity : AppCompatActivity() {
         }
     }
 
-    private fun setButtonListeners(
-        chronometer: Chronometer,
-    ) {
-
+    private fun setButtonListeners(chronometer: Chronometer, ) {
         findViewById<Button>(R.id.button_start).setOnClickListener {
             if (!running) {
-
                 chronometer.start()
                 running = true
 
@@ -81,13 +80,11 @@ class StillActivity : AppCompatActivity() {
 
                 registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
             }
-
         }
 
         findViewById<Button>(R.id.button_stop).setOnClickListener {
             if (running) {
                 chronometer.stop()
-
                 running = false
 
                 findViewById<Button>(R.id.button_start).isEnabled = true
@@ -111,20 +108,16 @@ class StillActivity : AppCompatActivity() {
     }
 
     private fun sendLazyUserNotification(title: String, content: String) {
-        val intent = Intent(NOTIFICATION_SERVICE)
-            .putExtra("title", title)
-            .putExtra("content", content)
-            .putExtra("type", "walk")
+        val intent = Intent(NOTIFICATION_SERVICE).apply {
+            putExtra("title", title)
+            putExtra("content", content)
+            putExtra("type", "walk")
+        }
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun unregisterActivityRecognitionReceiver() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-    }
-
-    override fun onDestroy() {
-        unregisterActivityRecognitionReceiver()
-        super.onDestroy()
     }
 }
