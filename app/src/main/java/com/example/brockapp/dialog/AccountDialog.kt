@@ -42,7 +42,7 @@ class AccountDialog: DialogFragment() {
         dialog?.window?.setGravity(Gravity.CENTER)
         dialog?.setCanceledOnTouchOutside(true)
 
-        view.findViewById<Button>(R.id.dismiss_dialog_button).setOnClickListener() {
+        view.findViewById<Button>(R.id.dismiss_dialog_button).setOnClickListener {
             dismiss()
         }
     }
