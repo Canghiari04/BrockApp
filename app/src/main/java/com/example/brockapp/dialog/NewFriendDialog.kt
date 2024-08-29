@@ -3,7 +3,6 @@ package com.example.brockapp.dialog
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.FriendEntity
 import com.example.brockapp.viewmodel.FriendsViewModel
 
 import android.os.Bundle
@@ -12,10 +11,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.view.ViewGroup
 import android.widget.TextView
-import kotlinx.coroutines.launch
 import android.view.LayoutInflater
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
 import androidx.fragment.app.DialogFragment
 
 class NewFriendDialog(private val username: String, private val viewModel: FriendsViewModel): DialogFragment() {

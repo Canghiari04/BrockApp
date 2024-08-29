@@ -4,6 +4,7 @@ import com.example.brockapp.*
 import com.example.brockapp.data.Friend
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.FriendEntity
 
 import java.io.File
 import android.util.Log
@@ -20,7 +21,6 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
-import com.example.brockapp.database.FriendEntity
 
 class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context) : ViewModel() {
     private val _friends = MutableLiveData<List<String>>()

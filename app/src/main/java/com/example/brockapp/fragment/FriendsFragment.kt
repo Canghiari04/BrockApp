@@ -59,7 +59,6 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
         observeFriends()
         observeUser()
-        // Da concludere.
         observeSuggestion()
         observeAddedFriend()
 
