@@ -28,6 +28,11 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.brockapp.worker.ActivityRecognitionWorker
 
 class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
@@ -73,7 +78,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
 
         if (stepDetectorSensor == null) {
-            Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
 
             findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
             findViewById<Button>(R.id.walk_button_start).isEnabled = false
@@ -119,16 +123,27 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
             }
         }
 
-        var notificationSent = false
+        var hourSpentWalkingNotification = false
 
         chronometer.setOnChronometerTickListener {
             val elapsedMillis = SystemClock.elapsedRealtime() - chronometer.base
 
             val elapsedHour = elapsedMillis / 1000 / 60 / 60
 
-            if (elapsedHour >= 1 && !notificationSent) {
-                notificationSent = true
-                // Deve richiamare il worker per Activity Recognition
+            if (elapsedHour >= 1 && !hourSpentWalkingNotification) {
+                hourSpentWalkingNotification = true
+
+                val inputData = Data.Builder()
+                    .putString("type", 7.toString())
+                    .putString("title", "Continua così!")
+                    .putString("text", "Stai camminando da più di un'ora")
+                    .build()
+
+                val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+                    .setInputData(inputData)
+                    .build()
+
+                WorkManager.getInstance(this).enqueue(workRequest)
             }
         }
 
@@ -168,9 +183,18 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
                 val stepsDuringSession = stepCount
 
-                // TODO sistemare le notifiche con work relativo, guardare dir worker
-                if (stepsDuringSession == 100) {
-                    // Deve richiamare il worker per Activity Recognition
+                if (stepsDuringSession == 1000) {
+                    val inputData = Data.Builder()
+                        .putString("type", 7.toString())
+                        .putString("title", "Bravo!")
+                        .putString("text", "Hai già fatto 1000 passi")
+                        .build()
+
+                    val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+                        .setInputData(inputData)
+                        .build()
+
+                    WorkManager.getInstance(this).enqueue(workRequest)
                 }
 
                 currentSteps = stepCount

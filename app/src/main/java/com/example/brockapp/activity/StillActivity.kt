@@ -15,6 +15,10 @@ import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.brockapp.worker.ActivityRecognitionWorker
 
 class StillActivity : AppCompatActivity() {
     private var running : Boolean = false
@@ -108,13 +112,18 @@ class StillActivity : AppCompatActivity() {
     }
 
     private fun sendLazyUserNotification(title: String, content: String) {
-        val intent = Intent(NOTIFICATION_SERVICE).apply {
-            putExtra("title", title)
-            putExtra("content", content)
-            putExtra("type", "walk")
-        }
+        val inputData = Data.Builder()
+            .putString("type", 3.toString())
+            .putString("title", title)
+            .putString("text", content)
+            .build()
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+
     }
 
     private fun unregisterActivityRecognitionReceiver() {

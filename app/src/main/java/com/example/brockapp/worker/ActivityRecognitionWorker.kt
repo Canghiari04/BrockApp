@@ -3,28 +3,30 @@ package com.example.brockapp.worker
 import com.example.brockapp.*
 import com.example.brockapp.util.NotificationUtil
 
-import androidx.work.Worker
 import android.content.Context
 import androidx.work.WorkerParameters
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.work.CoroutineWorker
 
-class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
+class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams) {
     private lateinit var util: NotificationUtil
     private lateinit var manager: NotificationManager
+    private var notificationChannelCreated = false
 
-    override fun doWork(): Result {
+
+    override suspend fun doWork(): Result {
         val type = inputData.getString("type")?.toInt()
         val title = inputData.getString("title")
         val text = inputData.getString("text")
 
         util = NotificationUtil()
-        sendActivityNotify(type, title, text)
+        sendActivityNotification(type, title, text)
 
         return Result.success()
     }
 
-    private fun sendActivityNotify(type: Int?, title: String?, text: String?) {
+    private fun sendActivityNotification(type: Int?, title: String?, text: String?) {
         manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notification = util.getActivityRecognitionNotification(CHANNEL_ID_ACTIVITY_NOTIFY, type, title, text, context)
@@ -35,16 +37,21 @@ class ActivityRecognitionWorker(private val context: Context, workerParams: Work
     }
 
     private fun getNotificationChannel() {
-        val channel = NotificationChannel(
-            CHANNEL_ID_ACTIVITY_NOTIFY,
-            NAME_CHANNEL_ACTIVITY_NOTIFY,
-            NotificationManager.IMPORTANCE_HIGH
-        )
 
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_ACTIVITY_NOTIFY
+        if(!notificationChannelCreated) {
+
+            val channel = NotificationChannel(
+                CHANNEL_ID_ACTIVITY_NOTIFY,
+                NAME_CHANNEL_ACTIVITY_NOTIFY,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+
+            channel.apply {
+                description = DESCRIPTION_CHANNEL_ACTIVITY_NOTIFY
+            }
+
+            manager.createNotificationChannel(channel)
+            notificationChannelCreated = true
         }
-
-        manager.createNotificationChannel(channel)
     }
 }
