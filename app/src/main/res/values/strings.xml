@@ -54,6 +54,7 @@
     <string name="calendar_text_view">CALENDARIO</string>
     <string name="friends_text_view">AMICI</string>
     <string name="charts_text_view">GRAFICI</string>
+    <string name="spinner_prompt">Visualizza per</string>
 
     <string name="description_back_month_button">Back arrow</string>
     <string name="description_forward_month_button">Forward arrow</string>
@@ -139,4 +140,10 @@
     <string name="search_user_button">Cerca</string>
     <string name="friend_data_text_view">Attività dell\'utente</string>
     <string name="height_difference_text">Dislivello:</string>
+
+    <string-array name="spinner_items">
+        <item>Visualizza per</item>
+        <item>Giorno</item>
+        <item>Settimana</item>
+    </string-array>
 </resources>
