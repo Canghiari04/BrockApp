@@ -3,8 +3,8 @@ package com.example.brockapp.fragment
 import com.example.brockapp.R
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.adapter.UsersAdapter
 import com.example.brockapp.adapter.FriendsAdapter
+import com.example.brockapp.adapter.SuggestionsAdapter
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
@@ -17,7 +17,6 @@ import android.widget.EditText
 import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.view.LayoutInflater
-import android.widget.ImageButton
 import com.amazonaws.regions.Regions
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
@@ -28,89 +27,86 @@ import com.example.brockapp.singleton.User
 import androidx.lifecycle.ViewModelProvider
 import com.amazonaws.services.s3.AmazonS3Client
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.dialog.NewFriendDialog
+import androidx.core.widget.addTextChangedListener
 import com.example.brockapp.viewmodel.UserViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import com.example.brockapp.dialog.NewFriendDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
-    private lateinit var viewModel: FriendsViewModel
     private lateinit var viewModelUser: UserViewModel
-    private lateinit var usersRecyclerView: RecyclerView
+    private lateinit var viewModelFriends: FriendsViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val user = User.getInstance()
+        val db: BrockDB = BrockDB.getInstance(requireContext())
+
+        val usernameTextView = view.findViewById<EditText>(R.id.search_user_text_area)
         val syncButton = view.findViewById<FloatingActionButton>(R.id.user_synchronized_button)
-        val searchButton = view.findViewById<ImageButton>(R.id.search_user_button)
 
         val credentialsProvider = CognitoCachingCredentialsProvider(requireContext(), "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00", Regions.EU_WEST_3)
         val s3Client = AmazonS3Client(credentialsProvider)
 
-        val db: BrockDB = BrockDB.getInstance(requireContext())
         val viewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
+        viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
 
         val viewModelFactoryUser = UserViewModelFactory(db)
         viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
 
         observeFriends()
-        observeUser()
         observeSuggestion()
         observeAddedFriend()
 
-        viewModel.getCurrentFriends(user.id)
+        viewModelFriends.getCurrentFriends(user.id)
 
         syncButton.setOnClickListener {
             if (user.flag) {
-                viewModel.uploadUserData()
+                viewModelFriends.uploadUserData()
                 syncButton.isEnabled = false
             } else {
                 showShareDataDialog()
             }
 
-            // Mettere observer che in base a nuove attività aggiunte vada ad abilitare il bottone.
             android.os.Handler().postDelayed({
                 syncButton.isEnabled = true
             }, 5000)
         }
 
-        searchButton.setOnClickListener {
-            val usernameToSearch = view.findViewById<EditText>(R.id.search_user_text_area).text.toString()
-            viewModel.searchUser(usernameToSearch)
-        }
-    }
+        usernameTextView.addTextChangedListener {
+            val usernameToSearch = usernameTextView.text.toString()
 
-    private fun observeFriends() {
-        viewModel.friends.observe(viewLifecycleOwner) { friends ->
-            if (!friends.isNullOrEmpty()) {
-                val recyclerView = view?.findViewById<RecyclerView>(R.id.friends_recycler_view)
-                populateFriendsRecyclerView(friends, recyclerView)
+            if (usernameToSearch.isNotBlank()) {
+                viewModelFriends.searchUser(usernameToSearch)
             } else {
-                Toast.makeText(context, "Nessun amico rintracciato.", Toast.LENGTH_SHORT).show()
+                Log.d("FRIENDS_FRAGMENT", "Search with empty body not supported.")
             }
         }
     }
 
-    private fun observeUser() {
-        viewModel.newUser.observe(viewLifecycleOwner) { newUser ->
-            if (newUser.isNotBlank()) {
-                activity?.let { NewFriendDialog(newUser, viewModel).show(it.supportFragmentManager, "CUSTOM_NEW_FRIEND_DIALOG") }
-            } else {
-                Toast.makeText(context, "Nessun utente possiede questo username.", Toast.LENGTH_SHORT).show()
+    private fun observeFriends() {
+        viewModelFriends.friends.observe(viewLifecycleOwner) { friends ->
+            if (!friends.isNullOrEmpty()) {
+                val recyclerView = view?.findViewById<RecyclerView>(R.id.friends_recycler_view)
+                populateFriendsRecyclerView(friends, recyclerView)
             }
         }
     }
 
     private fun observeSuggestion() {
-        // Inserire suggerimenti di nuovi amici da aws.
+        viewModelFriends.suggestions.observe(viewLifecycleOwner) { suggestions ->
+            if (suggestions.isNotEmpty()) {
+                val recyclerView = view?.findViewById<RecyclerView>(R.id.suggestions_recycler_view)
+                populateSuggestionsRecyclerView(suggestions, recyclerView)
+            }
+        }
     }
 
     private fun observeAddedFriend() {
-        viewModel.errorAddFriend.observe(viewLifecycleOwner) { errorAddFriend ->
+        viewModelFriends.errorAddFriend.observe(viewLifecycleOwner) { errorAddFriend ->
             if (errorAddFriend) {
                 Log.d("FRIENDS_FRAGMENT", "Amico aggiunto alla lista.")
             } else {
@@ -124,7 +120,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val friendsAdapter = FriendsAdapter(friends) { friend ->
             CoroutineScope(Dispatchers.Main).launch {
                 val friendData = withContext(Dispatchers.IO) {
-                    viewModel.loadFriendData(friend)
+                    viewModelFriends.loadFriendData(friend)
                 }
 
                 friendData?.let { showFriendActivity(it) }
@@ -135,13 +131,14 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         friendsRecyclerView?.layoutManager = layoutManager
     }
 
-    // Sarà utilizzato per i suggerimenti
-    private fun populateUsersRecyclerView(username: String) {
+    private fun populateSuggestionsRecyclerView(usernames: List<String>, suggestionsRecyclerView: RecyclerView?) {
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        val adapter = UsersAdapter(username, viewModel)
+        val adapter = SuggestionsAdapter(usernames) { username ->
+            showNewFriendDialog(username, viewModelFriends)
+        }
 
-        usersRecyclerView.layoutManager = layoutManager
-        usersRecyclerView.adapter = adapter
+        suggestionsRecyclerView?.layoutManager = layoutManager
+        suggestionsRecyclerView?.adapter = adapter
     }
 
     private fun showShareDataDialog() {
@@ -160,7 +157,13 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             .show()
     }
 
-    // Da rendere activity.
+    private fun showNewFriendDialog(username: String, viewModel: FriendsViewModel) {
+        activity?.let {
+            NewFriendDialog(username, viewModel).show(it.supportFragmentManager, "CUSTOM_NEW_FRIEND_DIALOG")
+        }
+    }
+
+    // Da rendere dialog migliore.
     private fun showFriendActivity(friend: Friend) {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_friend_data, null)
 

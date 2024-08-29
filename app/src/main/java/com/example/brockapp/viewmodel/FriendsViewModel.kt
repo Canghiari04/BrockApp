@@ -29,10 +29,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     private val _suggestions = MutableLiveData<List<String>>()
     val suggestions: LiveData<List<String>> get() = _suggestions
 
-    // Utente ricercato dal EditText.
-    private val _newUser = MutableLiveData<String>()
-    val newUser: LiveData<String> = _newUser
-
     private val _errorAddFriend = MutableLiveData<Boolean>()
     val errorAddFriend: LiveData<Boolean> = _errorAddFriend
 
@@ -85,20 +81,26 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     fun searchUser(user: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val userKey = "user/$user.json"
+                val userKey = "user/$user"
 
                 val listObjectsRequest = ListObjectsRequest()
                     .withBucketName(BUCKET_NAME)
                     .withPrefix(userKey)
-                    .withMaxKeys(1)
 
                 val objectListing = s3Client.listObjects(listObjectsRequest)
                 val s3Objects = objectListing.objectSummaries
+                val matchingUsers = s3Objects
+                    .filter {
+                        it.key.endsWith(".json")
+                    }
+                    .map {
+                        it.key.removePrefix("user/").removeSuffix(".json")
+                    }
 
-                if (s3Objects.isNotEmpty() && s3Objects[0].key == userKey) {
-                    _newUser.postValue(user)
+                if(matchingUsers.isNotEmpty()) {
+                    _suggestions.postValue(matchingUsers)
                 } else {
-                    _newUser.postValue("")
+                    _suggestions.postValue(listOf())
                 }
             } catch (e: Exception) {
                 Log.e("FRIENDS_VIEW_MODEL", e.toString())
