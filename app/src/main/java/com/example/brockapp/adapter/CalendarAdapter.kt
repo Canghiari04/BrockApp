@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class CalendarAdapter(private val days: List<String>, private val dates: ArrayList<String>, private val onItemClick: (String) -> Unit, private val showActivityOfDay: (String) -> Unit): RecyclerView.Adapter<CalendarViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): CalendarViewHolder {
-        val dayItem = LayoutInflater.from(parent.context).inflate(R.layout.calendar_cell, parent, false)
+        val dayItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_calendar, parent, false)
 
         return CalendarViewHolder(dayItem, onItemClick, showActivityOfDay)
     }

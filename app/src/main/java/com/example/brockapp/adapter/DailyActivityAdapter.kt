@@ -14,7 +14,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
     private val filteredActivities: List<UserActivity> = activities.filter { it.transitionType == 1 }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
-        val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.activity_cell, parent, false)
+        val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_activity, parent, false)
 
         return DailyActivityViewHolder(activityItem)
     }
@@ -44,7 +44,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>) : Recycle
                 }
 
                 VEHICLE_ACTIVITY_TYPE -> {
-                    val distanceTravelled = String.format("%.2f", exitActivity.info)
+                    val distanceTravelled = exitActivity.info.split(".")[0]
 
                     holder.bindActivity(
                         VEHICLE_ACTIVITY_TYPE,

@@ -2,15 +2,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <AutoCompleteTextView
         android:id="@+id/text_new_area"
         android:hint="@string/edit_text_map_fragment"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="65dp"
         android:layout_gravity="top|center_horizontal"
-        android:layout_margin="16dp"
+        android:layout_margin="10dp"
         android:padding="10dp"
         android:textAlignment="center"
         android:elevation="25dp"

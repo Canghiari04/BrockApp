@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class HomeAdapter(private val activities: List<UserActivity>): RecyclerView.Adapter<HomeViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): HomeViewHolder {
-        val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.home_activity_cell, parent, false)
+        val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_home_activity, parent, false)
 
         return HomeViewHolder(activityItem)
     }

@@ -22,4 +22,7 @@ interface GeofenceAreaDao {
 
     @Query("SELECT COUNT(*)>0 FROM GeofenceArea WHERE longitude=:longitude AND latitude=:latitude")
     suspend fun checkIfAreaIsPresent(longitude: Double, latitude: Double): Boolean
+
+    @Query("DELETE FROM GeofenceArea WHERE name=:name AND longitude=:longitude AND latitude=:latitude")
+    suspend fun deleteGeofenceArea(name: String?, longitude: Double, latitude: Double)
 }

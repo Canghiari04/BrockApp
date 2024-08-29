@@ -122,7 +122,7 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
     }
 
     private fun observeGeofenceAreas() {
-        viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
                 geofence.initAreas(areas)

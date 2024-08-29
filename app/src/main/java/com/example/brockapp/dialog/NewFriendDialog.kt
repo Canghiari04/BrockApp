@@ -13,6 +13,7 @@ import android.widget.Button
 import android.view.ViewGroup
 import kotlinx.coroutines.launch
 import android.view.LayoutInflater
+import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import androidx.fragment.app.DialogFragment
@@ -31,10 +32,13 @@ class NewFriendDialog(private val username: String, private val viewModel: Frien
 
         val user = User.getInstance()
         val db = BrockDB.getInstance(requireContext())
+        val textView = view.findViewById<TextView>(R.id.text_dialog_new_friend)
 
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog?.window?.setGravity(Gravity.CENTER)
         dialog?.setCanceledOnTouchOutside(true)
+
+        textView.setText("Desideri aggiungere $username alla tua lista di amici?")
 
         view.findViewById<Button>(R.id.add_new_friend_button).setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {

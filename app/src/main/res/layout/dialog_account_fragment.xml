@@ -46,9 +46,11 @@
         <Button
             android:id="@+id/dismiss_dialog_button"
             android:text="@string/exit_dialog_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp">
+            android:layout_width="125dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="50dp"
+            android:textColor="@color/white"
+            android:background="@color/uni_red">
         </Button>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

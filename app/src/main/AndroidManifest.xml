@@ -34,6 +34,7 @@
         </activity>
         <activity
             android:name=".activity.PageLoaderActivity"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
