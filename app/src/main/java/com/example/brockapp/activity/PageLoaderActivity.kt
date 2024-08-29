@@ -11,14 +11,14 @@ import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 
 import android.util.Log
-import android.view.Menu
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.content.Intent
-import kotlinx.coroutines.launch
 import android.view.MenuInflater
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog

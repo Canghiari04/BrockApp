@@ -122,7 +122,7 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
     }
 
     private fun observeGeofenceAreas() {
-        viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
                 geofence.initAreas(areas)
@@ -170,4 +170,28 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         startActivity(intent)
         activity?.finish()
     }
+
+    // POSTICIPARE IL BUCKET SOLO NEL MOMENTO IN CUI SIA DATO IL PERMESSO IN ONCLICK FRIENDS
+    private fun uploadUserDataToS3(username: String) {
+        val userData = mapOf("username" to username)
+        val json = JSONObject(userData).toString()
+
+        val fileName = "user_data.json"
+        val file = File(requireContext().filesDir, fileName)
+        file.writeText(json)
+
+        val key = "user/$username.json"
+
+        val thread = Thread {
+            try {
+                val request = PutObjectRequest(BUCKET_NAME, key, file)
+                s3Client.putObject(request)
+                Log.d("S3Upload", "User data uploaded successfully")
+            } catch (e: Exception) {
+                Log.e("S3Upload", "Failed to upload user data", e)
+            }
+        }
+        thread.start()
+    }
+
 }

@@ -1,16 +1,16 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.DATE_SEPARATOR
-import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.*
 import com.example.brockapp.data.UserActivity
-import java.time.DayOfWeek
+
+import java.time.Month
 import java.time.Duration
+import java.time.YearMonth
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Month
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class CalendarUtil {

@@ -1,28 +1,23 @@
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+package com.example.brockapp.adapter
+
 import com.example.brockapp.R
-import com.example.brockapp.data.Friend
 
-class FriendsAdapter(private val friends: List<Friend>) :
-    RecyclerView.Adapter<FriendsAdapter.FriendViewHolder>() {
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import androidx.recyclerview.widget.RecyclerView
 
-    class FriendViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val usernameTextView: TextView = view.findViewById(R.id.friend_name_text_view)
-    }
-
+class FriendsAdapter(private val friends: List<String>, private val onItemClick: (String) -> Unit): RecyclerView.Adapter<FriendViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.cell_friend, parent, false)
-        return FriendViewHolder(view)
+        val friendItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_friend, parent, false)
+
+        return FriendViewHolder(friendItem, onItemClick)
     }
 
     override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
-        val friend = friends[position]
-        holder.usernameTextView.text = friend.username
+        holder.bindFriend(friends[position])
     }
 
-    override fun getItemCount(): Int = friends.size
+    override fun getItemCount(): Int {
+        return friends.size
+    }
 }

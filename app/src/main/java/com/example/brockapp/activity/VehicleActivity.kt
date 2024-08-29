@@ -1,31 +1,31 @@
 package com.example.brockapp.activity
 
-import android.Manifest
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.location.Location
-import android.os.Bundle
-import android.os.SystemClock
-import android.view.MenuItem
-import android.widget.Button
-import android.widget.Chronometer
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
+import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+
+import android.Manifest
+import android.os.Bundle
+import android.widget.Button
+import android.view.MenuItem
+import android.os.SystemClock
+import android.content.Intent
+import android.widget.TextView
+import android.location.Location
+import android.widget.Chronometer
+import android.content.IntentFilter
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.Priority
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.FusedLocationProviderClient
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VehicleActivity: AppCompatActivity() {
     private var running = false
@@ -90,7 +90,7 @@ class VehicleActivity: AppCompatActivity() {
     private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
         vehicleButtonStart.setOnClickListener {
             if (!running) {
-                chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
+                chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
 
                 running = true
@@ -111,7 +111,6 @@ class VehicleActivity: AppCompatActivity() {
         vehicleButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
-                pauseOffset = SystemClock.elapsedRealtime() - chronometer.base
 
                 running = false
 
@@ -119,7 +118,7 @@ class VehicleActivity: AppCompatActivity() {
                 vehicleButtonStop.isEnabled = false
 
                 stopLocationUpdates()
-                chronometer.base = SystemClock.elapsedRealtime()
+
 
                 registerActivity(
                     DetectedActivity.IN_VEHICLE,
@@ -154,7 +153,7 @@ class VehicleActivity: AppCompatActivity() {
                     } else {
                         startLocation?.let {
                             totalDistance += it.distanceTo(newLocation).toDouble()
-                            distanceTravelled.text = String.format("%.2f meters", totalDistance)
+                            distanceTravelled.text = String.format("%.2f metri", totalDistance)
                         }
 
                         startLocation = newLocation

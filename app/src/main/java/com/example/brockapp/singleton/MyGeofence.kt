@@ -1,18 +1,15 @@
 package com.example.brockapp.singleton
 
-import android.app.PendingIntent
-import android.content.Context
+import com.example.brockapp.*
+import com.example.brockapp.data.Locality
+import com.example.brockapp.receiver.GeofenceReceiver
+import com.example.brockapp.database.GeofenceAreaEntry
+
 import android.content.Intent
+import android.content.Context
+import android.app.PendingIntent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.example.brockapp.CELLULAR_TYPE_CONNECTION
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
-import com.example.brockapp.NO_CONNECTION_TYPE_CONNECTION
-import com.example.brockapp.REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER
-import com.example.brockapp.WI_FI_TYPE_CONNECTION
-import com.example.brockapp.data.Locality
-import com.example.brockapp.database.GeofenceAreaEntry
-import com.example.brockapp.receiver.GeofenceReceiver
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 

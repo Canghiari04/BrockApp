@@ -105,8 +105,13 @@
 
     <string name="username_account_dialog">Username:</string>
     <string name="password_account_dialog">Password:</string>
-
+    <string name="locality_marker_dialog">Località:</string>
+    <string name="longitude_marker_dialog">Longitudine:</string>
+    <string name="latitude_marker_dialog">Latitudine:</string>
     <string name="exit_dialog_button">ESCI</string>
+    <string name="add_friend_dialog_button">AGGIUNGI</string>
+    <string name="delete_marker_button">ELIMINA</string>
+
     <string name="distance_label">Distanza percorsa</string>
     <string name="insert_username_text">Inserisci lo username:</string>
     <string name="insert_password_text">Inserisci la password:</string>
@@ -124,11 +129,14 @@
     <string name="new_activity_icon_description">Icona per registrare una nuova attività</string>
     <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 
+    <string name="search_friends_icon">Icona per cercare utenti sulla piattaforma</string>
     <string name="friends_synchronized_icon_description">Icona per sincronizzare i dati</string>
-    <string name="friends_label_permission">Share your data</string>
-    <string name="friends_description_permission">Allows the app to share the data registered. You can change the permission every time you want.</string>
     <string name="title_friends">I tuoi amici</string>
-    <string name="title_follow">Nuovi utenti per te</string>
-    <string name="button_view">Visualizza</string>
+    <string name="title_suggestion">Suggerimenti</string>
+    <string name="search_user_text">Cerca un utente</string>
+    <string name="button_view">Mostra</string>
     <string name="button_follow">Segui</string>
+    <string name="search_user_button">Cerca</string>
+    <string name="friend_data_text_view">Attività dell\'utente</string>
+    <string name="height_difference_text">Dislivello:</string>
 </resources>

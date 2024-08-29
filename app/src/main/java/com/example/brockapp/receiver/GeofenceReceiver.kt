@@ -1,15 +1,16 @@
 package com.example.brockapp.receiver
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.util.Log
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import com.example.brockapp.GEOFENCE_INTENT_TYPE
+import com.example.brockapp.*
 import com.example.brockapp.worker.GeofenceWorker
-import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
+
+import android.util.Log
+import android.content.Intent
+import android.content.Context
+import androidx.work.WorkManager
+import androidx.work.OneTimeWorkRequest
+import android.content.BroadcastReceiver
 import com.google.android.gms.location.GeofencingEvent
+import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
 
 class GeofenceReceiver: BroadcastReceiver() {
     private lateinit var workRequest: OneTimeWorkRequest
