@@ -64,12 +64,12 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun getSteps(user: User) {
+    fun getSteps(startOfDay: String, endOfDay: String, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             val steps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(
                 user.id,
-                LocalDate.now().atTime(0, 0, 0).toString(),
-                LocalDate.now().atTime(23, 59, 59).toString()
+                startOfDay,
+                endOfDay
             ).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
 
             _steps.postValue(steps)

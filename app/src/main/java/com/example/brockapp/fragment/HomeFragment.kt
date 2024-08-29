@@ -77,6 +77,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 }
 
                 viewModel.getUserActivities(range.first, range.second, user)
+                viewModel.getSteps(range.first, range.second, user)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -90,8 +91,6 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             if (listActivities.isNotEmpty()) {
                 val recyclerView = view?.findViewById<RecyclerView>(R.id.home_recycler_view)
                 populateHomeRecyclerView(recyclerView, listActivities)
-
-                viewModel.getSteps(user)
             } else {
                 Log.d("HOME_FRAGMENT", "None activities.")
             }
@@ -102,7 +101,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel.steps.observe(viewLifecycleOwner) { steps ->
             if (steps > 0) {
                 stepsProgressBar.progress = steps
-                stepsCountText.text = "$steps/10000 passi"
+                stepsCountText.setText("$steps/10000 passi")
             } else {
                 Log.d("HOME_FRAGMENT", "None steps detected.")
             }
