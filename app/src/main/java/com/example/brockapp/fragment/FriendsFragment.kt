@@ -33,7 +33,11 @@ import com.example.brockapp.viewmodel.UserViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import com.example.brockapp.ISO_DATE_FORMAT
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.time.LocalDateTime
+import java.time.Duration
+import java.time.format.DateTimeFormatter
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var viewModel: FriendsViewModel
@@ -68,6 +72,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             if (user.flag) {
                 viewModel.uploadUserData()
                 syncButton.isEnabled = false
+                Toast.makeText(context, "Dati sincronizzati.", Toast.LENGTH_SHORT).show()
             } else {
                 showShareDataDialog()
             }
@@ -167,36 +172,65 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val friendDataTextView: TextView = dialogView.findViewById(R.id.friend_data_text_view)
         val closeButton: Button = dialogView.findViewById(R.id.close_button)
 
+        val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
+
+
+
         val friendData = StringBuilder()
         friendData.append("Username: ${friend.username}\n\n")
+        friendData.append("------CAMMINATA------")
 
-        friendData.append("------CAMMINATA------\n")
-        friend.walkActivities.forEach { activity ->
+        for(i in 0 until friend.walkActivities.size) {
+            val activity = friend.walkActivities[i]
+
+            if(activity.transitionType == 1 || i == friend.walkActivities.size -1)
+                continue
+
+            val beginActivityTime = LocalDateTime.parse(activity.timestamp, dateFormatter)
+            val endTime = LocalDateTime.parse(friend.walkActivities[i+1].timestamp, dateFormatter)
+
+            val durationInSeconds = Duration.between(beginActivityTime, endTime).seconds
 
 
-            if(activity.transitionType == 0)
-                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-            else
-                friendData.append("Terminata alle: ${activity.timestamp}, passi fatti: ${activity.stepNumber}\n")
+            friendData.append("Durata: ${durationInSeconds} secondi\n")
+            friendData.append("Passi fatti: ${activity.stepNumber}\n\n")
+
 
         }
 
         friendData.append("------VEICOLO------\n")
-        friend.vehicleActivities.forEach { activity ->
-            if(activity.transitionType == 0)
-                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-            else
-                friendData.append("Terminata alle: ${activity.timestamp}, distanza percorsa: ${activity.distanceTravelled}\n")
+        for (i in 0 until friend.vehicleActivities.size) {
+            val activity = friend.vehicleActivities[i]
 
+            if (activity.transitionType == 1 || i == friend.vehicleActivities.size - 1)
+                continue
+
+            val beginActivityTime = LocalDateTime.parse(activity.timestamp, dateFormatter)
+            val endTime = LocalDateTime.parse(friend.vehicleActivities[i + 1].timestamp, dateFormatter)
+
+            val durationInSeconds = Duration.between(beginActivityTime, endTime).seconds
+
+            friendData.append("Durata: ${durationInSeconds} secondi\n\n")
+            friendData.append("Distanza percorsa: ${friend.vehicleActivities[i + 1].distanceTravelled} metri\n")
         }
 
         friendData.append("------FERMO------\n")
-        friend.stillActivities.forEach { activity ->
-            if(activity.transitionType == 0)
-                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-            else
-                friendData.append("Terminata alle: ${activity.timestamp}\n")
+        for (i in 0 until friend.stillActivities.size) {
+            val activity = friend.stillActivities[i]
+
+            if (activity.transitionType == 1 || i == friend.stillActivities.size - 1)
+                continue
+
+            val beginActivityTime = LocalDateTime.parse(activity.timestamp, dateFormatter)
+            val endTime = LocalDateTime.parse(friend.stillActivities[i + 1].timestamp, dateFormatter)
+
+            val durationInSeconds = Duration.between(beginActivityTime, endTime).seconds
+
+            friendData.append("Iniziata alle: ${activity.timestamp}\n")
+            friendData.append("Terminata alle: ${friend.stillActivities[i + 1].timestamp}\n")
+            friendData.append("Durata: ${durationInSeconds} secondi\n\n")
         }
+
 
         friendDataTextView.text = friendData.toString()
 
