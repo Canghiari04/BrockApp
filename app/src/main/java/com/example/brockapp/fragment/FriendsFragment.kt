@@ -4,6 +4,7 @@ import com.example.brockapp.R
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.adapter.FriendsAdapter
+import com.example.brockapp.dialog.NewFriendDialog
 import com.example.brockapp.adapter.SuggestionsAdapter
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
@@ -32,7 +33,6 @@ import com.example.brockapp.viewmodel.UserViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.example.brockapp.dialog.NewFriendDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
@@ -79,7 +79,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         usernameTextView.addTextChangedListener {
             val usernameToSearch = usernameTextView.text.toString()
 
-            if (usernameToSearch.isNotBlank()) {
+            if (usernameToSearch.length > 2) {
                 viewModelFriends.searchUser(usernameToSearch)
             } else {
                 Log.d("FRIENDS_FRAGMENT", "Search with empty body not supported.")
