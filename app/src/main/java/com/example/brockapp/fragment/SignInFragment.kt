@@ -13,31 +13,39 @@ import com.example.brockapp.receiver.ConnectivityReceiver
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
+import java.io.File
 import android.Manifest
-import android.content.Context
-import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.os.Bundle
 import android.util.Log
+import android.os.Bundle
 import android.view.View
+import org.json.JSONObject
+import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
+import android.content.Context
 import android.widget.TextView
+import kotlinx.coroutines.launch
+import android.content.IntentFilter
+import com.amazonaws.regions.Regions
+import kotlinx.coroutines.Dispatchers
+import androidx.fragment.app.Fragment
+import android.net.ConnectivityManager
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.PutObjectRequest
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
-class SignInFragment : Fragment(R.layout.sign_in_fragment) {
+class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
+
+    private lateinit var s3Client: AmazonS3Client
 
     private lateinit var db : BrockDB
     private lateinit var username : String
@@ -59,6 +67,13 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         super.onViewCreated(view, savedInstanceState)
 
         db = BrockDB.getInstance(requireContext())
+
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
+        s3Client = AmazonS3Client(credentialsProvider)
 
         val factoryUserViewModel = UserViewModelFactory(db)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
@@ -193,5 +208,4 @@ class SignInFragment : Fragment(R.layout.sign_in_fragment) {
         }
         thread.start()
     }
-
 }

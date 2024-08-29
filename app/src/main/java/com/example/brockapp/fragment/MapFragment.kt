@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import android.content.Intent
-import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import kotlinx.coroutines.launch
@@ -26,17 +25,15 @@ import android.widget.AutoCompleteTextView
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import androidx.core.widget.addTextChangedListener
 import com.example.brockapp.dialog.MarkerDialog
-import com.example.brockapp.dialog.NewFriendDialog
+import androidx.core.widget.addTextChangedListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 
-class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
+class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private lateinit var db: BrockDB
     private lateinit var map: GoogleMap
     private lateinit var geofence: MyGeofence
@@ -185,14 +182,6 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
                 MarkerOptions()
                     .position(value)
                     .title(key)
-            )
-
-            map.addCircle(
-                CircleOptions()
-                    .center(value)
-                    .radius(geofence.radius.toDouble())
-                    .strokeColor(Color.RED)
-                    .strokeWidth(2.5f)
             )
         }
     }

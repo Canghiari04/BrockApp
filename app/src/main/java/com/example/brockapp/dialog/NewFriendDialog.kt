@@ -11,9 +11,9 @@ import android.view.View
 import android.view.Gravity
 import android.widget.Button
 import android.view.ViewGroup
+import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.view.LayoutInflater
-import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import androidx.fragment.app.DialogFragment
@@ -41,11 +41,6 @@ class NewFriendDialog(private val username: String, private val viewModel: Frien
         textView.setText("Desideri aggiungere $username alla tua lista di amici?")
 
         view.findViewById<Button>(R.id.add_new_friend_button).setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                val friend = FriendEntity(userId = user.id, followedUsername = username)
-                db.FriendDao().insertFriend(friend)
-            }
-
             viewModel.addFriend(username)
             dismiss()
         }

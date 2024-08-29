@@ -1,7 +1,5 @@
 package com.example.brockapp.database
 
-import com.example.brockapp.singleton.User
-
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Insert

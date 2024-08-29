@@ -50,7 +50,8 @@ class ActivityRecognitionService : Service() {
                         }
 
                         DetectedActivity.IN_VEHICLE -> {
-                            val distanceTravelled = intent.getDoubleExtra("DISTANCE_TRAVELLED", -1.0)
+                            val distanceTravelled =
+                                intent.getDoubleExtra("DISTANCE_TRAVELLED", -1.0)
 
                             userVehicleActivityDao.insertVehicleActivity(
                                 UserVehicleActivityEntity(
@@ -62,24 +63,27 @@ class ActivityRecognitionService : Service() {
                             )
                         }
 
-                    DetectedActivity.WALKING -> {
-                        val stepNumber = intent.getLongExtra("STEP_NUMBER", -1)
-                        val heightDifference = intent.getFloatExtra("HEIGHT_DIFFERENCE", -1f)
+                        DetectedActivity.WALKING -> {
+                            val stepNumber = intent.getLongExtra("STEP_NUMBER", -1)
+                            val heightDifference = intent.getFloatExtra("HEIGHT_DIFFERENCE", -1f)
 
-                        userWalkActivityDao.insertWalkActivity(
-                            UserWalkActivityEntity(
-                                userId = user.id,
-                                transitionType = transitionType,
-                                timestamp = timestamp,
-                                stepNumber = stepNumber,
-                                heightDifference = heightDifference
+                            userWalkActivityDao.insertWalkActivity(
+                                UserWalkActivityEntity(
+                                    userId = user.id,
+                                    transitionType = transitionType,
+                                    timestamp = timestamp,
+                                    stepNumber = stepNumber,
+                                    heightDifference = heightDifference
+                                )
                             )
-                        )
+                        }
                     }
+                } catch (e: Exception) {
+                    Log.e("ACTIVITY_SERVICE", e.toString())
                 }
-            } catch (e: Exception) {
-                Log.e("ACTIVITY_SERVICE", e.toString())
             }
+        } else {
+            Log.d("ACTIVITY_SERVICE", "Null intent.")
         }
 
         return super.onStartCommand(intent, flags, startId)

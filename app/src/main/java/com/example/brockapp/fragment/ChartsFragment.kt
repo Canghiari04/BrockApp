@@ -33,7 +33,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
-class ChartsFragment: Fragment(R.layout.charts_fragment) {
+class ChartsFragment: Fragment(R.layout.fragment_charts) {
     val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     private lateinit var db : BrockDB

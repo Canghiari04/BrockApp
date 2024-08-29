@@ -1,6 +1,7 @@
 package com.example.brockapp.dialog
 
 import com.example.brockapp.R
+import com.example.brockapp.viewmodel.GeofenceViewModel
 
 import android.os.Bundle
 import android.view.View
@@ -11,7 +12,6 @@ import android.widget.TextView
 import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
 import com.google.android.gms.maps.model.Marker
-import com.example.brockapp.viewmodel.GeofenceViewModel
 
 class MarkerDialog(private val marker: Marker, private val viewModel: GeofenceViewModel): DialogFragment() {
     override fun onCreateView(

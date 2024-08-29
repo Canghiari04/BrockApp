@@ -20,6 +20,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
+import com.example.brockapp.database.FriendEntity
 
 class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context) : ViewModel() {
     private val _friends = MutableLiveData<List<String>>()
@@ -31,6 +32,9 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     // Utente ricercato dal EditText.
     private val _newUser = MutableLiveData<String>()
     val newUser: LiveData<String> = _newUser
+
+    private val _errorAddFriend = MutableLiveData<Boolean>()
+    val errorAddFriend: LiveData<Boolean> = _errorAddFriend
 
     fun getCurrentFriends(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -107,10 +111,16 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
 
         viewModelScope.launch(Dispatchers.IO) {
             if (listCurrentUsernameFriends?.contains(user) == false) {
+                val friend = FriendEntity(userId = User.id, followedUsername = user)
+                db.FriendDao().insertFriend(friend)
+
                 val updateList = listCurrentUsernameFriends.toMutableList()
                 updateList.add(user)
 
                 _friends.postValue(updateList)
+                _errorAddFriend.postValue(true)
+            } else {
+                _errorAddFriend.postValue(false)
             }
         }
     }

@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class UsersAdapter(private val newUser : String, private val viewModel: FriendsViewModel): RecyclerView.Adapter<UserViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.user_cell, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.cell_user, parent, false)
 
         return UserViewHolder(view)
     }

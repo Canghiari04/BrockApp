@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
-class HomeFragment: Fragment(R.layout.home_fragment) {
+class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var user: User
     private lateinit var db: BrockDB
     private lateinit var stepsCountText: TextView

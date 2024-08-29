@@ -32,7 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
-class LoginFragment: Fragment(R.layout.login_fragment) {
+class LoginFragment: Fragment(R.layout.fragment_login) {
     private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
 

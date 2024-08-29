@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 
-class CalendarFragment: Fragment(R.layout.calendar_fragment) {
+class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
     private lateinit var user: User

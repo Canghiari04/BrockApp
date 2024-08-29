@@ -9,6 +9,7 @@ import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.Button
@@ -28,12 +29,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.amazonaws.services.s3.AmazonS3Client
 import androidx.recyclerview.widget.RecyclerView
 import com.example.brockapp.dialog.NewFriendDialog
+import com.example.brockapp.viewmodel.UserViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class FriendsFragment: Fragment(R.layout.friends_fragment) {
+class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var viewModel: FriendsViewModel
+    private lateinit var viewModelUser: UserViewModel
     private lateinit var usersRecyclerView: RecyclerView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,16 +54,24 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         val viewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
 
+        val viewModelFactoryUser = UserViewModelFactory(db)
+        viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
+
         observeFriends()
         observeUser()
         // Da concludere.
         observeSuggestion()
+        observeAddedFriend()
 
         viewModel.getCurrentFriends(user.id)
 
         syncButton.setOnClickListener {
-            viewModel.uploadUserData()
-            syncButton.isEnabled = false
+            if (user.flag) {
+                viewModel.uploadUserData()
+                syncButton.isEnabled = false
+            } else {
+                showShareDataDialog()
+            }
 
             // Mettere observer che in base a nuove attività aggiunte vada ad abilitare il bottone.
             android.os.Handler().postDelayed({
@@ -98,6 +110,16 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         // Inserire suggerimenti di nuovi amici da aws.
     }
 
+    private fun observeAddedFriend() {
+        viewModel.errorAddFriend.observe(viewLifecycleOwner) { errorAddFriend ->
+            if (errorAddFriend) {
+                Log.d("FRIENDS_FRAGMENT", "Amico aggiunto alla lista.")
+            } else {
+                Toast.makeText(context, "Amico già presente nella lista.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun populateFriendsRecyclerView(friends: List<String>, friendsRecyclerView: RecyclerView?) {
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val friendsAdapter = FriendsAdapter(friends) { friend ->
@@ -106,7 +128,7 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
                     viewModel.loadFriendData(friend)
                 }
 
-                // friendData?.let { showFriendActivity(it) }
+                friendData?.let { showFriendActivity(it) }
             }
         }
 
@@ -123,54 +145,70 @@ class FriendsFragment: Fragment(R.layout.friends_fragment) {
         usersRecyclerView.adapter = adapter
     }
 
+    private fun showShareDataDialog() {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle(R.string.permission_title)
+            .setMessage(R.string.permission_share_data)
+            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
+                dialog.dismiss()
+                User.flag = true
+                viewModelUser.changeSharingDataFlag(User.username, User.password)
+            }
+            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
     // Da rendere activity.
-//    private fun showFriendActivity(friend: Friend) {
-//        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.friend_data, null)
-//
-//        val friendDataTextView: TextView = dialogView.findViewById(R.id.friend_data_text_view)
-//        val closeButton: Button = dialogView.findViewById(R.id.close_button)
-//
-//        val friendData = StringBuilder()
-//        friendData.append("Username: ${friend.username}\n\n")
-//
-//        friendData.append("------CAMMINATA------\n")
-//        friend.walkActivities.forEach { activity ->
-//
-//
-//            if(activity.transitionType == 0)
-//                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-//            else
-//                friendData.append("Terminata alle: ${activity.timestamp}, passi fatti: ${activity.stepNumber}\n")
-//
-//        }
-//
-//        friendData.append("------VEICOLO------\n")
-//        friend.vehicleActivities.forEach { activity ->
-//            if(activity.transitionType == 0)
-//                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-//            else
-//                friendData.append("Terminata alle: ${activity.timestamp}, distanza percorsa: ${activity.distanceTravelled}\n")
-//
-//        }
-//
-//        friendData.append("------FERMO------\n")
-//        friend.stillActivities.forEach { activity ->
-//            if(activity.transitionType == 0)
-//                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-//            else
-//                friendData.append("Terminata alle: ${activity.timestamp}\n")
-//        }
-//
-//        friendDataTextView.text = friendData.toString()
-//
-//        val dialog = AlertDialog.Builder(requireContext())
-//            .setView(dialogView)
-//            .create()
-//
-//        closeButton.setOnClickListener {
-//            dialog.dismiss()
-//        }
-//
-//        dialog.show()
-//    }
+    private fun showFriendActivity(friend: Friend) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_friend_data, null)
+
+        val friendDataTextView: TextView = dialogView.findViewById(R.id.friend_data_text_view)
+        val closeButton: Button = dialogView.findViewById(R.id.close_button)
+
+        val friendData = StringBuilder()
+        friendData.append("Username: ${friend.username}\n\n")
+
+        friendData.append("------CAMMINATA------\n")
+        friend.walkActivities.forEach { activity ->
+
+
+            if(activity.transitionType == 0)
+                friendData.append("Iniziata alle: ${activity.timestamp}\n")
+            else
+                friendData.append("Terminata alle: ${activity.timestamp}, passi fatti: ${activity.stepNumber}\n")
+
+        }
+
+        friendData.append("------VEICOLO------\n")
+        friend.vehicleActivities.forEach { activity ->
+            if(activity.transitionType == 0)
+                friendData.append("Iniziata alle: ${activity.timestamp}\n")
+            else
+                friendData.append("Terminata alle: ${activity.timestamp}, distanza percorsa: ${activity.distanceTravelled}\n")
+
+        }
+
+        friendData.append("------FERMO------\n")
+        friend.stillActivities.forEach { activity ->
+            if(activity.transitionType == 0)
+                friendData.append("Iniziata alle: ${activity.timestamp}\n")
+            else
+                friendData.append("Terminata alle: ${activity.timestamp}\n")
+        }
+
+        friendDataTextView.text = friendData.toString()
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
 }

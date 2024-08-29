@@ -32,7 +32,7 @@ class DailyActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.daily_activity_activity)
+        setContentView(R.layout.activity_daily_activity)
 
         val user = User.getInstance()
         val db = BrockDB.getInstance(this)
@@ -77,7 +77,7 @@ class DailyActivity: AppCompatActivity() {
                 val pieChart = findViewById<PieChart>(R.id.daily_activity_pie_chart)
                 populateDailyActivitiesChart(pieChart, item)
             } else {
-                setContentView(R.layout.empty_page)
+                setContentView(R.layout.activity_empty_page)
             }
 
             setUpToolBar()

@@ -48,7 +48,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.walk_activity)
+        setContentView(R.layout.activity_walk)
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 
@@ -59,6 +59,8 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        // TODO utilizzare sensore typestepcounter
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
@@ -166,6 +168,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
                 val stepsDuringSession = stepCount
 
+                // TODO sistemare le notifiche con work relativo, guardare dir worker
                 if (stepsDuringSession == 100) {
                     // Deve richiamare il worker per Activity Recognition
                 }

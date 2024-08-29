@@ -50,7 +50,6 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 listActivities.add(newActivity)
             }
 
-
             _sortedDayActivitiesList.postValue(listActivities.sortedBy { it.timestamp })
             val listExitActivities = listActivities.filter { it.transitionType == 1 }
             _sortedDayExitActivitiesList.postValue(listExitActivities)
