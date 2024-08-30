@@ -1,50 +1,57 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 
 import android.net.Uri
 import android.Manifest
 import android.os.Bundle
-import android.widget.Button
 import android.view.MenuItem
+import android.widget.Button
 import android.content.Intent
 import android.app.AlertDialog
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
 import androidx.appcompat.widget.Toolbar
+import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 
-class NewUserActivity : AppCompatActivity() {
+class NewUserActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.new_user_activity)
+        setContentView(R.layout.activity_new_user)
 
         checkActivityPermission()
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
         setSupportActionBar(toolbar)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         findViewById<Button>(R.id.button_still).setOnClickListener {
-            startActivity(Intent(this, StillActivity::class.java))
+            val intent = Intent(this, StillActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
         findViewById<Button>(R.id.button_vehicle).setOnClickListener {
-            startActivity(Intent(this, VehicleActivity::class.java))
+            val intent = Intent(this, VehicleActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
         findViewById<Button>(R.id.button_walk).setOnClickListener {
-            startActivity(Intent(this, WalkActivity::class.java))
+            val intent = Intent(this, WalkActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
+        if (requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
             if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 showPermissionDialog()
             }
@@ -59,6 +66,7 @@ class NewUserActivity : AppCompatActivity() {
                 finish()
                 true
             }
+
             else -> {
                 super.onOptionsItemSelected(item)
                 false

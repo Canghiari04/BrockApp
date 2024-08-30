@@ -2,6 +2,7 @@ package com.example.brockapp.fragment
 
 import com.example.brockapp.*
 import com.example.brockapp.R
+import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
 import com.example.brockapp.singleton.MyGeofence
@@ -12,31 +13,39 @@ import com.example.brockapp.receiver.ConnectivityReceiver
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
+import java.io.File
 import android.Manifest
 import android.util.Log
 import android.os.Bundle
 import android.view.View
+import org.json.JSONObject
 import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
-import android.content.Context
 import android.widget.EditText
+import android.content.Context
 import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.content.IntentFilter
+import com.amazonaws.regions.Regions
 import kotlinx.coroutines.Dispatchers
 import androidx.fragment.app.Fragment
 import android.net.ConnectivityManager
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import kotlinx.coroutines.CoroutineScope
-import com.example.brockapp.singleton.User
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.PutObjectRequest
 import com.google.android.gms.location.LocationServices
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
-class SignInFragment: Fragment(R.layout.sign_in_fragment) {
+class SignInFragment : Fragment(R.layout.fragment_sign_in) {
+    private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
+
+    private lateinit var s3Client: AmazonS3Client
 
     private lateinit var db : BrockDB
     private lateinit var username : String
@@ -57,14 +66,21 @@ class SignInFragment: Fragment(R.layout.sign_in_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val db = BrockDB.getInstance(requireContext())
+        db = BrockDB.getInstance(requireContext())
+
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
+        s3Client = AmazonS3Client(credentialsProvider)
+
         val factoryUserViewModel = UserViewModelFactory(db)
+        viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
         }
-
-        viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         observeSignIn()
 
@@ -100,11 +116,12 @@ class SignInFragment: Fragment(R.layout.sign_in_fragment) {
             if (auth) {
                 util.requestPermissions()
 
-                User.username = username
-                User.password = password
+                user.username = username
+                user.password = password
+                user.flag = false
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
+                    user.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
                 }
             } else {
                 Toast.makeText(requireContext(), SIGN_IN_ERROR, Toast.LENGTH_SHORT).show()
@@ -113,16 +130,14 @@ class SignInFragment: Fragment(R.layout.sign_in_fragment) {
     }
 
     private fun startBackgroundOperations() {
-        val db = BrockDB.getInstance(requireContext())
         val factoryViewModelGeofence = GeofenceViewModelFactory(db)
-
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
         observeGeofenceAreas()
     }
 
     private fun observeGeofenceAreas() {
-        viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
                 geofence.initAreas(areas)
@@ -169,5 +184,28 @@ class SignInFragment: Fragment(R.layout.sign_in_fragment) {
         val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home")
         startActivity(intent)
         activity?.finish()
+    }
+
+    // POSTICIPARE IL BUCKET SOLO NEL MOMENTO IN CUI SIA DATO IL PERMESSO IN ONCLICK FRIENDS
+    private fun uploadUserDataToS3(username: String) {
+        val userData = mapOf("username" to username)
+        val json = JSONObject(userData).toString()
+
+        val fileName = "user_data.json"
+        val file = File(requireContext().filesDir, fileName)
+        file.writeText(json)
+
+        val key = "user/$username.json"
+
+        val thread = Thread {
+            try {
+                val request = PutObjectRequest(BUCKET_NAME, key, file)
+                s3Client.putObject(request)
+                Log.d("S3Upload", "User data uploaded successfully")
+            } catch (e: Exception) {
+                Log.e("S3Upload", "Failed to upload user data", e)
+            }
+        }
+        thread.start()
     }
 }

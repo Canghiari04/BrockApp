@@ -1,18 +1,22 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.fragment.*
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
+import com.example.brockapp.fragment.MapFragment
+import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.fragment.FriendsFragment
+import com.example.brockapp.fragment.CalendarFragment
 
 import android.util.Log
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.content.Intent
-import kotlinx.coroutines.launch
 import android.view.MenuInflater
+import kotlinx.coroutines.launch
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import androidx.appcompat.widget.Toolbar
@@ -36,7 +40,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.page_loader_activity)
+        setContentView(R.layout.activity_page_loader)
 
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
@@ -99,7 +103,7 @@ class PageLoaderActivity: AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.new_activity_button).setOnClickListener {
+        newActivityButton.setOnClickListener {
             val intent = Intent(this, NewUserActivity::class.java)
             startActivity(intent)
             finish()
@@ -112,7 +116,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
         return super.onCreateOptionsMenu(menu)
     }
-
+    
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_more_info -> {
@@ -140,6 +144,7 @@ class PageLoaderActivity: AppCompatActivity() {
      * Metodo necessario per rimpiazzare il fragment corrente con quello nuovo.
      */
     private fun switchFragment(name: String, fragment: Fragment) {
+        hideButton(name)
         hideAllFragment(supportFragmentManager)
 
         toolbar.title = name
@@ -148,11 +153,22 @@ class PageLoaderActivity: AppCompatActivity() {
             show(fragment)
             commit()
         }
+    }
 
-        if (name == "Map")
-            newActivityButton.hide()
-        else
-            newActivityButton.show()
+    private fun hideButton(name: String) {
+        when (name) {
+            "Map" -> {
+                newActivityButton.hide()
+            }
+
+            "Friends" -> {
+                newActivityButton.hide()
+            }
+
+            else -> {
+                newActivityButton.show()
+            }
+        }
     }
 
     /**

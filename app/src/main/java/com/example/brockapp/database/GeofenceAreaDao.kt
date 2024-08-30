@@ -1,10 +1,10 @@
 package com.example.brockapp.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Insert
+import androidx.lifecycle.LiveData
+import androidx.room.OnConflictStrategy
 
 @Dao
 interface GeofenceAreaDao {
@@ -22,4 +22,7 @@ interface GeofenceAreaDao {
 
     @Query("SELECT COUNT(*)>0 FROM GeofenceArea WHERE longitude=:longitude AND latitude=:latitude")
     suspend fun checkIfAreaIsPresent(longitude: Double, latitude: Double): Boolean
+
+    @Query("DELETE FROM GeofenceArea WHERE name=:name AND longitude=:longitude AND latitude=:latitude")
+    suspend fun deleteGeofenceArea(name: String?, longitude: Double, latitude: Double)
 }

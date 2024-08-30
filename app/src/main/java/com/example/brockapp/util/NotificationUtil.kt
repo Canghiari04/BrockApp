@@ -6,8 +6,8 @@ import com.example.brockapp.activity.AuthenticatorActivity
 
 import android.content.Intent
 import android.content.Context
-import android.app.PendingIntent
 import android.provider.Settings
+import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
 
 class NotificationUtil {

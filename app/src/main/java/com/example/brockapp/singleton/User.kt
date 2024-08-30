@@ -6,6 +6,7 @@ object User {
     var id: Long = 0
     var username: String = ""
     var password: String = ""
+    var flag: Boolean = false
 
     fun getInstance(): User {
         return instance
@@ -19,5 +20,6 @@ object User {
         id = 0
         username = ""
         password = ""
+        flag = false
     }
 }

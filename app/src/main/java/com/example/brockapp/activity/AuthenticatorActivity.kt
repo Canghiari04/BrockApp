@@ -13,7 +13,7 @@ class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentIntera
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.authenticator_activity)
+        setContentView(R.layout.activity_authenticator)
 
         signInFragment = SignInFragment()
         loginFragment = LoginFragment()

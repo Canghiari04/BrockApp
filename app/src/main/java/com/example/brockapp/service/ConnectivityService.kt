@@ -4,8 +4,8 @@ import com.example.brockapp.*
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.util.NotificationUtil
 
-import android.Manifest
 import android.util.Log
+import android.Manifest
 import android.os.IBinder
 import android.app.Service
 import android.content.Intent

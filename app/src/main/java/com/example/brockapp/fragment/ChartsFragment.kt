@@ -7,17 +7,17 @@ import com.example.brockapp.database.BrockDB
 
 import android.os.Bundle
 import android.view.View
-import java.time.LocalDate
 import java.time.YearMonth
+import java.time.LocalDate
 import android.graphics.Color
 import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.widget.ImageButton
-import androidx.fragment.app.Fragment
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import com.github.mikephil.charting.data.BarData
@@ -26,14 +26,14 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.PieEntry
 import androidx.core.widget.addTextChangedListener
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
-class ChartsFragment : Fragment(R.layout.charts_fragment) {
+class ChartsFragment: Fragment(R.layout.fragment_charts) {
     val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     private lateinit var db : BrockDB
@@ -130,6 +130,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         stepCountBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         stepCountBarChart.xAxis.setDrawGridLines(false)
         stepCountBarChart.axisLeft.axisMinimum = 0f
+        stepCountBarChart.axisRight.axisMinimum = 0f
         stepCountBarChart.animateY(500)
         stepCountBarChart.description.isEnabled = false
         stepCountBarChart.legend.isEnabled = false
@@ -157,11 +158,14 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
         dataSet.color = color
 
         val data = BarData(dataSet)
+
+        data.setDrawValues(false)
         distanceTravelledBarChart.data = data
 
         distanceTravelledBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..currentDate.lengthOfMonth()).map { it.toString() })
         distanceTravelledBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         distanceTravelledBarChart.axisLeft.axisMinimum = 0f
+        distanceTravelledBarChart.axisRight.axisMinimum = 0f
         distanceTravelledBarChart.animateY(500)
         distanceTravelledBarChart.xAxis.setDrawGridLines(false)
         distanceTravelledBarChart.description.isEnabled = false
@@ -199,6 +203,7 @@ class ChartsFragment : Fragment(R.layout.charts_fragment) {
                 dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
 
                 val data = PieData(dataSet)
+                data.setDrawValues(false)
                 activityTypePieChart.data = data
                 activityTypePieChart.description?.isEnabled = false
 

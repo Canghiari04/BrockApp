@@ -1,17 +1,18 @@
 package com.example.brockapp.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.GeofenceAreaEntry
-import kotlinx.coroutines.Dispatchers
+
 import kotlinx.coroutines.launch
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.MutableLiveData
 
 class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
-    private val _areas = MutableLiveData<List<GeofenceAreaEntry>>()
-    val areas: LiveData<List<GeofenceAreaEntry>> get() = _areas
+    private val _staticAreas = MutableLiveData<List<GeofenceAreaEntry>>()
+    val staticAreas: LiveData<List<GeofenceAreaEntry>> get() = _staticAreas
 
     private val _dynamicAreas = MutableLiveData<List<GeofenceAreaEntry>>()
     val dynamicAreas: LiveData<List<GeofenceAreaEntry>> get() = _dynamicAreas
@@ -47,10 +48,17 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
         }
     }
 
+    fun deleteGeofenceArea(name: String?, longitude: Double, latitude: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.GeofenceAreaDao().deleteGeofenceArea(name, longitude, latitude)
+            fetchDynamicGeofenceAreas()
+        }
+    }
+
     private fun fetchGeofenceAreas() {
         viewModelScope.launch(Dispatchers.IO) {
             val items = db.GeofenceAreaDao().getAllGeofenceAreas()
-            _areas.postValue(items)
+            _staticAreas.postValue(items)
         }
     }
 

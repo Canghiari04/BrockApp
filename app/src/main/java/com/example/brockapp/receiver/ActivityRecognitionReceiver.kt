@@ -21,7 +21,7 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
                 val serviceIntent = defineIntent(intent, context)
                 context.startService(serviceIntent)
             } catch (e: Exception) {
-                Log.d("ACTIVITY_RECOGNITION_RECEIVER", e.toString())
+                Log.e("ACTIVITY_RECOGNITION_RECEIVER", e.toString())
             }
         } else {
             Log.d("ACTIVITY_RECOGNITION_RECEIVER", "Weird intent.")

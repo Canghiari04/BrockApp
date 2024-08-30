@@ -6,8 +6,8 @@ import com.example.brockapp.util.NotificationUtil
 import androidx.work.Worker
 import android.content.Context
 import androidx.work.WorkerParameters
-import android.app.NotificationManager
 import android.app.NotificationChannel
+import android.app.NotificationManager
 
 class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
     private lateinit var util: NotificationUtil

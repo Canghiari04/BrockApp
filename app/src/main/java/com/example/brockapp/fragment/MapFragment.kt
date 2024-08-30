@@ -2,18 +2,18 @@ package com.example.brockapp.fragment
 
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.GeofenceAreaEntry
+import com.example.brockapp.service.MapService
 import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
-import java.util.Locale
 import android.util.Log
-import android.view.View
+import java.util.Locale
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import android.content.Intent
-import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import kotlinx.coroutines.launch
@@ -25,16 +25,15 @@ import android.widget.AutoCompleteTextView
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.example.brockapp.dialog.MarkerDialog
 import androidx.core.widget.addTextChangedListener
-import com.example.brockapp.service.MapService
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 
-class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
+class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private lateinit var db: BrockDB
     private lateinit var map: GoogleMap
     private lateinit var geofence: MyGeofence
@@ -101,16 +100,21 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
         map.moveCamera(
             CameraUpdateFactory.newCameraPosition(position)
         )
+
+        map.setOnMarkerClickListener { marker ->
+            activity?.let { MarkerDialog(marker, viewModel).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
+            true
+        }
     }
 
     private fun observeInitialGeofenceAreas() {
         val mapMarker = mutableMapOf<String, LatLng>()
 
-        viewModel.areas.observe(viewLifecycleOwner) { areas ->
+        viewModel.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 for (area in areas) {
-                    val marker = LatLng(area.latitude, area.longitude)
-                    mapMarker[area.name] = marker
+                    val coordinates = LatLng(area.latitude, area.longitude)
+                    mapMarker[area.name] = coordinates
                 }
 
                 populateMapOfMarker(mapMarker)
@@ -161,23 +165,15 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
     }
 
     private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
-        val marker = LatLng(geofenceArea.latitude, geofenceArea.longitude)
+        val coordinates = LatLng(geofenceArea.latitude, geofenceArea.longitude)
 
         map.addMarker(
             MarkerOptions()
-                .position(marker)
+                .position(coordinates)
                 .title(geofenceArea.name)
         )
 
-        map.addCircle(
-            CircleOptions()
-                .center(marker)
-                .radius(geofence.radius.toDouble())
-                .strokeColor(Color.RED)
-                .strokeWidth(2.5f)
-        )
-
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(marker, 15f))
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
     }
 
     private fun populateMapOfMarker(mapMarker: Map<String, LatLng>) {
@@ -186,14 +182,6 @@ class MapFragment: Fragment(R.layout.map_fragment), OnMapReadyCallback {
                 MarkerOptions()
                     .position(value)
                     .title(key)
-            )
-
-            map.addCircle(
-                CircleOptions()
-                    .center(value)
-                    .radius(geofence.radius.toDouble())
-                    .strokeColor(Color.RED)
-                    .strokeWidth(2.5f)
             )
         }
     }

@@ -15,32 +15,30 @@ import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.Manifest
 import android.util.Log
-import android.os.Bundle
 import android.view.View
+import android.os.Bundle
 import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
 import android.content.Context
-import android.widget.EditText
 import android.widget.TextView
-import kotlinx.coroutines.launch
+import android.widget.EditText
 import android.content.IntentFilter
 import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
 import android.net.ConnectivityManager
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import kotlinx.coroutines.CoroutineScope
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
-class LoginFragment: Fragment(R.layout.login_fragment) {
+class LoginFragment: Fragment(R.layout.fragment_login) {
+    private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
 
-    private lateinit var db : BrockDB
-    private lateinit var username : String
-    private lateinit var password : String
+    private lateinit var db: BrockDB
+    private lateinit var username: String
+    private lateinit var password: String
     private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
@@ -58,19 +56,20 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
         super.onViewCreated(view, savedInstanceState)
 
         db = BrockDB.getInstance(requireContext())
+
         val factoryViewModelUser = UserViewModelFactory(db)
+        viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
         }
 
-        viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
-
         observeLogin()
+        observeUser()
 
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
-            password= view.findViewById<EditText>(R.id.text_password).text.toString()
+            password = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.checkIfUserExists(username, password)
@@ -99,30 +98,35 @@ class LoginFragment: Fragment(R.layout.login_fragment) {
         viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
                 util.requestPermissions()
-
-                User.username = username
-                User.password = password
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    User.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
-                }
+                viewModelUser.getUser(username, password)
             } else {
                 Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
             }
         }
     }
 
-    private fun startBackgroundOperations() {
-        val db = BrockDB.getInstance(requireContext())
-        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
+    private fun observeUser() {
+        viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
+            if (currentUser != null) {
+                user.id = currentUser.id
+                user.username = currentUser.username.toString()
+                user.password = currentUser.password.toString()
+                user.flag = currentUser.sharingFlag
+            } else {
+                Log.d("LOGIN_FRAGMENT", "User not found.")
+            }
+        }
+    }
 
+    private fun startBackgroundOperations() {
+        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
         observeGeofenceAreas()
     }
 
     private fun observeGeofenceAreas() {
-        viewModelGeofence.areas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 geofence = MyGeofence.getInstance()
                 geofence.initAreas(areas)

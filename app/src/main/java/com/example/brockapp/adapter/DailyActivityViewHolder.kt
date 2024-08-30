@@ -1,13 +1,12 @@
 package com.example.brockapp.adapter
 
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.WALK_ACTIVITY_TYPE
+
+import android.view.View
+import android.widget.TextView
+import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
 
 class DailyActivityViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val activityImageView = itemView.findViewById<ImageView>(R.id.activity_cell_image)
@@ -20,15 +19,17 @@ class DailyActivityViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
         activityTimestamp.text = timestampActivity
         activityInfo.text = infoActivity
 
-        when(typeActivity) {
-            WALK_ACTIVITY_TYPE -> {
-                activityImageView.setImageResource(R.drawable.baseline_directions_walk_24)
-            }
-            VEHICLE_ACTIVITY_TYPE-> {
-                activityImageView.setImageResource(R.drawable.baseline_directions_car_24)
-            }
+        when (typeActivity) {
             STILL_ACTIVITY_TYPE -> {
                 activityImageView.setImageResource(R.drawable.baseline_chair_24)
+            }
+
+            VEHICLE_ACTIVITY_TYPE -> {
+                activityImageView.setImageResource(R.drawable.baseline_directions_car_24)
+            }
+
+            WALK_ACTIVITY_TYPE -> {
+                activityImageView.setImageResource(R.drawable.baseline_directions_walk_24)
             }
         }
     }
