@@ -17,11 +17,13 @@ import android.view.MenuItem
 import android.content.Intent
 import android.view.MenuInflater
 import kotlinx.coroutines.launch
+import android.graphics.PorterDuff
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -50,6 +52,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
         toolbar = findViewById(R.id.toolbar_page_loader)
         setSupportActionBar(toolbar)
+        toolbar.overflowIcon?.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN)
 
         newActivityButton = findViewById(R.id.new_activity_button)
 
@@ -64,10 +67,10 @@ class PageLoaderActivity: AppCompatActivity() {
 
         mapFragments.apply {
             put("Home", homeFragment)
-            put("Calendar", calendarFragment)
-            put("Map", mapFragment)
-            put("Charts", chartsFragment)
-            put("Friends", friendsFragment)
+            put("Calendario", calendarFragment)
+            put("Mappa", mapFragment)
+            put("Grafici", chartsFragment)
+            put("Amici", friendsFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
@@ -82,19 +85,19 @@ class PageLoaderActivity: AppCompatActivity() {
                     true
                 }
                 R.id.navbar_item_calendar -> {
-                    switchFragment("Calendar", calendarFragment)
+                    switchFragment("Calendario", calendarFragment)
                     true
                 }
                 R.id.navbar_item_map -> {
-                    switchFragment("Map", mapFragment)
+                    switchFragment("Mappa", mapFragment)
                     true
                 }
                 R.id.navbar_item_charts -> {
-                    switchFragment("Charts", chartsFragment)
+                    switchFragment("Grafici", chartsFragment)
                     true
                 }
                 R.id.navbar_item_friends -> {
-                    switchFragment("Friends", friendsFragment)
+                    switchFragment("Amici", friendsFragment)
                     true
                 }
                 else -> {
@@ -157,11 +160,11 @@ class PageLoaderActivity: AppCompatActivity() {
 
     private fun hideButton(name: String) {
         when (name) {
-            "Map" -> {
+            "Mappa" -> {
                 newActivityButton.hide()
             }
 
-            "Friends" -> {
+            "Amici" -> {
                 newActivityButton.hide()
             }
 
