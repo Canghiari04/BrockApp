@@ -68,10 +68,13 @@
 
     <string name="empty_icon_description">Icona per empty page</string>
 
-    <string name="run_button">CORSETTA</string>
-    <string name="walk_button">CAMMINATA</string>
-    <string name="vehicle_button">VIAGGIO IN MACCHINA</string>
-    <string name="still_button">STILL</string>
+    <string name="title_new_activity">Seleziona una delle seguenti attività</string>
+    <string name="title_still">Attività sedentaria</string>
+    <string name="description_still_icon">Chair icon</string>
+    <string name="title_vehicle">Viaggio in macchina</string>
+    <string name="description_vehicle_icon">Vehicle icon</string>
+    <string name="title_walk">Camminata</string>
+    <string name="description_walk_icon">Walking icon</string>
 
     <string name="stop_button">STOP</string>
     <string name="start_button">START</string>

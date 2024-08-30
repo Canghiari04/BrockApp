@@ -2,7 +2,6 @@ package com.example.brockapp.fragment
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.singleton.User
 import com.example.brockapp.util.CalendarUtil
 import com.example.brockapp.activity.DailyActivity
 import com.example.brockapp.adapter.CalendarAdapter
@@ -21,14 +20,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
-    private lateinit var user: User
-    private lateinit var util: CalendarUtil
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        user = User.getInstance()
-        util = CalendarUtil()
+        val util = CalendarUtil()
         
         val calendar = view.findViewById<RecyclerView>(R.id.calendar_recycler_view)
 

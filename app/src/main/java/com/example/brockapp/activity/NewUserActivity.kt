@@ -7,7 +7,6 @@ import android.net.Uri
 import android.Manifest
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Button
 import android.content.Intent
 import android.app.AlertDialog
 import android.provider.Settings
@@ -16,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NewUserActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,19 +29,19 @@ class NewUserActivity: AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        findViewById<Button>(R.id.button_still).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.button_still).setOnClickListener {
             val intent = Intent(this, StillActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        findViewById<Button>(R.id.button_vehicle).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.button_vehicle).setOnClickListener {
             val intent = Intent(this, VehicleActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        findViewById<Button>(R.id.button_walk).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.button_walk).setOnClickListener {
             val intent = Intent(this, WalkActivity::class.java)
             startActivity(intent)
             finish()

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var user: User
     private lateinit var viewModel: ActivitiesViewModel
+    private lateinit var selectedItem: String
     private lateinit var staticTitle: TextView
     private lateinit var staticCountText: TextView
     private lateinit var staticProgressBar: ProgressBar
@@ -38,8 +39,6 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var stepsTitle: TextView
     private lateinit var stepsCountText: TextView
     private lateinit var stepsProgressBar: ProgressBar
-
-    private lateinit var selectedItem: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -123,7 +122,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 }
 
                 viewModel.getUserActivities(range.first, range.second, user)
-                viewModel.getStaticTime(range.first, range.second, user)
+                viewModel.getStillTime(range.first, range.second, user)
                 viewModel.getKilometers(range.first, range.second, user)
                 viewModel.getSteps(range.first, range.second, user)
             }
@@ -135,10 +134,10 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun observeUserActivities() {
-        viewModel.listActivities.observe(viewLifecycleOwner) { listActivities ->
-            if (listActivities.isNotEmpty()) {
+        viewModel.listExitActivities.observe(viewLifecycleOwner) { listExitActivities ->
+            if (listExitActivities.isNotEmpty()) {
                 val recyclerView = view?.findViewById<RecyclerView>(R.id.home_recycler_view)
-                populateHomeRecyclerView(recyclerView, listActivities)
+                populateHomeRecyclerView(recyclerView, listExitActivities)
             } else {
                 Log.d("HOME_FRAGMENT", "None activities.")
             }
@@ -146,8 +145,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun observeUserStillTime() {
-        viewModel.staticTime.observe(viewLifecycleOwner) { still ->
-            val timeSpentInHour = (still?.toInt()!! / 60 / 60)
+        viewModel.stillTime.observe(viewLifecycleOwner) { stillTime ->
+            val timeSpentInHour = (stillTime!!.toInt() / 60 / 60)
             staticProgressBar.progress = timeSpentInHour
 
             if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
