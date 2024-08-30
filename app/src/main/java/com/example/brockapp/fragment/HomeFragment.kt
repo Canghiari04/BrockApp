@@ -28,13 +28,29 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var user: User
+    private lateinit var viewModel: ActivitiesViewModel
+    private lateinit var staticTitle: TextView
+    private lateinit var staticCountText: TextView
+    private lateinit var staticProgressBar : ProgressBar
+    private lateinit var kilometersTitle: TextView
+    private lateinit var kilometersCountText: TextView
+    private lateinit var kilometersProgressBar : ProgressBar
+    private lateinit var stepsTitle: TextView
     private lateinit var stepsCountText: TextView
     private lateinit var stepsProgressBar : ProgressBar
-    private lateinit var viewModel: ActivitiesViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        staticTitle = view.findViewById(R.id.static_title_text_view)
+        staticProgressBar = view.findViewById(R.id.static_progress_bar)
+        staticCountText = view.findViewById(R.id.static_count_text)
+
+        kilometersTitle = view.findViewById(R.id.kilometers_title_text_view)
+        kilometersProgressBar = view.findViewById(R.id.kilometers_progress_bar)
+        kilometersCountText = view.findViewById(R.id.kilometers_count_text)
+
+        stepsTitle = view.findViewById(R.id.steps_title_text_view)
         stepsProgressBar = view.findViewById(R.id.steps_progress_bar)
         stepsCountText = view.findViewById(R.id.steps_count_text)
 
@@ -49,6 +65,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
 
         observeUserActivities()
+        observeUserStaticTime()
+        observeUserKilometers()
         observeUserSteps()
     }
 
@@ -62,21 +80,34 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedItem = spinnerItems[position]
-                val range = when (selectedItem) {
+                val range: Pair<String, String>
+
+                when (selectedItem) {
                     "Giorno" -> {
-                        getDayRange(LocalDate.now())
+                        range = getDayRange(LocalDate.now())
+                        staticTitle.setText(R.string.daily_static_text)
+                        kilometersTitle.setText(R.string.daily_kilometers_text)
+                        stepsTitle.setText(R.string.daily_step_text)
                     }
 
                     "Settimana" -> {
-                        getWeekRange(LocalDate.now())
+                        range = getWeekRange(LocalDate.now())
+                        staticTitle.setText(R.string.weekly_static_text)
+                        kilometersTitle.setText(R.string.weekly_kilometers_text)
+                        stepsTitle.setText(R.string.weekly_step_text)
                     }
 
                     else -> {
-                        getDayRange(LocalDate.now())
+                        range = getDayRange(LocalDate.now())
+                        staticTitle.setText(R.string.daily_static_text)
+                        kilometersTitle.setText(R.string.daily_kilometers_text)
+                        stepsTitle.setText(R.string.daily_step_text)
                     }
                 }
 
                 viewModel.getUserActivities(range.first, range.second, user)
+                viewModel.getStaticTime(range.first, range.second, user)
+                viewModel.getKilometers(range.first, range.second, user)
                 viewModel.getSteps(range.first, range.second, user)
             }
 
@@ -93,6 +124,28 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 populateHomeRecyclerView(recyclerView, listActivities)
             } else {
                 Log.d("HOME_FRAGMENT", "None activities.")
+            }
+        }
+    }
+
+    private fun observeUserStaticTime() {
+        viewModel.staticTime.observe(viewLifecycleOwner) { staticTime ->
+            if (staticTime > 0) {
+                staticProgressBar.progress = staticTime
+                staticCountText.setText("$staticTime/10000 h")
+            } else {
+                Log.d("HOME_FRAGMENT", "None static time detected.")
+            }
+        }
+    }
+
+    private fun observeUserKilometers() {
+        viewModel.kilometers.observe(viewLifecycleOwner) { kilometers ->
+            if (kilometers > 0) {
+                kilometersProgressBar.progress = kilometers
+                kilometersCountText.setText("$kilometers/10000 km")
+            } else {
+                Log.d("HOME_FRAGMENT", "None kilometers detected.")
             }
         }
     }

@@ -5,7 +5,6 @@ import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.data.UserActivity
 
-import java.time.DayOfWeek
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
@@ -14,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val _sortedDayExitActivitiesList = MutableLiveData<List<UserActivity>>()
@@ -25,6 +23,12 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     private val _listActivities = MutableLiveData<List<UserActivity>>()
     val listActivities: LiveData<List<UserActivity>> get() = _listActivities
+
+    private val _staticTime = MutableLiveData<Int>()
+    val staticTime: LiveData<Int> get() = _staticTime
+
+    private val _kilometers = MutableLiveData<Int>()
+    val kilometers: LiveData<Int> get() = _kilometers
 
     private val _steps = MutableLiveData<Int>()
     val steps: LiveData<Int> get() = _steps
@@ -61,6 +65,26 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 }
 
             _listActivities.postValue(listExitActivities)
+        }
+    }
+
+    fun getStaticTime(startOfDay: String, endOfDay: String, user: User) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // TODO VA CALCOLATO IL TEMPO TRASCORSO IN POSIZIONE STATICA.
+
+            // _staticTime.postValue(staticTime)
+        }
+    }
+
+    fun getKilometers(startOfDay: String, endOfDay: String, user: User) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val kilometers = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(
+                user.id,
+                startOfDay,
+                endOfDay
+            ).parallelStream().mapToInt {it.distanceTravelled!!.toInt()}.sum()
+
+            _kilometers.postValue(kilometers)
         }
     }
 
