@@ -54,6 +54,7 @@
     <string name="calendar_text_view">CALENDARIO</string>
     <string name="friends_text_view">AMICI</string>
     <string name="charts_text_view">GRAFICI</string>
+    <string name="spinner_prompt">Visualizza per</string>
 
     <string name="description_back_month_button">Back arrow</string>
     <string name="description_forward_month_button">Forward arrow</string>
@@ -115,8 +116,22 @@
     <string name="distance_label">Distanza percorsa</string>
     <string name="insert_username_text">Inserisci lo username:</string>
     <string name="insert_password_text">Inserisci la password:</string>
-    <string name="step_number_home_text">I tuoi passi oggi</string>
-    <string name="step_counter_home_text">0/10000 passi</string>
+    <string name="daily_static_text">Durata delle attività statiche di oggi</string>
+    <string name="weekly_static_text">Durata della attività statiche nella settimana</string>
+    <string name="daily_static_counter_home_text">0/24 ore</string>
+    <string name="weekly_static_counter_home_text">0/168 ore</string>
+    <string name="static_count_text">Il tempo speso:</string>
+    <string name="static_count_initial_value">0</string>
+    <string name="daily_kilometers_text">Chilometri accumulati oggi</string>
+    <string name="weekly_kilometers_text">Chilometri accumulati nella settimana</string>
+    <string name="daily_kilometers_counter_home_text">0/100 km</string>
+    <string name="weekly_kilometers_counter_home_text">0/700 km</string>
+    <string name="kilometers_count_text">Chilometri fatti:</string>
+    <string name="kilometers_count_initial_value">0</string>
+    <string name="daily_step_text">Passi effettuati oggi</string>
+    <string name="weekly_step_text">Passi effettuati nella settimana</string>
+    <string name="daily_step_counter_home_text">0/10000 passi</string>
+    <string name="weekly_step_counter_home_text">0/70000 passi</string>
     <string name="step_count_text">Passi fatti:</string>
     <string name="step_count_initial_value">0</string>
     <string name="walk_title">CAMMINATA</string>
@@ -139,4 +154,10 @@
     <string name="search_user_button">Cerca</string>
     <string name="friend_data_text_view">Attività dell\'utente</string>
     <string name="height_difference_text">Dislivello:</string>
+
+    <string-array name="spinner_items">
+        <item>Visualizza per</item>
+        <item>Giorno</item>
+        <item>Settimana</item>
+    </string-array>
 </resources>

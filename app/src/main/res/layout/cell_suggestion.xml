@@ -48,6 +48,5 @@
                 android:backgroundTint="@color/uni_red">
             </Button>
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

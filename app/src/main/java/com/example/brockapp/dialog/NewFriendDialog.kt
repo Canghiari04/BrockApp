@@ -1,8 +1,6 @@
 package com.example.brockapp.dialog
 
 import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
 import com.example.brockapp.viewmodel.FriendsViewModel
 
 import android.os.Bundle
@@ -26,8 +24,6 @@ class NewFriendDialog(private val username: String, private val viewModel: Frien
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val user = User.getInstance()
-        val db = BrockDB.getInstance(requireContext())
         val textView = view.findViewById<TextView>(R.id.text_dialog_new_friend)
 
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)

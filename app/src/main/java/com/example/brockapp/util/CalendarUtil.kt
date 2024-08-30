@@ -2,6 +2,8 @@ package com.example.brockapp.util
 
 import com.example.brockapp.*
 import com.example.brockapp.data.UserActivity
+import com.example.brockapp.interfaces.TimeSpentCounter
+import com.example.brockapp.interfaces.TimeSpentCounterImpl
 
 import java.time.Month
 import java.time.Duration
@@ -14,6 +16,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class CalendarUtil {
+
+
     fun getDateByTokens(formatter: DateTimeFormatter, tokens: List<String>): LocalDate {
         val year = tokens[1].toInt()
         val month = Month.valueOf(tokens[0].uppercase()).value
@@ -63,26 +67,4 @@ class CalendarUtil {
         return "${date.dayOfWeek}, ${tokens[2]} ${date.month}".lowercase()
     }
 
-    fun computeTimeSpent(userActivities: List<UserActivity>): Long {
-        var timeSpent = 0L
-        val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
-
-        for (i in userActivities.indices) {
-            if (userActivities[i].transitionType == 1)
-                continue
-
-            val beginActivityTime = LocalDateTime.parse(userActivities[i].timestamp, dateFormatter)
-            val nextActivity = if (i < userActivities.size - 1) userActivities[i + 1] else null
-
-            if (nextActivity == null)
-                break
-
-            val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
-            val durationInSeconds = Duration.between(beginActivityTime, endActivityTime).seconds
-
-            timeSpent += durationInSeconds
-        }
-
-        return timeSpent
-    }
 }
