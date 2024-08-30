@@ -128,8 +128,8 @@
     <string name="weekly_kilometers_counter_home_text">0/700 km</string>
     <string name="kilometers_count_text">Chilometri fatti:</string>
     <string name="kilometers_count_initial_value">0</string>
-    <string name="daily_step_text">I passi effetuati oggi</string>
-    <string name="weekly_step_text">I passi effettuati nella settimana</string>
+    <string name="daily_step_text">Passi effettuati oggi</string>
+    <string name="weekly_step_text">Passi effettuati nella settimana</string>
     <string name="daily_step_counter_home_text">0/10000 passi</string>
     <string name="weekly_step_counter_home_text">0/70000 passi</string>
     <string name="step_count_text">Passi fatti:</string>

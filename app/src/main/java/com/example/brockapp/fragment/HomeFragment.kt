@@ -39,6 +39,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var stepsCountText: TextView
     private lateinit var stepsProgressBar : ProgressBar
 
+    private var selectedItem: String = ""
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -79,7 +81,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedItem = spinnerItems[position]
+                selectedItem = spinnerItems[position]
                 val range: Pair<String, String>
 
                 when (selectedItem) {
@@ -140,7 +142,10 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             val timeSpentInHour = (still?.toInt()!! / 60 / 60)
             staticProgressBar.progress = timeSpentInHour
 
-            staticCountText.setText("$timeSpentInHour/24 ore")
+            if(selectedItem.isEmpty()|| selectedItem == "Giorno" )
+                staticCountText.setText("$timeSpentInHour/24 ore")
+            else
+                staticCountText.setText("$timeSpentInHour/168 ore")
 
         }
     }
@@ -150,7 +155,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
 
             kilometersProgressBar.progress = kilometers
-            kilometersCountText.setText("$kilometers/100 km")
+
+            if(selectedItem.isEmpty()|| selectedItem == "Giorno")
+                kilometersCountText.setText("$kilometers/100 km")
+            else
+                kilometersCountText.setText("$kilometers/700 km")
 
         }
     }
@@ -159,7 +168,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel.steps.observe(viewLifecycleOwner) { steps ->
 
             stepsProgressBar.progress = steps
-            stepsCountText.setText("$steps/10000 passi")
+
+            if(selectedItem.isEmpty()|| selectedItem == "Giorno")
+                stepsCountText.setText("$steps/10000 passi")
+            else
+                stepsCountText.setText("$steps/70000 passi")
 
         }
     }
