@@ -31,15 +31,15 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var viewModel: ActivitiesViewModel
     private lateinit var staticTitle: TextView
     private lateinit var staticCountText: TextView
-    private lateinit var staticProgressBar : ProgressBar
+    private lateinit var staticProgressBar: ProgressBar
     private lateinit var kilometersTitle: TextView
     private lateinit var kilometersCountText: TextView
-    private lateinit var kilometersProgressBar : ProgressBar
+    private lateinit var kilometersProgressBar: ProgressBar
     private lateinit var stepsTitle: TextView
     private lateinit var stepsCountText: TextView
-    private lateinit var stepsProgressBar : ProgressBar
+    private lateinit var stepsProgressBar: ProgressBar
 
-    private var selectedItem: String = ""
+    private lateinit var selectedItem: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,9 +87,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 when (selectedItem) {
                     "Giorno" -> {
                         range = getDayRange(LocalDate.now())
+
                         staticTitle.setText(R.string.daily_static_text)
                         kilometersTitle.setText(R.string.daily_kilometers_text)
                         stepsTitle.setText(R.string.daily_step_text)
+
                         staticProgressBar.max = 86400
                         kilometersProgressBar.max = 100000
                         stepsProgressBar.max = 10000
@@ -97,6 +99,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
                     "Settimana" -> {
                         range = getWeekRange(LocalDate.now())
+
                         staticTitle.setText(R.string.weekly_static_text)
                         kilometersTitle.setText(R.string.weekly_kilometers_text)
                         stepsTitle.setText(R.string.weekly_step_text)
@@ -108,9 +111,14 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
                     else -> {
                         range = getDayRange(LocalDate.now())
+
                         staticTitle.setText(R.string.daily_static_text)
                         kilometersTitle.setText(R.string.daily_kilometers_text)
                         stepsTitle.setText(R.string.daily_step_text)
+
+                        staticProgressBar.max = 86400
+                        kilometersProgressBar.max = 100000
+                        stepsProgressBar.max = 10000
                     }
                 }
 
@@ -142,38 +150,35 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             val timeSpentInHour = (still?.toInt()!! / 60 / 60)
             staticProgressBar.progress = timeSpentInHour
 
-            if(selectedItem.isEmpty()|| selectedItem == "Giorno" )
+            if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
                 staticCountText.setText("$timeSpentInHour/24 ore")
-            else
+            } else {
                 staticCountText.setText("$timeSpentInHour/168 ore")
-
+            }
         }
     }
 
     private fun observeUserKilometers() {
         viewModel.kilometers.observe(viewLifecycleOwner) { kilometers ->
-
-
             kilometersProgressBar.progress = kilometers
 
-            if(selectedItem.isEmpty()|| selectedItem == "Giorno")
+            if(selectedItem == "Giorno" || selectedItem == "Visualizza per") {
                 kilometersCountText.setText("$kilometers/100 km")
-            else
+            } else {
                 kilometersCountText.setText("$kilometers/700 km")
-
+            }
         }
     }
 
     private fun observeUserSteps() {
         viewModel.steps.observe(viewLifecycleOwner) { steps ->
-
             stepsProgressBar.progress = steps
 
-            if(selectedItem.isEmpty()|| selectedItem == "Giorno")
+            if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
                 stepsCountText.setText("$steps/10000 passi")
-            else
+            } else {
                 stepsCountText.setText("$steps/70000 passi")
-
+            }
         }
     }
 
