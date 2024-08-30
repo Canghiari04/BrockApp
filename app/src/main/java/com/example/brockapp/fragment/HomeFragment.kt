@@ -65,7 +65,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
 
         observeUserActivities()
-        observeUserStaticTime()
+        observeUserStillTime()
         observeUserKilometers()
         observeUserSteps()
     }
@@ -88,6 +88,9 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                         staticTitle.setText(R.string.daily_static_text)
                         kilometersTitle.setText(R.string.daily_kilometers_text)
                         stepsTitle.setText(R.string.daily_step_text)
+                        staticProgressBar.max = 86400
+                        kilometersProgressBar.max = 100000
+                        stepsProgressBar.max = 10000
                     }
 
                     "Settimana" -> {
@@ -95,6 +98,10 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                         staticTitle.setText(R.string.weekly_static_text)
                         kilometersTitle.setText(R.string.weekly_kilometers_text)
                         stepsTitle.setText(R.string.weekly_step_text)
+
+                        staticProgressBar.max = 86400 * 7
+                        kilometersProgressBar.max = 100000 * 7
+                        stepsProgressBar.max = 10000 * 7
                     }
 
                     else -> {
@@ -128,36 +135,32 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun observeUserStaticTime() {
-        viewModel.staticTime.observe(viewLifecycleOwner) { staticTime ->
-            if (staticTime > 0) {
-                staticProgressBar.progress = staticTime
-                staticCountText.setText("$staticTime/10000 h")
-            } else {
-                Log.d("HOME_FRAGMENT", "None static time detected.")
-            }
+    private fun observeUserStillTime() {
+        viewModel.staticTime.observe(viewLifecycleOwner) { still ->
+            val timeSpentInHour = (still?.toInt()!! / 60 / 60)
+            staticProgressBar.progress = timeSpentInHour
+
+            staticCountText.setText("$timeSpentInHour/24 ore")
+
         }
     }
 
     private fun observeUserKilometers() {
         viewModel.kilometers.observe(viewLifecycleOwner) { kilometers ->
-            if (kilometers > 0) {
-                kilometersProgressBar.progress = kilometers
-                kilometersCountText.setText("$kilometers/10000 km")
-            } else {
-                Log.d("HOME_FRAGMENT", "None kilometers detected.")
-            }
+
+
+            kilometersProgressBar.progress = kilometers
+            kilometersCountText.setText("$kilometers/100 km")
+
         }
     }
 
     private fun observeUserSteps() {
         viewModel.steps.observe(viewLifecycleOwner) { steps ->
-            if (steps > 0) {
-                stepsProgressBar.progress = steps
-                stepsCountText.setText("$steps/10000 passi")
-            } else {
-                Log.d("HOME_FRAGMENT", "None steps detected.")
-            }
+
+            stepsProgressBar.progress = steps
+            stepsCountText.setText("$steps/10000 passi")
+
         }
     }
 

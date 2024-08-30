@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
+import com.example.brockapp.interfaces.TimeSpentCounterImpl
 import java.time.format.DateTimeFormatter
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
@@ -24,14 +25,16 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val _listActivities = MutableLiveData<List<UserActivity>>()
     val listActivities: LiveData<List<UserActivity>> get() = _listActivities
 
-    private val _staticTime = MutableLiveData<Int>()
-    val staticTime: LiveData<Int> get() = _staticTime
+    private val _staticTime = MutableLiveData<Long>()
+    val staticTime: LiveData<Long> get() = _staticTime
 
     private val _kilometers = MutableLiveData<Int>()
     val kilometers: LiveData<Int> get() = _kilometers
 
     private val _steps = MutableLiveData<Int>()
     val steps: LiveData<Int> get() = _steps
+
+    private val timeSpentCounter = TimeSpentCounterImpl()
 
     fun getUserActivities(startOfDay: String, endOfDay: String, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -70,9 +73,17 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getStaticTime(startOfDay: String, endOfDay: String, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            // TODO VA CALCOLATO IL TEMPO TRASCORSO IN POSIZIONE STATICA.
+            val staticActivites = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
+                user.id,
+                startOfDay,
+                endOfDay
+            )
 
-            // _staticTime.postValue(staticTime)
+            val timeSpent = timeSpentCounter.computeTimeSpentStill(staticActivites)
+
+            _staticTime.postValue(timeSpent)
+
+
         }
     }
 

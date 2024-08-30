@@ -24,9 +24,11 @@ import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.brockapp.interfaces.TimeSpentCounterImpl
 
 class DailyActivity: AppCompatActivity() {
     private var utilCalendar: CalendarUtil = CalendarUtil()
+    private val timeSpentCounter = TimeSpentCounterImpl()
 
     private lateinit var viewModel: ActivitiesViewModel
 
@@ -88,13 +90,13 @@ class DailyActivity: AppCompatActivity() {
         val entries = mutableListOf<PieEntry>()
 
         val userWalkActivities = activities.filter { it.type == WALK_ACTIVITY_TYPE }.sortedBy { it.timestamp }
-        val timeSpentWalking = utilCalendar.computeTimeSpent(userWalkActivities)
+        val timeSpentWalking = timeSpentCounter.computeTimeSpent(userWalkActivities)
 
         val userStillActivities = activities.filter { it.type == STILL_ACTIVITY_TYPE }.sortedBy { it.timestamp }
-        val timeSpentStill = utilCalendar.computeTimeSpent(userStillActivities)
+        val timeSpentStill = timeSpentCounter.computeTimeSpent(userStillActivities)
 
         val userVehicleActivities = activities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp }
-        val timeSpentVehicle = utilCalendar.computeTimeSpent(userVehicleActivities)
+        val timeSpentVehicle = timeSpentCounter.computeTimeSpent(userVehicleActivities)
 
         val secondsInDay = 60 * 60 * 24
         val totalRecordedTime = timeSpentWalking + timeSpentStill + timeSpentVehicle
