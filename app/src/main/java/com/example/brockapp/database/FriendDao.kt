@@ -10,7 +10,7 @@ interface FriendDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFriend(friend: FriendEntity)
 
-    @Query("SELECT followedUsername FROM Friend WHERE userId = :userId")
+    @Query("SELECT followedUsername FROM Friend WHERE user_id = :userId")
     suspend fun getFriendsByUserId(userId: Long): List<String>
 
     @Query("DELETE FROM Friend WHERE id=:userId AND followedUsername=:username")

@@ -84,14 +84,14 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     }
 
     override fun onAttach(context: Context) {
-        super.onAttach(context)
         if (context is OnFragmentInteractionListener)
             listener = context
+        super.onAttach(context)
     }
 
     override fun onDetach() {
-        super.onDetach()
         listener = null
+        super.onDetach()
     }
 
     private fun observeLogin() {

@@ -8,6 +8,7 @@ import com.example.brockapp.database.BrockDB
 import android.os.Bundle
 import android.view.View
 import java.time.YearMonth
+import java.time.LocalTime
 import java.time.LocalDate
 import android.graphics.Color
 import android.widget.TextView
@@ -32,10 +33,9 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import java.time.LocalTime
 
 class ChartsFragment: Fragment(R.layout.fragment_charts) {
-    val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
+    private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     private lateinit var db : BrockDB
     private lateinit var dateTextView: TextView

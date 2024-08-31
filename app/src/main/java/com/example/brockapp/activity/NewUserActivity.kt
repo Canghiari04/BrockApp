@@ -22,13 +22,13 @@ class NewUserActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_user)
 
-        checkActivityPermission()
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
         setSupportActionBar(toolbar)
         toolbar.setNavigationIcon(R.drawable.baseline_home_more_24)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        checkActivityPermission()
 
         findViewById<FloatingActionButton>(R.id.button_still).setOnClickListener {
             val intent = Intent(this, StillActivity::class.java)

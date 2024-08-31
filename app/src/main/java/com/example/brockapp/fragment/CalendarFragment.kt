@@ -31,7 +31,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         populateCalendarRecyclerView(util.getCurrentDays(LocalDate.now()), util.getDates(LocalDate.now()), calendar)
 
         view.findViewById<ImageButton>(R.id.button_back_month).setOnClickListener {
-            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
+            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(DATE_SEPARATOR)
 
             var date = util.getDateByTokens(formatter, tokens)
             date = date.minusMonths(1)
@@ -42,7 +42,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         }
 
         view.findViewById<ImageButton>(R.id.button_forward_month).setOnClickListener {
-            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
+            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(DATE_SEPARATOR)
 
             var date = util.getDateByTokens(formatter, tokens)
             date = date.plusMonths(1)
@@ -54,7 +54,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun setDate(date: LocalDate) {
-        val strDate = "${date.month}" + " ${date.year}"
+        val strDate = "${date.monthValue}" + "-${date.year}"
         view?.findViewById<TextView>(R.id.date_text_view)?.text = strDate.lowercase()
     }
 
@@ -78,7 +78,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     /**
-     * Metodo attuato per attuare lo start di una nuova attività per visualizzare le informazioni
+     * Metodo attuato per lo start di una nuova attività per la visualizzazione le informazioni
      * rispetto alla data corrente passata come parametro.
      */
     private fun showActivityOfDay(date: String) {

@@ -44,15 +44,15 @@ class PageLoaderActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page_loader)
 
+        toolbar = findViewById(R.id.toolbar_page_loader)
+        setSupportActionBar(toolbar)
+        toolbar.overflowIcon?.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN)
+
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
         mapFragment = MapFragment()
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
-
-        toolbar = findViewById(R.id.toolbar_page_loader)
-        setSupportActionBar(toolbar)
-        toolbar.overflowIcon?.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN)
 
         newActivityButton = findViewById(R.id.new_activity_button)
 

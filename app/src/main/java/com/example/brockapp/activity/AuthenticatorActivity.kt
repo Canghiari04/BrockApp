@@ -15,6 +15,8 @@ class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentIntera
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authenticator)
 
+        supportActionBar?.hide()
+
         signInFragment = SignInFragment()
         loginFragment = LoginFragment()
 

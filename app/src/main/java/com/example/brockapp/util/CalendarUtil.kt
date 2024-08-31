@@ -1,26 +1,20 @@
 package com.example.brockapp.util
 
 import com.example.brockapp.*
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.interfaces.TimeSpentCounter
-import com.example.brockapp.interfaces.TimeSpentCounterImpl
 
-import java.time.Month
-import java.time.Duration
+import java.util.Locale
 import java.time.YearMonth
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class CalendarUtil {
-
-
     fun getDateByTokens(formatter: DateTimeFormatter, tokens: List<String>): LocalDate {
         val year = tokens[1].toInt()
-        val month = Month.valueOf(tokens[0].uppercase()).value
+        val month = tokens[0].toInt()
         val lastDay = YearMonth.of(year, month).atEndOfMonth()
 
         return LocalDate.parse(lastDay.toString(), formatter)
@@ -64,7 +58,6 @@ class CalendarUtil {
         val tokens = strDate!!.split(DATE_SEPARATOR)
         val date = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
 
-        return "${date.dayOfWeek}, ${tokens[2]} ${date.month}".lowercase()
+        return "${date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ITALIAN)}, ${tokens[2]} ${date.month.getDisplayName(TextStyle.FULL, Locale.ITALIAN)}".lowercase()
     }
-
 }

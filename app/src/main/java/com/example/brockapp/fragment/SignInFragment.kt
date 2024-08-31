@@ -101,14 +101,14 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     }
 
     override fun onAttach(context: Context) {
-        super.onAttach(context)
         if(context is OnFragmentInteractionListener)
             listener = context
+        super.onAttach(context)
     }
 
     override fun onDetach() {
-        super.onDetach()
         listener = null
+        super.onDetach()
     }
 
     private fun observeSignIn() {
