@@ -41,7 +41,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val listWalkingActivities = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
 
             listStillActivities.parallelStream().forEach {
-                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "METTERE DURATA STILL")
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
                 listActivities.add(newActivity)
             }
 

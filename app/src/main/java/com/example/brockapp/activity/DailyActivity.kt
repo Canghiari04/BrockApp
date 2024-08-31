@@ -100,10 +100,10 @@ class DailyActivity: AppCompatActivity() {
     }
 
     private fun populateDailyActivitiesRecyclerView(dailyList: RecyclerView, activities: List<UserActivity>) {
-        val adapterActivities = DailyActivityAdapter(activities)
+        val adapter = DailyActivityAdapter(activities)
         val layoutManager = LinearLayoutManager(this)
 
-        dailyList.adapter = adapterActivities
+        dailyList.adapter = adapter
         dailyList.layoutManager = layoutManager
     }
 

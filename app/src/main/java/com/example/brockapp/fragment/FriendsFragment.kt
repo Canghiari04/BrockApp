@@ -1,28 +1,26 @@
 package com.example.brockapp.fragment
 
+import android.content.Intent
 import com.example.brockapp.R
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.adapter.FriendsAdapter
 import com.example.brockapp.dialog.NewFriendDialog
+import com.example.brockapp.activity.FriendActivity
 import com.example.brockapp.adapter.SuggestionsAdapter
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
-import android.os.Bundle
 import android.util.Log
+import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import kotlinx.coroutines.launch
 import android.view.LayoutInflater
 import com.amazonaws.regions.Regions
 import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.CoroutineScope
 import androidx.appcompat.app.AlertDialog
 import com.example.brockapp.singleton.User
 import androidx.lifecycle.ViewModelProvider
@@ -42,17 +40,17 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val user = User.getInstance()
-        val db: BrockDB = BrockDB.getInstance(requireContext())
-
         val usernameTextView = view.findViewById<EditText>(R.id.search_user_text_area)
         val syncButton = view.findViewById<FloatingActionButton>(R.id.user_synchronized_button)
+
+        val user = User.getInstance()
+        val db: BrockDB = BrockDB.getInstance(requireContext())
 
         val credentialsProvider = CognitoCachingCredentialsProvider(requireContext(), "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00", Regions.EU_WEST_3)
         val s3Client = AmazonS3Client(credentialsProvider)
 
-        val viewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
-        viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
+        val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, requireContext())
+        viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactoryFriends)[FriendsViewModel::class.java]
 
         val viewModelFactoryUser = UserViewModelFactory(db)
         viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
@@ -80,7 +78,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             val usernameToSearch = usernameTextView.text.toString()
 
             if (usernameToSearch.length > 2) {
-                viewModelFriends.searchUser(usernameToSearch)
+                viewModelFriends.getSuggestions(usernameToSearch)
             } else {
                 Log.d("FRIENDS_FRAGMENT", "Search with empty body not supported.")
             }
@@ -115,22 +113,6 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         }
     }
 
-    private fun populateFriendsRecyclerView(friends: List<String>, friendsRecyclerView: RecyclerView?) {
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        val friendsAdapter = FriendsAdapter(friends) { friend ->
-            CoroutineScope(Dispatchers.Main).launch {
-                val friendData = withContext(Dispatchers.IO) {
-                    viewModelFriends.loadFriendData(friend)
-                }
-
-                friendData?.let { showFriendActivity(it) }
-            }
-        }
-
-        friendsRecyclerView?.adapter = friendsAdapter
-        friendsRecyclerView?.layoutManager = layoutManager
-    }
-
     private fun populateSuggestionsRecyclerView(usernames: List<String>, suggestionsRecyclerView: RecyclerView?) {
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val adapter = SuggestionsAdapter(usernames) { username ->
@@ -139,6 +121,18 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
         suggestionsRecyclerView?.layoutManager = layoutManager
         suggestionsRecyclerView?.adapter = adapter
+    }
+
+    private fun populateFriendsRecyclerView(friends: List<String>, friendsRecyclerView: RecyclerView?) {
+        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val friendsAdapter = FriendsAdapter(friends) { friend ->
+            val intent = Intent(context, FriendActivity::class.java).putExtra("FRIEND_USERNAME", friend)
+            startActivity(intent)
+            activity?.finish()
+        }
+
+        friendsRecyclerView?.adapter = friendsAdapter
+        friendsRecyclerView?.layoutManager = layoutManager
     }
 
     private fun showShareDataDialog() {

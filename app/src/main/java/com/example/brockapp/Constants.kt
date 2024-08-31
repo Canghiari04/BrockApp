@@ -54,3 +54,6 @@ const val NO_CONNECTION_TYPE_CONNECTION = "NO-CONNECTION"
 
 // AWS
 const val BUCKET_NAME = "brock-app"
+
+//
+const val NUM_TABS = 3

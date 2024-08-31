@@ -71,6 +71,13 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".activity.NewUserActivity">
         </activity>
+        <activity
+            android:name=".activity.FriendActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.NewUserActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        </activity>
 
         <receiver
             android:name=".receiver.GeofenceReceiver"

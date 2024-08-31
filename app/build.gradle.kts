@@ -66,7 +66,6 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     kapt("androidx.room:room-compiler:2.6.1")
 
-
     // scope view model
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
@@ -76,6 +75,8 @@ dependencies {
     // aws
     implementation(libs.aws.android.sdk.s3)
     implementation(libs.aws.android.sdk.core)
+    implementation (libs.gson)
 
-    implementation ("com.google.code.gson:gson:2.8.9")
+    // tab layout
+    implementation(libs.material.v130)
 }

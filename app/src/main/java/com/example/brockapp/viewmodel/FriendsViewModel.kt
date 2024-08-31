@@ -4,6 +4,7 @@ import com.example.brockapp.*
 import com.example.brockapp.data.Friend
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.data.UserActivity
 import com.example.brockapp.database.FriendEntity
 
 import java.io.File
@@ -32,16 +33,14 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     private val _errorAddFriend = MutableLiveData<Boolean>()
     val errorAddFriend: LiveData<Boolean> = _errorAddFriend
 
-    fun getCurrentFriends(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val item = db.FriendDao().getFriendsByUserId(id)
-            _friends.postValue(item)
-        }
-    }
+    private val _friendStillActivities = MutableLiveData<List<UserActivity>>()
+    val friendStillActivities: LiveData<List<UserActivity>> = _friendStillActivities
 
-    fun getSuggestionFriend() {
+    private val _friendVehicleActivities = MutableLiveData<List<UserActivity>>()
+    val friendVehicleActivities: LiveData<List<UserActivity>> = _friendVehicleActivities
 
-    }
+    private val _friendWalkActivities = MutableLiveData<List<UserActivity>>()
+    val friendWalkActivities: LiveData<List<UserActivity>> = _friendWalkActivities
 
     /**
      * Metodo necessario per inserire i dati dell'utente all'interno della repository in cloud.
@@ -78,7 +77,14 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
         }
     }
 
-    fun searchUser(user: String) {
+    fun getCurrentFriends(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val item = db.FriendDao().getFriendsByUserId(id)
+            _friends.postValue(item)
+        }
+    }
+
+    fun getSuggestions(user: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userKey = "user/$user"
@@ -127,7 +133,33 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
         }
     }
 
-    suspend fun loadFriendData(username: String): Friend? {
+    fun getFriendActivities(username: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val friend = loadFriendData(username)
+            val listActivities = ArrayList<UserActivity>()
+
+            friend?.stillActivities?.parallelStream()?.forEach {
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
+                listActivities.add(newActivity)
+            }
+
+            friend?.vehicleActivities?.parallelStream()?.forEach {
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, VEHICLE_ACTIVITY_TYPE, it.distanceTravelled.toString())
+                listActivities.add(newActivity)
+            }
+
+            friend?.walkActivities?.parallelStream()?.forEach  {
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, WALK_ACTIVITY_TYPE, it.stepNumber.toString())
+                listActivities.add(newActivity)
+            }
+
+            _friendStillActivities.postValue(listActivities.filter { it.type == STILL_ACTIVITY_TYPE })
+            _friendVehicleActivities.postValue(listActivities.filter { it.type == VEHICLE_ACTIVITY_TYPE })
+            _friendWalkActivities.postValue(listActivities.filter { it.type == WALK_ACTIVITY_TYPE })
+        }
+    }
+
+    private suspend fun loadFriendData(username: String?): Friend? {
         val friendKey = "user/$username.json"
 
         return try {

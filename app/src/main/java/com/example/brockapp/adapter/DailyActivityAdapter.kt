@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 
-class DailyActivityAdapter(private val activities: List<UserActivity>) : RecyclerView.Adapter<DailyActivityViewHolder>() {
+class DailyActivityAdapter(private val activities: List<UserActivity>): RecyclerView.Adapter<DailyActivityViewHolder>() {
     private val filteredActivities: List<UserActivity> = activities.filter { it.transitionType == 1 }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
