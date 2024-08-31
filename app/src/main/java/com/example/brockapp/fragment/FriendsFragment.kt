@@ -58,7 +58,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val viewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
         viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
 
-        val viewModelFactoryUser = UserViewModelFactory(db)
+        val viewModelFactoryUser = UserViewModelFactory(db, requireContext())
         viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
 
         observeFriends()

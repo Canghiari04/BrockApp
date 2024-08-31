@@ -57,7 +57,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
 
         db = BrockDB.getInstance(requireContext())
 
-        val factoryViewModelUser = UserViewModelFactory(db)
+        val factoryViewModelUser = UserViewModelFactory(db, requireContext())
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
@@ -72,7 +72,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             password = view.findViewById<EditText>(R.id.text_password).text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                viewModelUser.checkIfUserExists(username, password)
+                viewModelUser.checkIfUserExistsLocally(username, password)
             } else {
                 Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
             }
