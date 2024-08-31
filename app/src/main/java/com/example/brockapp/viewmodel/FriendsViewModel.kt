@@ -91,7 +91,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 val s3Objects = objectListing.objectSummaries
                 val matchingUsers = s3Objects
                     .filter {
-                        it.key.endsWith(".json")
+                        it.key.endsWith(".json") && it.key != "user/${User.username}.json"
                     }
                     .map {
                         it.key.removePrefix("user/").removeSuffix(".json")

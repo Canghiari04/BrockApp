@@ -32,6 +32,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import java.time.LocalTime
 
 class ChartsFragment: Fragment(R.layout.fragment_charts) {
     val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
@@ -106,22 +107,27 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         val dateStr: String = dateTextView.text.toString()
 
         val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
-
         val currentDate = yearMonth.atDay(1)
+        val startOfMonth = currentDate.atStartOfDay()
+        val endOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth()).atTime(LocalTime.MAX)
+
+        val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(User.id, startOfMonth.toString(), endOfMonth.toString())
+
+        val stepsPerDay = listWalkingActivities.groupBy {
+            it.timestamp?.let { timestamp ->
+                LocalDate.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).dayOfMonth
+            } ?: 0
+        }.mapValues { entry ->
+            entry.value.sumOf { it.stepNumber }
+        }
 
         for (day in 1..currentDate.lengthOfMonth()) {
-            val date = currentDate.withDayOfMonth(day)
-
-            val (startOfDay, endOfDay) = getDayRange(date)
-            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
-
-            val totalSteps = listWalkingActivities.map { it.stepNumber }.sum()
+            val totalSteps = stepsPerDay[day] ?: 0f
             entries.add(BarEntry(day.toFloat(), totalSteps.toFloat()))
         }
 
         val dataSet = BarDataSet(entries, "Numero di passi")
-        val color = Color.parseColor("#BB2222")
-        dataSet.color = color
+        dataSet.color = Color.parseColor("#BB2222")
 
         val data = BarData(dataSet)
         stepCountBarChart.data = data
@@ -137,6 +143,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         stepCountBarChart.invalidate()
     }
 
+
     private suspend fun setupDistanceTravelledBarChart() {
         val entries = ArrayList<BarEntry>()
         val dateStr: String = dateTextView.text.toString()
@@ -144,21 +151,28 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         val yearMonth = YearMonth.parse(dateStr, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
 
         val currentDate = yearMonth.atDay(1)
+        val startOfMonth = currentDate.atStartOfDay()
+        val endOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth()).atTime(LocalTime.MAX)
+
+        val listVehicleActivities = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(User.id, startOfMonth.toString(), endOfMonth.toString())
+
+        val distancePerDay = listVehicleActivities.groupBy {
+            it.timestamp?.let { timestamp ->
+                LocalDate.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).dayOfMonth
+            } ?: 0
+        }.mapValues { entry ->
+            entry.value.sumOf { it.distanceTravelled?: 0.0 }
+        }
 
         for (day in 1..currentDate.lengthOfMonth()) {
-            val date = currentDate.withDayOfMonth(day)
-            val (startOfDay, endOfDay) = getDayRange(date)
-
-            val totalDistanceTravelled = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay).parallelStream().mapToDouble { it.distanceTravelled!! }.sum()
+            val totalDistanceTravelled = distancePerDay[day] ?: 0.0
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
 
         val dataSet = BarDataSet(entries, "Distanza percorsa su veicoli")
-        val color = Color.parseColor("#BB2222")
-        dataSet.color = color
+        dataSet.color = Color.parseColor("#BB2222")
 
         val data = BarData(dataSet)
-
         data.setDrawValues(false)
         distanceTravelledBarChart.data = data
 
@@ -173,6 +187,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         distanceTravelledBarChart.invalidate()
     }
 
+
     private suspend fun setupActivityTypePieChart() {
         val entries = ArrayList<PieEntry>()
 
@@ -182,22 +197,22 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
 
         val (startOfMonth, endOfMonth) = getMonthRange(currentDate)
 
-        val userWalkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
-        val userWalkActivityCount = userWalkActivities.size
+        val userWalkActivitiesCount = db.UserWalkActivityDao().getWalkActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
 
-        val userStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
-        val userStillActivityCount = userStillActivities.size
 
-        val userVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
-        val userVehicleActivityCount = userVehicleActivities.size
+        val userStillActivitiesCount = db.UserStillActivityDao().getStillActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
+
+
+        val userVehicleActivitiesCount = db.UserVehicleActivityDao().getVehicleActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
+
 
         withContext(Dispatchers.Main) {
             val noActivityMessage = view?.findViewById<TextView>(R.id.no_activity_message)
 
-            if (userWalkActivityCount > 0 || userStillActivityCount > 0 || userVehicleActivityCount > 0) {
-                entries.add(PieEntry(userVehicleActivityCount.toFloat(), "Vehicle activity"))
-                entries.add(PieEntry(userStillActivityCount.toFloat(), "Still activity"))
-                entries.add(PieEntry(userWalkActivityCount.toFloat(), "Walk activity"))
+            if (userWalkActivitiesCount > 0 || userStillActivitiesCount > 0 || userVehicleActivitiesCount > 0) {
+                entries.add(PieEntry(userWalkActivitiesCount.toFloat(), "Walk activity"))
+                entries.add(PieEntry(userVehicleActivitiesCount.toFloat(), "Vehicle activity"))
+                entries.add(PieEntry(userStillActivitiesCount.toFloat(), "Still activity"))
 
                 val dataSet = PieDataSet(entries, "Dati")
                 dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
@@ -218,18 +233,6 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
                 activityTypePieChart.visibility = View.GONE
             }
         }
-    }
-
-    private fun getDayRange(date: LocalDate): Pair<String, String> {
-        val startOfMonth = date.atTime(0, 0, 0)
-        val endOfMonth = date.atTime(23, 59, 59)
-
-        val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
-
-        return Pair(
-            startOfMonth.format(outputFormatter),
-            endOfMonth.format(outputFormatter)
-        )
     }
 
     private fun getMonthRange(date: LocalDate): Pair<String, String> {

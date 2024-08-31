@@ -21,9 +21,8 @@ interface UserStillActivityDao {
     ): List<UserStillActivityEntity>
 
     @Query("SELECT * FROM UserStillActivity WHERE user_id=:userId AND timestamp BETWEEN :startTime AND :endTime ORDER BY timestamp")
-    suspend fun getStillActivitiesByUserIdAndPeriod(
-        userId: Long,
-        startTime: String,
-        endTime: String
-    ): List<UserStillActivityEntity>
+    suspend fun getStillActivitiesByUserIdAndPeriod(userId: Long, startTime: String, endTime: String): List<UserStillActivityEntity>
+
+    @Query("SELECT COUNT(*) FROM UserStillActivity WHERE user_id=:userId AND timestamp BETWEEN :startTime AND :endTime AND transition_type=1")
+    suspend fun getStillActivitiesCountByUserIdAndPeriod(userId: Long, startTime: String, endTime: String): Int
 }
