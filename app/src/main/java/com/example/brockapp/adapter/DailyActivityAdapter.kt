@@ -15,7 +15,6 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
         val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_activity, parent, false)
-
         return DailyActivityViewHolder(activityItem)
     }
 
@@ -24,10 +23,14 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
     }
 
     override fun onBindViewHolder(holder: DailyActivityViewHolder, position: Int) {
+        val timestamp = activities[position].timestamp
+        val tokens = timestamp?.split(" ")
+
+        val date = tokens?.get(0)
+
         val exitActivity = filteredActivities[position]
         val exitActivityTime = exitActivity.timestamp!!.split(" ")[1]
 
-        // ?
         if (2 * position < activities.size) {
             val enterActivity = activities[(2 * position)]
             val enterActivityTime = enterActivity.timestamp!!.split(" ")[1]
@@ -38,6 +41,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                 STILL_ACTIVITY_TYPE -> {
                     holder.bindActivity(
                         STILL_ACTIVITY_TYPE,
+                        "Data $date",
                         "Finito alle $exitActivityTime",
                         "Durata: $timeDifferenceInSeconds secondi"
                     )
@@ -48,6 +52,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
 
                     holder.bindActivity(
                         VEHICLE_ACTIVITY_TYPE,
+                        "Data $date",
                         "Finito alle $exitActivityTime",
                         "Distanza percorsa: $distanceTravelled metri.\nDurata: $timeDifferenceInSeconds secondi"
                     )
@@ -56,17 +61,14 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                 WALK_ACTIVITY_TYPE -> {
                     holder.bindActivity(
                         WALK_ACTIVITY_TYPE,
+                        "Data $date",
                         "Finito alle $exitActivityTime",
                         "Passi fatti: ${exitActivity.info}. \nDurata: $timeDifferenceInSeconds secondi"
                     )
                 }
 
                 else -> {
-                    holder.bindActivity(
-                        exitActivity.type,
-                        "Finito alle $exitActivityTime",
-                        "\nDurata: $timeDifferenceInSeconds secondi"
-                    )
+                    return
                 }
             }
         }

@@ -14,6 +14,7 @@ import android.graphics.Color
 import android.widget.TextView
 import kotlinx.coroutines.launch
 import android.widget.ImageButton
+import android.widget.Toast
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import androidx.fragment.app.Fragment
@@ -198,17 +199,10 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         val (startOfMonth, endOfMonth) = getMonthRange(currentDate)
 
         val userWalkActivitiesCount = db.UserWalkActivityDao().getWalkActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
-
-
         val userStillActivitiesCount = db.UserStillActivityDao().getStillActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
-
-
         val userVehicleActivitiesCount = db.UserVehicleActivityDao().getVehicleActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
 
-
         withContext(Dispatchers.Main) {
-            val noActivityMessage = view?.findViewById<TextView>(R.id.no_activity_message)
-
             if (userWalkActivitiesCount > 0 || userStillActivitiesCount > 0 || userVehicleActivitiesCount > 0) {
                 entries.add(PieEntry(userWalkActivitiesCount.toFloat(), "Walk activity"))
                 entries.add(PieEntry(userVehicleActivitiesCount.toFloat(), "Vehicle activity"))
@@ -226,11 +220,10 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
                 activityTypePieChart.setDrawEntryLabels(false)
                 activityTypePieChart.invalidate()
 
-                noActivityMessage?.visibility = View.GONE
                 activityTypePieChart.visibility = View.VISIBLE
             } else {
-                noActivityMessage?.visibility = View.VISIBLE
                 activityTypePieChart.visibility = View.GONE
+                Toast.makeText(requireContext(), "Nessuna attività compiuta nel mese.", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -32,23 +32,21 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 class WalkActivity : AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var running = false
-    private var heightDifference = 0f
-
     private var currentSteps = 0
-
+    private var heightDifference = 0f
+    private var pressureSensor: Sensor? = null
+    private var initialAltitude: Float? = null
     private var stepDetectorSensor : Sensor? = null
+    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
 
-    private var pressureSensor: Sensor? = null
-    private var initialAltitude: Float? = null
-
-    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_walk)
+
+        supportActionBar?.title = " "
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 
@@ -59,10 +57,8 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
         // TODO utilizzare sensore typestepcounter
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-
         pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
 
         if (pressureSensor != null) {
@@ -70,7 +66,6 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         } else {
             Toast.makeText(this, "Sensore barometrico non disponibile", Toast.LENGTH_SHORT).show()
         }
-
 
         if (stepDetectorSensor == null) {
             Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
@@ -193,11 +188,9 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
     }
-
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long, heightDifference: Float? = null) {
         val intent = Intent().apply {
