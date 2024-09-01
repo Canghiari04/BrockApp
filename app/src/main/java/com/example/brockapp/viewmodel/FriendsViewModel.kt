@@ -46,7 +46,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
      * Metodo necessario per inserire i dati dell'utente all'interno della repository in cloud.
      */
     fun uploadUserData() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
             val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
             val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
@@ -163,7 +163,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
         val friendKey = "user/$username.json"
 
         return try {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 val request = GetObjectRequest(BUCKET_NAME, friendKey)
                 val result = s3Client.getObject(request)
                 val content = result.objectContent.bufferedReader().use { it.readText() }
