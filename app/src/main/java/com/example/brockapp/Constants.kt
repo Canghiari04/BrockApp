@@ -29,7 +29,7 @@ const val LOGIN_ERROR = "Credenziali errate, riprova."
 const val BLANK_ERROR = "Inserisci le credenziali."
 
 // Versione del database.
-const val ROOM_DATABASE_VERSION = 20
+const val ROOM_DATABASE_VERSION = 21
 
 // Request code utilizzati per i Pending Intent dei receiver.
 const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1

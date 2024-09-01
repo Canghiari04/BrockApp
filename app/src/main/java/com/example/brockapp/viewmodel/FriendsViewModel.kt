@@ -153,9 +153,9 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 listActivities.add(newActivity)
             }
 
-            _friendStillActivities.postValue(listActivities.filter { it.type == STILL_ACTIVITY_TYPE })
-            _friendVehicleActivities.postValue(listActivities.filter { it.type == VEHICLE_ACTIVITY_TYPE })
-            _friendWalkActivities.postValue(listActivities.filter { it.type == WALK_ACTIVITY_TYPE })
+            _friendStillActivities.postValue(listActivities.filter { it.type == STILL_ACTIVITY_TYPE }.sortedBy { it.timestamp })
+            _friendVehicleActivities.postValue(listActivities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp })
+            _friendWalkActivities.postValue(listActivities.filter { it.type == WALK_ACTIVITY_TYPE }.sortedBy { it.timestamp })
         }
     }
 
