@@ -37,7 +37,6 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
             val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
             val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-            // ?
             val listWalkingActivities = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
 
             listStillActivities.parallelStream().forEach {
