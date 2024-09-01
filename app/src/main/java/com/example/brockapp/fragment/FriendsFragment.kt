@@ -1,52 +1,54 @@
 package com.example.brockapp.fragment
 
-import android.content.Intent
 import com.example.brockapp.R
-import com.example.brockapp.data.Friend
+import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.adapter.FriendsAdapter
 import com.example.brockapp.dialog.NewFriendDialog
 import com.example.brockapp.activity.FriendActivity
+import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.adapter.SuggestionsAdapter
 import com.example.brockapp.viewmodel.FriendsViewModel
+import com.example.brockapp.interfaces.InternetAvailable
+import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
 import android.util.Log
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import android.widget.Button
+import android.content.Intent
 import android.widget.EditText
-import android.widget.TextView
-import android.view.LayoutInflater
 import com.amazonaws.regions.Regions
 import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AlertDialog
-import com.example.brockapp.singleton.User
 import androidx.lifecycle.ViewModelProvider
 import com.amazonaws.services.s3.AmazonS3Client
 import androidx.recyclerview.widget.RecyclerView
 import androidx.core.widget.addTextChangedListener
-import com.example.brockapp.viewmodel.UserViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
+    private lateinit var internetUtil: InternetAvailable
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelFriends: FriendsViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val usernameTextView = view.findViewById<EditText>(R.id.search_user_text_area)
-        val syncButton = view.findViewById<FloatingActionButton>(R.id.user_synchronized_button)
+        internetUtil = InternetAvailableImpl()
+        checkIfNetworkIsActive()
 
         val user = User.getInstance()
         val db: BrockDB = BrockDB.getInstance(requireContext())
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(requireContext(), "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00", Regions.EU_WEST_3)
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
         val s3Client = AmazonS3Client(credentialsProvider)
 
         val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, requireContext())
@@ -61,6 +63,8 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
         viewModelFriends.getCurrentFriends(user.id)
 
+        val syncButton = view.findViewById<FloatingActionButton>(R.id.user_synchronized_button)
+
         syncButton.setOnClickListener {
             if (user.flag) {
                 viewModelFriends.uploadUserData()
@@ -74,6 +78,8 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             }, 5000)
         }
 
+        val usernameTextView = view.findViewById<EditText>(R.id.search_user_text_area)
+
         usernameTextView.addTextChangedListener {
             val usernameToSearch = usernameTextView.text.toString()
 
@@ -82,6 +88,13 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             } else {
                 Log.d("FRIENDS_FRAGMENT", "Search with empty body not supported.")
             }
+        }
+    }
+
+    private fun checkIfNetworkIsActive() {
+        if (!internetUtil.isInternetActive(requireContext())) {
+            view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = false
+            view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.isEnabled = false
         }
     }
 
@@ -128,7 +141,6 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val friendsAdapter = FriendsAdapter(friends) { friend ->
             val intent = Intent(context, FriendActivity::class.java).putExtra("FRIEND_USERNAME", friend)
             startActivity(intent)
-            activity?.finish()
         }
 
         friendsRecyclerView?.adapter = friendsAdapter
@@ -155,56 +167,5 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         activity?.let {
             NewFriendDialog(username, viewModel).show(it.supportFragmentManager, "CUSTOM_NEW_FRIEND_DIALOG")
         }
-    }
-
-    // Da rendere dialog migliore.
-    private fun showFriendActivity(friend: Friend) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_friend_data, null)
-
-        val friendDataTextView: TextView = dialogView.findViewById(R.id.friend_data_text_view)
-        val closeButton: Button = dialogView.findViewById(R.id.close_button)
-
-        val friendData = StringBuilder()
-        friendData.append("Username: ${friend.username}\n\n")
-
-        friendData.append("------CAMMINATA------\n")
-        friend.walkActivities.forEach { activity ->
-
-
-            if(activity.transitionType == 0)
-                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-            else
-                friendData.append("Terminata alle: ${activity.timestamp}, passi fatti: ${activity.stepNumber}\n")
-
-        }
-
-        friendData.append("------VEICOLO------\n")
-        friend.vehicleActivities.forEach { activity ->
-            if(activity.transitionType == 0)
-                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-            else
-                friendData.append("Terminata alle: ${activity.timestamp}, distanza percorsa: ${activity.distanceTravelled}\n")
-
-        }
-
-        friendData.append("------FERMO------\n")
-        friend.stillActivities.forEach { activity ->
-            if(activity.transitionType == 0)
-                friendData.append("Iniziata alle: ${activity.timestamp}\n")
-            else
-                friendData.append("Terminata alle: ${activity.timestamp}\n")
-        }
-
-        friendDataTextView.text = friendData.toString()
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .create()
-
-        closeButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
     }
 }

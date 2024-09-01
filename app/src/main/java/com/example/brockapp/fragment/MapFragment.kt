@@ -3,9 +3,11 @@ package com.example.brockapp.fragment
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
+import com.example.brockapp.dialog.MarkerDialog
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.util.Log
@@ -25,8 +27,8 @@ import android.widget.AutoCompleteTextView
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import com.example.brockapp.dialog.MarkerDialog
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.FragmentContainerView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
@@ -37,21 +39,23 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private lateinit var db: BrockDB
     private lateinit var map: GoogleMap
     private lateinit var geofence: MyGeofence
-    private lateinit var viewModel: GeofenceViewModel
     private lateinit var mapFragment: SupportMapFragment
+    private lateinit var internetUtil: InternetAvailableImpl
+    private lateinit var viewModelGeofence: GeofenceViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        geofence = MyGeofence.getInstance()
+        internetUtil = InternetAvailableImpl()
+        checkIfNetworkIsActive()
 
+        geofence = MyGeofence.getInstance()
         mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
-
-        viewModel = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
+        viewModelGeofence = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
 
         observeUpdatesGeofenceAreas()
 
@@ -77,7 +81,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 )
 
                 addNewMarker(geofenceArea)
-                viewModel.insertGeofenceArea(geofenceArea)
+                viewModelGeofence.insertGeofenceArea(geofenceArea)
             } else {
                 Toast.makeText(requireContext(), R.string.toast_error_map, Toast.LENGTH_LONG).show()
             }
@@ -102,15 +106,22 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         )
 
         map.setOnMarkerClickListener { marker ->
-            activity?.let { MarkerDialog(marker, viewModel).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
+            activity?.let { MarkerDialog(marker, viewModelGeofence).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
             true
+        }
+    }
+
+    private fun checkIfNetworkIsActive() {
+        if (!internetUtil.isInternetActive(requireContext())) {
+            view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = false
+            view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.GONE
         }
     }
 
     private fun observeInitialGeofenceAreas() {
         val mapMarker = mutableMapOf<String, LatLng>()
 
-        viewModel.staticAreas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 for (area in areas) {
                     val coordinates = LatLng(area.latitude, area.longitude)
@@ -125,7 +136,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     }
 
     private fun observeUpdatesGeofenceAreas() {
-        viewModel.dynamicAreas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.dynamicAreas.observe(viewLifecycleOwner) { areas ->
             geofence.geofences = areas
 
             val serviceIntent = Intent(requireContext(), MapService::class.java)
@@ -173,7 +184,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 .title(geofenceArea.name)
         )
 
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 10f))
     }
 
     private fun populateMapOfMarker(mapMarker: Map<String, LatLng>) {

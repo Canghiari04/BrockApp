@@ -55,11 +55,11 @@ class NotificationUtil {
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle("Sei entrato in una zona speciale")
-            setContentText("Inizia a registrare nuove attività!")
+            setContentTitle("Zona di interesse varcata")
+            setContentText("Inizia a registrare nuove attività")
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText("Hai appena varcato i confini di una zona di interesse. " +
-                             "Inizia a registrare le tue attività per non perdere nulla di importante."))
+                             "Inizia a registrare le tue attività per non perdere nulla di importante"))
             setPriority(NotificationCompat.PRIORITY_DEFAULT)
             setAutoCancel(true)
             addAction(R.drawable.baseline_directions_run_24, "Apri BrockApp", pendingIntent)
@@ -73,13 +73,13 @@ class NotificationUtil {
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle("Aggiornamento aree di interesse")
-            setContentText("Verifica le impostazioni di connessione.")
+            setContentTitle("Connessione non rilevata")
+            setContentText("Verifica le impostazioni di connessione")
             setStyle(
                 NotificationCompat.BigTextStyle().bigText(
                     "Alcune funzionalità potrebbero non essere disponibili. " +
                         "Verifica le impostazioni di connessione sul tuo dispositivo " +
-                        "per garantire che le aree di interesse vengano aggiornate correttamente."
+                        "per garantire che tutte le funzionalità operino correttamente"
                 )
             )
             setPriority(NotificationCompat.PRIORITY_HIGH)

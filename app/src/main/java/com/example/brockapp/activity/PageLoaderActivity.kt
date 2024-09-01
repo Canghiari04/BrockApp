@@ -1,25 +1,31 @@
 package com.example.brockapp.activity
 
+import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.dialog.AccountDialog
 import com.example.brockapp.fragment.MapFragment
 import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.fragment.ChartsFragment
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
+import com.example.brockapp.interfaces.InternetAvailableImpl
 
 import android.util.Log
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.content.Intent
+import android.content.Context
 import android.view.MenuInflater
 import kotlinx.coroutines.launch
 import android.graphics.PorterDuff
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
@@ -31,13 +37,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PageLoaderActivity: AppCompatActivity() {
     private var mapFragments = mutableMapOf<String, Fragment>()
+    private var internetUtil = InternetAvailableImpl()
 
     private lateinit var toolbar: Toolbar
-    private lateinit var homeFragment: HomeFragment
-    private lateinit var calendarFragment: CalendarFragment
+    private lateinit var util: NotificationUtil
     private lateinit var mapFragment: MapFragment
+    private lateinit var homeFragment: HomeFragment
+    private lateinit var manager: NotificationManager
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
+    private lateinit var calendarFragment: CalendarFragment
     private lateinit var newActivityButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,6 +115,8 @@ class PageLoaderActivity: AppCompatActivity() {
             }
         }
 
+        checkIfNetworkIsActive()
+
         newActivityButton.setOnClickListener {
             val intent = Intent(this, NewUserActivity::class.java)
             startActivity(intent)
@@ -140,6 +151,13 @@ class PageLoaderActivity: AppCompatActivity() {
             else -> {
                 super.onOptionsItemSelected(item)
             }
+        }
+    }
+
+    private fun checkIfNetworkIsActive() {
+        if (!internetUtil.isInternetActive(this)) {
+            util = NotificationUtil()
+            sendErrorNotification()
         }
     }
 
@@ -216,5 +234,30 @@ class PageLoaderActivity: AppCompatActivity() {
         val intent = Intent(this, AuthenticatorActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun sendErrorNotification() {
+        manager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val pendingIntent = util.getConnectivityPendingIntent(this)
+        val notification = util.getConnectivityNotification(CHANNEL_ID_CONNECTIVITY_NOTIFY, pendingIntent, this)
+
+        getNotificationChannel()
+
+        manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
+    }
+
+    private fun getNotificationChannel() {
+        val channel = NotificationChannel(
+            CHANNEL_ID_CONNECTIVITY_NOTIFY,
+            NAME_CHANNEL_CONNECTIVITY_NOTIFY,
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        channel.apply {
+            description = DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
+        }
+
+        manager.createNotificationChannel(channel)
     }
 }

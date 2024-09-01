@@ -8,6 +8,7 @@ import com.example.brockapp.util.CalendarUtil
 import com.example.brockapp.data.UserActivity
 import com.example.brockapp.adapter.DailyActivityAdapter
 import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.interfaces.TimeSpentCounterImpl
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 
 import android.os.Bundle
@@ -26,7 +27,6 @@ import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.brockapp.interfaces.TimeSpentCounterImpl
 
 class DailyActivity: AppCompatActivity() {
     private var utilCalendar: CalendarUtil = CalendarUtil()
@@ -125,13 +125,13 @@ class DailyActivity: AppCompatActivity() {
         val unknownTime = (secondsInDay - totalRecordedTime).toFloat()
 
         entries.apply {
-            add(PieEntry(timeSpentWalking.toFloat(), "CAMMINO"))
-            add(PieEntry(timeSpentStill.toFloat(), "STAZIONARIO"))
-            add(PieEntry(timeSpentVehicle.toFloat(), "VEICOLO"))
-            add(PieEntry(unknownTime, "Sconosciuto"))
+            add(PieEntry(timeSpentStill.toFloat(), "Attività sedentaria"))
+            add(PieEntry(timeSpentVehicle.toFloat(), "Viaggio in macchina"))
+            add(PieEntry(timeSpentWalking.toFloat(), "Camminata"))
+            add(PieEntry(unknownTime, "Unknown"))
         }
 
-        val dataSet = PieDataSet(entries, "Dati").apply {
+        val dataSet = PieDataSet(entries, " ").apply {
             colors = ColorTemplate.PASTEL_COLORS.toList()
         }
 

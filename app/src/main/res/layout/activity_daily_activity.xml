@@ -40,6 +40,7 @@
             android:layout_height="300dp"
             android:gravity="center"
             android:layout_margin="10dp"
+            android:elevation="2.5dp"
             android:background="@color/white"/>
 
         <androidx.recyclerview.widget.RecyclerView
