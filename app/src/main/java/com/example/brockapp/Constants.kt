@@ -52,8 +52,8 @@ const val WI_FI_TYPE_CONNECTION = "WI-FI"
 const val CELLULAR_TYPE_CONNECTION = "CELLULAR"
 const val NO_CONNECTION_TYPE_CONNECTION = "NO-CONNECTION"
 
-// AWS
+// AWS.
 const val BUCKET_NAME = "brock-app"
 
-//
+// Tab layout.
 const val NUM_TABS = 3

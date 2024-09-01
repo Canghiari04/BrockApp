@@ -2,6 +2,7 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -13,16 +14,17 @@ import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class StillActivity : AppCompatActivity() {
-    private var running : Boolean = false
-    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
+class StillActivity: AppCompatActivity() {
+    private var running: Boolean = false
+    private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_still)
+
+        supportActionBar?.title = " "
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 

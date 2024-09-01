@@ -32,17 +32,18 @@ class VehicleActivity: AppCompatActivity() {
     private var totalDistance = 0.0
     private var pauseOffset: Long = 0
     private var startLocation: Location? = null
+    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     private lateinit var distanceTravelled: TextView
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vehicle)
+
+        supportActionBar?.title = " "
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 
