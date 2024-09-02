@@ -207,7 +207,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         val entries = ArrayList<PieEntry>()
 
         if (mapCountActivities["STILL"]!! > 0 || mapCountActivities["VEHICLE"]!! > 0 || mapCountActivities["WALK"]!! > 0) {
-            entries.add(PieEntry(mapCountActivities["STILL"]!!.toFloat(), "Attività sedenatira"))
+            entries.add(PieEntry(mapCountActivities["STILL"]!!.toFloat(), "Attività sedentaria"))
             entries.add(PieEntry(mapCountActivities["VEHICLE"]!!.toFloat(), "Viaggio in macchina"))
             entries.add(PieEntry(mapCountActivities["WALK"]!!.toFloat(), "Camminata"))
 

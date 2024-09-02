@@ -54,7 +54,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                         VEHICLE_ACTIVITY_TYPE,
                         "Data $date",
                         "Finito alle $exitActivityTime",
-                        "Distanza percorsa: $distanceTravelled metri.\nDurata: $timeDifferenceInSeconds secondi"
+                        "Distanza percorsa: $distanceTravelled metri\nDurata: $timeDifferenceInSeconds secondi"
                     )
                 }
 

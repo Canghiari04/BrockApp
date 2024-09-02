@@ -82,8 +82,6 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
             startBackgroundOperations()
         }
 
-        observeSignIn()
-
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
             password = view.findViewById<EditText>(R.id.text_password).text.toString()
@@ -98,6 +96,8 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         view.findViewById<TextView>(R.id.login_text_view).setOnClickListener {
             listener?.showLoginFragment()
         }
+
+        observeSignIn()
     }
 
     override fun onAttach(context: Context) {
@@ -161,6 +161,8 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                     }
                     addOnFailureListener {
                         Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
+                        startConnectivity()
+                        goToHome()
                     }
                 }
             }

@@ -56,16 +56,12 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         super.onViewCreated(view, savedInstanceState)
 
         db = BrockDB.getInstance(requireContext())
-
         val factoryViewModelUser = UserViewModelFactory(db)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
         }
-
-        observeLogin()
-        observeUser()
 
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
@@ -81,6 +77,9 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
             listener?.showSignInFragment()
         }
+
+        observeLogin()
+        observeUser()
     }
 
     override fun onAttach(context: Context) {
@@ -150,6 +149,8 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                     }
                     addOnFailureListener {
                         Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
+                        startConnectivity()
+                        goToHome()
                     }
                 }
             }
