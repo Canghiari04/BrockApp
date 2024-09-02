@@ -8,8 +8,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener {
-    private lateinit var signInFragment: SignInFragment
     private lateinit var loginFragment: LoginFragment
+    private lateinit var signInFragment: SignInFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

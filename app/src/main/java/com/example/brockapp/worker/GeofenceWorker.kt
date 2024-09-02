@@ -23,9 +23,7 @@ class GeofenceWorker(context: Context, workerParams: WorkerParameters): Worker(c
     private fun sendNotification() {
         manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val pendingIntent = util.getGeofencePendingIntent(applicationContext)
-        val notification = util.getGeofenceNotification(CHANNEL_ID_GEOFENCE_NOTIFY, pendingIntent, applicationContext)
-
+        val notification = util.getGeofenceNotification(CHANNEL_ID_GEOFENCE_NOTIFY, applicationContext)
         getNotificationChannel()
 
         manager.notify(ID_GEOFENCE_NOTIFY, notification.build())

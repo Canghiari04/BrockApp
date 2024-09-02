@@ -2,7 +2,6 @@ package com.example.brockapp.util
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.activity.AuthenticatorActivity
 
 import android.content.Intent
 import android.content.Context
@@ -11,19 +10,6 @@ import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
 
 class NotificationUtil {
-    fun getGeofencePendingIntent(context: Context): PendingIntent {
-        val intent = Intent(context, AuthenticatorActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-
-        return PendingIntent.getActivity(
-            context,
-            REQUEST_CODE_GEOFENCE_NOTIFY,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
     fun getConnectivityPendingIntent(context: Context): PendingIntent {
         return PendingIntent.getActivity(
             context,
@@ -50,7 +36,6 @@ class NotificationUtil {
 
     fun getGeofenceNotification(
         channelId: String,
-        pendingIntent: PendingIntent,
         context: Context
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
@@ -60,13 +45,25 @@ class NotificationUtil {
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText("Hai appena varcato i confini di una zona di interesse. " +
                              "Inizia a registrare le tue attività per non perdere nulla di importante"))
-            setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            setPriority(NotificationCompat.PRIORITY_HIGH)
             setAutoCancel(true)
-            addAction(R.drawable.baseline_directions_run_24, "Apri BrockApp", pendingIntent)
         }
     }
 
     fun getConnectivityNotification(
+        channelId: String,
+        context: Context
+    ): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, channelId).apply {
+            setSmallIcon(R.drawable.baseline_directions_run_24)
+            setContentTitle("Connessione rilevata")
+            setContentText("Le funzionalità disabilitate sono state attivate")
+            setPriority(NotificationCompat.PRIORITY_HIGH)
+            setAutoCancel(true)
+        }
+    }
+
+    fun getErrorConnectivityNotification(
         channelId: String,
         pendingIntent: PendingIntent,
         context: Context

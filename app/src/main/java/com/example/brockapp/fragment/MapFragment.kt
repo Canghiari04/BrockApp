@@ -6,8 +6,9 @@ import com.example.brockapp.service.MapService
 import com.example.brockapp.dialog.MarkerDialog
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.database.GeofenceAreaEntry
+import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.interfaces.InternetAvailableImpl
+import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.util.Log
@@ -36,27 +37,29 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 
 class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
-    private lateinit var db: BrockDB
     private lateinit var map: GoogleMap
     private lateinit var geofence: MyGeofence
-    private lateinit var mapFragment: SupportMapFragment
-    private lateinit var internetUtil: InternetAvailableImpl
+    private lateinit var internetUtil: NetworkAvailableImpl
+    private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        internetUtil = InternetAvailableImpl()
+        internetUtil = NetworkAvailableImpl()
         checkIfNetworkIsActive()
 
         geofence = MyGeofence.getInstance()
-        mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        db = BrockDB.getInstance(requireContext())
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
+
+        val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
 
+        observeNetwork()
         observeUpdatesGeofenceAreas()
 
         val input = view.findViewById<AutoCompleteTextView>(R.id.text_new_area)
@@ -83,7 +86,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 addNewMarker(geofenceArea)
                 viewModelGeofence.insertGeofenceArea(geofenceArea)
             } else {
-                Toast.makeText(requireContext(), R.string.toast_error_map, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Nessuna località individuata con questo nome", Toast.LENGTH_LONG).show()
             }
 
             input.setText(R.string.text_blank)
@@ -115,6 +118,18 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         if (!internetUtil.isInternetActive(requireContext())) {
             view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = false
             view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.GONE
+        }
+    }
+
+    private fun observeNetwork() {
+        viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { currentNetwork ->
+            if (!currentNetwork) {
+                view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = false
+                view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.GONE
+            } else {
+                view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = true
+                view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -175,28 +190,6 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         }
     }
 
-    private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
-        val coordinates = LatLng(geofenceArea.latitude, geofenceArea.longitude)
-
-        map.addMarker(
-            MarkerOptions()
-                .position(coordinates)
-                .title(geofenceArea.name)
-        )
-
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 10f))
-    }
-
-    private fun populateMapOfMarker(mapMarker: Map<String, LatLng>) {
-        mapMarker.forEach { (key, value) ->
-            map.addMarker(
-                MarkerOptions()
-                    .position(value)
-                    .title(key)
-            )
-        }
-    }
-
     private fun getAddressAndLocation(item: String): Pair<Address?, LatLng?> {
         var address: Address? = null
         var location: LatLng? = null
@@ -217,5 +210,27 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         }
 
         return Pair(address, location)
+    }
+
+    private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
+        val coordinates = LatLng(geofenceArea.latitude, geofenceArea.longitude)
+
+        map.addMarker(
+            MarkerOptions()
+                .position(coordinates)
+                .title(geofenceArea.name)
+        )
+
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 10f))
+    }
+
+    private fun populateMapOfMarker(mapMarker: Map<String, LatLng>) {
+        mapMarker.forEach { (key, value) ->
+            map.addMarker(
+                MarkerOptions()
+                    .position(value)
+                    .title(key)
+            )
+        }
     }
 }

@@ -9,9 +9,10 @@ import com.example.brockapp.activity.FriendActivity
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.adapter.SuggestionsAdapter
 import com.example.brockapp.viewmodel.FriendsViewModel
+import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.interfaces.InternetAvailable
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.interfaces.InternetAvailableImpl
+import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
 import android.util.Log
@@ -31,18 +32,16 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
-    private lateinit var internetUtil: InternetAvailable
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var internetUtil: InternetAvailable
+    private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelFriends: FriendsViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        internetUtil = InternetAvailableImpl()
+        internetUtil = NetworkAvailableImpl()
         checkIfNetworkIsActive()
-
-        val user = User.getInstance()
-        val db: BrockDB = BrockDB.getInstance(requireContext())
 
         val credentialsProvider = CognitoCachingCredentialsProvider(
             requireContext(),
@@ -51,12 +50,18 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         )
         val s3Client = AmazonS3Client(credentialsProvider)
 
+        val user = User.getInstance()
+        val db: BrockDB = BrockDB.getInstance(requireContext())
+
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
+
         val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, requireContext())
         viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactoryFriends)[FriendsViewModel::class.java]
 
         val viewModelFactoryUser = UserViewModelFactory(db)
         viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
 
+        observeNetwork()
         observeFriends()
         observeSuggestion()
         observeAddedFriend()
@@ -94,7 +99,19 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private fun checkIfNetworkIsActive() {
         if (!internetUtil.isInternetActive(requireContext())) {
             view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = false
-            view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.isEnabled = false
+            view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.hide()
+        }
+    }
+
+    private fun observeNetwork() {
+        viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { currentNetwork ->
+            if (!currentNetwork) {
+                view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = false
+                view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.hide()
+            } else {
+                view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = true
+                view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.show()
+            }
         }
     }
 
@@ -121,30 +138,9 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             if (errorAddFriend) {
                 Log.d("FRIENDS_FRAGMENT", "Amico aggiunto alla lista.")
             } else {
-                Toast.makeText(context, "Amico già presente nella lista.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Amico già presente nella lista", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun populateSuggestionsRecyclerView(usernames: List<String>, suggestionsRecyclerView: RecyclerView?) {
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        val adapter = SuggestionsAdapter(usernames) { username ->
-            showNewFriendDialog(username, viewModelFriends)
-        }
-
-        suggestionsRecyclerView?.layoutManager = layoutManager
-        suggestionsRecyclerView?.adapter = adapter
-    }
-
-    private fun populateFriendsRecyclerView(friends: List<String>, friendsRecyclerView: RecyclerView?) {
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        val friendsAdapter = FriendsAdapter(friends) { friend ->
-            val intent = Intent(context, FriendActivity::class.java).putExtra("FRIEND_USERNAME", friend)
-            startActivity(intent)
-        }
-
-        friendsRecyclerView?.adapter = friendsAdapter
-        friendsRecyclerView?.layoutManager = layoutManager
     }
 
     private fun showShareDataDialog() {
@@ -161,6 +157,28 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             }
             .create()
             .show()
+    }
+
+    private fun populateFriendsRecyclerView(friends: List<String>, friendsRecyclerView: RecyclerView?) {
+        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val friendsAdapter = FriendsAdapter(friends) { friend ->
+            val intent = Intent(context, FriendActivity::class.java).putExtra("FRIEND_USERNAME", friend)
+            startActivity(intent)
+            activity?.finish()
+        }
+
+        friendsRecyclerView?.adapter = friendsAdapter
+        friendsRecyclerView?.layoutManager = layoutManager
+    }
+
+    private fun populateSuggestionsRecyclerView(usernames: List<String>, suggestionsRecyclerView: RecyclerView?) {
+        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val adapter = SuggestionsAdapter(usernames) { username ->
+            showNewFriendDialog(username, viewModelFriends)
+        }
+
+        suggestionsRecyclerView?.layoutManager = layoutManager
+        suggestionsRecyclerView?.adapter = adapter
     }
 
     private fun showNewFriendDialog(username: String, viewModel: FriendsViewModel) {
