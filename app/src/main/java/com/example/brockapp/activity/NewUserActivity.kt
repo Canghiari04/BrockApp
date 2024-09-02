@@ -9,12 +9,16 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.content.Intent
 import android.app.AlertDialog
+import android.content.IntentFilter
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.google.android.gms.location.DetectedActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NewUserActivity: AppCompatActivity() {
@@ -46,6 +50,7 @@ class NewUserActivity: AppCompatActivity() {
             val intent = Intent(this, WalkActivity::class.java)
             startActivity(intent)
             finish()
+
         }
     }
 

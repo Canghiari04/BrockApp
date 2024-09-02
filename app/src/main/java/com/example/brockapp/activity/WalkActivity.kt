@@ -75,7 +75,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
             Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
 
-            return
+            //return
         } else {
             Toast.makeText(this, "Il sensore non è null", Toast.LENGTH_SHORT).show()
         }
@@ -100,7 +100,9 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
 
         findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
+            /*
             if (running) {
+
                 chronometer.stop()
 
                 running = false
@@ -112,6 +114,27 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
 
                 registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, currentSteps.toLong())
             }
+            */
+
+            val intentEnter = Intent().apply {
+                action = ACTIVITY_RECOGNITION_INTENT_TYPE
+                putExtra("activityType", DetectedActivity.WALKING)
+                putExtra("transitionType", 0)
+                putExtra("stepNumber", 0)
+                putExtra("heightDifference", 0)
+            }
+
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intentEnter)
+
+            val intentExit = Intent().apply {
+                action = ACTIVITY_RECOGNITION_INTENT_TYPE
+                putExtra("activityType", DetectedActivity.WALKING)
+                putExtra("transitionType", 1)
+                putExtra("stepNumber", 100L)
+                putExtra("heightDifference", 0L)
+            }
+
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intentExit)
         }
 
         var notificationSent = false
@@ -128,7 +151,7 @@ class WalkActivity : AppCompatActivity(), SensorEventListener {
         }
 
         findViewById<Button>(R.id.walk_button_start).isEnabled = true
-        findViewById<Button>(R.id.walk_button_stop).isEnabled = false
+        //findViewById<Button>(R.id.walk_button_stop).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

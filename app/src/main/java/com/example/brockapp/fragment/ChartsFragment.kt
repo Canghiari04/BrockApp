@@ -32,6 +32,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 class ChartsFragment: Fragment(R.layout.fragment_charts) {
     private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
@@ -137,7 +138,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
 
         val stepsPerDay = listWalkingActivities.groupBy {
             it.timestamp?.let { timestamp ->
-                LocalDate.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).dayOfMonth
+                LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
             } ?: 0
         }.mapValues { entry ->
             entry.value.sumOf { it.stepNumber }
@@ -174,7 +175,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
 
         val distancePerDay = listVehicleActivities.groupBy {
             it.timestamp?.let { timestamp ->
-                LocalDate.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).dayOfMonth
+                LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
             } ?: 0
         }.mapValues { entry ->
             entry.value.sumOf { it.distanceTravelled?: 0.0 }
@@ -206,16 +207,15 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
     private fun setupActivityTypePieChart(mapCountActivities: Map<String, Int>) {
         val entries = ArrayList<PieEntry>()
 
-        if (mapCountActivities["STILL"]!! > 0 || mapCountActivities["VEHICLE"]!! > 0 || mapCountActivities["WALK"]!! > 0) {
-            entries.add(PieEntry(mapCountActivities["STILL"]!!.toFloat(), "Attività sedentaria"))
-            entries.add(PieEntry(mapCountActivities["VEHICLE"]!!.toFloat(), "Viaggio in macchina"))
-            entries.add(PieEntry(mapCountActivities["WALK"]!!.toFloat(), "Camminata"))
+        if (mapCountActivities[STILL_ACTIVITY_TYPE]!! > 0 || mapCountActivities[VEHICLE_ACTIVITY_TYPE]!! > 0 || mapCountActivities[WALK_ACTIVITY_TYPE]!! > 0) {
+            entries.add(PieEntry(mapCountActivities[STILL_ACTIVITY_TYPE]!!.toFloat(), "Attività sedenatira"))
+            entries.add(PieEntry(mapCountActivities[VEHICLE_ACTIVITY_TYPE]!!.toFloat(), "Viaggio in macchina"))
+            entries.add(PieEntry(mapCountActivities[WALK_ACTIVITY_TYPE]!!.toFloat(), "Camminata"))
 
             val dataSet = PieDataSet(entries, " ")
             dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
 
             val data = PieData(dataSet)
-            data.setDrawValues(false)
             activityTypePieChart.data = data
             activityTypePieChart.description?.isEnabled = false
 
