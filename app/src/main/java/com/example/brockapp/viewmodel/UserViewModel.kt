@@ -3,10 +3,10 @@ package com.example.brockapp.viewmodel
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserEntity
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 

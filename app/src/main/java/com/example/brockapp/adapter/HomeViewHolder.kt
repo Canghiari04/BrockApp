@@ -4,8 +4,8 @@ import com.example.brockapp.*
 import com.example.brockapp.R
 
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 
 class HomeViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
