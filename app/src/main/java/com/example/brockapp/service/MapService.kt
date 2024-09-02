@@ -1,5 +1,7 @@
 package com.example.brockapp.service
 
+import com.example.brockapp.singleton.MyGeofence
+
 import android.util.Log
 import android.Manifest
 import android.os.IBinder
@@ -7,7 +9,6 @@ import android.app.Service
 import android.content.Intent
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import com.example.brockapp.singleton.MyGeofence
 import com.google.android.gms.location.LocationServices
 
 class MapService: Service() {

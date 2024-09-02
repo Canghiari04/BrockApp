@@ -3,6 +3,7 @@ package com.example.brockapp.service
 import com.example.brockapp.*
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.util.NotificationUtil
+import com.example.brockapp.interfaces.NetworkAvailableImpl
 
 import android.util.Log
 import android.Manifest
@@ -22,18 +23,26 @@ class ConnectivityService: Service() {
     private lateinit var geofence: MyGeofence
     private lateinit var util: NotificationUtil
     private lateinit var manager: NotificationManager
+    private lateinit var networkUtil: NetworkAvailableImpl
 
     override fun onCreate() {
         super.onCreate()
 
-        geofence = MyGeofence.getInstance()
         util = NotificationUtil()
+        geofence = MyGeofence.getInstance()
+        networkUtil = NetworkAvailableImpl()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val (significantChange, typeNetwork) = handleSignificantConnectivityChange(this)
 
         if (significantChange) {
+            if (networkUtil.isInternetActive(this)) {
+                sendNotification()
+            } else {
+                sendErrorNotification()
+            }
+
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 val geofenceClient = LocationServices.getGeofencingClient(this)
 
@@ -95,11 +104,21 @@ class ConnectivityService: Service() {
         return Pair(currentTypeNetwork != geofence.typeNetwork, currentTypeNetwork)
     }
 
+    private fun sendNotification() {
+        manager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notification = util.getConnectivityNotification(CHANNEL_ID_CONNECTIVITY_NOTIFY, this)
+
+        getNotificationChannel()
+
+        manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
+    }
+
     private fun sendErrorNotification() {
         manager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val pendingIntent = util.getConnectivityPendingIntent(this)
-        val notification = util.getConnectivityNotification(CHANNEL_ID_CONNECTIVITY_NOTIFY, pendingIntent, this)
+        val notification = util.getErrorConnectivityNotification(CHANNEL_ID_CONNECTIVITY_NOTIFY, pendingIntent, this)
 
         getNotificationChannel()
 

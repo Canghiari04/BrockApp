@@ -1,15 +1,13 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
@@ -23,12 +21,9 @@ import android.content.Intent
 import android.content.Context
 import android.widget.TextView
 import android.widget.EditText
-import android.content.IntentFilter
 import androidx.fragment.app.Fragment
-import android.net.ConnectivityManager
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
@@ -36,7 +31,6 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
 
-    private lateinit var db: BrockDB
     private lateinit var username: String
     private lateinit var password: String
     private lateinit var util: PermissionUtil
@@ -55,7 +49,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        db = BrockDB.getInstance(requireContext())
+        val db = BrockDB.getInstance(requireContext())
         val factoryViewModelUser = UserViewModelFactory(db)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
@@ -70,7 +64,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.checkIfUserExists(username, password)
             } else {
-                Toast.makeText(requireContext(), BLANK_ERROR, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Inserisci le credenziali", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -96,10 +90,10 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     private fun observeLogin() {
         viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
-                util.requestPermissions()
                 viewModelUser.getUser(username, password)
+                util.requestPermissions()
             } else {
-                Toast.makeText(requireContext(), LOGIN_ERROR, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Credenziali errate", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -118,6 +112,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     }
 
     private fun startBackgroundOperations() {
+        val db = BrockDB.getInstance(requireContext())
         val factoryViewModelGeofence = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
@@ -144,12 +139,10 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             geofence.pendingIntent.let {
                 geofencingClient.addGeofences(geofence.request, it).run {
                     addOnSuccessListener {
-                        startConnectivity()
                         goToHome()
                     }
                     addOnFailureListener {
                         Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
-                        startConnectivity()
                         goToHome()
                     }
                 }
@@ -157,17 +150,6 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         } else {
             Log.e("GEOFENCE_PERMISSION", "Missing permission.")
         }
-    }
-
-    private fun startConnectivity() {
-        val receiver = ConnectivityReceiver()
-
-        ContextCompat.registerReceiver(
-            requireContext(),
-            receiver,
-            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
     }
 
     private fun goToHome() {

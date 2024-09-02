@@ -28,17 +28,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var user: User
-    private lateinit var viewModel: ActivitiesViewModel
     private lateinit var selectedItem: String
-    private lateinit var staticTitle: TextView
-    private lateinit var staticCountText: TextView
-    private lateinit var staticProgressBar: ProgressBar
-    private lateinit var kilometersTitle: TextView
-    private lateinit var kilometersCountText: TextView
-    private lateinit var kilometersProgressBar: ProgressBar
     private lateinit var stepsTitle: TextView
+    private lateinit var staticTitle: TextView
     private lateinit var stepsCountText: TextView
+    private lateinit var staticCountText: TextView
+    private lateinit var kilometersTitle: TextView
     private lateinit var stepsProgressBar: ProgressBar
+    private lateinit var kilometersCountText: TextView
+    private lateinit var staticProgressBar: ProgressBar
+    private lateinit var viewModel: ActivitiesViewModel
+    private lateinit var kilometersProgressBar: ProgressBar
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

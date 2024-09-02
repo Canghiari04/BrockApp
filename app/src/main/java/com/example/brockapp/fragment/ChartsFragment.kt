@@ -37,8 +37,8 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
     private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
     private lateinit var user: User
-    private lateinit var viewModel: ChartsViewModel
     private lateinit var dateTextView: TextView
+    private lateinit var viewModel: ChartsViewModel
     private lateinit var stepCountBarChart: BarChart
     private lateinit var activityTypePieChart: PieChart
     private lateinit var distanceTravelledBarChart: BarChart
@@ -226,7 +226,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
             activityTypePieChart.visibility = View.VISIBLE
         } else {
             activityTypePieChart.visibility = View.GONE
-            Toast.makeText(requireContext(), "Nessuna attività compiuta nel mese.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Nessuna attività compiuta nel mese", Toast.LENGTH_SHORT).show()
         }
     }
 }

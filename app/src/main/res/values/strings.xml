@@ -35,7 +35,6 @@
     <string name="permissions_location">Concedi il permesso di accedere alla tua posizione per garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
     <string name="permissions_title">Permessi richiesti</string>
     <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere a tutte le funzionalità richieste.</string>
-    <string name="permissions_toast">Clicca su "Concedi sempre".</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_activity">Calendario</string>
@@ -142,7 +141,6 @@
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
-    <string name="toast_error_map">Nessuna località individuata con questo nome.</string>
     <string name="new_activity_icon_description">Icona per registrare una nuova attività</string>
     <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 

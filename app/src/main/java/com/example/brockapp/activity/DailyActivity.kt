@@ -29,8 +29,8 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
-    private var utilCalendar: CalendarUtil = CalendarUtil()
     private val timeSpentCounter = TimeSpentCounterImpl()
+    private var utilCalendar: CalendarUtil = CalendarUtil()
 
     private lateinit var viewModel: ActivitiesViewModel
 
