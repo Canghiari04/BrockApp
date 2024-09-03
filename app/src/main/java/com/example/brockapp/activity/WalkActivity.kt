@@ -2,11 +2,11 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
+import com.example.brockapp.worker.ActivityRecognitionWorker
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
 
-import android.Manifest
-import android.util.Log
 import android.os.Bundle
+import androidx.work.Data
 import android.widget.Toast
 import android.view.MenuItem
 import android.widget.Button
@@ -15,14 +15,13 @@ import android.os.SystemClock
 import android.hardware.Sensor
 import android.content.Context
 import android.widget.TextView
+import androidx.work.WorkManager
 import android.widget.Chronometer
 import android.content.IntentFilter
 import android.hardware.SensorEvent
 import android.hardware.SensorManager
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import android.hardware.SensorEventListener
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.DetectedActivity
@@ -30,14 +29,14 @@ import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class WalkActivity: AppCompatActivity(), SensorEventListener {
-    private var stepCount = 0
     private var running = false
-    private var currentSteps = 0
+    private var initialStepCount = 0
+    private var sessionStepCount = 0
     private var heightDifference = 0f
     private var pressureSensor: Sensor? = null
     private var initialAltitude: Float? = null
-    private var stepDetectorSensor : Sensor? = null
-    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
+    private var stepCounterSensor: Sensor? = null
+    private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
@@ -51,14 +50,9 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 
         notificationManager = NotificationManagerCompat.from(this)
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION)
-        }
-
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        // TODO utilizzare sensore typestepcounter
-        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+
+        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
 
         if (pressureSensor != null) {
@@ -67,17 +61,10 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
             Toast.makeText(this, "Sensore barometrico non disponibile", Toast.LENGTH_SHORT).show()
         }
 
-        if (stepDetectorSensor == null) {
-            Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
-
-            findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
+        if (stepCounterSensor == null) {
             findViewById<Button>(R.id.walk_button_start).isEnabled = false
-
-            Log.e("WalkActivity", "Sensore TYPE_STEP_DETECTOR non disponibile sul dispositivo.")
-
+            findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
             return
-        } else {
-            Toast.makeText(this, "Il sensore non è null", Toast.LENGTH_SHORT).show()
         }
 
         val chronometer = findViewById<Chronometer>(R.id.walk_chronometer)
@@ -85,8 +72,9 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
         findViewById<Button>(R.id.walk_button_start).setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime()
-                heightDifference = 0f
                 chronometer.start()
+                heightDifference = 0f
+                sessionStepCount = 0
                 running = true
 
                 findViewById<Button>(R.id.walk_button_start).isEnabled = false
@@ -100,11 +88,8 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
         }
 
         findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
-
             if (running) {
-
                 chronometer.stop()
-
                 running = false
 
                 findViewById<Button>(R.id.walk_button_start).isEnabled = true
@@ -112,27 +97,66 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
 
                 stopStepCounting()
 
-                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, currentSteps.toLong())
+                registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, sessionStepCount.toLong())
             }
-
-
         }
 
-        var notificationSent = false
+        var hourSpentWalkingNotification = false
 
         chronometer.setOnChronometerTickListener {
             val elapsedMillis = SystemClock.elapsedRealtime() - chronometer.base
 
             val elapsedHour = elapsedMillis / 1000 / 60 / 60
 
-            if (elapsedHour >= 1 && !notificationSent) {
-                notificationSent = true
-                // Deve richiamare il worker per Activity Recognition
+            if (elapsedHour >= 1 && !hourSpentWalkingNotification) {
+                hourSpentWalkingNotification = true
+
+                val inputData = Data.Builder()
+                    .putString("type", 7.toString())
+                    .putString("title", "Continua così!")
+                    .putString("text", "Stai camminando da più di un'ora")
+                    .build()
+
+                val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+                    .setInputData(inputData)
+                    .build()
+
+                WorkManager.getInstance(this).enqueue(workRequest)
             }
         }
 
         findViewById<Button>(R.id.walk_button_start).isEnabled = true
         findViewById<Button>(R.id.walk_button_stop).isEnabled = false
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        when (event.sensor.type) {
+            Sensor.TYPE_STEP_COUNTER -> {
+                if (initialStepCount < 0) {
+                    initialStepCount = event.values[0].toInt()
+                }
+                sessionStepCount = event.values[0].toInt() - initialStepCount
+
+                findViewById<TextView>(R.id.step_count)?.text = sessionStepCount.toString()
+            }
+            Sensor.TYPE_PRESSURE -> {
+                val pressure = event.values[0]
+                val currentAltitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressure)
+
+                if (initialAltitude == null) {
+                    initialAltitude = currentAltitude
+                } else {
+                    val altitudeDifference = Math.abs(currentAltitude - initialAltitude!!)
+                    heightDifference += altitudeDifference
+                }
+
+                findViewById<TextView>(R.id.height_difference_count)?.text = "${heightDifference} metri"
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        //
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -147,53 +171,18 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
         }
     }
 
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        super.onDestroy()
+    }
+
     private fun startStepCounting() {
-        stepCount = 0
-        stepDetectorSensor.also { stepSensor ->
-            sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-            Toast.makeText(this, "Sensore registrato", Toast.LENGTH_SHORT).show()
-        }
+        initialStepCount = -1
+        sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     private fun stopStepCounting() {
         sensorManager.unregisterListener(this)
-    }
-
-    override fun onSensorChanged(event: SensorEvent) {
-        when (event.sensor.type) {
-            Sensor.TYPE_STEP_DETECTOR -> {
-                stepCount++
-                Log.d("StepCount", "Passi: $stepCount")
-
-                val stepsDuringSession = stepCount
-
-                // TODO sistemare le notifiche con work relativo, guardare dir worker
-                if (stepsDuringSession == 100) {
-                    // Deve richiamare il worker per Activity Recognition
-                }
-
-                currentSteps = stepCount
-                findViewById<TextView>(R.id.step_count)?.text = currentSteps.toString()
-            }
-            Sensor.TYPE_PRESSURE -> {
-                val pressure = event.values[0]
-                val currentAltitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressure)
-
-                if (initialAltitude == null) {
-                    initialAltitude = currentAltitude
-                } else {
-                    val altitudeDifference = Math.abs(currentAltitude - initialAltitude!!)
-                    heightDifference += altitudeDifference
-                }
-
-                // Aggiorna la UI con il dislivello
-                findViewById<TextView>(R.id.height_difference_count)?.text = "${heightDifference} metri"
-            }
-        }
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
     }
 
     private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long, heightDifference: Float? = null) {
@@ -206,14 +195,5 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
         }
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-    }
-
-    private fun unregisterActivityRecognitionReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-    }
-
-    override fun onDestroy() {
-        unregisterActivityRecognitionReceiver()
-        super.onDestroy()
     }
 }

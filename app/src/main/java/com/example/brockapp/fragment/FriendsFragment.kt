@@ -58,7 +58,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, requireContext())
         viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactoryFriends)[FriendsViewModel::class.java]
 
-        val viewModelFactoryUser = UserViewModelFactory(db)
+        val viewModelFactoryUser = UserViewModelFactory(db, requireContext())
         viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
 
         observeNetwork()
@@ -74,6 +74,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             if (user.flag) {
                 viewModelFriends.uploadUserData()
                 syncButton.isEnabled = false
+                Toast.makeText(context, "Dati correttamente sincronizzati", Toast.LENGTH_SHORT).show()
             } else {
                 showShareDataDialog()
             }

@@ -64,7 +64,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
             val file = File(context.filesDir, "user_data.json")
             file.writeText(json)
 
-            val thread = Thread {
+            withContext(Dispatchers.IO) {
                 try {
                     val request = PutObjectRequest(BUCKET_NAME, "user/${User.username}.json", file)
                     s3Client.putObject(request)
@@ -73,7 +73,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 }
             }
 
-            thread.start()
         }
     }
 

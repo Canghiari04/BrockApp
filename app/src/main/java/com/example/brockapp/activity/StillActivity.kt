@@ -2,15 +2,19 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
+import com.example.brockapp.worker.ActivityRecognitionWorker
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
 
 import android.os.Bundle
+import androidx.work.Data
 import android.view.MenuItem
 import android.widget.Button
 import android.content.Intent
 import android.os.SystemClock
+import androidx.work.WorkManager
 import android.widget.Chronometer
 import android.content.IntentFilter
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
@@ -54,21 +58,8 @@ class StillActivity: AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        unregisterActivityRecognitionReceiver()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
         super.onDestroy()
-    }
-
-    private fun setChronometerListener(chronometer: Chronometer) {
-        var notificationSent = false
-
-        chronometer.setOnChronometerTickListener {
-            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val hours = (elapsedTime / 1000 * 60 * 60).toInt()
-            if (hours == 1 && !notificationSent) {
-                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
-                notificationSent = true
-            }
-        }
     }
 
     private fun setButtonListeners(chronometer: Chronometer, ) {
@@ -99,6 +90,19 @@ class StillActivity: AppCompatActivity() {
         }
     }
 
+    private fun setChronometerListener(chronometer: Chronometer) {
+        var notificationSent = false
+
+        chronometer.setOnChronometerTickListener {
+            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+            val hours = (elapsedTime / 1000 * 60 * 60).toInt()
+            if (hours == 1 && !notificationSent) {
+                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
+                notificationSent = true
+            }
+        }
+    }
+
     private fun registerTransition(activityType: Int, transitionType: Int) {
         val intent = Intent().apply {
             setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
@@ -110,16 +114,16 @@ class StillActivity: AppCompatActivity() {
     }
 
     private fun sendLazyUserNotification(title: String, content: String) {
-        val intent = Intent(NOTIFICATION_SERVICE).apply {
-            putExtra("title", title)
-            putExtra("content", content)
-            putExtra("type", "walk")
-        }
+        val inputData = Data.Builder()
+            .putString("type", 3.toString())
+            .putString("title", title)
+            .putString("text", content)
+            .build()
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-    }
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
 
-    private fun unregisterActivityRecognitionReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        WorkManager.getInstance(this).enqueue(workRequest)
     }
 }

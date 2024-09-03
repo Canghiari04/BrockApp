@@ -54,7 +54,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         super.onViewCreated(view, savedInstanceState)
 
         db = BrockDB.getInstance(requireContext())
-        val factoryUserViewModel = UserViewModelFactory(db)
+        val factoryUserViewModel = UserViewModelFactory(db, requireContext())
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
