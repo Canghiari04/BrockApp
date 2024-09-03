@@ -47,6 +47,7 @@
     <string name="item_more_delete">Elimina account</string>
 
     <string name="title_home_fragment">In primo piano</string>
+    <string name="title_spinner">Visualizza per</string>
     <string name="subtitle_activities">Le tue ultime attività</string>
     <string name="subtitle_features">Le funzionalità dell\'app</string>
     <string name="register_text_view">REGISTRAZIONE</string>
@@ -156,7 +157,6 @@
     <string name="height_difference_text">Dislivello:</string>
 
     <string-array name="spinner_items">
-        <item>Visualizza per</item>
         <item>Giorno</item>
         <item>Settimana</item>
     </string-array>

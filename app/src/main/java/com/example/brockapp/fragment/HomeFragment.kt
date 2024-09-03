@@ -149,7 +149,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             val timeSpentInHour = (stillTime!!.toInt() / 60 / 60)
             staticProgressBar.progress = timeSpentInHour
 
-            if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
+            if (selectedItem == "Giorno") {
                 staticCountText.setText("$timeSpentInHour/24 ore")
             } else {
                 staticCountText.setText("$timeSpentInHour/168 ore")
@@ -161,7 +161,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel.kilometers.observe(viewLifecycleOwner) { kilometers ->
             kilometersProgressBar.progress = kilometers
 
-            if(selectedItem == "Giorno" || selectedItem == "Visualizza per") {
+            if(selectedItem == "Giorno") {
                 kilometersCountText.setText("$kilometers/100 km")
             } else {
                 kilometersCountText.setText("$kilometers/700 km")
@@ -173,7 +173,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel.steps.observe(viewLifecycleOwner) { steps ->
             stepsProgressBar.progress = steps
 
-            if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
+            if (selectedItem == "Giorno") {
                 stepsCountText.setText("$steps/10000 passi")
             } else {
                 stepsCountText.setText("$steps/70000 passi")

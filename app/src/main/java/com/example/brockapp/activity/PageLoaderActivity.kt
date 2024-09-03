@@ -10,12 +10,10 @@ import com.example.brockapp.fragment.ChartsFragment
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.interfaces.NetworkAvailableImpl
 
 import android.util.Log
 import android.os.Bundle
 import android.view.Menu
-import android.widget.Toast
 import android.view.MenuItem
 import android.content.Intent
 import android.view.MenuInflater
@@ -35,7 +33,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PageLoaderActivity: AppCompatActivity() {
-    private var internetUtil = NetworkAvailableImpl()
     private var mapFragments = mutableMapOf<String, Fragment>()
 
     private lateinit var toolbar: Toolbar
@@ -52,7 +49,6 @@ class PageLoaderActivity: AppCompatActivity() {
         setContentView(R.layout.activity_page_loader)
 
         startConnectivity()
-        checkIfNetworkIsActive()
 
         toolbar = findViewById(R.id.toolbar_page_loader)
         setSupportActionBar(toolbar)
@@ -167,12 +163,6 @@ class PageLoaderActivity: AppCompatActivity() {
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
-    }
-
-    private fun checkIfNetworkIsActive() {
-        if (!internetUtil.isInternetActive(this)) {
-            Toast.makeText(this, "Connessione non rilevata. Alcune funzionalità saranno disabilitate", Toast.LENGTH_LONG).show()
-        }
     }
 
     /**
