@@ -1,5 +1,8 @@
 package com.example.brockapp.activity
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.worker.ActivityRecognitionWorker
@@ -14,15 +17,25 @@ import android.os.SystemClock
 import androidx.work.WorkManager
 import android.widget.Chronometer
 import android.content.IntentFilter
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.util.NotificationUtil
 
-class StillActivity: AppCompatActivity() {
+class StillActivity: AppCompatActivity(), SensorEventListener {
     private var running: Boolean = false
     private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
+
+    private lateinit var sensorManager: SensorManager
+    private var stepCounterSensor: Sensor? = null
+    private var stepNumber = 0
+    private lateinit var notificationManager: NotificationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +44,11 @@ class StillActivity: AppCompatActivity() {
         supportActionBar?.title = " "
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
 
@@ -67,6 +85,7 @@ class StillActivity: AppCompatActivity() {
             if (!running) {
                 chronometer.start()
                 running = true
+                stepNumber = 0
 
                 findViewById<Button>(R.id.button_start).isEnabled = false
                 findViewById<Button>(R.id.button_stop).isEnabled = true
@@ -95,7 +114,7 @@ class StillActivity: AppCompatActivity() {
 
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val hours = (elapsedTime / 1000 * 60 * 60).toInt()
+            val hours = (elapsedTime / 1000 / 60 / 60).toInt() //Da millisecondi a ore
             if (hours == 1 && !notificationSent) {
                 sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
                 notificationSent = true
@@ -126,4 +145,20 @@ class StillActivity: AppCompatActivity() {
 
         WorkManager.getInstance(this).enqueue(workRequest)
     }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if(event?.sensor?.type == Sensor.TYPE_STEP_DETECTOR){
+            stepNumber++
+
+            if(stepNumber == 10){
+               sendLazyUserNotification("Sembra che tu non sia fermo!", "Apri l'app per registrare una nuova attività")
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        TODO("Not yet implemented")
+    }
+
+
 }
