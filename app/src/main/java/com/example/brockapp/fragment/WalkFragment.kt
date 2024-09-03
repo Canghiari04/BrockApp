@@ -37,7 +37,7 @@ class WalkFragment: Fragment(R.layout.fragment_walk) {
             val adapter = DailyActivityAdapter(friendWalkActivities)
             val layoutManager = LinearLayoutManager(requireContext())
 
-            val recyclerView = view?.findViewById<RecyclerView>(R.id.vehicle_recycler_view)
+            val recyclerView = view?.findViewById<RecyclerView>(R.id.walk_recycler_view)
             recyclerView?.adapter = adapter
             recyclerView?.layoutManager = layoutManager
         }

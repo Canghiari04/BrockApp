@@ -15,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import com.google.android.gms.location.DetectedActivity
 
-class ActivityRecognitionService : Service() {
+class ActivityRecognitionService: Service() {
     private lateinit var user: User
     private lateinit var db: BrockDB
 

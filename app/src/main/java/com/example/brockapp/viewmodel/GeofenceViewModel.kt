@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 
-class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
+class GeofenceViewModel(private val db: BrockDB): ViewModel() {
     private val _staticAreas = MutableLiveData<List<GeofenceAreaEntry>>()
     val staticAreas: LiveData<List<GeofenceAreaEntry>> get() = _staticAreas
 

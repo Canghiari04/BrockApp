@@ -23,7 +23,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
 
-class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context) : ViewModel() {
+class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context): ViewModel() {
     private val _friends = MutableLiveData<List<String>>()
     val friends: LiveData<List<String>> get() = _friends
 

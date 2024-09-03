@@ -33,7 +33,6 @@ class FriendActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_friend)
 
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar_friend_activity)
         setSupportActionBar(toolbar)
 

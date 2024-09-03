@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 class DailyActivityAdapter(private val activities: List<UserActivity>): RecyclerView.Adapter<DailyActivityViewHolder>() {
     private val filteredActivities: List<UserActivity> = activities.filter { it.transitionType == 1 }
 
-    private val timeMeasure = {"secondi"; "minuti"; "ore"}
-
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyActivityViewHolder {
         val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_activity, parent, false)
         return DailyActivityViewHolder(activityItem)
@@ -56,7 +54,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                         VEHICLE_ACTIVITY_TYPE,
                         "Data: $date",
                         "Terminata alle $exitActivityTime",
-                        "Distanza percorsa: $distanceTravelled metri.\nDurata: $timeDifference"
+                        "Distanza percorsa: $distanceTravelled metri\nDurata: $timeDifference"
                     )
                 }
 
@@ -65,7 +63,7 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                         WALK_ACTIVITY_TYPE,
                         "Data: $date",
                         "Terminata alle $exitActivityTime",
-                        "Passi fatti: ${exitActivity.info}. \nDurata: $timeDifference"
+                        "Passi fatti: ${exitActivity.info}\nDurata: $timeDifference"
                     )
                 }
 
@@ -84,20 +82,18 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
 
         val startDate = timeFormat.parse(startTime)
         val endDate = timeFormat.parse(endTime)
-
-
         val timeDifference = ((endDate.time - startDate.time) / 1000)
 
-        if(timeDifference >= 60) {
+        if (timeDifference >= 60) {
             val hour = (timeDifference / 3600).toInt()
             val minute = (timeDifference / 60).toInt()
             val second = (timeDifference % 60).toInt()
 
-            if(hour > 0){
+            if (hour > 0){
                 return "$hour ore, $minute minuti, $second secondi"
             }
-            return "$minute minuti, $second secondi"
 
+            return "$minute minuti, $second secondi"
         } else {
             return "$timeDifference secondi"
         }

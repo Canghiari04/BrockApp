@@ -1,0 +1,103 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage{fixltx2e}
+\usepackage{booktabs}
+\usepackage{float}  
+\usepackage{graphicx}
+\usepackage{floatflt,epsfig}
+\usepackage[margin=1in]{geometry} 
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{hyperref}
+
+\hypersetup{
+    pdfborder = {0 0 0}, % No border
+}
+
+\lstdefinelanguage{Java}{
+  keywords={abstract,assert,boolean,break,byte,case,catch,char,class,const,continue,default,do,double,else,enum,extends,false,final,finally,float,for,goto,if,implements,import,instanceof,int,interface,long,native,new,null,package,private,protected,public,return,short,static,strictfp,super,switch,synchronized,this,throw,throws,transient,true,try,void,volatile,while},
+  morekeywords={[2]System,out},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{blue}\bfseries,
+  keywordstyle={[2]\color{orange}\bfseries},
+  commentstyle=\color{green!70!black},
+  stringstyle=\color{red},
+  showstringspaces=false,
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=true,
+  frame=single, 
+  captionpos=b
+}
+
+\titleformat{\section}[block]
+{\large\bfseries}{\thesection}{1em}{}
+
+\titleformat{\subsection}[block]
+{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\pagestyle{empty}
+
+\begin{titlepage} 
+\begin{center}
+    {{\Large{\textsc{Alma Mater Studiorum - Università di Bologna}}}}
+    \rule[0.1cm]{\textwidth}{0.1px}
+    \rule[0.5cm]{\textwidth}{0.6px}\\
+    {\large{SCUOLA DI SCIENZE \\ Corso di Laurea in Informatica per il Management}}
+\end{center}
+
+\vspace{90px}
+
+\begin{center}
+    \href{https://github.com/DavideDeRosa/storj_SWE}{\includegraphics[width=0.4\textwidth]{storJ.png}}
+\end{center}
+
+\vspace{100px}
+\par
+\noindent
+\begin{minipage}[t]{0.04\textwidth}
+~
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}\raggedleft
+    {\fontsize{12}{13}{DOCUMENTAZIONE SVOLTA DA:}\
+\fontsize{12}{13}{\it Canghiari Matteo, 1032059 \\ Rocca Claudio, 0000000}}
+\end{minipage}
+\begin{minipage}[t]{0.04\textwidth}
+~
+\end{minipage}
+
+\vspace*{200px}
+
+\begin{center}
+    \large{Laboratorio di Applicazioni Mobili}\\
+    \large{Anno Accademico 2023/2024}
+\end{center}
+\end{titlepage}
+
+\section*{BrockApp}
+
+\subsection*{title}
+
+\end{document}

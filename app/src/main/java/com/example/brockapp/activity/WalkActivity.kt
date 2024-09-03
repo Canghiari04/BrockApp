@@ -29,7 +29,7 @@ import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class WalkActivity : AppCompatActivity(), SensorEventListener {
+class WalkActivity: AppCompatActivity(), SensorEventListener {
     private var stepCount = 0
     private var running = false
     private var currentSteps = 0

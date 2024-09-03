@@ -30,7 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
-class SignInFragment : Fragment(R.layout.fragment_sign_in) {
+class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
     private var listener: OnFragmentInteractionListener? = null
 

@@ -138,7 +138,7 @@ class PageLoaderActivity: AppCompatActivity() {
             }
             R.id.item_more_logout -> {
                 val user = User.getInstance()
-                user.logoutUser(user)
+                user.logoutUser()
 
                 goToAuthenticator()
                 true
@@ -227,7 +227,7 @@ class PageLoaderActivity: AppCompatActivity() {
             .setMessage(R.string.dangerous_dialog_message)
             .setPositiveButton(R.string.dangerous_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                user.logoutUser(user)
+                user.logoutUser()
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         userDao.deleteUserById(user.id)

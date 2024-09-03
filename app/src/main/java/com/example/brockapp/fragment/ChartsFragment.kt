@@ -32,7 +32,6 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 class ChartsFragment: Fragment(R.layout.fragment_charts) {
     private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
