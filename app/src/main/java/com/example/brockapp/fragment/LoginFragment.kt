@@ -11,6 +11,7 @@ import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
+import java.io.File
 import android.Manifest
 import android.util.Log
 import android.view.View
@@ -21,11 +22,14 @@ import android.content.Intent
 import android.content.Context
 import android.widget.TextView
 import android.widget.EditText
+import com.amazonaws.regions.Regions
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
+import com.amazonaws.services.s3.AmazonS3Client
 import com.google.android.gms.location.LocationServices
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
     private var user = User.getInstance()
@@ -49,8 +53,17 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
+        val s3Client = AmazonS3Client(credentialsProvider)
+
+        val file = File(requireContext().filesDir, "user_data.json")
         val db = BrockDB.getInstance(requireContext())
-        val factoryViewModelUser = UserViewModelFactory(db, requireContext())
+
+        val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
@@ -64,7 +77,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.checkIfUserExistsLocally(username, password)
             } else {
-                Toast.makeText(requireContext(), "Inserisci le credenziali", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Inserisci le credenziali", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -93,7 +106,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 viewModelUser.getUser(username, password)
                 util.requestPermissions()
             } else {
-                Toast.makeText(requireContext(), "Credenziali errate", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Credenziali errate", Toast.LENGTH_SHORT).show()
             }
         }
     }

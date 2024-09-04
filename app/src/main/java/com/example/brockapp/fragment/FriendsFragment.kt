@@ -15,6 +15,7 @@ import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
+import java.io.File
 import android.util.Log
 import android.os.Bundle
 import android.view.View
@@ -50,6 +51,8 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         )
         val s3Client = AmazonS3Client(credentialsProvider)
 
+        val file = File(requireContext().filesDir, "user_data.json")
+
         val user = User.getInstance()
         val db: BrockDB = BrockDB.getInstance(requireContext())
 
@@ -58,7 +61,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, requireContext())
         viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactoryFriends)[FriendsViewModel::class.java]
 
-        val viewModelFactoryUser = UserViewModelFactory(db, requireContext())
+        val viewModelFactoryUser = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
 
         observeNetwork()

@@ -11,6 +11,7 @@ import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
+import java.io.File
 import android.Manifest
 import android.util.Log
 import android.os.Bundle
@@ -22,13 +23,16 @@ import android.widget.EditText
 import android.content.Context
 import android.widget.TextView
 import kotlinx.coroutines.launch
+import com.amazonaws.regions.Regions
 import kotlinx.coroutines.Dispatchers
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import kotlinx.coroutines.CoroutineScope
 import androidx.lifecycle.ViewModelProvider
+import com.amazonaws.services.s3.AmazonS3Client
 import com.google.android.gms.location.LocationServices
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
@@ -53,8 +57,17 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
+        val s3Client = AmazonS3Client(credentialsProvider)
+
         db = BrockDB.getInstance(requireContext())
-        val factoryUserViewModel = UserViewModelFactory(db, requireContext())
+        val file = File(requireContext().filesDir, "user_data.json")
+
+        val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
@@ -103,7 +116,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
 
                 util.requestPermissions()
             } else {
-                Toast.makeText(requireContext(), "Credenziali presenti, passa da Login", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Credenziali presenti", Toast.LENGTH_SHORT).show()
             }
         }
     }

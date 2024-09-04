@@ -10,9 +10,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 
 class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams) {
+    private var notificationChannelCreated = false
+
     private lateinit var util: NotificationUtil
     private lateinit var manager: NotificationManager
-    private var notificationChannelCreated = false
 
     override suspend fun doWork(): Result {
         val type = inputData.getString("type")?.toInt()

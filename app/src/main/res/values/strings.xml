@@ -14,11 +14,11 @@
 
     <string name="login_welcome_text_view">Login</string>
     <string name="message_to_signin">Non hai un account?</string>
-    <string name="on_click_signin">Sign In</string>
+    <string name="on_click_signin">Clicca qui!</string>
 
     <string name="signin_welcome_text_view">Sign In</string>
     <string name="message_to_login">Hai già un account?</string>
-    <string name="on_click_login">Login</string>
+    <string name="on_click_login">Clicca qui!</string>
 
     <string name="description_error_signin">CREDENZIALI GIA\' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD</string>
     <string name="description_error_login">CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL\'APPLICAZIONE?</string>

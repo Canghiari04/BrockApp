@@ -62,12 +62,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:backgroundTint="@color/uni_red"
             android:text="@string/sign_in_button"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_password" />
+            app:layout_constraintTop_toBottomOf="@+id/text_password"
+            android:background="@color/uni_red"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -91,10 +91,10 @@
 
             <TextView
                 android:id="@+id/login_text_view"
+                android:text="@string/on_click_login"
                 android:layout_width="wrap_content"
                 android:layout_height="24sp"
                 android:layout_weight="1"
-                android:text="@string/on_click_login"
                 android:textAlignment="textStart"
                 android:textColor="@color/uni_red"
                 android:layout_marginStart="5dp"

@@ -63,10 +63,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:textColor="@color/white"
-            android:backgroundTint="@color/uni_red"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_password" />
+            app:layout_constraintTop_toBottomOf="@+id/text_password"
+            android:background="@color/uni_red"/>
 
         <LinearLayout
             android:layout_width="match_parent"
