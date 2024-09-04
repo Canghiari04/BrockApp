@@ -21,6 +21,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
+import android.widget.Toast
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
@@ -48,7 +50,7 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
         val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
 
@@ -67,7 +69,6 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
                 finish()
                 true
             }
-
             else -> {
                 super.onOptionsItemSelected(item)
                 false
@@ -80,12 +81,12 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
         super.onDestroy()
     }
 
-    private fun setButtonListeners(chronometer: Chronometer, ) {
+    private fun setButtonListeners(chronometer: Chronometer) {
         findViewById<Button>(R.id.button_start).setOnClickListener {
             if (!running) {
                 chronometer.start()
                 running = true
-                stepNumber = 0
+                startStepCounting()
 
                 findViewById<Button>(R.id.button_start).isEnabled = false
                 findViewById<Button>(R.id.button_stop).isEnabled = true
@@ -98,6 +99,7 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
             if (running) {
                 chronometer.stop()
                 running = false
+                stopStepCounting()
 
                 findViewById<Button>(R.id.button_start).isEnabled = true
                 findViewById<Button>(R.id.button_stop).isEnabled = false
@@ -132,6 +134,20 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
+    private fun startStepCounting() {
+        stepNumber = 0
+        if(stepCounterSensor != null){
+
+            sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            Toast.makeText(this, "Sensore registrato", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Step number: $stepNumber", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopStepCounting() {
+        sensorManager.unregisterListener(this)
+    }
+
     private fun sendLazyUserNotification(title: String, content: String) {
         val inputData = Data.Builder()
             .putString("type", 3.toString())
@@ -147,12 +163,22 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if(event?.sensor?.type == Sensor.TYPE_STEP_DETECTOR){
-            stepNumber++
-
-            if(stepNumber == 10){
-               sendLazyUserNotification("Sembra che tu non sia fermo!", "Apri l'app per registrare una nuova attività")
+        try {
+            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+                stepNumber++
+                runOnUiThread {
+                    updateUI()
+                }
             }
+        } catch (e: Exception) {
+            Log.e("StillActivity", "Errore in onSensorChanged", e)
+        }
+    }
+
+    private fun updateUI() {
+        Toast.makeText(this, "Passo fatto: $stepNumber", Toast.LENGTH_SHORT).show()
+        if (stepNumber == 10) {
+            sendLazyUserNotification("Sembra che tu non sia fermo!", "Apri l'app per registrare una nuova attività")
         }
     }
 
