@@ -1,8 +1,5 @@
 \documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lipsum}
-\usepackage{graphicx}
+
 \usepackage{amsmath}
 \usepackage[margin=1in]{geometry}
 \usepackage{titlesec}
@@ -11,15 +8,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lipsum}
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage[margin=1in]{geometry}
-\usepackage{titlesec}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{subfigure}
-\usepackage{graphicx}
 
 \hypersetup{
     pdfborder = {0 0 0},
@@ -205,12 +197,57 @@ L'utente può sincronizzare i dati salvati in \textit{cloud} in qualsiasi moment
 \subsection*{Scelte implementative}
 \subsubsection*{ViewModel}
 \subsubsection*{Room}
+Room viene utilizzato per garantire la persistenza dei dati relativi alle attività dell'utente attraverso un database relazionale locale. Le tabelle presenti nel database sono le seguenti:
+\begin{itemize}
+    \renewcommand{\labelitemi}{-}
+    \item \textbf{User}, contenente id, username e password degli utenti
+    \item \textbf{UserWalkActivity}, contenente i dati relativi alle attività di camminata relative agli utenti
+    \item \textbf{UserStillActivity}, contenente i dati relativi alle attività sedentarie degli utenti
+    \item \textbf{UserVehicleActivity}, contenente i dati relativi alle attività di spostamento con veicolo registrati dagli utenti
+    \item \textbf{GeofenceArea}, contenente i dati delle aree di interesse registrate dagli utenti
+    \item \textbf{Friends}, contenente gli id degli amici seguiti da ogni utente
+\end{itemize}
+L'utilizzo di Room offre vantaggi rispetto alla gestione manuale con i metodi onCreate() e onUpgrade() del database, come la gestione automatica dell'aggiornamento del database causato per esempio dall'introduzione di una nuova tabella o dall'aggiornamento della struttura di una esistente.
 \subsubsection*{Background operations}
 \textit{Geofecing} \\
 Receiver - Service - Worker \\
 \textit{Connectivity} \\
-\subsubsection*{Aws}
+\subsubsection*{AWS Simple Storage Service}
+Per consentire agli utenti di condividere i propri dati è stato utilizzato \textit{AWS Simple Storage Service}, la scelta è ricaduta su esso per le conoscenze pregresse del gruppo e per la facile integrazione fornita dalla AWS SDK in Kotlin.\\
+Al momento della condivisione dei dati dell'utente viene effettuato un dump del database in formato JSON: i dati vengono strutturati in questo formato tramite la popolare libreria Gson, per poi essere salvati su un file che viene caricato su un bucket tramite una richiesta formulata da un AwsS3Client come nel seguente codice:\\
+\begin{lstlisting}[language=Java]
+    fun uploadUserData() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
+            val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
+            val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
 
+            val userData = mapOf(
+                "username" to User.username,
+                "walkActivities" to walkActivities,
+                "vehicleActivities" to vehicleActivities,
+                "stillActivities" to stillActivities
+            )
+
+            val gson = Gson()
+            val json = gson.toJson(userData)
+
+            val file = File(context.filesDir, "user_data.json")
+            file.writeText(json)
+
+            withContext(Dispatchers.IO) {
+                try {
+                    val request = PutObjectRequest(BUCKET_NAME, "user/${User.username}.json", file)
+                    s3Client.putObject(request)
+                } catch (e: Exception) {
+                    Log.e("S3Upload", "Failed to upload user data", e)
+                }
+            }
+
+        }
+    }
+
+\end{lstlisting}
 \subsection*{Possibili sviluppi futuri}
 
 \end{document}
