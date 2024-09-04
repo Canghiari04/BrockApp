@@ -38,8 +38,13 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
     private var stepCounterSensor: Sensor? = null
     private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
+    private var hourSpentWalkingNotification: Boolean = false
+    private var notWalkingNotificationSent: Boolean = false
+
     private lateinit var sensorManager: SensorManager
     private lateinit var notificationManager: NotificationManagerCompat
+
+    private var lastStepTime: Long = System.currentTimeMillis()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +88,9 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
                 startStepCounting()
                 Toast.makeText(this, "Iniziato conteggio passi", Toast.LENGTH_SHORT).show()
 
+                hourSpentWalkingNotification = false
+                notWalkingNotificationSent = false
+
                 registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER, 0L)
             }
         }
@@ -101,7 +109,7 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
             }
         }
 
-        var hourSpentWalkingNotification = false
+
 
         chronometer.setOnChronometerTickListener {
             val elapsedMillis = SystemClock.elapsedRealtime() - chronometer.base
@@ -109,7 +117,6 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
             val elapsedHour = elapsedMillis / 1000 / 60 / 60
 
             if (elapsedHour >= 1 && !hourSpentWalkingNotification) {
-                hourSpentWalkingNotification = true
 
                 val inputData = Data.Builder()
                     .putString("type", 7.toString())
@@ -122,6 +129,23 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
                     .build()
 
                 WorkManager.getInstance(this).enqueue(workRequest)
+                hourSpentWalkingNotification = true
+            }
+
+
+            if(System.currentTimeMillis() - lastStepTime >= NOT_WALKING_NOTIFICATION_TIME_MILLIS && !notWalkingNotificationSent){
+                val inputData = Data.Builder()
+                    .putString("type", 7.toString())
+                    .putString("title", "Ricomincia a camminare!")
+                    .putString("text", "Non stai facendo passi da un po'")
+                    .build()
+
+                val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+                    .setInputData(inputData)
+                    .build()
+
+                WorkManager.getInstance(this).enqueue(workRequest)
+                notWalkingNotificationSent = true
             }
         }
 
@@ -138,6 +162,7 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
                 sessionStepCount = event.values[0].toInt() - initialStepCount
 
                 findViewById<TextView>(R.id.step_count)?.text = sessionStepCount.toString()
+                lastStepTime = System.currentTimeMillis()
             }
             Sensor.TYPE_PRESSURE -> {
                 val pressure = event.values[0]
