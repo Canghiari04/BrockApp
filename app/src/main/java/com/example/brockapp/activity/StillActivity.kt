@@ -28,9 +28,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.util.NotificationUtil
 
-class StillActivity: AppCompatActivity(), SensorEventListener {
+class StillActivity: NotificationSender, AppCompatActivity(), SensorEventListener{
     private var running: Boolean = false
     private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
@@ -118,7 +119,7 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
             val hours = (elapsedTime / 1000 / 60 / 60).toInt() //Da millisecondi a ore
             if (hours == 1 && !notificationSent) {
-                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
+                sendNotification("Torna in attività!", "Sei fermo da più di un'ora ")
                 notificationSent = true
             }
         }
@@ -148,19 +149,6 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
         sensorManager.unregisterListener(this)
     }
 
-    private fun sendLazyUserNotification(title: String, content: String) {
-        val inputData = Data.Builder()
-            .putString("type", 3.toString())
-            .putString("title", title)
-            .putString("text", content)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(this).enqueue(workRequest)
-    }
 
     override fun onSensorChanged(event: SensorEvent?) {
         try {
@@ -178,12 +166,26 @@ class StillActivity: AppCompatActivity(), SensorEventListener {
     private fun updateUI() {
         Toast.makeText(this, "Passo fatto: $stepNumber", Toast.LENGTH_SHORT).show()
         if (stepNumber == 10) {
-            sendLazyUserNotification("Sembra che tu non sia fermo!", "Apri l'app per registrare una nuova attività")
+            sendNotification("Sembra che tu non sia fermo!", "Apri l'app per registrare una nuova attività")
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         TODO("Not yet implemented")
+    }
+
+    override fun sendNotification(title: String, content: String) {
+        val inputData = Data.Builder()
+            .putString("type", 3.toString())
+            .putString("title", title)
+            .putString("text", content)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
     }
 
 

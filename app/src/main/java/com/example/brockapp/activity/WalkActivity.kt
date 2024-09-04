@@ -27,8 +27,9 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.interfaces.NotificationSender
 
-class WalkActivity: AppCompatActivity(), SensorEventListener {
+class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender {
     private var running = false
     private var initialStepCount = 0
     private var sessionStepCount = 0
@@ -117,35 +118,15 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
             val elapsedHour = elapsedMillis / 1000 / 60 / 60
 
             if (elapsedHour >= 1 && !hourSpentWalkingNotification) {
-
-                val inputData = Data.Builder()
-                    .putString("type", 7.toString())
-                    .putString("title", "Continua così!")
-                    .putString("text", "Stai camminando da più di un'ora")
-                    .build()
-
-                val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
-                    .setInputData(inputData)
-                    .build()
-
-                WorkManager.getInstance(this).enqueue(workRequest)
+                sendNotification( "Continua così!", "Stai camminando da più di un'ora")
                 hourSpentWalkingNotification = true
             }
 
 
             if(System.currentTimeMillis() - lastStepTime >= NOT_WALKING_NOTIFICATION_TIME_MILLIS && !notWalkingNotificationSent){
-                val inputData = Data.Builder()
-                    .putString("type", 7.toString())
-                    .putString("title", "Ricomincia a camminare!")
-                    .putString("text", "Non stai facendo passi da un po'")
-                    .build()
-
-                val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
-                    .setInputData(inputData)
-                    .build()
-
-                WorkManager.getInstance(this).enqueue(workRequest)
+                sendNotification("Ricomincia a camminare!", "Non stai facendo passi da un po'")
                 notWalkingNotificationSent = true
+
             }
         }
 
@@ -220,5 +201,20 @@ class WalkActivity: AppCompatActivity(), SensorEventListener {
         }
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    override fun sendNotification(title: String, content: String) {
+        val inputData = Data.Builder()
+            .putString("type", 7.toString())
+            .putString("title", "Ricomincia a camminare!")
+            .putString("text", "Non stai facendo passi da un po'")
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+        notWalkingNotificationSent = true
     }
 }
