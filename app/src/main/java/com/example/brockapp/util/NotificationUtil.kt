@@ -40,11 +40,11 @@ class NotificationUtil {
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle("Zona di interesse varcata")
-            setContentText("Inizia a registrare nuove attività")
+            setContentTitle("Inizia a registare nuove attività!")
+            setContentText("Hai appena varcato i confini di una zona di interesse")
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText("Hai appena varcato i confini di una zona di interesse. " +
-                             "Inizia a registrare le tue attività per non perdere nulla di importante"))
+                             "Inizia a registrare nuove attività!"))
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setAutoCancel(true)
         }
@@ -71,10 +71,10 @@ class NotificationUtil {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
             setContentTitle("Connessione non rilevata")
-            setContentText("Verifica le impostazioni di connessione")
+            setContentText("Alcune funzionalità sono state disattivate")
             setStyle(
                 NotificationCompat.BigTextStyle().bigText(
-                    "Alcune funzionalità potrebbero non essere disponibili. " +
+                    "Alcune funzionalità sono state disattivate. " +
                         "Verifica le impostazioni di connessione sul tuo dispositivo " +
                         "per garantire che tutte le funzionalità operino correttamente"
                 )

@@ -16,7 +16,6 @@ class MapService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-
         geofence = MyGeofence.getInstance()
     }
 

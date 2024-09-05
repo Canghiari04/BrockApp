@@ -74,9 +74,6 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
         }
     }
 
-    /**
-     * Calcola la differenza di tempo in secondi tra due timestamp nel formato "HH:mm:ss".
-     */
     private fun calculateTimeDifference(startTime: String, endTime: String): String {
         val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
 

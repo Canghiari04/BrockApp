@@ -10,9 +10,7 @@ import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.adapter.SuggestionsAdapter
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.NetworkViewModel
-import com.example.brockapp.interfaces.InternetAvailable
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
 import java.io.File
@@ -34,15 +32,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var viewModelUser: UserViewModel
-    private lateinit var internetUtil: InternetAvailable
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelFriends: FriendsViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        internetUtil = NetworkAvailableImpl()
-        checkIfNetworkIsActive()
 
         val credentialsProvider = CognitoCachingCredentialsProvider(
             requireContext(),
@@ -58,7 +52,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
         viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
-        val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, requireContext())
+        val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, file)
         viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactoryFriends)[FriendsViewModel::class.java]
 
         val viewModelFactoryUser = UserViewModelFactory(db, s3Client, file)
@@ -97,13 +91,6 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             } else {
                 Log.d("FRIENDS_FRAGMENT", "Search with empty body not supported.")
             }
-        }
-    }
-
-    private fun checkIfNetworkIsActive() {
-        if (!internetUtil.isInternetActive(requireContext())) {
-            view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = false
-            view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.hide()
         }
     }
 

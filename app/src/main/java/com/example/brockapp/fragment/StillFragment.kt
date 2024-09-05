@@ -6,6 +6,7 @@ import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.adapter.DailyActivityAdapter
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
+import java.io.File
 import android.os.Bundle
 import android.view.View
 import com.amazonaws.regions.Regions
@@ -22,11 +23,16 @@ class StillFragment: Fragment(R.layout.fragment_still) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(requireContext(), "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00", Regions.EU_WEST_3)
+        val credentialsProvider = CognitoCachingCredentialsProvider(requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
         val s3Client = AmazonS3Client(credentialsProvider)
 
+        val file = File(requireContext().filesDir, "user_data.json")
+
         val db = BrockDB.getInstance(requireContext())
-        val viewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
+        val viewModelFactory = FriendsViewModelFactory(s3Client, db, file)
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
 
         observeFriendStillActivities()

@@ -26,7 +26,7 @@
     <string name="permission_title">Permesso richiesto</string>
     <string name="permission_message">Concedi il permesso dei tuoi spostamenti per usufruire di tutte le funzionalità.</string>
     <string name="permission_positive_button">Concedi</string>
-    <string name="settings_positive_button">Accedi</string>
+    <string name="settings_positive_button">Concedi</string>
     <string name="permission_negative_button">Annulla</string>
     <string name="permission_setting_button">Settings</string>
     <string name="permission_background">Concedi il permesso di accedere alla tua posizione anche quando l\'app è in background per garantire il corretto funzionamento di tutte le funzionalità.</string>

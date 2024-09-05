@@ -22,13 +22,10 @@ import android.content.Intent
 import android.widget.EditText
 import android.content.Context
 import android.widget.TextView
-import kotlinx.coroutines.launch
 import com.amazonaws.regions.Regions
-import kotlinx.coroutines.Dispatchers
 import androidx.fragment.app.Fragment
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import kotlinx.coroutines.CoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import com.amazonaws.services.s3.AmazonS3Client
 import com.google.android.gms.location.LocationServices
@@ -46,10 +43,6 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
-    /**
-     * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
-     * activity owner.
-     */
     interface OnFragmentInteractionListener {
         fun showLoginFragment()
     }
@@ -64,15 +57,18 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         )
         val s3Client = AmazonS3Client(credentialsProvider)
 
-        db = BrockDB.getInstance(requireContext())
         val file = File(requireContext().filesDir, "user_data.json")
 
+        db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
         }
+
+        observeSignIn()
+        observeUser()
 
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
@@ -88,13 +84,13 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         view.findViewById<TextView>(R.id.login_text_view).setOnClickListener {
             listener?.showLoginFragment()
         }
-
-        observeSignIn()
     }
 
     override fun onAttach(context: Context) {
-        if(context is OnFragmentInteractionListener)
+        if(context is OnFragmentInteractionListener){
             listener = context
+        }
+
         super.onAttach(context)
     }
 
@@ -106,17 +102,23 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private fun observeSignIn() {
         viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
-                user.username = username
-                user.password = password
-                user.flag = false
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    user.id = db.UserDao().getIdFromUsernameAndPassword(username, password)
-                }
-
+                viewModelUser.getUser(username, password)
                 util.requestPermissions()
             } else {
-                Toast.makeText(requireContext(), "Credenziali presenti", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Credenziali di accesso già presenti", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun observeUser() {
+        viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
+            if (currentUser != null) {
+                user.id = currentUser.id
+                user.username = currentUser.username.toString()
+                user.password = currentUser.password.toString()
+                user.flag = currentUser.sharingFlag
+            } else {
+                Log.e("LOGIN_FRAGMENT", "User not found")
             }
         }
     }
@@ -126,6 +128,8 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
         observeGeofenceAreas()
+
+        viewModelGeofence.fetchGeofenceAreas()
     }
 
     private fun observeGeofenceAreas() {
@@ -145,19 +149,17 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofence.pendingIntent.let {
-                geofencingClient.addGeofences(geofence.request, it).run {
-                    addOnSuccessListener {
-                        goToHome()
-                    }
-                    addOnFailureListener {
-                        Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
-                        goToHome()
-                    }
+            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+                addOnSuccessListener {
+                    goToHome()
+                }
+                addOnFailureListener {
+                    goToHome()
+                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection")
                 }
             }
         } else {
-            Log.e("GEOFENCE_PERMISSION", "Missing permission.")
+            Log.wtf("GEOFENCE_PERMISSION", "Permission denied")
         }
     }
 

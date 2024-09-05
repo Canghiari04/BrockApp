@@ -120,9 +120,7 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
 
     private fun observeCountUserActivities() {
         viewModel.mapCountActivities.observe(viewLifecycleOwner) { mapCountActivities ->
-            if (mapCountActivities.isNullOrEmpty()) {
-
-            } else {
+            if (!mapCountActivities.isNullOrEmpty()) {
                 setupActivityTypePieChart(mapCountActivities)
             }
         }

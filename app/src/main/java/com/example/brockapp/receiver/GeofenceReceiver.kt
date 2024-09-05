@@ -10,7 +10,7 @@ import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequest
 import android.content.BroadcastReceiver
 import com.google.android.gms.location.GeofencingEvent
-import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
+import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 
 class GeofenceReceiver: BroadcastReceiver() {
     private lateinit var workRequest: OneTimeWorkRequest
@@ -21,18 +21,18 @@ class GeofenceReceiver: BroadcastReceiver() {
 
             if(event != null) {
                 if(event.hasError()) {
-                    Log.d("GEOFENCE_RECEIVER", event.errorCode.toString())
+                    Log.e("GEOFENCE_RECEIVER", event.errorCode.toString())
                 } else {
                     val geofenceTransition = event.geofenceTransition
 
                     when (geofenceTransition) {
-                        GEOFENCE_TRANSITION_ENTER -> {
+                        GEOFENCE_TRANSITION_DWELL -> {
                             workRequest = OneTimeWorkRequest.Builder(GeofenceWorker::class.java).build()
                             WorkManager.getInstance(context).enqueue(workRequest)
                         }
 
                         else -> {
-                            Log.d("GEOFENCE_RECEIVER", "Transition not recognize.")
+                            Log.e("GEOFENCE_RECEIVER", "Transition not recognize.")
                         }
                     }
                 }

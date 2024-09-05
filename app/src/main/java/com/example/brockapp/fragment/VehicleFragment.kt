@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import java.io.File
 
 class VehicleFragment: Fragment(R.layout.fragment_vehicle) {
     private lateinit var viewModel: FriendsViewModel
@@ -22,11 +23,17 @@ class VehicleFragment: Fragment(R.layout.fragment_vehicle) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(requireContext(), "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00", Regions.EU_WEST_3)
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            requireContext(),
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
         val s3Client = AmazonS3Client(credentialsProvider)
 
+        val file = File(requireContext().filesDir, "user_data.json")
+
         val db = BrockDB.getInstance(requireContext())
-        val viewModelFactory = FriendsViewModelFactory(s3Client, db, requireContext())
+        val viewModelFactory = FriendsViewModelFactory(s3Client, db, file)
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[FriendsViewModel::class.java]
 
         observeFriendVehicleActivities()

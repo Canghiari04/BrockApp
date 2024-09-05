@@ -42,10 +42,6 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
-    /**
-     * Uso di un'interfaccia per delegare l'implementazione del metodo desiderato dal fragment all'
-     * activity owner.
-     */
     interface OnFragmentInteractionListener {
         fun showSignInFragment()
     }
@@ -61,14 +57,17 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         val s3Client = AmazonS3Client(credentialsProvider)
 
         val file = File(requireContext().filesDir, "user_data.json")
-        val db = BrockDB.getInstance(requireContext())
 
+        val db = BrockDB.getInstance(requireContext())
         val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
             startBackgroundOperations()
         }
+
+        observeLogin()
+        observeUser()
 
         view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
@@ -77,16 +76,13 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.checkIfUserExistsLocally(username, password)
             } else {
-                Toast.makeText(requireContext(), "Inserisci le credenziali", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Inserisci le credenziali di accesso", Toast.LENGTH_SHORT).show()
             }
         }
 
         view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
             listener?.showSignInFragment()
         }
-
-        observeLogin()
-        observeUser()
     }
 
     override fun onAttach(context: Context) {
@@ -106,7 +102,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 viewModelUser.getUser(username, password)
                 util.requestPermissions()
             } else {
-                Toast.makeText(requireContext(), "Credenziali errate", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Credenziali di accesso errate", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -119,7 +115,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 user.password = currentUser.password.toString()
                 user.flag = currentUser.sharingFlag
             } else {
-                Log.d("LOGIN_FRAGMENT", "User not found.")
+                Log.e("LOGIN_FRAGMENT", "User not found.")
             }
         }
     }
@@ -130,6 +126,8 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
         observeGeofenceAreas()
+
+        viewModelGeofence.fetchGeofenceAreas()
     }
 
     private fun observeGeofenceAreas() {
@@ -149,19 +147,17 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofence.pendingIntent.let {
-                geofencingClient.addGeofences(geofence.request, it).run {
-                    addOnSuccessListener {
-                        goToHome()
-                    }
-                    addOnFailureListener {
-                        Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection.")
-                        goToHome()
-                    }
+            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+                addOnSuccessListener {
+                    goToHome()
+                }
+                addOnFailureListener {
+                    goToHome()
+                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection")
                 }
             }
         } else {
-            Log.e("GEOFENCE_PERMISSION", "Missing permission.")
+            Log.wtf("GEOFENCE_PERMISSION", "Permission denied")
         }
     }
 

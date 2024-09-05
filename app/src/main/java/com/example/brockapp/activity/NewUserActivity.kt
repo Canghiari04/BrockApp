@@ -76,10 +76,6 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo attuato per definire se il permesso di activity recognition sia stato accettato
-     * oppure negato.
-     */
     private fun checkActivityPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             return
@@ -94,10 +90,6 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo necessaria per accettare i permessi
-     * richiesti.
-     */
     private fun showPermissionDialog() {
         AlertDialog.Builder(this)
             .setTitle(R.string.permission_title)

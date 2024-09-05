@@ -4,11 +4,11 @@ import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
 import com.example.brockapp.dialog.MarkerDialog
+import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.util.Log
@@ -39,17 +39,12 @@ import com.google.android.gms.maps.model.CameraPosition
 class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var geofence: MyGeofence
-    private lateinit var internetUtil: NetworkAvailableImpl
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        internetUtil = NetworkAvailableImpl()
-        checkIfNetworkIsActive()
-
-        geofence = MyGeofence.getInstance()
         val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -58,6 +53,8 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
+
+        geofence = MyGeofence.getInstance()
 
         observeNetwork()
         observeUpdatesGeofenceAreas()
@@ -98,6 +95,8 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
         observeInitialGeofenceAreas()
 
+        viewModelGeofence.fetchGeofenceAreas()
+
         val startingPoint = LatLng(41.8719, 12.5674)
         val position = CameraPosition.Builder()
             .target(startingPoint)
@@ -111,13 +110,6 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         map.setOnMarkerClickListener { marker ->
             activity?.let { MarkerDialog(marker, viewModelGeofence).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
             true
-        }
-    }
-
-    private fun checkIfNetworkIsActive() {
-        if (!internetUtil.isInternetActive(requireContext())) {
-            view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = false
-            view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.GONE
         }
     }
 
@@ -162,7 +154,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private fun showSuggestions(query: String) {
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             try {
                 val addresses = geocoder.getFromLocationName(query, 3)
                 val suggestions: MutableList<String> = mutableListOf()
@@ -173,17 +165,15 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                     }
                 }
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        suggestions
-                    )
+                val adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_dropdown_item_1line,
+                    suggestions
+                )
 
-                    val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
-                    input?.setAdapter(adapter)
-                    input?.showDropDown()
-                }
+                val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
+                input?.setAdapter(adapter)
+                input?.showDropDown()
             } catch (e: Exception) {
                 Log.e("MAP_FRAGMENT", e.toString())
             }

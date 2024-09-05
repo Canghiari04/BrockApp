@@ -14,9 +14,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
 class PermissionUtil(private val activity: FragmentActivity, private val onPermissionGranted: () -> Unit) {
-    private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var requestBackgroundPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     init {
         setupLaunchers()
@@ -65,10 +65,6 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
         }
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
     private fun showPermissionsRationaleDialog() {
         AlertDialog.Builder(activity)
             .setTitle(R.string.permissions_title)
@@ -85,10 +81,6 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
             .show()
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
     private fun showLocationPermissionsDeniedDialog() {
         AlertDialog.Builder(activity)
             .setTitle(R.string.permissions_title)

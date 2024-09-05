@@ -61,9 +61,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         user = User.getInstance()
 
         val db = BrockDB.getInstance(requireContext())
-        val factoryViewModelActivities = ActivitiesViewModelFactory(db)
-
-        viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
+        val factoryViewModel = ActivitiesViewModelFactory(db)
+        viewModel = ViewModelProvider(this, factoryViewModel)[ActivitiesViewModel::class.java]
 
         observeUserActivities()
         observeUserStillTime()
@@ -181,14 +180,6 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun populateHomeRecyclerView(recyclerView: RecyclerView?, activities: List<UserActivity>) {
-        val adapterHome = HomeAdapter(activities)
-        val layoutManager = LinearLayoutManager(requireContext())
-
-        recyclerView?.adapter = adapterHome
-        recyclerView?.layoutManager = layoutManager
-    }
-
     private fun getDayRange(day: LocalDate): Pair<String, String> {
         val startOfDay = day.atStartOfDay().withSecond(0)
         val endOfDay = startOfDay.plusDays(1).minusSeconds(1)
@@ -203,5 +194,13 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         return Pair(firstDay.format(outputFormatter), lastDay.format(outputFormatter))
+    }
+
+    private fun populateHomeRecyclerView(recyclerView: RecyclerView?, activities: List<UserActivity>) {
+        val adapterHome = HomeAdapter(activities)
+        val layoutManager = LinearLayoutManager(requireContext())
+
+        recyclerView?.adapter = adapterHome
+        recyclerView?.layoutManager = layoutManager
     }
 }

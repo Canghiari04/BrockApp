@@ -12,18 +12,50 @@ import android.content.BroadcastReceiver
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 
+private var lastHandledTime = 0L
+private const val DEBOUNCE_INTERVAL = 5000L
+
 class ConnectivityReceiver(private val viewModelStoreOwner: ViewModelStoreOwner): BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ConnectivityManager.CONNECTIVITY_ACTION) {
-            val networkUtil = NetworkAvailableImpl()
-            val networkViewModel = ViewModelProvider(viewModelStoreOwner)[NetworkViewModel::class.java]
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connectivityManager.activeNetworkInfo
 
-            networkViewModel.setNetwork(networkUtil.isInternetActive(context))
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastHandledTime < DEBOUNCE_INTERVAL) {
+                return
+            }
+            lastHandledTime = currentTime
 
-            val serviceIntent = Intent(context, ConnectivityService::class.java)
-            context.startService(serviceIntent)
+            if (networkInfo != null && networkInfo.isConnected) {
+                when (networkInfo.type) {
+                    ConnectivityManager.TYPE_WIFI -> {
+                        handleConnectivityChange(context)
+                    }
+
+                    ConnectivityManager.TYPE_MOBILE -> {
+                        handleConnectivityChange(context)
+                    }
+
+                    else  -> {
+                        Log.d("CONNECTIVITY_RECEIVER", "Connectivity change not recognized.")
+                    }
+                }
+            } else {
+                handleConnectivityChange(context)
+            }
         } else {
             Log.d("CONNECTIVITY_RECEIVER", "Weird intent.")
         }
+    }
+
+    private fun handleConnectivityChange(context: Context) {
+        val networkUtil = NetworkAvailableImpl()
+        val networkViewModel = ViewModelProvider(viewModelStoreOwner)[NetworkViewModel::class.java]
+
+        networkViewModel.setNetwork(networkUtil.isInternetActive(context))
+
+        val serviceIntent = Intent(context, ConnectivityService::class.java)
+        context.startService(serviceIntent)
     }
 }

@@ -66,10 +66,6 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         calendar.layoutManager = layoutManager
     }
 
-    /**
-     * Metodo associato alle singole ViewHolder per garantire la possibilità di impostare la data
-     * corretta successivo all'evento click.
-     */
     private fun onItemClick(date: String) {
         val tokens = date.split(DATE_SEPARATOR).toList()
         val item = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
@@ -77,10 +73,6 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         setDate(item)
     }
 
-    /**
-     * Metodo attuato per lo start di una nuova attività per la visualizzazione le informazioni
-     * rispetto alla data corrente passata come parametro.
-     */
     private fun showActivityOfDay(date: String) {
         val intent = Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
         startActivity(intent)

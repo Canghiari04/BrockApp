@@ -3,6 +3,7 @@ package com.example.brockapp.activity
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.dialog.AccountDialog
 import com.example.brockapp.fragment.MapFragment
 import com.example.brockapp.fragment.HomeFragment
@@ -10,10 +11,12 @@ import com.example.brockapp.fragment.ChartsFragment
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.interfaces.NetworkAvailableImpl
 
 import android.util.Log
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import android.view.MenuItem
 import android.content.Intent
 import android.view.MenuInflater
@@ -33,6 +36,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PageLoaderActivity: AppCompatActivity() {
+    private val networkUtil = NetworkAvailableImpl()
     private var mapFragments = mutableMapOf<String, Fragment>()
 
     private lateinit var toolbar: Toolbar
@@ -48,6 +52,7 @@ class PageLoaderActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page_loader)
 
+        checkConnectivity()
         startConnectivity()
 
         toolbar = findViewById(R.id.toolbar_page_loader)
@@ -90,22 +95,27 @@ class PageLoaderActivity: AppCompatActivity() {
                     switchFragment("Home", homeFragment)
                     true
                 }
+
                 R.id.navbar_item_calendar -> {
                     switchFragment("Calendario", calendarFragment)
                     true
                 }
+
                 R.id.navbar_item_map -> {
                     switchFragment("Mappa", mapFragment)
                     true
                 }
+
                 R.id.navbar_item_charts -> {
                     switchFragment("Grafici", chartsFragment)
                     true
                 }
+
                 R.id.navbar_item_friends -> {
                     switchFragment("Amici", friendsFragment)
                     true
                 }
+
                 else -> {
                     false
                 }
@@ -132,17 +142,19 @@ class PageLoaderActivity: AppCompatActivity() {
                 AccountDialog().show(supportFragmentManager, "CUSTOM_ACCOUNT_DIALOG")
                 true
             }
+
             R.id.item_more_logout -> {
                 val user = User.getInstance()
                 user.logoutUser()
-
                 goToAuthenticator()
                 true
             }
+
             R.id.item_more_delete -> {
                 showDangerousDialog(User.getInstance())
                 true
             }
+
             else -> {
                 super.onOptionsItemSelected(item)
             }
@@ -152,6 +164,15 @@ class PageLoaderActivity: AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+    }
+
+    private fun checkConnectivity() {
+        if (networkUtil.isInternetActive(this)) {
+            MyNetwork.isConnected = true
+        } else {
+            MyNetwork.isConnected = false
+            Toast.makeText(this, "Sei offline", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun startConnectivity() {
@@ -165,9 +186,6 @@ class PageLoaderActivity: AppCompatActivity() {
         )
     }
 
-    /**
-     * Metodo necessario per rimpiazzare il fragment corrente con quello nuovo.
-     */
     private fun switchFragment(name: String, fragment: Fragment) {
         hideButton(name)
         hideAllFragment(supportFragmentManager)
@@ -196,14 +214,12 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo utilizzato per nascondere tutti i fragment contenuti nel manager.
-     */
     private fun hideAllFragment(manager: FragmentManager) {
         manager.beginTransaction().apply {
             mapFragments.forEach { (key, value) ->
                 hide(value)
             }
+
             commit()
         }
     }

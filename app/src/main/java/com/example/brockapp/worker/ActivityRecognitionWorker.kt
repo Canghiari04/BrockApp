@@ -16,11 +16,11 @@ class ActivityRecognitionWorker(private val context: Context, workerParams: Work
     private lateinit var manager: NotificationManager
 
     override suspend fun doWork(): Result {
+        util = NotificationUtil()
+
         val type = inputData.getString("type")?.toInt()
         val title = inputData.getString("title")
         val text = inputData.getString("text")
-
-        util = NotificationUtil()
         sendActivityNotification(type, title, text)
 
         return Result.success()
@@ -29,7 +29,13 @@ class ActivityRecognitionWorker(private val context: Context, workerParams: Work
     private fun sendActivityNotification(type: Int?, title: String?, text: String?) {
         manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val notification = util.getActivityRecognitionNotification(CHANNEL_ID_ACTIVITY_NOTIFY, type, title, text, context)
+        val notification = util.getActivityRecognitionNotification(
+            CHANNEL_ID_ACTIVITY_NOTIFY,
+            type,
+            title,
+            text,
+            context
+        )
 
         getNotificationChannel()
 
@@ -37,7 +43,7 @@ class ActivityRecognitionWorker(private val context: Context, workerParams: Work
     }
 
     private fun getNotificationChannel() {
-        if(!notificationChannelCreated) {
+        if (!notificationChannelCreated) {
             val channel = NotificationChannel(
                 CHANNEL_ID_ACTIVITY_NOTIFY,
                 NAME_CHANNEL_ACTIVITY_NOTIFY,

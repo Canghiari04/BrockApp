@@ -10,7 +10,6 @@ import com.example.brockapp.database.FriendEntity
 import java.io.File
 import android.util.Log
 import com.google.gson.Gson
-import android.content.Context
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -23,7 +22,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
 
-class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context): ViewModel() {
+class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val file: File): ViewModel() {
     private val _friends = MutableLiveData<List<String>>()
     val friends: LiveData<List<String>> get() = _friends
 
@@ -61,7 +60,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
             val gson = Gson()
             val json = gson.toJson(userData)
 
-            val file = File(context.filesDir, "user_data.json")
             file.writeText(json)
 
             withContext(Dispatchers.IO) {
@@ -87,7 +85,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userKey = "user/$user"
-
                 val listObjectsRequest = ListObjectsRequest()
                     .withBucketName(BUCKET_NAME)
                     .withPrefix(userKey)
@@ -170,7 +167,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 gson.fromJson(content, Friend::class.java)
             }
         } catch (e: Exception) {
-            Log.e("FRIENDS_VIEW_MODEL", "Failed to load friend data for $username", e)
+            Log.e("FRIENDS_VIEW_MODEL", e.toString())
             null
         }
     }

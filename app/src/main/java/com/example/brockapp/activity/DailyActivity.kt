@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
     private val timeSpentCounter = TimeSpentCounterImpl()
-    private var utilCalendar: CalendarUtil = CalendarUtil()
+    private val utilCalendar: CalendarUtil = CalendarUtil()
 
     private lateinit var viewModel: ActivitiesViewModel
 
@@ -73,8 +73,6 @@ class DailyActivity: AppCompatActivity() {
     private fun observeDailyActivities() {
         viewModel.listTimeStampActivities.observe(this) { listTimeStampActivities ->
             if (listTimeStampActivities.isNotEmpty()) {
-                utilCalendar = CalendarUtil()
-
                 val dailyList = findViewById<RecyclerView>(R.id.activities_recycler_view)
                 populateDailyActivitiesRecyclerView(dailyList, listTimeStampActivities)
 
@@ -119,7 +117,7 @@ class DailyActivity: AppCompatActivity() {
         val userVehicleActivities = activities.filter { it.type == VEHICLE_ACTIVITY_TYPE }
         val timeSpentVehicle = timeSpentCounter.computeTimeSpent(userVehicleActivities)
 
-        val secondsInDay = 60 * 60 * 24
+        val secondsInDay = 30
         val totalRecordedTime = timeSpentWalking + timeSpentStill + timeSpentVehicle
 
         val unknownTime = (secondsInDay - totalRecordedTime).toFloat()
@@ -146,9 +144,6 @@ class DailyActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo attuato per personalizzare il comportamento dell'action bar dell'activity.
-     */
     private fun setUpToolBar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar_daily_activity)
         setSupportActionBar(toolbar)
