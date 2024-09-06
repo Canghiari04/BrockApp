@@ -1,24 +1,21 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.adapter.ViewPagerAdapter
-import com.example.brockapp.viewmodel.FriendsViewModel
-import com.example.brockapp.viewmodel.FriendsViewModelFactory
-
-import java.io.File
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.content.Intent
-import com.amazonaws.regions.Regions
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
-import androidx.appcompat.app.AppCompatActivity
-import com.amazonaws.services.s3.AmazonS3Client
+import com.example.brockapp.R
+import com.example.brockapp.adapter.ViewPagerAdapter
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.viewmodel.FriendsViewModel
+import com.example.brockapp.viewmodel.FriendsViewModelFactory
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import java.io.File
 
 class FriendActivity: AppCompatActivity() {
     private val tabsIconArray = mapOf(
@@ -44,8 +41,7 @@ class FriendActivity: AppCompatActivity() {
 
         val friendUsername = intent.getStringExtra("FRIEND_USERNAME")
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(this, "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00", Regions.EU_WEST_3)
-        val s3Client = AmazonS3Client(credentialsProvider)
+        val s3Client = S3ClientProvider.getInstance(this)
 
         val file = File(this.filesDir, "user_data.json")
 

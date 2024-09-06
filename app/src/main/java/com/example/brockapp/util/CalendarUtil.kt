@@ -1,15 +1,14 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.*
-
-import java.util.Locale
-import java.time.YearMonth
+import com.example.brockapp.DATE_SEPARATOR
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
-import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 class CalendarUtil {
     fun getDateByTokens(formatter: DateTimeFormatter, tokens: List<String>): LocalDate {

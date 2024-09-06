@@ -1,14 +1,15 @@
 package com.example.brockapp.adapter
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.data.UserActivity
-
-import java.util.Locale
-import android.view.ViewGroup
-import java.text.SimpleDateFormat
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.UserActivity
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class DailyActivityAdapter(private val activities: List<UserActivity>): RecyclerView.Adapter<DailyActivityViewHolder>() {
     private val filteredActivities: List<UserActivity> = activities.filter { it.transitionType == 1 }
