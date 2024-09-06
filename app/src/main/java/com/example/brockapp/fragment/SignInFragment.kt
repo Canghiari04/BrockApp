@@ -4,14 +4,11 @@ import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import java.io.File
@@ -32,7 +29,7 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
 import com.amazonaws.services.s3.AmazonS3Client
 import com.google.android.gms.location.LocationServices
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
+
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
@@ -56,13 +53,8 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         super.onViewCreated(view, savedInstanceState)
 
         checkConnectivity()
+        val s3Client = S3ClientProvider.getInstance(requireContext())
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(
-            requireContext(),
-            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-            Regions.EU_WEST_3
-        )
-        val s3Client = AmazonS3Client(credentialsProvider)
 
         val file = File(context?.filesDir, "user_data.json")
 

@@ -1,17 +1,18 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.*
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.interfaces.TimeSpentCounterImpl
-
-import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.interfaces.TimeSpentCounterImpl
+import com.example.brockapp.singleton.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val timeSpentCounter = TimeSpentCounterImpl()

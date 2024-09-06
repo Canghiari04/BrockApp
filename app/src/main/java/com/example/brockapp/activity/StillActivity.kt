@@ -1,24 +1,23 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.worker.ActivityRecognitionWorker
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
-
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import androidx.work.Data
+import android.os.SystemClock
 import android.view.MenuItem
 import android.widget.Button
-import android.content.Intent
-import android.os.SystemClock
-import androidx.work.WorkManager
 import android.widget.Chronometer
-import android.content.IntentFilter
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityTransition
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+import com.example.brockapp.R
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.example.brockapp.worker.ActivityRecognitionWorker
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 
 class StillActivity: AppCompatActivity() {
     private var running: Boolean = false

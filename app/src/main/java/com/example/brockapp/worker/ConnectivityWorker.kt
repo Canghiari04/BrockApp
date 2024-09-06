@@ -1,13 +1,15 @@
 package com.example.brockapp.worker
 
-import com.example.brockapp.*
-import com.example.brockapp.util.NotificationUtil
-
-import androidx.work.Worker
-import android.content.Context
-import androidx.work.WorkerParameters
-import android.app.NotificationManager
 import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import androidx.work.Worker
+import androidx.work.WorkerParameters
+import com.example.brockapp.CHANNEL_ID_CONNECTIVITY_NOTIFY
+import com.example.brockapp.DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
+import com.example.brockapp.ID_CONNECTIVITY_NOTIFY
+import com.example.brockapp.NAME_CHANNEL_CONNECTIVITY_NOTIFY
+import com.example.brockapp.util.NotificationUtil
 
 class ConnectivityWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private lateinit var util: NotificationUtil

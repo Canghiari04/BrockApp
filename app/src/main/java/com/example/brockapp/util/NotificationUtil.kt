@@ -1,13 +1,12 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-
-import android.content.Intent
-import android.content.Context
-import android.provider.Settings
 import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_CONNECTIVITY_NOTIFY
 
 class NotificationUtil {
     fun getConnectivityPendingIntent(context: Context): PendingIntent {
