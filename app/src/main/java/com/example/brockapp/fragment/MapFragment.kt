@@ -4,7 +4,6 @@ import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
 import com.example.brockapp.dialog.MarkerDialog
-import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.database.GeofenceAreaEntry
 import com.example.brockapp.viewmodel.NetworkViewModel

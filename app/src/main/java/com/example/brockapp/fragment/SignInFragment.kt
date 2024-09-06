@@ -4,11 +4,14 @@ import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
+import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import java.io.File
@@ -33,14 +36,16 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
+    private val networkUtil = NetworkAvailableImpl()
     private var listener: OnFragmentInteractionListener? = null
 
-    private lateinit var db : BrockDB
-    private lateinit var username : String
-    private lateinit var password : String
+    private lateinit var db: BrockDB
+    private lateinit var username: String
+    private lateinit var password: String
     private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
     interface OnFragmentInteractionListener {
@@ -49,6 +54,8 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        checkConnectivity()
 
         val credentialsProvider = CognitoCachingCredentialsProvider(
             requireContext(),
@@ -59,6 +66,8 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
 
         val file = File(context?.filesDir, "user_data.json")
 
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
+
         db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
@@ -67,6 +76,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
             startBackgroundOperations()
         }
 
+        observeNetwork()
         observeSignIn()
         observeUser()
 
@@ -97,6 +107,21 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     override fun onDetach() {
         listener = null
         super.onDetach()
+    }
+
+    private fun checkConnectivity() {
+        if (networkUtil.isInternetActive(requireContext())) {
+            MyNetwork.isConnected = true
+        } else {
+            MyNetwork.isConnected = false
+            Toast.makeText(requireContext(), "Attiva la connessione per registrarti", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun observeNetwork() {
+        viewModelNetwork.authNetwork.observe(viewLifecycleOwner) { authNetwork ->
+            view?.findViewById<Button>(R.id.button_sign_in)?.isEnabled = authNetwork
+        }
     }
 
     private fun observeSignIn() {
