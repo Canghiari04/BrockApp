@@ -1,18 +1,19 @@
 package com.example.brockapp.service
 
-import android.app.Service
-import android.content.Intent
-import android.os.IBinder
-import android.util.Log
+import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.UserWalkActivityEntity
 import com.example.brockapp.database.UserStillActivityEntity
 import com.example.brockapp.database.UserVehicleActivityEntity
-import com.example.brockapp.database.UserWalkActivityEntity
-import com.example.brockapp.singleton.User
-import com.google.android.gms.location.DetectedActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+
+import android.util.Log
+import android.os.IBinder
+import android.app.Service
+import android.content.Intent
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionService: Service() {
     private lateinit var user: User

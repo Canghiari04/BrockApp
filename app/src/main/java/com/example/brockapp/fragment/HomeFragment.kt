@@ -1,29 +1,30 @@
 package com.example.brockapp.fragment
 
-import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ProgressBar
-import android.widget.Spinner
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.adapter.HomeAdapter
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.adapter.HomeAdapter
 import com.example.brockapp.viewmodel.ActivitiesViewModel
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
+
+import android.util.Log
+import android.os.Bundle
+import android.view.View
 import java.time.DayOfWeek
 import java.time.LocalDate
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.ProgressBar
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var user: User

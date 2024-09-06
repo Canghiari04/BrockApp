@@ -1,18 +1,19 @@
 package com.example.brockapp.fragment
 
+import com.example.brockapp.R
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.viewmodel.FriendsViewModel
+import com.example.brockapp.adapter.DailyActivityAdapter
+import com.example.brockapp.viewmodel.FriendsViewModelFactory
+
+import java.io.File
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.R
-import com.example.brockapp.adapter.DailyActivityAdapter
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.S3ClientProvider
-import com.example.brockapp.viewmodel.FriendsViewModel
-import com.example.brockapp.viewmodel.FriendsViewModelFactory
-import java.io.File
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class VehicleFragment: Fragment(R.layout.fragment_vehicle) {
     private lateinit var viewModel: FriendsViewModel

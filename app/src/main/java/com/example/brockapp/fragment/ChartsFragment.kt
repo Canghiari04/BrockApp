@@ -1,40 +1,37 @@
 package com.example.brockapp.fragment
 
-import android.graphics.Color
+import com.example.brockapp.*
+import com.example.brockapp.R
+import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.viewmodel.ChartsViewModel
+import com.example.brockapp.database.UserWalkActivityEntity
+import com.example.brockapp.viewmodel.ChartsViewModelFactory
+import com.example.brockapp.database.UserVehicleActivityEntity
+
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
+import java.time.YearMonth
+import java.time.LocalDate
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
+import android.graphics.Color
+import android.widget.TextView
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import java.time.format.DateTimeFormatter
 import androidx.lifecycle.ViewModelProvider
-import com.example.brockapp.CHARTS_DATE_FORMAT
-import com.example.brockapp.ISO_DATE_FORMAT
-import com.example.brockapp.R
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.UserVehicleActivityEntity
-import com.example.brockapp.database.UserWalkActivityEntity
-import com.example.brockapp.singleton.User
-import com.example.brockapp.viewmodel.ChartsViewModel
-import com.example.brockapp.viewmodel.ChartsViewModelFactory
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.data.BarEntry
+import androidx.core.widget.addTextChangedListener
+import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
 class ChartsFragment: Fragment(R.layout.fragment_charts) {
     private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)

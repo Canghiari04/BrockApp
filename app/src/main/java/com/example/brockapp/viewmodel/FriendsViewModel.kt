@@ -1,28 +1,26 @@
 package com.example.brockapp.viewmodel
 
+import com.example.brockapp.*
+import com.example.brockapp.data.Friend
+import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.FriendEntity
+
+import java.io.File
 import android.util.Log
+import com.google.gson.Gson
+import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.MutableLiveData
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.amazonaws.services.s3.model.ListObjectsRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
-import com.example.brockapp.BUCKET_NAME
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.data.Friend
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.FriendEntity
-import com.example.brockapp.singleton.User
-import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
+import com.amazonaws.services.s3.model.ListObjectsRequest
 
 class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val file: File): ViewModel() {
     private val _friends = MutableLiveData<List<String>>()
@@ -43,9 +41,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     private val _friendWalkActivities = MutableLiveData<List<UserActivity>>()
     val friendWalkActivities: LiveData<List<UserActivity>> = _friendWalkActivities
 
-    /**
-     * Metodo necessario per inserire i dati dell'utente all'interno della repository in cloud.
-     */
     fun uploadUserData() {
         viewModelScope.launch(Dispatchers.Default) {
             val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)

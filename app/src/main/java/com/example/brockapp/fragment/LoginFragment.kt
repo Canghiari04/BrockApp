@@ -1,32 +1,33 @@
 package com.example.brockapp.fragment
 
-import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Bundle
+import com.example.brockapp.R
+import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.util.PermissionUtil
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+
+import java.io.File
 import android.util.Log
+import android.Manifest
+import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
+import android.content.Intent
+import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
-import com.example.brockapp.R
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.singleton.S3ClientProvider
-import com.example.brockapp.singleton.User
-import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.gms.location.LocationServices
-import java.io.File
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
     private var user = User.getInstance()
@@ -46,11 +47,10 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val db = BrockDB.getInstance(requireContext())
+        val file = File(requireContext().filesDir, "user_data.json")
         val s3Client = S3ClientProvider.getInstance(requireContext())
 
-        val file = File(requireContext().filesDir, "user_data.json")
-
-        val db = BrockDB.getInstance(requireContext())
         val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
