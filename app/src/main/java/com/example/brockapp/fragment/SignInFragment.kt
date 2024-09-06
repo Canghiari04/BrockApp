@@ -57,7 +57,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         )
         val s3Client = AmazonS3Client(credentialsProvider)
 
-        val file = File(requireContext().filesDir, "user_data.json")
+        val file = File(context?.filesDir, "user_data.json")
 
         db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)

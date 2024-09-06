@@ -8,30 +8,33 @@ import com.example.brockapp.dialog.AccountDialog
 import com.example.brockapp.fragment.MapFragment
 import com.example.brockapp.fragment.HomeFragment
 import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
 
-import android.util.Log
+import java.io.File
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Toast
 import android.view.MenuItem
 import android.content.Intent
 import android.view.MenuInflater
-import kotlinx.coroutines.launch
 import android.graphics.PorterDuff
 import android.content.IntentFilter
+import com.amazonaws.regions.Regions
 import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
 import android.net.ConnectivityManager
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
+import com.amazonaws.services.s3.AmazonS3Client
 import androidx.appcompat.app.AppCompatActivity
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -225,22 +228,13 @@ class PageLoaderActivity: AppCompatActivity() {
     }
 
     private fun showDangerousDialog(user: User) {
-        val db = BrockDB.getInstance(this)
-        val userDao = db.UserDao()
-
         AlertDialog.Builder(this)
             .setTitle(R.string.dangerous_dialog_title)
             .setMessage(R.string.dangerous_dialog_message)
             .setPositiveButton(R.string.dangerous_positive_button) { dialog, _ ->
                 dialog.dismiss()
+                deleteUser()
                 user.logoutUser()
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        userDao.deleteUserById(user.id)
-                    } catch (e: Exception) {
-                        Log.e("PAGE_LOADER_DANGEROUS_ZONE", e.toString())
-                    }
-                }
                 goToAuthenticator()
             }
             .setNegativeButton(R.string.dangerous_negative_button) { dialog, _ ->
@@ -248,6 +242,25 @@ class PageLoaderActivity: AppCompatActivity() {
             }
             .create()
             .show()
+    }
+
+    private fun deleteUser() {
+        val user = User.getInstance()
+
+        val credentialsProvider = CognitoCachingCredentialsProvider(
+            this,
+            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
+            Regions.EU_WEST_3
+        )
+        val s3Client = AmazonS3Client(credentialsProvider)
+
+        val file = File(this.filesDir, "user_data.json")
+
+        val db = BrockDB.getInstance(this)
+        val factoryViewModel = UserViewModelFactory(db, s3Client, file)
+        val viewModel = ViewModelProvider(this, factoryViewModel)[UserViewModel::class.java]
+
+        viewModel.deleteUser(user.username, user.password)
     }
 
     private fun goToAuthenticator() {
