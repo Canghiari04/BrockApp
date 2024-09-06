@@ -28,6 +28,10 @@ import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
 import com.amazonaws.services.s3.AmazonS3Client
+import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.singleton.MyNetwork
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.viewmodel.NetworkViewModel
 import com.google.android.gms.location.LocationServices
 
 
