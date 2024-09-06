@@ -28,15 +28,15 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
 
     fun registerUser(username: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val userAlreadyExists = checkIfUserExistsOnS3(username)
+            val userAlreadyExistsOnS3 = checkIfUserExistsOnS3(username)
 
-            if (userAlreadyExists) {
+            if (userAlreadyExistsOnS3) {
                 _auth.postValue(false)
             } else {
                 db.UserDao().insertUser(UserEntity(username = username, password = password, sharingFlag = false))
 
-                val file = createUserDataFile(username)
-                uploadUserToS3(username, file)
+                val jsonFile = createUserDataFile(username)
+                uploadUserToS3(username, jsonFile)
 
                 _auth.postValue(true)
             }
@@ -71,15 +71,14 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         return file
     }
 
-    private fun uploadUserToS3(username: String, file: File) {
+    private fun uploadUserToS3(username: String, jsonFile: File) {
         val userKey = "user/$username.json"
 
         try {
-            val request = PutObjectRequest(BUCKET_NAME, userKey, file)
+            val request = PutObjectRequest(BUCKET_NAME, userKey, jsonFile)
             s3Client.putObject(request)
         } catch (e: Exception) {
-            Log.e("UploadError", "Errore durante l'upload del file su S3", e)
-            throw e
+            Log.e("UploadError", e.toString())
         }
     }
 
@@ -100,6 +99,12 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
     fun changeSharingDataFlag(username: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             db.UserDao().changeFlag(username, password)
+        }
+    }
+
+    fun deleteUser(username: String, password: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.UserDao().deleteUserByUsernameAndPassword(username, password)
         }
     }
 }
