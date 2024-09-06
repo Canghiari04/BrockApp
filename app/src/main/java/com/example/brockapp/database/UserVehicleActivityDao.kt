@@ -1,12 +1,11 @@
 package com.example.brockapp.database
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Insert
 
 @Dao
 interface UserVehicleActivityDao {
-
     @Query("SELECT * FROM UserVehicleActivity WHERE user_id=:userId ORDER BY TIMESTAMP")
     suspend fun getVehicleActivitiesByUserId(userId: Long): List<UserVehicleActivityEntity>
 

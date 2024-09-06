@@ -1,21 +1,22 @@
 package com.example.brockapp.activity
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager2.widget.ViewPager2
 import com.example.brockapp.R
-import com.example.brockapp.adapter.ViewPagerAdapter
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.adapter.ViewPagerAdapter
 import com.example.brockapp.singleton.S3ClientProvider
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
+
+import java.io.File
+import android.os.Bundle
+import android.view.MenuItem
+import android.content.Intent
+import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager2.widget.ViewPager2
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import java.io.File
 
 class FriendActivity: AppCompatActivity() {
     private val tabsIconArray = mapOf(
@@ -41,11 +42,10 @@ class FriendActivity: AppCompatActivity() {
 
         val friendUsername = intent.getStringExtra("FRIEND_USERNAME")
 
+        val db = BrockDB.getInstance(this)
+        val file = File(this.filesDir, "user_data.json")
         val s3Client = S3ClientProvider.getInstance(this)
 
-        val file = File(this.filesDir, "user_data.json")
-
-        val db = BrockDB.getInstance(this)
         val viewModelFactory = FriendsViewModelFactory(s3Client, db, file)
         viewModel = ViewModelProvider(this, viewModelFactory)[FriendsViewModel::class.java]
 

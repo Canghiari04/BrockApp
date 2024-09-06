@@ -1,8 +1,9 @@
 package com.example.brockapp
 
-import android.app.Application
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.MyGeofence
+
+import android.app.Application
 
 class MyApplication: Application() {
     override fun onCreate() {

@@ -1,34 +1,32 @@
 package com.example.brockapp.activity
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.MenuItem
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.adapter.DailyActivityAdapter
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.interfaces.TimeSpentCounterImpl
 import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.data.UserActivity
 import com.example.brockapp.util.CalendarUtil
+import com.example.brockapp.adapter.DailyActivityAdapter
 import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.interfaces.TimeSpentCounterImpl
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.utils.ColorTemplate
+
+import android.os.Bundle
 import java.time.LocalDate
+import android.view.MenuItem
+import android.content.Intent
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import java.time.format.DateTimeFormatter
+import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.utils.ColorTemplate
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class DailyActivity: AppCompatActivity() {
     private val timeSpentCounter = TimeSpentCounterImpl()
@@ -40,9 +38,10 @@ class DailyActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_daily_activity)
 
+        val date: String? = intent.getStringExtra("ACTIVITY_DATE")
+
         val user = User.getInstance()
         val db = BrockDB.getInstance(this)
-        val date: String? = intent.getStringExtra("ACTIVITY_DATE")
 
         val textView = findViewById<TextView>(R.id.date_text_view)
         textView.text = utilCalendar.getPrettyDate(date)

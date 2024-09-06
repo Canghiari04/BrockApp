@@ -13,7 +13,6 @@
 \usepackage{hyperref}
 \usepackage{subfigure}
 
-
 \hypersetup{
     pdfborder = {0 0 0},
 }
@@ -44,9 +43,7 @@
 {\Large\bfseries}{\thesection}{1em}{}
 
 \begin{document}
-
     \pagestyle{empty}
-
     \begin{titlepage}
         \begin{center}
         {{\Large{\textsc{Alma Mater Studiorum - Università di Bologna}}}}
@@ -100,7 +97,7 @@
     \newpage
     \subsection*{Feature}
     \textit{Registrazione} \vspace*{7pt}\\
-    All'avvio dell'app è richiesta la registrazione delle credenziali, suddivise in \textit{username} e \textit{password}. E' necessario registrarsi con un username non ancora presente, per garantire l' univocità dei dati. Una volta registrato, all'utente sarà richiesto di concedere tutti i permessi necessari per il funzionamento dell'applicazione. L'applicazione utilizza la connessione internet per controllare se un altro utente si è già registrato in passato con lo stesso username, è pertanto necessario avere una connessione dati per registrarsi all'app.\\
+    All'avvio dell'app è richiesta la registrazione delle credenziali. E' necessario registrarsi con un username non ancora presente, per garantire l' univocità dei dati. Una volta registrato, all'utente sarà richiesto di concedere tutti i permessi necessari per il funzionamento dell'applicazione. L'applicazione utilizza la \textit{connessione Internet} per controllare se un altro utente si è già registrato in passato con lo stesso username, è pertanto necessario avere una connessione dati per registrarsi all'app.
     Tra i permessi richiesti sono presenti:
     \begin{itemize}
         \renewcommand{\labelitemi}{-}
@@ -108,7 +105,7 @@
         \item \textbf{Access background location}, permesso necessario per accedere alla posizione del dispositivo anche quando l'applicazione è in secondo piano
         \item \textbf{Post notifications}, consente di inviare notifiche al dispositivo
     \end{itemize}
-    Qualora siano negati i permessi richiesti non sarà consentito l'utilizzo dell'applicazione; ad un nuovo avvio è mostrato un \textit{Alert Dialog} in cui è richiesto all'utente di abilitare le autorizzazioni necessarie tramite \textit{Impostazioni}. \vspace*{7pt}\\
+    Qualora siano negati i permessi richiesti non sarà consentito l'utilizzo dell'applicazione; ad un nuovo avvio è mostrato un \textit{Alert Dialog} in cui è richiesto all'utente di abilitare le autorizzazioni necessarie tramite \textit{Impostazioni}.
     \begin{center}
         \begin{figure}[H]
             \centering
@@ -194,8 +191,8 @@
     \newpage
     \subsection*{Scelte implementative}
     \subsubsection*{RecyclerView}
-    Questo tipo di view è stata utilizzata per la rappresentazione delle attività dell'utente, essa è infatti ottimizzata per gestire grandi quantità di dati pur garantendo buone prestazioni nella velocità di caricamento. La Recycler View ricicla infatti i dati al di fuori della view che per consentire di ridurre la memoria utilizzata. \vspace*{7pt}\\
-    Negli screenshot riportati, la RecyclerView è stata utilizzata nelle schermate Home, Calendario e Amici, riutilizzando il codice per caricare i dati all'interno delle card. In diverse occasioni sono state implementate funzionalità direttamente nei singoli ViewHolder, operazione resa possibile grazie al binding dei parametri, semplificato dall'uso degli Adapter. Questo approccio permette una gestione più efficiente e flessibile dei dati nelle varie sezioni dell'app.
+    Questo tipo di \textit{View} è stata utilizzata per la rappresentazione delle attività dell'utente, essa è infatti ottimizzata per gestire grandi quantità di dati pur garantendo buone prestazioni nella velocità di caricamento. \vspace*{7pt}\\
+    Negli screenshot riportati, la \textbf{RecyclerView} è stata utilizzata nelle schermate Home, Calendario e Amici, riutilizzando il codice per caricare i dati all'interno delle card. In diverse occasioni sono state implementate funzionalità direttamente nei singoli ViewHolder, operazione resa possibile grazie al \textit{binding} dei parametri, semplificato dall'implementazione degli \textit{Adapter}. Questo approccio permette una gestione più efficiente e flessibile dei dati nelle varie sezioni dell'app.
     \subsubsection*{ViewModel}
     Come già accennato nell'introduzione, uno dei punti cardine su cui si basa il progetto è il design pattern architetturale \textbf{Model-View-ViewModel}. \\
     Questo approccio separa la \textit{View}, definita \textbf{entità attiva}, poichè al suo interno è sviluppata la \textit{business logic}, e il Model, \textbf{entità passiva}, contenitore statico di dati. \vspace*{7pt}\\
@@ -286,49 +283,46 @@ abstract class BrockDB: RoomDatabase() {
     Per consentire agli utenti di condividere i propri dati è stato utilizzato \textit{AWS Simple Storage Service}, la scelta è ricaduta su esso per le conoscenze pregresse del gruppo e per la facile integrazione fornita dalla AWS SDK in Kotlin.\\
     Al momento della condivisione dei dati dell'utente viene effettuato un dump del database in formato JSON: i dati vengono strutturati in questo formato tramite la popolare libreria Gson, per poi essere salvati su un file che viene caricato su un bucket tramite una richiesta formulata da un AwsS3Client come nel seguente codice:\\
     \begin{lstlisting}[language=Java]
-    fun uploadUserData() {
-        viewModelScope.launch(Dispatchers.Default) {
-            val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
-            val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
-            val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
+fun uploadUserData() {
+    viewModelScope.launch(Dispatchers.Default) {
+        val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
+        val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
+        val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
 
-            val userData = mapOf(
-                "username" to User.username,
-                "walkActivities" to walkActivities,
-                "vehicleActivities" to vehicleActivities,
-                "stillActivities" to stillActivities
-            )
+        val userData = mapOf(
+            "username" to User.username,
+            "walkActivities" to walkActivities,
+            "vehicleActivities" to vehicleActivities,
+            "stillActivities" to stillActivities
+        )
 
-            val gson = Gson()
-            val json = gson.toJson(userData)
+        val gson = Gson()
+        val json = gson.toJson(userData)
 
-            val file = File(context.filesDir, "user_data.json")
-            file.writeText(json)
+        val file = File(context.filesDir, "user_data.json")
+        file.writeText(json)
 
-            withContext(Dispatchers.IO) {
-                try {
-                    val request = PutObjectRequest(BUCKET_NAME, "user/${User.username}.json", file)
-                    s3Client.putObject(request)
-                } catch (e: Exception) {
-                    Log.e("S3Upload", "Failed to upload user data", e)
-                }
+        withContext(Dispatchers.IO) {
+            try {
+                val request = PutObjectRequest(BUCKET_NAME, "user/${User.username}.json", file)
+                s3Client.putObject(request)
+            } catch (e: Exception) {
+                Log.e("S3Upload", "Failed to upload user data", e)
             }
-
         }
     }
-
+}
     \end{lstlisting}
     Per cercare un amico l'utente digita lo username della persona desiderata nella barra di ricerca, viene dunque effettuata una richiesta di \textit{getObject} al bucket, che restituisce i dati di tutti gli utenti che hanno come prefisso dello username la stringa inserita dall'utente nella barra di ricerca.
 
     \subsection*{Possibili sviluppi futuri}
-    In un ulteriore sviluppo dell'app sarebbe possibile migliorare i seguenti aspetti:
+    In un ulteriore sviluppo dell'applicazione sarebbe possibile migliorare i seguenti aspetti:
     \begin{itemize}
         \renewcommand{\labelitemi}{-}
-        \item Maggiore sicurezza nella condivisione dei dati in cloud, per garantire l'accesso solo agli utenti autorizzati.
-        \item Miglioramento interfaccia ed esperienza utente, per garantire un facile accesso a tutte le funzionalit
-        \item Aumento dei servizi in background, come la registrazione automatica delle attività, per eliminare la necessità dell'avvio e dell'interruzione di una attività da parte dell'utente.
-        \item Miglioramento gestione batteria, con riduzione delle prestazioni dell'app in caso di batteria scarica
-        \item Aggiunta della possibilità di eliminare amici
+        \item \textbf{Maggiore sicurezza} nella condivisione dei dati in cloud, per garantire l'accesso solo agli utenti autorizzati
+        \item \textbf{Miglioramento interfaccia} ed esperienza utente, per garantire un facile accesso a tutte le funzionalità
+        \item \textbf{Aumento dei servizi in background}, come la registrazione automatica delle attività, per eliminare la necessità dell'avvio e dell'interruzione di una attività da parte dell'utente.
+        \item \textbf{Miglioramento gestione batteria}, con riduzione delle prestazioni dell'app in caso di batteria scarica
+        \item Possibilità di \textbf{eliminare amici} appartenenti alle proprie amicizie
     \end{itemize}
-
 \end{document}

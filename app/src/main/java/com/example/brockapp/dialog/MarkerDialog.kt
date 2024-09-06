@@ -1,15 +1,16 @@
 package com.example.brockapp.dialog
 
-import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import androidx.fragment.app.DialogFragment
 import com.example.brockapp.R
 import com.example.brockapp.viewmodel.GeofenceViewModel
+
+import android.view.View
+import android.os.Bundle
+import android.view.Gravity
+import android.widget.Button
+import android.view.ViewGroup
+import android.widget.TextView
+import android.view.LayoutInflater
+import androidx.fragment.app.DialogFragment
 import com.google.android.gms.maps.model.Marker
 
 class MarkerDialog(private val marker: Marker, private val viewModel: GeofenceViewModel): DialogFragment() {

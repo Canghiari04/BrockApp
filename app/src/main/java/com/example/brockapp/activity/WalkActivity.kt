@@ -1,31 +1,32 @@
 package com.example.brockapp.activity
 
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import com.example.brockapp.*
+import com.example.brockapp.R
+import com.example.brockapp.worker.ActivityRecognitionWorker
+import com.example.brockapp.receiver.ActivityRecognitionReceiver
+
 import android.os.Bundle
-import android.os.SystemClock
+import androidx.work.Data
+import android.widget.Toast
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.Chronometer
+import android.content.Intent
+import android.os.SystemClock
+import android.content.Context
+import android.hardware.Sensor
 import android.widget.TextView
-import android.widget.Toast
+import androidx.work.WorkManager
+import android.widget.Chronometer
+import android.content.IntentFilter
+import android.hardware.SensorEvent
+import android.hardware.SensorManager
+import android.hardware.SensorEventListener
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.R
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.example.brockapp.worker.ActivityRecognitionWorker
-import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.ActivityTransition
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class WalkActivity: AppCompatActivity(), SensorEventListener {
     private var running = false

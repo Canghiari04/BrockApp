@@ -30,7 +30,6 @@ import com.google.android.gms.location.Priority
 class VehicleActivity: AppCompatActivity() {
     private var running = false
     private var totalDistance = 0.0
-    private var pauseOffset: Long = 0
     private var startLocation: Location? = null
     private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
@@ -130,10 +129,6 @@ class VehicleActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Costruisce una richiesta di aggiornamento di posizione.Gestisce l'aggiornamento della
-     * posizione in background e mostra a schermo la distanza percorsa.
-     */
     private fun setupLocationUpdates() {
         locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
@@ -164,19 +159,12 @@ class VehicleActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Controlla se i permessi sono stati garantiti e richiama la funzione per iniziare
-     * l'aggiornamento della posizione.
-     */
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         }
     }
 
-    /**
-     * Ferma l'aggiornamento della posizione.
-     */
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
