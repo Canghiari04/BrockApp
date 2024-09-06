@@ -3,8 +3,10 @@ package com.example.brockapp.fragment
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
+import com.example.brockapp.dialog.MarkerDialog
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.database.GeofenceAreaEntry
+import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
@@ -25,8 +27,8 @@ import android.widget.AutoCompleteTextView
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import com.example.brockapp.dialog.MarkerDialog
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.FragmentContainerView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
@@ -34,25 +36,26 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 
 class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
-    private lateinit var db: BrockDB
     private lateinit var map: GoogleMap
     private lateinit var geofence: MyGeofence
-    private lateinit var viewModel: GeofenceViewModel
-    private lateinit var mapFragment: SupportMapFragment
+    private lateinit var viewModelNetwork: NetworkViewModel
+    private lateinit var viewModelGeofence: GeofenceViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        geofence = MyGeofence.getInstance()
-
-        mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        db = BrockDB.getInstance(requireContext())
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
+
+        val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
+        viewModelGeofence = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
 
-        viewModel = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
+        geofence = MyGeofence.getInstance()
 
+        observeNetwork()
         observeUpdatesGeofenceAreas()
 
         val input = view.findViewById<AutoCompleteTextView>(R.id.text_new_area)
@@ -77,9 +80,9 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 )
 
                 addNewMarker(geofenceArea)
-                viewModel.insertGeofenceArea(geofenceArea)
+                viewModelGeofence.insertGeofenceArea(geofenceArea)
             } else {
-                Toast.makeText(requireContext(), R.string.toast_error_map, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Nessuna località individuata con questo nome", Toast.LENGTH_LONG).show()
             }
 
             input.setText(R.string.text_blank)
@@ -90,6 +93,8 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         map = googleMap
 
         observeInitialGeofenceAreas()
+
+        viewModelGeofence.fetchGeofenceAreas()
 
         val startingPoint = LatLng(41.8719, 12.5674)
         val position = CameraPosition.Builder()
@@ -102,15 +107,27 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         )
 
         map.setOnMarkerClickListener { marker ->
-            activity?.let { MarkerDialog(marker, viewModel).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
+            activity?.let { MarkerDialog(marker, viewModelGeofence).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
             true
+        }
+    }
+
+    private fun observeNetwork() {
+        viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { currentNetwork ->
+            if (!currentNetwork) {
+                view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = false
+                view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.GONE
+            } else {
+                view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)?.isEnabled = true
+                view?.findViewById<FragmentContainerView>(R.id.fragment_map)?.visibility = View.VISIBLE
+            }
         }
     }
 
     private fun observeInitialGeofenceAreas() {
         val mapMarker = mutableMapOf<String, LatLng>()
 
-        viewModel.staticAreas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
                 for (area in areas) {
                     val coordinates = LatLng(area.latitude, area.longitude)
@@ -125,7 +142,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     }
 
     private fun observeUpdatesGeofenceAreas() {
-        viewModel.dynamicAreas.observe(viewLifecycleOwner) { areas ->
+        viewModelGeofence.dynamicAreas.observe(viewLifecycleOwner) { areas ->
             geofence.geofences = areas
 
             val serviceIntent = Intent(requireContext(), MapService::class.java)
@@ -136,7 +153,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private fun showSuggestions(query: String) {
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             try {
                 val addresses = geocoder.getFromLocationName(query, 3)
                 val suggestions: MutableList<String> = mutableListOf()
@@ -147,42 +164,18 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                     }
                 }
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        suggestions
-                    )
+                val adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_dropdown_item_1line,
+                    suggestions
+                )
 
-                    val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
-                    input?.setAdapter(adapter)
-                    input?.showDropDown()
-                }
+                val input = view?.findViewById<AutoCompleteTextView>(R.id.text_new_area)
+                input?.setAdapter(adapter)
+                input?.showDropDown()
             } catch (e: Exception) {
                 Log.e("MAP_FRAGMENT", e.toString())
             }
-        }
-    }
-
-    private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
-        val coordinates = LatLng(geofenceArea.latitude, geofenceArea.longitude)
-
-        map.addMarker(
-            MarkerOptions()
-                .position(coordinates)
-                .title(geofenceArea.name)
-        )
-
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
-    }
-
-    private fun populateMapOfMarker(mapMarker: Map<String, LatLng>) {
-        mapMarker.forEach { (key, value) ->
-            map.addMarker(
-                MarkerOptions()
-                    .position(value)
-                    .title(key)
-            )
         }
     }
 
@@ -206,5 +199,27 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         }
 
         return Pair(address, location)
+    }
+
+    private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
+        val coordinates = LatLng(geofenceArea.latitude, geofenceArea.longitude)
+
+        map.addMarker(
+            MarkerOptions()
+                .position(coordinates)
+                .title(geofenceArea.name)
+        )
+
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 10f))
+    }
+
+    private fun populateMapOfMarker(mapMarker: Map<String, LatLng>) {
+        mapMarker.forEach { (key, value) ->
+            map.addMarker(
+                MarkerOptions()
+                    .position(value)
+                    .title(key)
+            )
+        }
     }
 }

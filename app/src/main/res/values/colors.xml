@@ -8,5 +8,6 @@
     <color name="uni_red">#BB2222</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="dark_grey">#696969</color>
     <color name="grey">#F8F2F2</color>
 </resources>

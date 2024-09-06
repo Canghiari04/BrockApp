@@ -1,34 +1,29 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.util.CalendarUtil
-import com.example.brockapp.activity.DailyActivity
-import com.example.brockapp.adapter.CalendarAdapter
-
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import java.time.LocalDate
-import android.content.Intent
-import android.widget.TextView
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import java.time.format.DateTimeFormatter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.CALENDAR_DATE_FORMAT
+import com.example.brockapp.DATE_SEPARATOR
+import com.example.brockapp.R
+import com.example.brockapp.activity.DailyActivity
+import com.example.brockapp.adapter.CalendarAdapter
+import com.example.brockapp.util.CalendarUtil
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
-    private lateinit var user: User
-    private lateinit var util: CalendarUtil
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        user = User.getInstance()
-        util = CalendarUtil()
+        val util = CalendarUtil()
         
         val calendar = view.findViewById<RecyclerView>(R.id.calendar_recycler_view)
 
@@ -36,7 +31,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         populateCalendarRecyclerView(util.getCurrentDays(LocalDate.now()), util.getDates(LocalDate.now()), calendar)
 
         view.findViewById<ImageButton>(R.id.button_back_month).setOnClickListener {
-            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
+            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(DATE_SEPARATOR)
 
             var date = util.getDateByTokens(formatter, tokens)
             date = date.minusMonths(1)
@@ -47,7 +42,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         }
 
         view.findViewById<ImageButton>(R.id.button_forward_month).setOnClickListener {
-            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(" ")
+            val tokens = (view.findViewById<TextView>(R.id.date_text_view).text).split(DATE_SEPARATOR)
 
             var date = util.getDateByTokens(formatter, tokens)
             date = date.plusMonths(1)
@@ -59,7 +54,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun setDate(date: LocalDate) {
-        val strDate = "${date.month}" + " ${date.year}"
+        val strDate = "${date.monthValue}" + "-${date.year}"
         view?.findViewById<TextView>(R.id.date_text_view)?.text = strDate.lowercase()
     }
 
@@ -71,10 +66,6 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         calendar.layoutManager = layoutManager
     }
 
-    /**
-     * Metodo associato alle singole ViewHolder per garantire la possibilità di impostare la data
-     * corretta successivo all'evento click.
-     */
     private fun onItemClick(date: String) {
         val tokens = date.split(DATE_SEPARATOR).toList()
         val item = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
@@ -82,10 +73,6 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         setDate(item)
     }
 
-    /**
-     * Metodo attuato per attuare lo start di una nuova attività per visualizzare le informazioni
-     * rispetto alla data corrente passata come parametro.
-     */
     private fun showActivityOfDay(date: String) {
         val intent = Intent(requireContext(), DailyActivity::class.java).putExtra("ACTIVITY_DATE", date)
         startActivity(intent)

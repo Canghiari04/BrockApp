@@ -1,11 +1,21 @@
 package com.example.brockapp.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "Friend")
+@Entity(
+    tableName = "Friend",
+    foreignKeys = [ForeignKey(
+        entity = UserEntity::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("user_id"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class FriendEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val userId: Long,
+    @ColumnInfo(name = "user_id") val userId: Long,
     val followedUsername: String
 )

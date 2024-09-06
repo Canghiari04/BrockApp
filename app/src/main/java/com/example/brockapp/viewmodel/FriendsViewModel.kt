@@ -1,28 +1,30 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.*
-import com.example.brockapp.data.Friend
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.FriendEntity
-
-import java.io.File
 import android.util.Log
-import com.google.gson.Gson
-import android.content.Context
-import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
+import com.amazonaws.services.s3.model.PutObjectRequest
+import com.example.brockapp.BUCKET_NAME
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
+import com.example.brockapp.data.Friend
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.FriendEntity
+import com.example.brockapp.singleton.User
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
-class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val context: Context) : ViewModel() {
+class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val file: File): ViewModel() {
     private val _friends = MutableLiveData<List<String>>()
     val friends: LiveData<List<String>> get() = _friends
 
@@ -32,22 +34,20 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     private val _errorAddFriend = MutableLiveData<Boolean>()
     val errorAddFriend: LiveData<Boolean> = _errorAddFriend
 
-    fun getCurrentFriends(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val item = db.FriendDao().getFriendsByUserId(id)
-            _friends.postValue(item)
-        }
-    }
+    private val _friendStillActivities = MutableLiveData<List<UserActivity>>()
+    val friendStillActivities: LiveData<List<UserActivity>> = _friendStillActivities
 
-    fun getSuggestionFriend() {
+    private val _friendVehicleActivities = MutableLiveData<List<UserActivity>>()
+    val friendVehicleActivities: LiveData<List<UserActivity>> = _friendVehicleActivities
 
-    }
+    private val _friendWalkActivities = MutableLiveData<List<UserActivity>>()
+    val friendWalkActivities: LiveData<List<UserActivity>> = _friendWalkActivities
 
     /**
      * Metodo necessario per inserire i dati dell'utente all'interno della repository in cloud.
      */
     fun uploadUserData() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
             val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
             val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
@@ -62,10 +62,9 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
             val gson = Gson()
             val json = gson.toJson(userData)
 
-            val file = File(context.filesDir, "user_data.json")
             file.writeText(json)
 
-            val thread = Thread {
+            withContext(Dispatchers.IO) {
                 try {
                     val request = PutObjectRequest(BUCKET_NAME, "user/${User.username}.json", file)
                     s3Client.putObject(request)
@@ -74,15 +73,20 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 }
             }
 
-            thread.start()
         }
     }
 
-    fun searchUser(user: String) {
+    fun getCurrentFriends(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val item = db.FriendDao().getFriendsByUserId(id)
+            _friends.postValue(item)
+        }
+    }
+
+    fun getSuggestions(user: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userKey = "user/$user"
-
                 val listObjectsRequest = ListObjectsRequest()
                     .withBucketName(BUCKET_NAME)
                     .withPrefix(userKey)
@@ -91,7 +95,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 val s3Objects = objectListing.objectSummaries
                 val matchingUsers = s3Objects
                     .filter {
-                        it.key.endsWith(".json")
+                        it.key.endsWith(".json") && it.key != "user/${User.username}.json"
                     }
                     .map {
                         it.key.removePrefix("user/").removeSuffix(".json")
@@ -127,11 +131,37 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
         }
     }
 
-    suspend fun loadFriendData(username: String): Friend? {
+    fun getFriendActivities(username: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val friend = loadFriendData(username)
+            val listActivities = ArrayList<UserActivity>()
+
+            friend?.stillActivities?.parallelStream()?.forEach {
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
+                listActivities.add(newActivity)
+            }
+
+            friend?.vehicleActivities?.parallelStream()?.forEach {
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, VEHICLE_ACTIVITY_TYPE, it.distanceTravelled.toString())
+                listActivities.add(newActivity)
+            }
+
+            friend?.walkActivities?.parallelStream()?.forEach  {
+                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, WALK_ACTIVITY_TYPE, it.stepNumber.toString())
+                listActivities.add(newActivity)
+            }
+
+            _friendStillActivities.postValue(listActivities.filter { it.type == STILL_ACTIVITY_TYPE }.sortedBy { it.timestamp })
+            _friendVehicleActivities.postValue(listActivities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp })
+            _friendWalkActivities.postValue(listActivities.filter { it.type == WALK_ACTIVITY_TYPE }.sortedBy { it.timestamp })
+        }
+    }
+
+    private suspend fun loadFriendData(username: String?): Friend? {
         val friendKey = "user/$username.json"
 
         return try {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 val request = GetObjectRequest(BUCKET_NAME, friendKey)
                 val result = s3Client.getObject(request)
                 val content = result.objectContent.bufferedReader().use { it.readText() }
@@ -139,7 +169,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 gson.fromJson(content, Friend::class.java)
             }
         } catch (e: Exception) {
-            Log.e("FRIENDS_VIEW_MODEL", "Failed to load friend data for $username", e)
+            Log.e("FRIENDS_VIEW_MODEL", e.toString())
             null
         }
     }

@@ -1,22 +1,21 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.R
-import com.example.brockapp.activity.AuthenticatorActivity
-
-import android.net.Uri
 import android.Manifest
-import android.content.Intent
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
-import androidx.fragment.app.FragmentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.fragment.app.FragmentActivity
+import com.example.brockapp.R
+import com.example.brockapp.activity.AuthenticatorActivity
 
 class PermissionUtil(private val activity: FragmentActivity, private val onPermissionGranted: () -> Unit) {
-    private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var requestBackgroundPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     init {
         setupLaunchers()
@@ -65,10 +64,6 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
         }
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
     private fun showPermissionsRationaleDialog() {
         AlertDialog.Builder(activity)
             .setTitle(R.string.permissions_title)
@@ -85,10 +80,6 @@ class PermissionUtil(private val activity: FragmentActivity, private val onPermi
             .show()
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo successiva al "Deny" dei permessi
-     * richiesti.
-     */
     private fun showLocationPermissionsDeniedDialog() {
         AlertDialog.Builder(activity)
             .setTitle(R.string.permissions_title)

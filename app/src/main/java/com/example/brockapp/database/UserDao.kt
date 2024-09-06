@@ -1,8 +1,8 @@
 package com.example.brockapp.database
 
 import androidx.room.Dao
-import androidx.room.Query
 import androidx.room.Insert
+import androidx.room.Query
 
 @Dao
 interface UserDao {
@@ -24,6 +24,6 @@ interface UserDao {
     @Query("UPDATE User SET sharing_flag=1 WHERE username=:username AND password=:password")
     suspend fun changeFlag(username: String, password: String)
 
-    @Query("DELETE FROM User WHERE id=:id")
-    suspend fun deleteUserById(id: Long)
+    @Query("DELETE FROM User WHERE username=:username AND password=:password")
+    suspend fun deleteUserByUsernameAndPassword(username: String, password: String)
 }

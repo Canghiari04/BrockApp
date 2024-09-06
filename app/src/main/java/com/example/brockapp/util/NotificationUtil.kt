@@ -1,29 +1,14 @@
 package com.example.brockapp.util
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.activity.AuthenticatorActivity
-
-import android.content.Intent
-import android.content.Context
-import android.provider.Settings
 import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_CONNECTIVITY_NOTIFY
 
 class NotificationUtil {
-    fun getGeofencePendingIntent(context: Context): PendingIntent {
-        val intent = Intent(context, AuthenticatorActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-
-        return PendingIntent.getActivity(
-            context,
-            REQUEST_CODE_GEOFENCE_NOTIFY,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
     fun getConnectivityPendingIntent(context: Context): PendingIntent {
         return PendingIntent.getActivity(
             context,
@@ -50,36 +35,47 @@ class NotificationUtil {
 
     fun getGeofenceNotification(
         channelId: String,
-        pendingIntent: PendingIntent,
         context: Context
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle("Sei entrato in una zona speciale")
-            setContentText("Inizia a registrare nuove attività!")
+            setContentTitle("Inizia a registare nuove attività!")
+            setContentText("Hai appena varcato i confini di una zona di interesse")
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText("Hai appena varcato i confini di una zona di interesse. " +
-                             "Inizia a registrare le tue attività per non perdere nulla di importante."))
-            setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                             "Inizia a registrare nuove attività!"))
+            setPriority(NotificationCompat.PRIORITY_HIGH)
             setAutoCancel(true)
-            addAction(R.drawable.baseline_directions_run_24, "Apri BrockApp", pendingIntent)
         }
     }
 
     fun getConnectivityNotification(
+        channelId: String,
+        context: Context
+    ): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, channelId).apply {
+            setSmallIcon(R.drawable.baseline_directions_run_24)
+            setContentTitle("Connessione rilevata")
+            setContentText("Le funzionalità disabilitate sono state attivate")
+            setPriority(NotificationCompat.PRIORITY_HIGH)
+            setAutoCancel(true)
+        }
+    }
+
+    fun getErrorConnectivityNotification(
         channelId: String,
         pendingIntent: PendingIntent,
         context: Context
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle("Aggiornamento aree di interesse")
-            setContentText("Verifica le impostazioni di connessione.")
+            setContentTitle("Connessione non rilevata")
+            setContentText("Alcune funzionalità sono state disattivate")
             setStyle(
                 NotificationCompat.BigTextStyle().bigText(
-                    "Alcune funzionalità potrebbero non essere disponibili. " +
+                    "Alcune funzionalità sono state disattivate. " +
                         "Verifica le impostazioni di connessione sul tuo dispositivo " +
-                        "per garantire che le aree di interesse vengano aggiornate correttamente."
+                        "per garantire che tutte le funzionalità operino correttamente"
                 )
             )
             setPriority(NotificationCompat.PRIORITY_HIGH)

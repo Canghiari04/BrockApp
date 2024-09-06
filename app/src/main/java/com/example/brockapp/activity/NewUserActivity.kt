@@ -1,50 +1,51 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-
-import android.net.Uri
 import android.Manifest
-import android.os.Bundle
-import android.view.MenuItem
-import android.widget.Button
-import android.content.Intent
 import android.app.AlertDialog
-import android.provider.Settings
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.widget.Toolbar
+import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
+import android.net.Uri
+import android.os.Bundle
+import android.provider.Settings
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NewUserActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_user)
 
-        checkActivityPermission()
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
         setSupportActionBar(toolbar)
+        toolbar.setNavigationIcon(R.drawable.baseline_home_more_24)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        findViewById<Button>(R.id.button_still).setOnClickListener {
+        checkActivityPermission()
+
+        findViewById<FloatingActionButton>(R.id.button_still).setOnClickListener {
             val intent = Intent(this, StillActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        findViewById<Button>(R.id.button_vehicle).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.button_vehicle).setOnClickListener {
             val intent = Intent(this, VehicleActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        findViewById<Button>(R.id.button_walk).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.button_walk).setOnClickListener {
             val intent = Intent(this, WalkActivity::class.java)
             startActivity(intent)
             finish()
+
         }
     }
 
@@ -74,10 +75,6 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo attuato per definire se il permesso di activity recognition sia stato accettato
-     * oppure negato.
-     */
     private fun checkActivityPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
             return
@@ -92,10 +89,6 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo attuato per mostrare la finestra di dialogo necessaria per accettare i permessi
-     * richiesti.
-     */
     private fun showPermissionDialog() {
         AlertDialog.Builder(this)
             .setTitle(R.string.permission_title)

@@ -1,25 +1,20 @@
 package com.example.brockapp.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.GeofenceAreaEntry
-
-import kotlinx.coroutines.launch
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.launch
 
-class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
+class GeofenceViewModel(private val db: BrockDB): ViewModel() {
     private val _staticAreas = MutableLiveData<List<GeofenceAreaEntry>>()
     val staticAreas: LiveData<List<GeofenceAreaEntry>> get() = _staticAreas
 
     private val _dynamicAreas = MutableLiveData<List<GeofenceAreaEntry>>()
     val dynamicAreas: LiveData<List<GeofenceAreaEntry>> get() = _dynamicAreas
-
-    init {
-        fetchGeofenceAreas()
-    }
 
     fun insertStaticGeofenceAreas() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -41,6 +36,13 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
         }
     }
 
+    fun fetchGeofenceAreas() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val items = db.GeofenceAreaDao().getAllGeofenceAreas()
+            _staticAreas.postValue(items)
+        }
+    }
+
     fun insertGeofenceArea(area: GeofenceAreaEntry) {
         viewModelScope.launch(Dispatchers.IO) {
             db.GeofenceAreaDao().insertGeofenceArea(area)
@@ -52,13 +54,6 @@ class GeofenceViewModel(private val db: BrockDB) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             db.GeofenceAreaDao().deleteGeofenceArea(name, longitude, latitude)
             fetchDynamicGeofenceAreas()
-        }
-    }
-
-    private fun fetchGeofenceAreas() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val items = db.GeofenceAreaDao().getAllGeofenceAreas()
-            _staticAreas.postValue(items)
         }
     }
 

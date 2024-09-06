@@ -1,45 +1,43 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.data.UserActivity
-import com.example.brockapp.adapter.HomeAdapter
-import com.example.brockapp.viewmodel.ActivitiesViewModel
-import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
-
-import android.util.Log
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import java.time.LocalDate
-import java.time.DayOfWeek
-import android.widget.Spinner
-import android.widget.TextView
-import android.widget.ProgressBar
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ProgressBar
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.R
+import com.example.brockapp.adapter.HomeAdapter
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.User
+import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.LinearLayoutManager
 
 class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var user: User
-    private lateinit var viewModel: ActivitiesViewModel
-    private lateinit var staticTitle: TextView
-    private lateinit var staticCountText: TextView
-    private lateinit var staticProgressBar: ProgressBar
-    private lateinit var kilometersTitle: TextView
-    private lateinit var kilometersCountText: TextView
-    private lateinit var kilometersProgressBar: ProgressBar
-    private lateinit var stepsTitle: TextView
-    private lateinit var stepsCountText: TextView
-    private lateinit var stepsProgressBar: ProgressBar
-
     private lateinit var selectedItem: String
+    private lateinit var stepsTitle: TextView
+    private lateinit var staticTitle: TextView
+    private lateinit var stepsCountText: TextView
+    private lateinit var staticCountText: TextView
+    private lateinit var kilometersTitle: TextView
+    private lateinit var stepsProgressBar: ProgressBar
+    private lateinit var kilometersCountText: TextView
+    private lateinit var staticProgressBar: ProgressBar
+    private lateinit var viewModel: ActivitiesViewModel
+    private lateinit var kilometersProgressBar: ProgressBar
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,9 +60,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         user = User.getInstance()
 
         val db = BrockDB.getInstance(requireContext())
-        val factoryViewModelActivities = ActivitiesViewModelFactory(db)
-
-        viewModel = ViewModelProvider(this, factoryViewModelActivities)[ActivitiesViewModel::class.java]
+        val factoryViewModel = ActivitiesViewModelFactory(db)
+        viewModel = ViewModelProvider(this, factoryViewModel)[ActivitiesViewModel::class.java]
 
         observeUserActivities()
         observeUserStillTime()
@@ -123,7 +120,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 }
 
                 viewModel.getUserActivities(range.first, range.second, user)
-                viewModel.getStaticTime(range.first, range.second, user)
+                viewModel.getStillTime(range.first, range.second, user)
                 viewModel.getKilometers(range.first, range.second, user)
                 viewModel.getSteps(range.first, range.second, user)
             }
@@ -135,10 +132,10 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun observeUserActivities() {
-        viewModel.listActivities.observe(viewLifecycleOwner) { listActivities ->
-            if (listActivities.isNotEmpty()) {
+        viewModel.listExitActivities.observe(viewLifecycleOwner) { listExitActivities ->
+            if (listExitActivities.isNotEmpty()) {
                 val recyclerView = view?.findViewById<RecyclerView>(R.id.home_recycler_view)
-                populateHomeRecyclerView(recyclerView, listActivities)
+                populateHomeRecyclerView(recyclerView, listExitActivities)
             } else {
                 Log.d("HOME_FRAGMENT", "None activities.")
             }
@@ -146,11 +143,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun observeUserStillTime() {
-        viewModel.staticTime.observe(viewLifecycleOwner) { still ->
-            val timeSpentInHour = (still?.toInt()!! / 60 / 60)
+        viewModel.stillTime.observe(viewLifecycleOwner) { stillTime ->
+            val timeSpentInHour = (stillTime!!.toInt() / 60 / 60)
             staticProgressBar.progress = timeSpentInHour
 
-            if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
+            if (selectedItem == "Giorno") {
                 staticCountText.setText("$timeSpentInHour/24 ore")
             } else {
                 staticCountText.setText("$timeSpentInHour/168 ore")
@@ -162,7 +159,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel.kilometers.observe(viewLifecycleOwner) { kilometers ->
             kilometersProgressBar.progress = kilometers
 
-            if(selectedItem == "Giorno" || selectedItem == "Visualizza per") {
+            if(selectedItem == "Giorno") {
                 kilometersCountText.setText("$kilometers/100 km")
             } else {
                 kilometersCountText.setText("$kilometers/700 km")
@@ -174,20 +171,12 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         viewModel.steps.observe(viewLifecycleOwner) { steps ->
             stepsProgressBar.progress = steps
 
-            if (selectedItem == "Giorno" || selectedItem == "Visualizza per") {
+            if (selectedItem == "Giorno") {
                 stepsCountText.setText("$steps/10000 passi")
             } else {
                 stepsCountText.setText("$steps/70000 passi")
             }
         }
-    }
-
-    private fun populateHomeRecyclerView(recyclerView: RecyclerView?, activities: List<UserActivity>) {
-        val adapterHome = HomeAdapter(activities)
-        val layoutManager = LinearLayoutManager(requireContext())
-
-        recyclerView?.adapter = adapterHome
-        recyclerView?.layoutManager = layoutManager
     }
 
     private fun getDayRange(day: LocalDate): Pair<String, String> {
@@ -204,5 +193,13 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         val outputFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         return Pair(firstDay.format(outputFormatter), lastDay.format(outputFormatter))
+    }
+
+    private fun populateHomeRecyclerView(recyclerView: RecyclerView?, activities: List<UserActivity>) {
+        val adapterHome = HomeAdapter(activities)
+        val layoutManager = LinearLayoutManager(requireContext())
+
+        recyclerView?.adapter = adapterHome
+        recyclerView?.layoutManager = layoutManager
     }
 }

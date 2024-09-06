@@ -1,13 +1,15 @@
 package com.example.brockapp.worker
 
-import com.example.brockapp.*
-import com.example.brockapp.util.NotificationUtil
-
-import androidx.work.Worker
-import android.content.Context
-import androidx.work.WorkerParameters
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
+import androidx.work.Worker
+import androidx.work.WorkerParameters
+import com.example.brockapp.CHANNEL_ID_GEOFENCE_NOTIFY
+import com.example.brockapp.DESCRIPTION_CHANNEL_GEOFENCE_NOTIFY
+import com.example.brockapp.ID_GEOFENCE_NOTIFY
+import com.example.brockapp.NAME_CHANNEL_GEOFENCE_NOTIFY
+import com.example.brockapp.util.NotificationUtil
 
 class GeofenceWorker(context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
     private lateinit var util: NotificationUtil
@@ -23,8 +25,10 @@ class GeofenceWorker(context: Context, workerParams: WorkerParameters): Worker(c
     private fun sendNotification() {
         manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val pendingIntent = util.getGeofencePendingIntent(applicationContext)
-        val notification = util.getGeofenceNotification(CHANNEL_ID_GEOFENCE_NOTIFY, pendingIntent, applicationContext)
+        val notification = util.getGeofenceNotification(
+            CHANNEL_ID_GEOFENCE_NOTIFY,
+            applicationContext
+        )
 
         getNotificationChannel()
 
@@ -32,8 +36,11 @@ class GeofenceWorker(context: Context, workerParams: WorkerParameters): Worker(c
     }
 
     private fun getNotificationChannel() {
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(CHANNEL_ID_GEOFENCE_NOTIFY, NAME_CHANNEL_GEOFENCE_NOTIFY, importance)
+        val channel = NotificationChannel(
+            CHANNEL_ID_GEOFENCE_NOTIFY,
+            NAME_CHANNEL_GEOFENCE_NOTIFY,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
 
         channel.apply {
             description = DESCRIPTION_CHANNEL_GEOFENCE_NOTIFY

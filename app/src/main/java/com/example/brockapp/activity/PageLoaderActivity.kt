@@ -1,55 +1,69 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.dialog.AccountDialog
-import com.example.brockapp.fragment.MapFragment
-import com.example.brockapp.fragment.HomeFragment
-import com.example.brockapp.fragment.ChartsFragment
-import com.example.brockapp.fragment.FriendsFragment
-import com.example.brockapp.fragment.CalendarFragment
-
-import android.util.Log
+import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.PorterDuff
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
-import android.content.Intent
 import android.view.MenuInflater
-import kotlinx.coroutines.launch
-import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.lifecycleScope
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
+import com.example.brockapp.R
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.dialog.AccountDialog
+import com.example.brockapp.fragment.CalendarFragment
+import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.fragment.FriendsFragment
+import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.fragment.MapFragment
+import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.singleton.MyNetwork
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.singleton.User
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.File
 
 class PageLoaderActivity: AppCompatActivity() {
+    private val networkUtil = NetworkAvailableImpl()
     private var mapFragments = mutableMapOf<String, Fragment>()
 
     private lateinit var toolbar: Toolbar
-    private lateinit var homeFragment: HomeFragment
-    private lateinit var calendarFragment: CalendarFragment
     private lateinit var mapFragment: MapFragment
+    private lateinit var homeFragment: HomeFragment
+    private lateinit var receiver: ConnectivityReceiver
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
+    private lateinit var calendarFragment: CalendarFragment
     private lateinit var newActivityButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page_loader)
 
+        checkConnectivity()
+        startConnectivity()
+
+        toolbar = findViewById(R.id.toolbar_page_loader)
+        setSupportActionBar(toolbar)
+        toolbar.overflowIcon?.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN)
+
         homeFragment = HomeFragment()
         calendarFragment = CalendarFragment()
         mapFragment = MapFragment()
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
-
-        toolbar = findViewById(R.id.toolbar_page_loader)
-        setSupportActionBar(toolbar)
 
         newActivityButton = findViewById(R.id.new_activity_button)
 
@@ -64,10 +78,10 @@ class PageLoaderActivity: AppCompatActivity() {
 
         mapFragments.apply {
             put("Home", homeFragment)
-            put("Calendar", calendarFragment)
-            put("Map", mapFragment)
-            put("Charts", chartsFragment)
-            put("Friends", friendsFragment)
+            put("Calendario", calendarFragment)
+            put("Mappa", mapFragment)
+            put("Grafici", chartsFragment)
+            put("Amici", friendsFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
@@ -81,22 +95,27 @@ class PageLoaderActivity: AppCompatActivity() {
                     switchFragment("Home", homeFragment)
                     true
                 }
+
                 R.id.navbar_item_calendar -> {
-                    switchFragment("Calendar", calendarFragment)
+                    switchFragment("Calendario", calendarFragment)
                     true
                 }
+
                 R.id.navbar_item_map -> {
-                    switchFragment("Map", mapFragment)
+                    switchFragment("Mappa", mapFragment)
                     true
                 }
+
                 R.id.navbar_item_charts -> {
-                    switchFragment("Charts", chartsFragment)
+                    switchFragment("Grafici", chartsFragment)
                     true
                 }
+
                 R.id.navbar_item_friends -> {
-                    switchFragment("Friends", friendsFragment)
+                    switchFragment("Amici", friendsFragment)
                     true
                 }
+
                 else -> {
                     false
                 }
@@ -123,26 +142,50 @@ class PageLoaderActivity: AppCompatActivity() {
                 AccountDialog().show(supportFragmentManager, "CUSTOM_ACCOUNT_DIALOG")
                 true
             }
+
             R.id.item_more_logout -> {
                 val user = User.getInstance()
-                user.logoutUser(user)
-
+                user.logoutUser()
                 goToAuthenticator()
                 true
             }
+
             R.id.item_more_delete -> {
                 showDangerousDialog(User.getInstance())
                 true
             }
+
             else -> {
                 super.onOptionsItemSelected(item)
             }
         }
     }
 
-    /**
-     * Metodo necessario per rimpiazzare il fragment corrente con quello nuovo.
-     */
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+    }
+
+    private fun checkConnectivity() {
+        if (networkUtil.isInternetActive(this)) {
+            MyNetwork.isConnected = true
+        } else {
+            MyNetwork.isConnected = false
+            Toast.makeText(this, "Sei offline", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun startConnectivity() {
+        receiver = ConnectivityReceiver(this)
+
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
     private fun switchFragment(name: String, fragment: Fragment) {
         hideButton(name)
         hideAllFragment(supportFragmentManager)
@@ -157,11 +200,11 @@ class PageLoaderActivity: AppCompatActivity() {
 
     private fun hideButton(name: String) {
         when (name) {
-            "Map" -> {
+            "Mappa" -> {
                 newActivityButton.hide()
             }
 
-            "Friends" -> {
+            "Amici" -> {
                 newActivityButton.hide()
             }
 
@@ -171,35 +214,24 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * Metodo utilizzato per nascondere tutti i fragment contenuti nel manager.
-     */
     private fun hideAllFragment(manager: FragmentManager) {
         manager.beginTransaction().apply {
             mapFragments.forEach { (key, value) ->
                 hide(value)
             }
+
             commit()
         }
     }
 
     private fun showDangerousDialog(user: User) {
-        val db = BrockDB.getInstance(this)
-        val userDao = db.UserDao()
-
         AlertDialog.Builder(this)
             .setTitle(R.string.dangerous_dialog_title)
             .setMessage(R.string.dangerous_dialog_message)
             .setPositiveButton(R.string.dangerous_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                user.logoutUser(user)
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        userDao.deleteUserById(user.id)
-                    } catch (e: Exception) {
-                        Log.e("PAGE_LOADER_DANGEROUS_ZONE", e.toString())
-                    }
-                }
+                deleteUser()
+                user.logoutUser()
                 goToAuthenticator()
             }
             .setNegativeButton(R.string.dangerous_negative_button) { dialog, _ ->
@@ -207,6 +239,21 @@ class PageLoaderActivity: AppCompatActivity() {
             }
             .create()
             .show()
+    }
+
+    private fun deleteUser() {
+        val user = User.getInstance()
+
+
+
+        val file = File(this.filesDir, "user_data.json")
+
+        val db = BrockDB.getInstance(this)
+        val s3Client = S3ClientProvider.getInstance(this)
+        val factoryViewModel = UserViewModelFactory(db, s3Client, file)
+        val viewModel = ViewModelProvider(this, factoryViewModel)[UserViewModel::class.java]
+
+        viewModel.deleteUser(user.username, user.password)
     }
 
     private fun goToAuthenticator() {

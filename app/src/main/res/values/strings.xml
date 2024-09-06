@@ -14,11 +14,11 @@
 
     <string name="login_welcome_text_view">Login</string>
     <string name="message_to_signin">Non hai un account?</string>
-    <string name="on_click_signin">Sign In</string>
+    <string name="on_click_signin">Clicca qui!</string>
 
     <string name="signin_welcome_text_view">Sign In</string>
     <string name="message_to_login">Hai già un account?</string>
-    <string name="on_click_login">Login</string>
+    <string name="on_click_login">Clicca qui!</string>
 
     <string name="description_error_signin">CREDENZIALI GIA\' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD</string>
     <string name="description_error_login">CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL\'APPLICAZIONE?</string>
@@ -26,7 +26,7 @@
     <string name="permission_title">Permesso richiesto</string>
     <string name="permission_message">Concedi il permesso dei tuoi spostamenti per usufruire di tutte le funzionalità.</string>
     <string name="permission_positive_button">Concedi</string>
-    <string name="settings_positive_button">Accedi</string>
+    <string name="settings_positive_button">Concedi</string>
     <string name="permission_negative_button">Annulla</string>
     <string name="permission_setting_button">Settings</string>
     <string name="permission_background">Concedi il permesso di accedere alla tua posizione anche quando l\'app è in background per garantire il corretto funzionamento di tutte le funzionalità.</string>
@@ -35,7 +35,6 @@
     <string name="permissions_location">Concedi il permesso di accedere alla tua posizione per garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
     <string name="permissions_title">Permessi richiesti</string>
     <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere a tutte le funzionalità richieste.</string>
-    <string name="permissions_toast">Clicca su "Concedi sempre".</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_activity">Calendario</string>
@@ -48,6 +47,7 @@
     <string name="item_more_delete">Elimina account</string>
 
     <string name="title_home_fragment">In primo piano</string>
+    <string name="title_spinner">Visualizza per</string>
     <string name="subtitle_activities">Le tue ultime attività</string>
     <string name="subtitle_features">Le funzionalità dell\'app</string>
     <string name="register_text_view">REGISTRAZIONE</string>
@@ -68,10 +68,13 @@
 
     <string name="empty_icon_description">Icona per empty page</string>
 
-    <string name="run_button">CORSETTA</string>
-    <string name="walk_button">CAMMINATA</string>
-    <string name="vehicle_button">VIAGGIO IN MACCHINA</string>
-    <string name="still_button">STILL</string>
+    <string name="title_new_activity">Seleziona una delle seguenti attività</string>
+    <string name="title_still">Attività sedentaria</string>
+    <string name="description_still_icon">Chair icon</string>
+    <string name="title_vehicle">Viaggio in macchina</string>
+    <string name="description_vehicle_icon">Vehicle icon</string>
+    <string name="title_walk">Camminata</string>
+    <string name="description_walk_icon">Walking icon</string>
 
     <string name="stop_button">STOP</string>
     <string name="start_button">START</string>
@@ -81,7 +84,6 @@
     <string name="charts_step_count_text">Numero di passi giornaliero</string>
     <string name="charts_distance_travelled_text">Distanza percorsa giornaliera</string>
     <string name="charts_pie_chart_text">Suddivisione delle attività nel mese</string>
-    <string name="no_activity_text">Nessuna attività compiuta nel mese</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="activity_main_text">Le tue attività</string>
@@ -140,7 +142,6 @@
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
-    <string name="toast_error_map">Nessuna località individuata con questo nome.</string>
     <string name="new_activity_icon_description">Icona per registrare una nuova attività</string>
     <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 
@@ -156,7 +157,6 @@
     <string name="height_difference_text">Dislivello:</string>
 
     <string-array name="spinner_items">
-        <item>Visualizza per</item>
         <item>Giorno</item>
         <item>Settimana</item>
     </string-array>

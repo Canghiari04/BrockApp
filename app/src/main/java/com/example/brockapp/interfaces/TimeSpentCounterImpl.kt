@@ -13,14 +13,16 @@ class TimeSpentCounterImpl: TimeSpentCounter {
         val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         for (i in userActivities.indices) {
-            if (userActivities[i].transitionType == 1)
+            if (userActivities[i].transitionType == 1) {
                 continue
+            }
 
             val beginActivityTime = LocalDateTime.parse(userActivities[i].timestamp, dateFormatter)
             val nextActivity = if (i < userActivities.size - 1) userActivities[i + 1] else null
 
-            if (nextActivity == null)
+            if (nextActivity == null) {
                 break
+            }
 
             val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
             val durationInSeconds = Duration.between(beginActivityTime, endActivityTime).seconds
@@ -36,14 +38,16 @@ class TimeSpentCounterImpl: TimeSpentCounter {
         val dateFormatter = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
         for (i in userStillActivities.indices) {
-            if (userStillActivities[i].transitionType == 1)
+            if (userStillActivities[i].transitionType == 1) {
                 continue
+            }
 
             val beginActivityTime = LocalDateTime.parse(userStillActivities[i].timestamp, dateFormatter)
             val nextActivity = if (i < userStillActivities.size - 1) userStillActivities[i + 1] else null
 
-            if (nextActivity == null)
+            if (nextActivity == null) {
                 break
+            }
 
             val endActivityTime = LocalDateTime.parse(nextActivity.timestamp, dateFormatter)
             val durationInSeconds = Duration.between(beginActivityTime, endActivityTime).seconds

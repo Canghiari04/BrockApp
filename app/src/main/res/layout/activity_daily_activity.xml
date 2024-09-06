@@ -9,6 +9,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_daily_activity"
+        app:title=" "
         app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +40,7 @@
             android:layout_height="300dp"
             android:gravity="center"
             android:layout_margin="10dp"
+            android:elevation="2.5dp"
             android:background="@color/white"/>
 
         <androidx.recyclerview.widget.RecyclerView

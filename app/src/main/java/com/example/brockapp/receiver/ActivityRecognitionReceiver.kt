@@ -1,16 +1,16 @@
 package com.example.brockapp.receiver
 
-import com.example.brockapp.*
-import com.example.brockapp.service.ActivityRecognitionService
-
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.util.Log
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+import com.example.brockapp.ISO_DATE_FORMAT
+import com.example.brockapp.service.ActivityRecognitionService
+import com.google.android.gms.location.DetectedActivity
 import java.time.Instant
 import java.time.ZoneOffset
-import android.content.Intent
-import android.content.Context
-import android.content.BroadcastReceiver
 import java.time.format.DateTimeFormatter
-import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionReceiver: BroadcastReceiver() {
     private lateinit var serviceIntent: Intent

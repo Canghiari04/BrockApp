@@ -1,48 +1,49 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
+import android.Manifest
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Bundle
+import android.os.SystemClock
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.Chronometer
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
+import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
 import com.example.brockapp.R
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
-
-import android.Manifest
-import android.os.Bundle
-import android.widget.Button
-import android.view.MenuItem
-import android.os.SystemClock
-import android.content.Intent
-import android.widget.TextView
-import android.location.Location
-import android.widget.Chronometer
-import android.content.IntentFilter
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.Priority
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.FusedLocationProviderClient
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 class VehicleActivity: AppCompatActivity() {
     private var running = false
     private var totalDistance = 0.0
     private var pauseOffset: Long = 0
     private var startLocation: Location? = null
+    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     private lateinit var distanceTravelled: TextView
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vehicle)
+
+        supportActionBar?.title = " "
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
 
