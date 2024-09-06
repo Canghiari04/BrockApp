@@ -1,43 +1,52 @@
 package com.example.brockapp.fragment
 
-import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.brockapp.R
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.singleton.S3ClientProvider
 import com.example.brockapp.singleton.User
+import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.google.android.gms.location.LocationServices
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+
 import java.io.File
+import android.Manifest
+import android.util.Log
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import android.widget.Button
+import android.content.Intent
+import android.widget.EditText
+import android.content.Context
+import android.widget.TextView
+import com.amazonaws.regions.Regions
+import androidx.fragment.app.Fragment
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import androidx.lifecycle.ViewModelProvider
+import com.amazonaws.services.s3.AmazonS3Client
+import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.singleton.MyNetwork
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.viewmodel.NetworkViewModel
+import com.google.android.gms.location.LocationServices
+
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
+    private val networkUtil = NetworkAvailableImpl()
     private var listener: OnFragmentInteractionListener? = null
 
-    private lateinit var db : BrockDB
-    private lateinit var username : String
-    private lateinit var password : String
+    private lateinit var db: BrockDB
+    private lateinit var username: String
+    private lateinit var password: String
     private lateinit var util: PermissionUtil
     private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
     interface OnFragmentInteractionListener {
@@ -47,9 +56,13 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        checkConnectivity()
         val s3Client = S3ClientProvider.getInstance(requireContext())
 
+
         val file = File(context?.filesDir, "user_data.json")
+
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
         db = BrockDB.getInstance(requireContext())
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
@@ -59,6 +72,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
             startBackgroundOperations()
         }
 
+        observeNetwork()
         observeSignIn()
         observeUser()
 
@@ -89,6 +103,21 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     override fun onDetach() {
         listener = null
         super.onDetach()
+    }
+
+    private fun checkConnectivity() {
+        if (networkUtil.isInternetActive(requireContext())) {
+            MyNetwork.isConnected = true
+        } else {
+            MyNetwork.isConnected = false
+            Toast.makeText(requireContext(), "Attiva la connessione per registrarti", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun observeNetwork() {
+        viewModelNetwork.authNetwork.observe(viewLifecycleOwner) { authNetwork ->
+            view?.findViewById<Button>(R.id.button_sign_in)?.isEnabled = authNetwork
+        }
     }
 
     private fun observeSignIn() {
