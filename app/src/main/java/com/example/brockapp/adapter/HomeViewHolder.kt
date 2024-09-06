@@ -1,12 +1,13 @@
 package com.example.brockapp.adapter
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-
 import android.view.View
-import android.widget.TextView
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
+import com.example.brockapp.STILL_ACTIVITY_TYPE
+import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
+import com.example.brockapp.WALK_ACTIVITY_TYPE
 
 class HomeViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val activityImageView = itemView.findViewById<ImageView>(R.id.activity_cell_image)

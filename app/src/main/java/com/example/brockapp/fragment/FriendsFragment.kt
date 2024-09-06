@@ -1,34 +1,31 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.adapter.FriendsAdapter
-import com.example.brockapp.dialog.NewFriendDialog
-import com.example.brockapp.activity.FriendActivity
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.adapter.SuggestionsAdapter
-import com.example.brockapp.viewmodel.FriendsViewModel
-import com.example.brockapp.viewmodel.NetworkViewModel
-import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.viewmodel.FriendsViewModelFactory
-
-import java.io.File
-import android.util.Log
-import android.os.Bundle
-import android.view.View
-import android.widget.Toast
 import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.EditText
-import com.amazonaws.regions.Regions
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.amazonaws.services.s3.AmazonS3Client
-import androidx.recyclerview.widget.RecyclerView
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import androidx.recyclerview.widget.RecyclerView
+import com.example.brockapp.R
+import com.example.brockapp.activity.FriendActivity
+import com.example.brockapp.adapter.FriendsAdapter
+import com.example.brockapp.adapter.SuggestionsAdapter
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.dialog.NewFriendDialog
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.singleton.User
+import com.example.brockapp.viewmodel.FriendsViewModel
+import com.example.brockapp.viewmodel.FriendsViewModelFactory
+import com.example.brockapp.viewmodel.NetworkViewModel
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.File
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var viewModelUser: UserViewModel
@@ -38,12 +35,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(
-            requireContext(),
-            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-            Regions.EU_WEST_3
-        )
-        val s3Client = AmazonS3Client(credentialsProvider)
+        val s3Client = S3ClientProvider.getInstance(requireContext())
 
         val file = File(requireContext().filesDir, "user_data.json")
 

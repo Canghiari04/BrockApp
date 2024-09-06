@@ -1,23 +1,22 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.BUCKET_NAME
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.UserEntity
-
-import java.io.File
 import android.util.Log
-import java.io.FileWriter
-import com.google.gson.Gson
-import kotlinx.coroutines.launch
-import com.google.gson.JsonObject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.Dispatchers
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
+import com.example.brockapp.BUCKET_NAME
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.database.UserEntity
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileWriter
 
 class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Client, private val file: File): ViewModel() {
     private var _auth = MutableLiveData<Boolean>()

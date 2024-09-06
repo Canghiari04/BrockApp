@@ -1,20 +1,19 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.*
-import com.example.brockapp.R
-
-import android.net.Uri
 import android.Manifest
-import android.os.Bundle
-import android.view.MenuItem
-import android.content.Intent
 import android.app.AlertDialog
-import android.provider.Settings
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.widget.Toolbar
+import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
+import android.net.Uri
+import android.os.Bundle
+import android.provider.Settings
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.brockapp.R
+import com.example.brockapp.REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NewUserActivity: AppCompatActivity() {

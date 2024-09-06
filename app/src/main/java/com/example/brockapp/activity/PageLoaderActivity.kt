@@ -1,42 +1,39 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyNetwork
-import com.example.brockapp.dialog.AccountDialog
-import com.example.brockapp.fragment.MapFragment
-import com.example.brockapp.fragment.HomeFragment
-import com.example.brockapp.fragment.ChartsFragment
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.fragment.FriendsFragment
-import com.example.brockapp.fragment.CalendarFragment
-import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.interfaces.NetworkAvailableImpl
-
-import java.io.File
+import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.PorterDuff
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.Menu
-import android.widget.Toast
-import android.view.MenuItem
-import android.content.Intent
 import android.view.MenuInflater
-import android.graphics.PorterDuff
-import android.content.IntentFilter
-import com.amazonaws.regions.Regions
-import androidx.fragment.app.Fragment
-import android.net.ConnectivityManager
-import androidx.appcompat.widget.Toolbar
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.fragment.app.FragmentManager
-import com.amazonaws.services.s3.AmazonS3Client
 import androidx.appcompat.app.AppCompatActivity
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
+import com.example.brockapp.R
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.dialog.AccountDialog
+import com.example.brockapp.fragment.CalendarFragment
+import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.fragment.FriendsFragment
+import com.example.brockapp.fragment.HomeFragment
+import com.example.brockapp.fragment.MapFragment
+import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.singleton.MyNetwork
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.singleton.User
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.File
 
 class PageLoaderActivity: AppCompatActivity() {
     private val networkUtil = NetworkAvailableImpl()
@@ -247,16 +244,12 @@ class PageLoaderActivity: AppCompatActivity() {
     private fun deleteUser() {
         val user = User.getInstance()
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(
-            this,
-            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-            Regions.EU_WEST_3
-        )
-        val s3Client = AmazonS3Client(credentialsProvider)
+
 
         val file = File(this.filesDir, "user_data.json")
 
         val db = BrockDB.getInstance(this)
+        val s3Client = S3ClientProvider.getInstance(this)
         val factoryViewModel = UserViewModelFactory(db, s3Client, file)
         val viewModel = ViewModelProvider(this, factoryViewModel)[UserViewModel::class.java]
 

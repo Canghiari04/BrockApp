@@ -1,35 +1,32 @@
 package com.example.brockapp.fragment
 
-import com.example.brockapp.R
-import com.example.brockapp.singleton.User
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.activity.PageLoaderActivity
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
-
-import java.io.File
 import android.Manifest
-import android.util.Log
-import android.os.Bundle
-import android.view.View
-import android.widget.Toast
-import android.widget.Button
-import android.content.Intent
-import android.widget.EditText
 import android.content.Context
-import android.widget.TextView
-import com.amazonaws.regions.Regions
-import androidx.fragment.app.Fragment
-import androidx.core.app.ActivityCompat
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.amazonaws.services.s3.AmazonS3Client
+import com.example.brockapp.R
+import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.database.BrockDB
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.singleton.User
+import com.example.brockapp.util.PermissionUtil
+import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.google.android.gms.location.LocationServices
-import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import java.io.File
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private var user = User.getInstance()
@@ -50,12 +47,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val credentialsProvider = CognitoCachingCredentialsProvider(
-            requireContext(),
-            "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-            Regions.EU_WEST_3
-        )
-        val s3Client = AmazonS3Client(credentialsProvider)
+        val s3Client = S3ClientProvider.getInstance(requireContext())
 
         val file = File(context?.filesDir, "user_data.json")
 

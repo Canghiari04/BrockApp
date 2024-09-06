@@ -1,11 +1,10 @@
 package com.example.brockapp.activity
 
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.brockapp.R
 import com.example.brockapp.fragment.LoginFragment
 import com.example.brockapp.fragment.SignInFragment
-
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 
 class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener {
     private lateinit var loginFragment: LoginFragment
