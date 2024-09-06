@@ -62,7 +62,7 @@ class StillActivity: AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun setButtonListeners(chronometer: Chronometer, ) {
+    private fun setButtonListeners(chronometer: Chronometer) {
         findViewById<Button>(R.id.button_start).setOnClickListener {
             if (!running) {
                 chronometer.start()
