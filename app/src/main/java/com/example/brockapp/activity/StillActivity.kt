@@ -44,6 +44,9 @@ class StillActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                if(running)
+                    registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+
                 val intent = Intent(this, NewUserActivity::class.java)
                 startActivity(intent)
                 finish()

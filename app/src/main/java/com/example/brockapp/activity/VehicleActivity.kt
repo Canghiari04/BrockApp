@@ -75,6 +75,12 @@ class VehicleActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                if(running)
+                    registerActivity(
+                        DetectedActivity.IN_VEHICLE,
+                        ActivityTransition.ACTIVITY_TRANSITION_EXIT,
+                        totalDistance
+                    )
                 val intent = Intent(this, NewUserActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -154,7 +160,10 @@ class VehicleActivity: AppCompatActivity() {
                     } else {
                         startLocation?.let {
                             totalDistance += it.distanceTo(newLocation).toDouble()
-                            distanceTravelled.text = String.format("%.2f metri", totalDistance)
+                            if(totalDistance < 1000)
+                                distanceTravelled.text = String.format("%.2f metri", totalDistance)
+                            else
+                                distanceTravelled.text = String.format("%.2f km", totalDistance / 1000)
                         }
 
                         startLocation = newLocation

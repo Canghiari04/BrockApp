@@ -70,7 +70,7 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
         if (stepCounterSensor == null) {
             findViewById<Button>(R.id.walk_button_start).isEnabled = false
             findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
-            return
+
         }
 
         val chronometer = findViewById<Chronometer>(R.id.walk_chronometer)
@@ -168,6 +168,9 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                if(running)
+                    registerActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT, sessionStepCount.toLong())
+
                 val intent = Intent(this, NewUserActivity::class.java)
                 startActivity(intent)
                 finish()

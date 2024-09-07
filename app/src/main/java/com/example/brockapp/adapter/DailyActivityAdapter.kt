@@ -48,13 +48,13 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                 }
 
                 VEHICLE_ACTIVITY_TYPE -> {
-                    val distanceTravelled = exitActivity.info.split(".")[0]
+                    val distanceTravelled = computeDistanceTravelled(exitActivity.info.split(".")[0])
 
                     holder.bindActivity(
                         VEHICLE_ACTIVITY_TYPE,
                         "Data: $date",
                         "Terminata alle $exitActivityTime",
-                        "Distanza percorsa: $distanceTravelled metri\nDurata: $timeDifference"
+                        "Distanza percorsa: $distanceTravelled\nDurata: $timeDifference"
                     )
                 }
 
@@ -72,6 +72,16 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
                 }
             }
         }
+    }
+
+    private fun computeDistanceTravelled(distanceTravelled: String): String {
+        if(distanceTravelled.toLong() < 1000) {
+            return "$distanceTravelled metri"
+        }
+        val distance = distanceTravelled.toLong() / 1000.0
+        return "$distance km"
+
+
     }
 
     /**
