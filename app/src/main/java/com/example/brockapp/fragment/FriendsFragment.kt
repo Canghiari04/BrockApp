@@ -36,6 +36,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var internetUtil: InternetAvailable
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelFriends: FriendsViewModel
+    private lateinit var syncButton: FloatingActionButton
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,13 +69,11 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
         viewModelFriends.getCurrentFriends(user.id)
 
-        val syncButton = view.findViewById<FloatingActionButton>(R.id.user_synchronized_button)
+        syncButton = view.findViewById(R.id.user_synchronized_button)
 
         syncButton.setOnClickListener {
             if (user.flag) {
-                viewModelFriends.uploadUserData()
-                syncButton.isEnabled = false
-                Toast.makeText(context, "Dati correttamente sincronizzati", Toast.LENGTH_SHORT).show()
+                updateUserData(syncButton)
             } else {
                 showShareDataDialog()
             }
@@ -95,6 +94,12 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
                 Log.d("FRIENDS_FRAGMENT", "Search with empty body not supported.")
             }
         }
+    }
+
+    private fun updateUserData(syncButton: FloatingActionButton) {
+        viewModelFriends.uploadUserData()
+        syncButton.isEnabled = false
+        Toast.makeText(context, "Dati correttamente sincronizzati", Toast.LENGTH_SHORT).show()
     }
 
     private fun checkIfNetworkIsActive() {
@@ -152,6 +157,8 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
                 dialog.dismiss()
                 User.flag = true
                 viewModelUser.changeSharingDataFlag(User.username, User.password)
+                updateUserData(syncButton)
+
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()

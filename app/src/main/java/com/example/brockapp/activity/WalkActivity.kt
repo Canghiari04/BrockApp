@@ -34,7 +34,6 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
     private var initialStepCount = 0
     private var sessionStepCount = 0
     private var heightDifference = 0f
-    private var pressureSensor: Sensor? = null
     private var initialAltitude: Float? = null
     private var stepCounterSensor: Sensor? = null
     private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
@@ -59,13 +58,7 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
 
-        if (pressureSensor != null) {
-            sensorManager.registerListener(this, pressureSensor, SensorManager.SENSOR_DELAY_NORMAL)
-        } else {
-            Toast.makeText(this, "Sensore barometrico non disponibile", Toast.LENGTH_SHORT).show()
-        }
 
         if (stepCounterSensor == null) {
             findViewById<Button>(R.id.walk_button_start).isEnabled = false
@@ -135,30 +128,15 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        when (event.sensor.type) {
-            Sensor.TYPE_STEP_COUNTER -> {
-                if (initialStepCount < 0) {
-                    initialStepCount = event.values[0].toInt()
-                }
-                sessionStepCount = event.values[0].toInt() - initialStepCount
 
-                findViewById<TextView>(R.id.step_count)?.text = sessionStepCount.toString()
-                lastStepTime = System.currentTimeMillis()
-            }
-            Sensor.TYPE_PRESSURE -> {
-                val pressure = event.values[0]
-                val currentAltitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressure)
-
-                if (initialAltitude == null) {
-                    initialAltitude = currentAltitude
-                } else {
-                    val altitudeDifference = Math.abs(currentAltitude - initialAltitude!!)
-                    heightDifference += altitudeDifference
-                }
-
-                findViewById<TextView>(R.id.height_difference_count)?.text = "${heightDifference} metri"
-            }
+        if (initialStepCount < 0) {
+            initialStepCount = event.values[0].toInt()
         }
+        sessionStepCount = event.values[0].toInt() - initialStepCount
+
+        findViewById<TextView>(R.id.step_count)?.text = sessionStepCount.toString()
+        lastStepTime = System.currentTimeMillis()
+
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
