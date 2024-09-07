@@ -30,6 +30,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var syncButton: FloatingActionButton
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelFriends: FriendsViewModel
 
@@ -45,10 +46,16 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         val file = File(requireContext().filesDir, "user_data.json")
 
         val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, file)
-        viewModelFriends = ViewModelProvider(requireActivity(), viewModelFactoryFriends)[FriendsViewModel::class.java]
+        viewModelFriends = ViewModelProvider(
+            requireActivity(),
+            viewModelFactoryFriends
+        )[FriendsViewModel::class.java]
 
         val viewModelFactoryUser = UserViewModelFactory(db, s3Client, file)
-        viewModelUser = ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
+        viewModelUser = ViewModelProvider(
+            requireActivity(),
+            viewModelFactoryUser
+        )[UserViewModel::class.java]
 
         observeNetwork()
         observeFriends()
@@ -57,13 +64,11 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
         viewModelFriends.getCurrentFriends(user.id)
 
-        val syncButton = view.findViewById<FloatingActionButton>(R.id.user_synchronized_button)
+        syncButton = view.findViewById(R.id.user_synchronized_button)
 
         syncButton.setOnClickListener {
             if (user.flag) {
-                viewModelFriends.uploadUserData()
-                syncButton.isEnabled = false
-                Toast.makeText(context, "Dati correttamente sincronizzati", Toast.LENGTH_SHORT).show()
+                syncUserData(syncButton)
             } else {
                 showShareDataDialog()
             }
@@ -85,7 +90,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             }
         }
     }
-
+    
     private fun observeNetwork() {
         viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { currentNetwork ->
             if (!currentNetwork) {
@@ -121,7 +126,11 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             if (errorAddFriend) {
                 Log.d("FRIENDS_FRAGMENT", "Amico aggiunto alla lista.")
             } else {
-                Toast.makeText(context, "Amico già presente nella lista", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Amico già presente nella lista",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -134,6 +143,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
                 dialog.dismiss()
                 User.flag = true
                 viewModelUser.changeSharingDataFlag(User.username, User.password)
+                syncUserData(syncButton)
             }
             .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
                 dialog.dismiss()
@@ -142,10 +152,19 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             .show()
     }
 
+    private fun syncUserData(syncButton: FloatingActionButton) {
+        viewModelFriends.uploadUserData()
+        syncButton.isEnabled = false
+        Toast.makeText(context, "Dati correttamente sincronizzati", Toast.LENGTH_SHORT).show()
+    }
+
     private fun populateFriendsRecyclerView(friends: List<String>, friendsRecyclerView: RecyclerView?) {
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val friendsAdapter = FriendsAdapter(friends) { friend ->
-            val intent = Intent(context, FriendActivity::class.java).putExtra("FRIEND_USERNAME", friend)
+            val intent = Intent(
+                context,
+                FriendActivity::class.java
+            ).putExtra("FRIEND_USERNAME", friend)
             startActivity(intent)
             activity?.finish()
         }
@@ -166,7 +185,10 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
 
     private fun showNewFriendDialog(username: String, viewModel: FriendsViewModel) {
         activity?.let {
-            NewFriendDialog(username, viewModel).show(it.supportFragmentManager, "CUSTOM_NEW_FRIEND_DIALOG")
+            NewFriendDialog(username, viewModel).show(
+                it.supportFragmentManager,
+                "CUSTOM_NEW_FRIEND_DIALOG"
+            )
         }
     }
 }

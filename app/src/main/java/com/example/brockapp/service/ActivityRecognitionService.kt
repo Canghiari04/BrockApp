@@ -65,15 +65,13 @@ class ActivityRecognitionService: Service() {
 
                         DetectedActivity.WALKING -> {
                             val stepNumber = intent.getLongExtra("STEP_NUMBER", -1)
-                            val heightDifference = intent.getFloatExtra("HEIGHT_DIFFERENCE", -1f)
 
                             userWalkActivityDao.insertWalkActivity(
                                 UserWalkActivityEntity(
                                     userId = user.id,
                                     transitionType = transitionType,
                                     timestamp = timestamp,
-                                    stepNumber = stepNumber,
-                                    heightDifference = heightDifference
+                                    stepNumber = stepNumber
                                 )
                             )
                         }

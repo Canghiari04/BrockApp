@@ -1,7 +1,7 @@
 package com.example.brockapp.database
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ColumnInfo
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
@@ -19,6 +19,5 @@ data class UserWalkActivityEntity (
     @ColumnInfo(name = "user_id") val userId: Long?,
     @ColumnInfo(name = "transition_type") val transitionType: Int,
     val timestamp: String?,
-    @ColumnInfo(name = "step_number") val stepNumber: Long,
-    @ColumnInfo(name = "height_difference") val heightDifference: Float
+    @ColumnInfo(name = "step_number") val stepNumber: Long
 )

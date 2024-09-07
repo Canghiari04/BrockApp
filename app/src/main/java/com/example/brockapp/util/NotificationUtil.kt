@@ -40,11 +40,11 @@ class NotificationUtil {
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle("Inizia a registare nuove attività!")
+            setContentTitle("Sei entrato in una zona d'interesse!")
             setContentText("Hai appena varcato i confini di una zona di interesse")
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText("Hai appena varcato i confini di una zona di interesse. " +
-                             "Inizia a registrare nuove attività!"))
+                        "Inizia a registrare le tue attività di oggi!!"))
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setAutoCancel(true)
         }
