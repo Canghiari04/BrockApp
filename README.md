@@ -1,6 +1,3 @@
 # BrockApp
 
-## Chicche per prendere voto più alto
-### Calendario
-* SEGNARE CON UNA PICCOLA ICONA I GIORNI IN CUI SIANO PRESENTI ATTIVITÀ
-* DOPO AVER VISUALIZZATO IL DAILY ACTIVITY POSSIBILITÀ DI CLICCARE PER VEDERE LE INFORMAZIONI ASSOCIATE
+Progetto per il corso di Laboratorio di Applicazioni Mobili (66860) Anno accademico (2023/2024)
