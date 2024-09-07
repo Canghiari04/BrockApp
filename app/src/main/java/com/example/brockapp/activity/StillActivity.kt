@@ -30,7 +30,10 @@ class StillActivity: AppCompatActivity() {
 
         supportActionBar?.title = " "
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            receiver,
+            IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE)
+        )
 
         val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
 
@@ -44,6 +47,13 @@ class StillActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                if (running) {
+                    registerTransition(
+                        DetectedActivity.STILL,
+                        ActivityTransition.ACTIVITY_TRANSITION_EXIT
+                    )
+                }
+
                 val intent = Intent(this, NewUserActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -71,7 +81,10 @@ class StillActivity: AppCompatActivity() {
                 findViewById<Button>(R.id.button_start).isEnabled = false
                 findViewById<Button>(R.id.button_stop).isEnabled = true
 
-                registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                registerTransition(
+                    DetectedActivity.STILL,
+                    ActivityTransition.ACTIVITY_TRANSITION_ENTER
+                )
             }
         }
 
@@ -85,7 +98,10 @@ class StillActivity: AppCompatActivity() {
 
                 chronometer.base = SystemClock.elapsedRealtime()
 
-                registerTransition(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+                registerTransition(
+                    DetectedActivity.STILL,
+                    ActivityTransition.ACTIVITY_TRANSITION_EXIT
+                )
             }
         }
     }
@@ -97,7 +113,10 @@ class StillActivity: AppCompatActivity() {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
             val hours = (elapsedTime / 1000 * 60 * 60).toInt()
             if (hours == 1 && !notificationSent) {
-                sendLazyUserNotification("Torna in attività!", "Sei fermo da più di un'ora ")
+                sendLazyUserNotification(
+                    "Torna in attività!",
+                    "Sei fermo da più di un'ora"
+                )
                 notificationSent = true
             }
         }

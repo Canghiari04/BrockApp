@@ -22,7 +22,7 @@ const val NAME_CHANNEL_GEOFENCE_NOTIFY = "GEOFENCE NOTIFICATION CHANNEL"
 const val DESCRIPTION_CHANNEL_GEOFENCE_NOTIFY = "CHANNEL FOR GEOFENCE NOTIFY"
 
 // Versione del database
-const val ROOM_DATABASE_VERSION = 21
+const val ROOM_DATABASE_VERSION = 22
 
 // Request code utilizzati per i Pending Intent dei receiver
 const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1
@@ -50,3 +50,5 @@ const val BUCKET_NAME = "brock-app"
 
 // Tab layout
 const val NUM_TABS = 3
+
+const val NOT_WALKING_NOTIFICATION_TIME_MILLIS = 1200000

@@ -1,31 +1,31 @@
 package com.example.brockapp.activity
 
-import android.Manifest
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.location.Location
-import android.os.Bundle
-import android.os.SystemClock
-import android.view.MenuItem
-import android.widget.Button
-import android.widget.Chronometer
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.brockapp.ACTIVITY_RECOGNITION_INTENT_TYPE
-import com.example.brockapp.POSITION_UPDATE_INTERVAL_MILLIS
+import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+
+import android.Manifest
+import android.os.Bundle
+import android.view.MenuItem
+import android.widget.Button
+import android.content.Intent
+import android.os.SystemClock
+import android.widget.TextView
+import android.location.Location
+import android.widget.Chronometer
+import android.content.IntentFilter
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.Priority
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.FusedLocationProviderClient
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class VehicleActivity: AppCompatActivity() {
     private var running = false
@@ -44,7 +44,10 @@ class VehicleActivity: AppCompatActivity() {
 
         supportActionBar?.title = " "
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE))
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            receiver,
+            IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE)
+        )
 
         distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
 
@@ -74,6 +77,14 @@ class VehicleActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                if (running) {
+                    registerActivity(
+                        DetectedActivity.IN_VEHICLE,
+                        ActivityTransition.ACTIVITY_TRANSITION_EXIT,
+                        totalDistance
+                    )
+                }
+
                 val intent = Intent(this, NewUserActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -149,7 +160,16 @@ class VehicleActivity: AppCompatActivity() {
                     } else {
                         startLocation?.let {
                             totalDistance += it.distanceTo(newLocation).toDouble()
-                            distanceTravelled.text = String.format("%.2f metri", totalDistance)
+                            if (totalDistance < 1000)
+                                distanceTravelled.text = String.format(
+                                    "%.2f metri",
+                                    totalDistance
+                                )
+                            else
+                                distanceTravelled.text = String.format(
+                                    "%.2f km",
+                                    totalDistance / 1000
+                                )
                         }
 
                         startLocation = newLocation

@@ -232,7 +232,6 @@ abstract class BrockDB: RoomDatabase() {
     abstract fun GeofenceAreaDao(): GeofenceAreaDao
     abstract fun FriendDao(): FriendDao
 
-
     companion object {
         @Volatile
         var INSTANCE: BrockDB? = null

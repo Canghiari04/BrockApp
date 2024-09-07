@@ -93,7 +93,7 @@
     <string name="friends_main_text">I tuoi amici</string>
 
     <string name="vehicle_distance_travelled">Distanza percorsa</string>
-    <string name="initial_distance_travelled">0.0</string>
+    <string name="initial_distance_travelled">0 metri</string>
 
     <string name="account_text_view">Account</string>
     <string name="description_icon_account">Account icon</string>
