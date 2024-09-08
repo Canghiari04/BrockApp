@@ -115,7 +115,7 @@
     <string name="add_friend_dialog_button">AGGIUNGI</string>
     <string name="delete_marker_button">ELIMINA</string>
 
-    <string name="distance_label">Distanza percorsa</string>
+    <string name="distance_label">Distanza:</string>
     <string name="insert_username_text">Inserisci lo username:</string>
     <string name="insert_password_text">Inserisci la password:</string>
     <string name="daily_static_text">Durata delle attività statiche di oggi</string>
@@ -137,8 +137,8 @@
     <string name="step_count_text">Passi fatti:</string>
     <string name="step_count_initial_value">0</string>
     <string name="walk_title">CAMMINATA</string>
-    <string name="vehicle_title">VEICOLO</string>
-    <string name="still_title">FERMO</string>
+    <string name="vehicle_title">VIAGGIO IN MACCHINA</string>
+    <string name="still_title">ATTIVITÀ SEDENTARIA</string>
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
