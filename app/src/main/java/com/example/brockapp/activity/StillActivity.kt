@@ -40,8 +40,8 @@ class StillActivity: AppCompatActivity() {
         setButtonListeners(chronometer)
         setChronometerListener(chronometer)
 
-        findViewById<Button>(R.id.button_start).isEnabled = true
-        findViewById<Button>(R.id.button_stop).isEnabled = false
+        findViewById<Button>(R.id.still_button_start).isEnabled = true
+        findViewById<Button>(R.id.still_button_stop).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -73,13 +73,13 @@ class StillActivity: AppCompatActivity() {
     }
 
     private fun setButtonListeners(chronometer: Chronometer) {
-        findViewById<Button>(R.id.button_start).setOnClickListener {
+        findViewById<Button>(R.id.still_button_start).setOnClickListener {
             if (!running) {
                 chronometer.start()
                 running = true
 
-                findViewById<Button>(R.id.button_start).isEnabled = false
-                findViewById<Button>(R.id.button_stop).isEnabled = true
+                findViewById<Button>(R.id.still_button_start).isEnabled = false
+                findViewById<Button>(R.id.still_button_stop).isEnabled = true
 
                 registerTransition(
                     DetectedActivity.STILL,
@@ -88,13 +88,13 @@ class StillActivity: AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.button_stop).setOnClickListener {
+        findViewById<Button>(R.id.still_button_stop).setOnClickListener {
             if (running) {
                 chronometer.stop()
                 running = false
 
-                findViewById<Button>(R.id.button_start).isEnabled = true
-                findViewById<Button>(R.id.button_stop).isEnabled = false
+                findViewById<Button>(R.id.still_button_start).isEnabled = true
+                findViewById<Button>(R.id.still_button_stop).isEnabled = false
 
                 chronometer.base = SystemClock.elapsedRealtime()
 

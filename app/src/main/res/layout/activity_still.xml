@@ -59,7 +59,7 @@
         android:layout_marginTop="25dp">
 
         <Button
-            android:id="@+id/vehicle_button_stop"
+            android:id="@+id/still_button_stop"
             android:text="@string/stop_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             android:background="@color/uni_red" />
 
         <Button
-            android:id="@+id/vehicle_button_start"
+            android:id="@+id/still_button_start"
             android:text="@string/start_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
