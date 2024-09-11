@@ -1,10 +1,11 @@
 package com.example.brockapp.database
 
-import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.example.brockapp.ROOM_DATABASE_VERSION
+
+import androidx.room.Room
+import androidx.room.Database
+import android.content.Context
+import androidx.room.RoomDatabase
 
 @Database(
     entities = [UserEntity::class, UserStillActivityEntity::class, UserVehicleActivityEntity::class, UserWalkActivityEntity::class, GeofenceAreaEntry::class, FriendEntity::class],
@@ -17,7 +18,6 @@ abstract class BrockDB: RoomDatabase() {
     abstract fun UserWalkActivityDao(): UserWalkActivityDao
     abstract fun GeofenceAreaDao(): GeofenceAreaDao
     abstract fun FriendDao(): FriendDao
-
 
     companion object {
         @Volatile

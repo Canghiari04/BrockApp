@@ -90,7 +90,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                         kilometersTitle.setText(R.string.daily_kilometers_text)
                         stepsTitle.setText(R.string.daily_step_text)
 
-                        staticProgressBar.max = 86400
+                        staticProgressBar.max = 24
                         kilometersProgressBar.max = 100000
                         stepsProgressBar.max = 10000
                     }
@@ -102,7 +102,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                         kilometersTitle.setText(R.string.weekly_kilometers_text)
                         stepsTitle.setText(R.string.weekly_step_text)
 
-                        staticProgressBar.max = 86400 * 7
+                        staticProgressBar.max = 24 * 7
                         kilometersProgressBar.max = 100000 * 7
                         stepsProgressBar.max = 10000 * 7
                     }
@@ -157,8 +157,10 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun observeUserKilometers() {
-        viewModel.kilometers.observe(viewLifecycleOwner) { kilometers ->
-            kilometersProgressBar.progress = kilometers
+        viewModel.meters.observe(viewLifecycleOwner) { meters ->
+            kilometersProgressBar.progress = meters
+
+            val kilometers = meters / 1000
 
             if(selectedItem == "Giorno") {
                 kilometersCountText.setText("$kilometers/100 km")

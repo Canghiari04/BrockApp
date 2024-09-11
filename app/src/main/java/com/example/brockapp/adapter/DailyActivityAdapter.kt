@@ -82,11 +82,11 @@ class DailyActivityAdapter(private val activities: List<UserActivity>): Recycler
         val timeDifference = ((endDate.time - startDate.time) / 1000)
 
         if (timeDifference >= 60) {
-            val hour = (timeDifference / 3600).toInt()
-            val minute = (timeDifference / 60).toInt()
+            val hour = (timeDifference / (60 * 60)).toInt()
+            val minute = ((timeDifference / 60) % 60).toInt()
             val second = (timeDifference % 60).toInt()
 
-            if (hour > 0){
+            if (hour > 0) {
                 return "$hour ore, $minute minuti, $second secondi"
             }
 

@@ -209,8 +209,10 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
             entries.add(PieEntry(mapCountActivities[VEHICLE_ACTIVITY_TYPE]!!.toFloat(), "Viaggio in macchina"))
             entries.add(PieEntry(mapCountActivities[WALK_ACTIVITY_TYPE]!!.toFloat(), "Camminata"))
 
-            val dataSet = PieDataSet(entries, " ")
-            dataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
+            val dataSet = PieDataSet(entries, " ").apply {
+                colors = ColorTemplate.PASTEL_COLORS.toList()
+                valueTextSize = 12f
+            }
 
             val data = PieData(dataSet)
             activityTypePieChart.data = data

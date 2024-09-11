@@ -118,7 +118,7 @@ class DailyActivity: AppCompatActivity() {
         val userVehicleActivities = activities.filter { it.type == VEHICLE_ACTIVITY_TYPE }
         val timeSpentVehicle = timeSpentCounter.computeTimeSpent(userVehicleActivities)
 
-        val secondsInDay = 30
+        val secondsInDay = 24 * 60 * 60
         val totalRecordedTime = timeSpentWalking + timeSpentStill + timeSpentVehicle
 
         val unknownTime = (secondsInDay - totalRecordedTime).toFloat()
@@ -132,6 +132,7 @@ class DailyActivity: AppCompatActivity() {
 
         val dataSet = PieDataSet(entries, " ").apply {
             colors = ColorTemplate.PASTEL_COLORS.toList()
+            valueTextSize = 12f
         }
 
         val data = PieData(dataSet)

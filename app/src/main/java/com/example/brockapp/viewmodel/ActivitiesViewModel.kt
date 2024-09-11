@@ -26,8 +26,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val _stillTime = MutableLiveData<Long>()
     val stillTime: LiveData<Long> get() = _stillTime
 
-    private val _kilometers = MutableLiveData<Int>()
-    val kilometers: LiveData<Int> get() = _kilometers
+    private val _meters = MutableLiveData<Int>()
+    val meters: LiveData<Int> get() = _meters
 
     private val _steps = MutableLiveData<Int>()
     val steps: LiveData<Int> get() = _steps
@@ -38,7 +38,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
             val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
             val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-            val listWalkingActivities = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
 
             listStillActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
@@ -89,13 +89,13 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getKilometers(startOfDay: String, endOfDay: String, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            val kilometers = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(
+            val meters = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(
                 user.id,
                 startOfDay,
                 endOfDay
-            ).parallelStream().mapToInt {it.distanceTravelled!!.toInt()}.sum()
+            ).parallelStream().mapToInt { it.distanceTravelled!!.toInt() }.sum()
 
-            _kilometers.postValue(kilometers)
+            _meters.postValue(meters)
         }
     }
 

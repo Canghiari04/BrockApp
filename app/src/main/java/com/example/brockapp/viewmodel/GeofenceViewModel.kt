@@ -28,7 +28,7 @@ class GeofenceViewModel(private val db: BrockDB): ViewModel() {
                     GeofenceAreaEntry(longitude = 11.326957, latitude = 44.476543, name = "Villa Ghigi")
                 )
 
-                for(area in geofenceAreas) {
+                for (area in geofenceAreas) {
                     db.GeofenceAreaDao().insertGeofenceArea(area)
                 }
 
