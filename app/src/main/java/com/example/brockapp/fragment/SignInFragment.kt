@@ -33,7 +33,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
-    private var user = User.getInstance()
     private val networkUtil = NetworkAvailableImpl()
     private var listener: OnFragmentInteractionListener? = null
 
@@ -41,7 +40,6 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private lateinit var username: String
     private lateinit var password: String
     private lateinit var util: PermissionUtil
-    private lateinit var geofence: MyGeofence
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
@@ -130,10 +128,10 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private fun observeUser() {
         viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
             if (currentUser != null) {
-                user.id = currentUser.id
-                user.username = currentUser.username.toString()
-                user.password = currentUser.password.toString()
-                user.flag = currentUser.sharingFlag
+                User.id = currentUser.id
+                User.username = currentUser.username.toString()
+                User.password = currentUser.password.toString()
+                User.flag = currentUser.sharingFlag
             } else {
                 Log.e("LOGIN_FRAGMENT", "User not found")
             }
@@ -152,8 +150,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private fun observeGeofenceAreas() {
         viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
             if (areas.isNotEmpty()) {
-                geofence = MyGeofence.getInstance()
-                geofence.initAreas(areas)
+                MyGeofence.initAreas(areas)
 
                 startGeofence()
             } else {
@@ -166,7 +163,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         val geofencingClient = LocationServices.getGeofencingClient(requireContext())
 
         if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofencingClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+            geofencingClient.addGeofences(MyGeofence.request, MyGeofence.pendingIntent).run {
                 addOnSuccessListener {
                     goToHome()
                 }

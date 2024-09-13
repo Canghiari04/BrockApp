@@ -12,7 +12,7 @@ class S3ClientProvider private constructor() {
 
         fun getInstance(context: Context): AmazonS3Client {
             synchronized(this) {
-                if(s3Client == null) {
+                if (s3Client == null) {
                     s3Client = createS3Client(context)
                 }
             }
@@ -26,6 +26,7 @@ class S3ClientProvider private constructor() {
                 "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
                 Regions.EU_WEST_3
             )
+
             return AmazonS3Client(credentialsProvider)
         }
     }

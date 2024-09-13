@@ -16,13 +16,11 @@ import kotlinx.coroutines.CoroutineScope
 import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionService: Service() {
-    private lateinit var user: User
     private lateinit var db: BrockDB
 
     override fun onCreate() {
         super.onCreate()
 
-        user = User.getInstance()
         db = BrockDB.getInstance(this)
     }
 
@@ -42,7 +40,7 @@ class ActivityRecognitionService: Service() {
                         DetectedActivity.STILL -> {
                             userStillActivityDao.insertStillActivity(
                                 UserStillActivityEntity(
-                                    userId = user.id,
+                                    userId = User.id,
                                     transitionType = transitionType,
                                     timestamp = timestamp
                                 )
@@ -55,7 +53,7 @@ class ActivityRecognitionService: Service() {
 
                             userVehicleActivityDao.insertVehicleActivity(
                                 UserVehicleActivityEntity(
-                                    userId = user.id,
+                                    userId = User.id,
                                     transitionType = transitionType,
                                     timestamp = timestamp,
                                     distanceTravelled = distanceTravelled
@@ -68,7 +66,7 @@ class ActivityRecognitionService: Service() {
 
                             userWalkActivityDao.insertWalkActivity(
                                 UserWalkActivityEntity(
-                                    userId = user.id,
+                                    userId = User.id,
                                     transitionType = transitionType,
                                     timestamp = timestamp,
                                     stepNumber = stepNumber

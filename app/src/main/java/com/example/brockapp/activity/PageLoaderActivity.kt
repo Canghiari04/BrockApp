@@ -145,14 +145,13 @@ class PageLoaderActivity: AppCompatActivity() {
             }
 
             R.id.item_more_logout -> {
-                val user = User.getInstance()
-                user.logoutUser()
+                User.logoutUser()
                 goToAuthenticator()
                 true
             }
 
             R.id.item_more_delete -> {
-                showDangerousDialog(User.getInstance())
+                showDangerousDialog()
                 true
             }
 
@@ -225,14 +224,14 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
-    private fun showDangerousDialog(user: User) {
+    private fun showDangerousDialog() {
         AlertDialog.Builder(this)
             .setTitle(R.string.dangerous_dialog_title)
             .setMessage(R.string.dangerous_dialog_message)
             .setPositiveButton(R.string.dangerous_positive_button) { dialog, _ ->
                 dialog.dismiss()
                 deleteUser()
-                user.logoutUser()
+                User.logoutUser()
                 goToAuthenticator()
             }
             .setNegativeButton(R.string.dangerous_negative_button) { dialog, _ ->
@@ -243,8 +242,6 @@ class PageLoaderActivity: AppCompatActivity() {
     }
 
     private fun deleteUser() {
-        val user = User.getInstance()
-
         val db = BrockDB.getInstance(this)
         val file = File(this.filesDir, "user_data.json")
         val s3Client = S3ClientProvider.getInstance(this)
@@ -252,7 +249,7 @@ class PageLoaderActivity: AppCompatActivity() {
         val factoryViewModel = UserViewModelFactory(db, s3Client, file)
         val viewModel = ViewModelProvider(this, factoryViewModel)[UserViewModel::class.java]
 
-        viewModel.deleteUser(user.username, user.password)
+        viewModel.deleteUser(User.username, User.password)
     }
 
     private fun goToAuthenticator() {

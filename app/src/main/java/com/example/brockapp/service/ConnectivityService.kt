@@ -25,14 +25,12 @@ import com.google.android.gms.location.LocationServices
 class ConnectivityService: Service() {
     private val networkUtil = NetworkAvailableImpl()
 
-    private lateinit var geofence: MyGeofence
     private lateinit var util: NotificationUtil
 
     override fun onCreate() {
         super.onCreate()
 
         util = NotificationUtil()
-        geofence = MyGeofence.getInstance()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -44,7 +42,7 @@ class ConnectivityService: Service() {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 val geofenceClient = LocationServices.getGeofencingClient(this)
 
-                geofenceClient.removeGeofences(geofence.pendingIntent).run {
+                geofenceClient.removeGeofences(MyGeofence.pendingIntent).run {
                     addOnSuccessListener {
                         Log.d("CONNECTIVITY_SERVICE", "Geofence removed")
                     }
@@ -53,11 +51,11 @@ class ConnectivityService: Service() {
                     }
                 }
 
-                geofence.typeNetwork = typeNetwork
-                geofence.defineRadius(this)
-                geofence.defineRequest()
+                MyGeofence.typeNetwork = typeNetwork
+                MyGeofence.defineRadius(this)
+                MyGeofence.defineRequest()
 
-                geofenceClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+                geofenceClient.addGeofences(MyGeofence.request, MyGeofence.pendingIntent).run {
                     addOnSuccessListener {
                         Log.d("CONNECTIVITY_SERVICE", "Geofence added")
                     }
@@ -133,6 +131,6 @@ class ConnectivityService: Service() {
             }
         }
 
-        return Pair(currentTypeNetwork != geofence.typeNetwork, currentTypeNetwork)
+        return Pair(currentTypeNetwork != MyGeofence.typeNetwork, currentTypeNetwork)
     }
 }

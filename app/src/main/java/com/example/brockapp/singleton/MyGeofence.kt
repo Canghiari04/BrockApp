@@ -15,7 +15,6 @@ import com.google.android.gms.location.GeofencingRequest
 
 object MyGeofence {
     private var radius = 0
-    private val instance = MyGeofence
     private var duration = 86400000L
 
     lateinit var request: GeofencingRequest
@@ -23,10 +22,6 @@ object MyGeofence {
 
     var typeNetwork: String ?= null
     var geofences: List<GeofenceAreaEntry> = mutableListOf()
-
-    fun getInstance(): MyGeofence {
-        return instance
-    }
 
     fun initPendingIntent(context: Context) {
         defineRadius(context)

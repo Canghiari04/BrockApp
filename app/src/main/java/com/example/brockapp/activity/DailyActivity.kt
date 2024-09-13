@@ -40,7 +40,6 @@ class DailyActivity: AppCompatActivity() {
 
         val date: String? = intent.getStringExtra("ACTIVITY_DATE")
 
-        val user = User.getInstance()
         val db = BrockDB.getInstance(this)
 
         val textView = findViewById<TextView>(R.id.date_text_view)
@@ -52,7 +51,7 @@ class DailyActivity: AppCompatActivity() {
         observeDailyActivities()
 
         val (startOfDay, endOfDay) = getDayRange(date)
-        viewModel.getUserActivities(startOfDay, endOfDay, user)
+        viewModel.getUserActivities(startOfDay, endOfDay)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

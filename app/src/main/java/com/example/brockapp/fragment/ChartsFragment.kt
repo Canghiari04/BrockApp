@@ -36,7 +36,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 class ChartsFragment: Fragment(R.layout.fragment_charts) {
     private val formatter = DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT)
 
-    private lateinit var user: User
     private lateinit var dateTextView: TextView
     private lateinit var viewModel: ChartsViewModel
     private lateinit var stepCountBarChart: BarChart
@@ -59,8 +58,6 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
 
         val date: String = dateTextView.text.toString()
 
-        user = User.getInstance()
-
         val db = BrockDB.getInstance(requireContext())
         val viewModelFactory = ChartsViewModelFactory(db)
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[ChartsViewModel::class.java]
@@ -69,9 +66,9 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
         observeVehicleActivities()
         observeCountUserActivities()
 
-        viewModel.getChartsWalkActivities(date, user)
-        viewModel.getChartsVehicleActivities(date, user)
-        viewModel.getCountsOfActivities(date, user)
+        viewModel.getChartsWalkActivities(date)
+        viewModel.getChartsVehicleActivities(date)
+        viewModel.getCountsOfActivities(date)
     }
 
     private fun setDate(date: YearMonth) {
@@ -99,9 +96,9 @@ class ChartsFragment: Fragment(R.layout.fragment_charts) {
             afterTextChanged = {
                 val date: String = dateTextView.text.toString()
 
-                viewModel.getChartsWalkActivities(date, user)
-                viewModel.getChartsVehicleActivities(date, user)
-                viewModel.getCountsOfActivities(date, user)
+                viewModel.getChartsWalkActivities(date)
+                viewModel.getChartsVehicleActivities(date)
+                viewModel.getCountsOfActivities(date)
             }
         )
     }

@@ -28,7 +28,7 @@ class ChartsViewModel(private val db: BrockDB): ViewModel() {
     private val _mapCountActivities = MutableLiveData<Map<String, Int>>()
     val mapCountActivities: MutableLiveData<Map<String, Int>> get() = _mapCountActivities
 
-    fun getChartsVehicleActivities(date: String, user: User) {
+    fun getChartsVehicleActivities(date: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
             val currentDate = yearMonth.atDay(1)
@@ -36,7 +36,7 @@ class ChartsViewModel(private val db: BrockDB): ViewModel() {
             val endOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth()).atTime(LocalTime.MAX)
 
             val listWalkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
-                user.id,
+                User.id,
                 startOfMonth.toString(),
                 endOfMonth.toString()
             )
@@ -45,7 +45,7 @@ class ChartsViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun getChartsWalkActivities(date: String, user: User) {
+    fun getChartsWalkActivities(date: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
             val currentDate = yearMonth.atDay(1)
@@ -53,7 +53,7 @@ class ChartsViewModel(private val db: BrockDB): ViewModel() {
             val endOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth()).atTime(LocalTime.MAX)
 
             val listVehicleActivity = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
-                user.id,
+                User.id,
                 startOfMonth.toString(),
                 endOfMonth.toString()
             )
@@ -62,15 +62,15 @@ class ChartsViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun getCountsOfActivities(date: String, user: User) {
+    fun getCountsOfActivities(date: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern(CHARTS_DATE_FORMAT))
             val currentDate = yearMonth.atDay(1)
             val (startOfMonth, endOfMonth) = getMonthRange(currentDate)
 
-            val walkActivitiesCount = db.UserWalkActivityDao().getWalkActivitiesCountByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-            val stillActivitiesCount = db.UserStillActivityDao().getStillActivitiesCountByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
-            val vehicleActivitiesCount = db.UserVehicleActivityDao().getVehicleActivitiesCountByUserIdAndPeriod(user.id, startOfMonth, endOfMonth)
+            val walkActivitiesCount = db.UserWalkActivityDao().getWalkActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
+            val stillActivitiesCount = db.UserStillActivityDao().getStillActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
+            val vehicleActivitiesCount = db.UserVehicleActivityDao().getVehicleActivitiesCountByUserIdAndPeriod(User.id, startOfMonth, endOfMonth)
 
             val map = mapOf(
                 "STILL" to stillActivitiesCount,

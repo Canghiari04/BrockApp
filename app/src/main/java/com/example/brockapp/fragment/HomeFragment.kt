@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class HomeFragment: Fragment(R.layout.fragment_home) {
-    private lateinit var user: User
     private lateinit var selectedItem: String
     private lateinit var stepsTitle: TextView
     private lateinit var staticTitle: TextView
@@ -57,8 +56,6 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
         val spinner = view.findViewById<Spinner>(R.id.home_spinner)
         setUpSpinner(spinner)
-
-        user = User.getInstance()
 
         val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = ActivitiesViewModelFactory(db)
@@ -120,10 +117,10 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                     }
                 }
 
-                viewModel.getUserActivities(range.first, range.second, user)
-                viewModel.getStillTime(range.first, range.second, user)
-                viewModel.getKilometers(range.first, range.second, user)
-                viewModel.getSteps(range.first, range.second, user)
+                viewModel.getUserActivities(range.first, range.second)
+                viewModel.getStillTime(range.first, range.second)
+                viewModel.getKilometers(range.first, range.second)
+                viewModel.getSteps(range.first, range.second)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {

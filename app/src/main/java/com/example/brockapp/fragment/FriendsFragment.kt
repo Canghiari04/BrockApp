@@ -37,8 +37,6 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val user = User.getInstance()
-
         viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
         val db: BrockDB = BrockDB.getInstance(requireContext())
@@ -62,12 +60,12 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         observeSuggestion()
         observeAddedFriend()
 
-        viewModelFriends.getCurrentFriends(user.id)
+        viewModelFriends.getCurrentFriends(User.id)
 
         syncButton = view.findViewById(R.id.user_synchronized_button)
 
         syncButton.setOnClickListener {
-            if (user.flag) {
+            if (User.flag) {
                 syncUserData(syncButton)
             } else {
                 showShareDataDialog()

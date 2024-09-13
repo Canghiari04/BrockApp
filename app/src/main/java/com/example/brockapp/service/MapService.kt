@@ -12,26 +12,19 @@ import android.content.pm.PackageManager
 import com.google.android.gms.location.LocationServices
 
 class MapService: Service() {
-    private lateinit var geofence: MyGeofence
-
-    override fun onCreate() {
-        super.onCreate()
-        geofence = MyGeofence.getInstance()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             val geofenceClient = LocationServices.getGeofencingClient(this)
 
-            geofenceClient.removeGeofences(geofence.pendingIntent).run {
+            geofenceClient.removeGeofences(MyGeofence.pendingIntent).run {
                 addOnSuccessListener {
                     Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
                 }
             }
 
-            geofence.defineRequest()
+            MyGeofence.defineRequest()
 
-            geofenceClient.addGeofences(geofence.request, geofence.pendingIntent).run {
+            geofenceClient.addGeofences(MyGeofence.request, MyGeofence.pendingIntent).run {
                 addOnSuccessListener {
                     Log.d("CONNECTIVITY_SERVICE", "Geofence added.")
                 }

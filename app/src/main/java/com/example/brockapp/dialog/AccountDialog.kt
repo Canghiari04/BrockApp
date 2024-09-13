@@ -13,8 +13,6 @@ import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
 
 class AccountDialog: DialogFragment() {
-    private val user = User.getInstance()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -32,8 +30,8 @@ class AccountDialog: DialogFragment() {
         val entryUsername = usernameTextView.text.toString()
         val entryPassword = passwordTextView.text.toString()
 
-        val accountUsername = entryUsername + " ${user.username}"
-        val accountPassword = entryPassword + " ${user.password}"
+        val accountUsername = entryUsername + " ${User.username}"
+        val accountPassword = entryPassword + " ${User.password}"
 
         usernameTextView.text = accountUsername
         passwordTextView.text = accountPassword

@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.CameraPosition
 
 class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private lateinit var map: GoogleMap
-    private lateinit var geofence: MyGeofence
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
@@ -52,8 +51,6 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
-
-        geofence = MyGeofence.getInstance()
 
         observeNetwork()
         observeUpdatesGeofenceAreas()
@@ -143,7 +140,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
     private fun observeUpdatesGeofenceAreas() {
         viewModelGeofence.dynamicAreas.observe(viewLifecycleOwner) { areas ->
-            geofence.geofences = areas
+            MyGeofence.geofences = areas
 
             val serviceIntent = Intent(requireContext(), MapService::class.java)
             activity?.startService(serviceIntent)

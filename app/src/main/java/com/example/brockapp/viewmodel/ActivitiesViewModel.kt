@@ -32,13 +32,13 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val _steps = MutableLiveData<Int>()
     val steps: LiveData<Int> get() = _steps
 
-    fun getUserActivities(startOfDay: String, endOfDay: String, user: User) {
+    fun getUserActivities(startOfDay: String, endOfDay: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val listActivities = ArrayList<UserActivity>()
 
-            val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-            val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
-            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(user.id, startOfDay, endOfDay)
+            val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
+            val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
+            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
 
             listStillActivities.parallelStream().forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
@@ -73,10 +73,10 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun getStillTime(startOfDay: String, endOfDay: String, user: User) {
+    fun getStillTime(startOfDay: String, endOfDay: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
-                user.id,
+                User.id,
                 startOfDay,
                 endOfDay
             )
@@ -87,10 +87,10 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun getKilometers(startOfDay: String, endOfDay: String, user: User) {
+    fun getKilometers(startOfDay: String, endOfDay: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val meters = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(
-                user.id,
+                User.id,
                 startOfDay,
                 endOfDay
             ).parallelStream().mapToInt { it.distanceTravelled!!.toInt() }.sum()
@@ -99,10 +99,10 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun getSteps(startOfDay: String, endOfDay: String, user: User) {
+    fun getSteps(startOfDay: String, endOfDay: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val steps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(
-                user.id,
+                User.id,
                 startOfDay,
                 endOfDay
             ).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
