@@ -21,16 +21,17 @@ class NotificationUtil {
 
     fun getActivityRecognitionNotification(
         channelId: String,
-        activityType: Int?,
         title: String?,
         text: String?,
         context: Context
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
-            setSmallIcon(getActivityRecognitionIcon(activityType))
+            setSmallIcon(R.drawable.baseline_directions_run_24)
             setContentTitle(title)
             setContentText(text)
-            setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            setStyle(NotificationCompat.BigTextStyle()
+                .bigText(text))
+            setPriority(NotificationCompat.PRIORITY_HIGH)
         }
     }
 
@@ -45,7 +46,7 @@ class NotificationUtil {
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText("Hai appena varcato i confini di una zona di interesse. " +
                         "Inizia a registrare le tue attività di oggi!!"))
-            setPriority(NotificationCompat.PRIORITY_HIGH)
+            setPriority(NotificationCompat.PRIORITY_DEFAULT)
             setAutoCancel(true)
         }
     }
@@ -82,26 +83,6 @@ class NotificationUtil {
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setAutoCancel(true)
             addAction(R.drawable.baseline_settings_applications_24, "Apri Impostazioni", pendingIntent)
-        }
-    }
-
-    private fun getActivityRecognitionIcon(type: Int?): Int {
-        return when (type) {
-            3 -> {
-                R.drawable.baseline_chair_24
-            }
-
-            0 -> {
-                R.drawable.baseline_directions_car_24
-            }
-
-            7 -> {
-                R.drawable.baseline_directions_walk_24
-            }
-
-            else -> {
-                R.drawable.baseline_directions_run_24
-            }
         }
     }
 }

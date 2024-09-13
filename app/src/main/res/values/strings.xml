@@ -31,6 +31,7 @@
     <string name="permission_setting_button">Settings</string>
     <string name="permission_background">Concedi il permesso di accedere alla tua posizione anche quando l\'app è in background per garantire il corretto funzionamento di tutte le funzionalità.</string>
     <string name="permission_notification">Concedi il permesso di inviarti notifiche per tenerti aggiornato e garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
+    <string name="permission_recognition">Concedi il permesso di monitorare le tue attività anche quando l\'app è in background.</string>
     <string name="permission_share_data">Concedi il permesso di condividere i dati registrati per migliorare l\'esperienza offerta dall\'app.</string>
     <string name="permissions_location">Concedi il permesso di accedere alla tua posizione per garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
     <string name="permissions_title">Permessi richiesti</string>
@@ -142,6 +143,7 @@
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
+    <string name="activity_recognition_icon_description">Icona per abilitare activity recognition</string>
     <string name="new_activity_icon_description">Icona per registrare una nuova attività</string>
     <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 

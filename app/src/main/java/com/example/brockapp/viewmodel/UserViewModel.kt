@@ -33,7 +33,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
             if (userAlreadyExistsOnS3) {
                 _auth.postValue(false)
             } else {
-                db.UserDao().insertUser(UserEntity(username = username, password = password, sharingFlag = false))
+                db.UserDao().insertUser(UserEntity(username = username, password = password, recognitionFlag = false, sharingFlag = false))
 
                 val jsonFile = createUserDataFile(username)
                 uploadUserToS3(username, jsonFile)
@@ -97,9 +97,15 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         }
     }
 
+    fun changeRecognitionFlag(username: String, password: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.UserDao().changeRecognitionFlag(username, password)
+        }
+    }
+
     fun changeSharingDataFlag(username: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.UserDao().changeFlag(username, password)
+            db.UserDao().changeSharingFlag(username, password)
         }
     }
 

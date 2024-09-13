@@ -103,7 +103,8 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 User.id = currentUser.id
                 User.username = currentUser.username.toString()
                 User.password = currentUser.password.toString()
-                User.flag = currentUser.sharingFlag
+                User.recognition = currentUser.recognitionFlag
+                User.sharing = currentUser.sharingFlag
             } else {
                 Log.e("LOGIN_FRAGMENT", "User not found.")
             }

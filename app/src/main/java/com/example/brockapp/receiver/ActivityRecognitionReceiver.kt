@@ -18,8 +18,8 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTIVITY_RECOGNITION_INTENT_TYPE) {
             try {
-                val serviceIntent = defineIntent(intent, context)
-                context.startService(serviceIntent)
+//               val serviceIntent = defineIntent(intent, context)
+//                context.startService(serviceIntent)
             } catch (e: Exception) {
                 Log.e("ACTIVITY_RECOGNITION_RECEIVER", e.toString())
             }

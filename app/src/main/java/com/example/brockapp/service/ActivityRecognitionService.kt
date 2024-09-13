@@ -1,5 +1,6 @@
 package com.example.brockapp.service
 
+import com.example.brockapp.*
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.UserWalkActivityEntity
@@ -7,12 +8,15 @@ import com.example.brockapp.database.UserStillActivityEntity
 import com.example.brockapp.database.UserVehicleActivityEntity
 
 import android.util.Log
+import java.time.Instant
 import android.os.IBinder
 import android.app.Service
+import java.time.ZoneOffset
 import android.content.Intent
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
+import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionService: Service() {
@@ -20,7 +24,6 @@ class ActivityRecognitionService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-
         db = BrockDB.getInstance(this)
     }
 
@@ -28,7 +31,10 @@ class ActivityRecognitionService: Service() {
         if (intent != null) {
             val activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
             val transitionType = intent.getIntExtra("TRANSITION_TYPE", -1)
-            val timestamp = intent.getStringExtra("TIMESTAMP")
+            val timestamp = DateTimeFormatter
+                .ofPattern(ISO_DATE_FORMAT)
+                .withZone(ZoneOffset.UTC)
+                .format(Instant.now())
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -79,7 +85,7 @@ class ActivityRecognitionService: Service() {
                 }
             }
         } else {
-            Log.d("ACTIVITY_SERVICE", "Null intent.")
+            Log.d("ACTIVITY_SERVICE", "Null intent")
         }
 
         return super.onStartCommand(intent, flags, startId)

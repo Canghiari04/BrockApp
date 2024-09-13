@@ -4,7 +4,7 @@ import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.worker.ActivityRecognitionWorker
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.example.brockapp.service.ActivityRecognitionService
 
 import android.os.Bundle
 import androidx.work.Data
@@ -18,30 +18,24 @@ import android.hardware.Sensor
 import android.widget.TextView
 import androidx.work.WorkManager
 import android.widget.Chronometer
-import android.content.IntentFilter
 import android.hardware.SensorEvent
 import android.hardware.SensorManager
 import android.hardware.SensorEventListener
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender {
     private var running = false
     private var initialStepCount = 0
     private var sessionStepCount = 0
-    private var heightDifference = 0f
     private var stepCounterSensor: Sensor? = null
     private var notWalkingNotificationSent: Boolean = false
     private var hourSpentWalkingNotification: Boolean = false
     private var lastStepTime: Long = System.currentTimeMillis()
-    private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     private lateinit var sensorManager: SensorManager
-    private lateinit var notificationManager: NotificationManagerCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,34 +43,34 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
 
         supportActionBar?.title = " "
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            receiver,
-            IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE)
-        )
-
-        notificationManager = NotificationManagerCompat.from(this)
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
-
-        if (stepCounterSensor == null) {
-            findViewById<Button>(R.id.walk_button_start).isEnabled = false
-            findViewById<TextView>(R.id.step_count)?.text = "Sensore non disponibile"
-        }
-
         val chronometer = findViewById<Chronometer>(R.id.walk_chronometer)
+        val walkStartButton = findViewById<Button>(R.id.walk_button_start)
+        val walkStopButton = findViewById<Button>(R.id.walk_button_stop)
 
-        findViewById<Button>(R.id.walk_button_start).setOnClickListener {
+        setUpOnClickListeners(chronometer, walkStartButton, walkStopButton)
+
+        walkStartButton.isEnabled = true
+        walkStopButton.isEnabled = false
+    }
+
+    private fun setUpOnClickListeners(
+        chronometer: Chronometer,
+        walkStartButton: Button,
+        walkStopButton: Button
+    ) {
+        walkStartButton.setOnClickListener {
             if (!running) {
                 chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
-                heightDifference = 0f
+
                 sessionStepCount = 0
                 running = true
 
-                findViewById<Button>(R.id.walk_button_start).isEnabled = false
-                findViewById<Button>(R.id.walk_button_stop).isEnabled = true
+                walkStartButton.isEnabled = false
+                walkStopButton.isEnabled = true
 
                 startStepCounting()
                 Toast.makeText(
@@ -89,25 +83,23 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
                 notWalkingNotificationSent = false
 
                 registerActivity(
-                    DetectedActivity.WALKING,
                     ActivityTransition.ACTIVITY_TRANSITION_ENTER,
                     0L
                 )
             }
         }
 
-        findViewById<Button>(R.id.walk_button_stop).setOnClickListener {
+        walkStopButton.setOnClickListener {
             if (running) {
                 chronometer.stop()
                 running = false
 
-                findViewById<Button>(R.id.walk_button_start).isEnabled = true
-                findViewById<Button>(R.id.walk_button_stop).isEnabled = false
+                walkStartButton.isEnabled = true
+                walkStopButton.isEnabled = false
 
                 stopStepCounting()
 
                 registerActivity(
-                    DetectedActivity.WALKING,
                     ActivityTransition.ACTIVITY_TRANSITION_EXIT,
                     sessionStepCount.toLong()
                 )
@@ -116,7 +108,6 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
 
         chronometer.setOnChronometerTickListener {
             val elapsedMillis = SystemClock.elapsedRealtime() - chronometer.base
-
             val elapsedHour = elapsedMillis / 1000 / 60 / 60
 
             if (elapsedHour >= 1 && !hourSpentWalkingNotification) {
@@ -135,9 +126,6 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
                 notWalkingNotificationSent = true
             }
         }
-
-        findViewById<Button>(R.id.walk_button_start).isEnabled = true
-        findViewById<Button>(R.id.walk_button_stop).isEnabled = false
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -155,12 +143,25 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
         //
     }
 
+    override fun sendNotification(title: String, content: String) {
+        val inputData = Data.Builder()
+            .putString("title", title)
+            .putString("text", content)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+        notWalkingNotificationSent = true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 if (running) {
                     registerActivity(
-                        DetectedActivity.WALKING,
                         ActivityTransition.ACTIVITY_TRANSITION_EXIT,
                         sessionStepCount.toLong()
                     )
@@ -175,9 +176,9 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
         }
     }
 
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
     }
 
     private fun startStepCounting() {
@@ -189,30 +190,15 @@ class WalkActivity: AppCompatActivity(), SensorEventListener, NotificationSender
         sensorManager.unregisterListener(this)
     }
 
-    private fun registerActivity(activityType: Int, transitionType: Int, stepCount: Long, heightDifference: Float? = null) {
-        val intent = Intent().apply {
+    // Richiamo un service dedito alla registrazione su DB.
+    private fun registerActivity(transitionType: Int, stepCount: Long) {
+        val intent = Intent(this, ActivityRecognitionService::class.java).apply {
             action = ACTIVITY_RECOGNITION_INTENT_TYPE
-            putExtra("activityType", activityType)
-            putExtra("transitionType", transitionType)
-            putExtra("stepNumber", stepCount)
-            putExtra("heightDifference", heightDifference)
+            putExtra("ACTIVITY_TYPE", DetectedActivity.WALKING)
+            putExtra("TRANSITION_TYPE", transitionType)
+            putExtra("STEP_NUMBER", stepCount)
         }
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-    }
-
-    override fun sendNotification(title: String, content: String) {
-        val inputData = Data.Builder()
-            .putString("type", 7.toString())
-            .putString("title", title)
-            .putString("text", content)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(this).enqueue(workRequest)
-        notWalkingNotificationSent = true
+        startService(intent)
     }
 }

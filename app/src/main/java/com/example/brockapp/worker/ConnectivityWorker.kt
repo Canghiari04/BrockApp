@@ -6,7 +6,6 @@ import com.example.brockapp.util.NotificationUtil
 import androidx.work.Worker
 import android.content.Context
 import androidx.work.WorkerParameters
-import android.app.NotificationChannel
 import android.app.NotificationManager
 
 class ConnectivityWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
@@ -30,8 +29,6 @@ class ConnectivityWorker(context: Context, workerParams: WorkerParameters) : Wor
             applicationContext
         )
 
-        getNotificationChannel()
-
         manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
     }
 
@@ -42,24 +39,9 @@ class ConnectivityWorker(context: Context, workerParams: WorkerParameters) : Wor
         val notification = util.getErrorConnectivityNotification(
             CHANNEL_ID_CONNECTIVITY_NOTIFY,
             pendingIntent,
-            applicationContext)
-
-        getNotificationChannel()
-
-        manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
-    }
-
-    private fun getNotificationChannel() {
-        val channel = NotificationChannel(
-            CHANNEL_ID_CONNECTIVITY_NOTIFY,
-            NAME_CHANNEL_CONNECTIVITY_NOTIFY,
-            NotificationManager.IMPORTANCE_HIGH
+            applicationContext
         )
 
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
-        }
-
-        manager.createNotificationChannel(channel)
+        manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
     }
 }

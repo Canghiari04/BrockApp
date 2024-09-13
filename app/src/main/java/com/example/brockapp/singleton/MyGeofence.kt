@@ -62,6 +62,15 @@ object MyGeofence {
         }
     }
 
+    fun defineRequest() {
+        val list = getAreas()
+
+        request = GeofencingRequest.Builder().apply {
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+            addGeofences(list)
+        }.build()
+    }
+
     private fun definePendingIntent(context: Context) {
         val intent = Intent(context, GeofenceReceiver::class.java).apply {
             action = GEOFENCE_INTENT_TYPE
@@ -73,15 +82,6 @@ object MyGeofence {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
-    }
-
-    fun defineRequest() {
-        val list = getAreas()
-
-        request = GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-            addGeofences(list)
-        }.build()
     }
 
     private fun getAreas(): List<Geofence> {

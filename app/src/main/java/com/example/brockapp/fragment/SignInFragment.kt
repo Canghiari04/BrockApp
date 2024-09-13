@@ -63,6 +63,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
+            // TODO UNITY CHE SI ACCERTI DEL CONSENSO POI INVIARE STARTARE O MENO LE BACKGROUND
             startBackgroundOperations()
         }
 
@@ -131,7 +132,8 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
                 User.id = currentUser.id
                 User.username = currentUser.username.toString()
                 User.password = currentUser.password.toString()
-                User.flag = currentUser.sharingFlag
+                User.recognition = currentUser.recognitionFlag
+                User.sharing = currentUser.sharingFlag
             } else {
                 Log.e("LOGIN_FRAGMENT", "User not found")
             }

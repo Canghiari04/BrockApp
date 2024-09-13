@@ -6,7 +6,6 @@ import com.example.brockapp.util.NotificationUtil
 import androidx.work.Worker
 import android.content.Context
 import androidx.work.WorkerParameters
-import android.app.NotificationChannel
 import android.app.NotificationManager
 
 class GeofenceWorker(context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
@@ -21,29 +20,14 @@ class GeofenceWorker(context: Context, workerParams: WorkerParameters): Worker(c
     }
 
     private fun sendNotification() {
-        manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notification = util.getGeofenceNotification(
             CHANNEL_ID_GEOFENCE_NOTIFY,
             applicationContext
         )
 
-        getNotificationChannel()
-
         manager.notify(ID_GEOFENCE_NOTIFY, notification.build())
-    }
-
-    private fun getNotificationChannel() {
-        val channel = NotificationChannel(
-            CHANNEL_ID_GEOFENCE_NOTIFY,
-            NAME_CHANNEL_GEOFENCE_NOTIFY,
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
-
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_GEOFENCE_NOTIFY
-        }
-
-        manager.createNotificationChannel(channel)
     }
 }

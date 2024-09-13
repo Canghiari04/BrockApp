@@ -2,10 +2,13 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.example.brockapp.interfaces.NotificationSender
+import com.example.brockapp.worker.ActivityRecognitionWorker
+import com.example.brockapp.service.ActivityRecognitionService
 
 import android.Manifest
 import android.os.Bundle
+import androidx.work.Data
 import android.view.MenuItem
 import android.widget.Button
 import android.content.Intent
@@ -13,11 +16,12 @@ import android.os.SystemClock
 import android.widget.TextView
 import android.location.Location
 import android.widget.Chronometer
-import android.content.IntentFilter
+import androidx.work.WorkManager
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import androidx.work.OneTimeWorkRequestBuilder
 import com.google.android.gms.location.Priority
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.DetectedActivity
@@ -25,15 +29,13 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.FusedLocationProviderClient
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class VehicleActivity: AppCompatActivity() {
+class VehicleActivity: AppCompatActivity(), NotificationSender {
     private var running = false
     private var totalDistance = 0.0
     private var startLocation: Location? = null
-    private var receiver : ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
-    private lateinit var distanceTravelled: TextView
+    private lateinit var distanceTraveled: TextView
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -41,37 +43,21 @@ class VehicleActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vehicle)
-
         supportActionBar?.title = " "
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            receiver,
-            IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE)
-        )
-
-        distanceTravelled = findViewById(R.id.vehicle_distance_travelled)
+        distanceTraveled = findViewById(R.id.vehicle_distance_travelled)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val chronometer = findViewById<Chronometer>(R.id.vehicle_chronometer)
         val vehicleButtonStart = findViewById<Button>(R.id.vehicle_button_start)
         val vehicleButtonStop = findViewById<Button>(R.id.vehicle_button_stop)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        setOnClickListeners(chronometer, vehicleButtonStart, vehicleButtonStop)
 
         setupLocationUpdates()
 
-        setOnClickListeners(vehicleButtonStart, chronometer, vehicleButtonStop)
-
         vehicleButtonStart.isEnabled = true
         vehicleButtonStop.isEnabled = false
-    }
-
-    private fun unregisterActivityRecognitionReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-    }
-
-    override fun onDestroy() {
-        unregisterActivityRecognitionReceiver()
-        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -79,7 +65,6 @@ class VehicleActivity: AppCompatActivity() {
             android.R.id.home -> {
                 if (running) {
                     registerActivity(
-                        DetectedActivity.IN_VEHICLE,
                         ActivityTransition.ACTIVITY_TRANSITION_EXIT,
                         totalDistance
                     )
@@ -98,13 +83,31 @@ class VehicleActivity: AppCompatActivity() {
         }
     }
 
-    private fun setOnClickListeners(vehicleButtonStart: Button, chronometer: Chronometer, vehicleButtonStop: Button) {
+    override fun sendNotification(title: String, content: String) {
+        val inputData = Data.Builder()
+            .putString("title", title)
+            .putString("text", content)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun setOnClickListeners(chronometer: Chronometer, vehicleButtonStart: Button, vehicleButtonStop: Button) {
         vehicleButtonStart.setOnClickListener {
             if (!running) {
+                running = true
+
                 chronometer.base = SystemClock.elapsedRealtime()
                 chronometer.start()
-
-                running = true
 
                 vehicleButtonStart.isEnabled = false
                 vehicleButtonStop.isEnabled = true
@@ -112,8 +115,13 @@ class VehicleActivity: AppCompatActivity() {
                 startLocationUpdates()
             }
 
+            sendNotification(
+                "Buon viaggio!",
+                "Ricorda di prestare la massima attenzione alla guida, evita di usare " +
+                "il dispositivo"
+            )
+
             registerActivity(
-                DetectedActivity.IN_VEHICLE,
                 ActivityTransition.ACTIVITY_TRANSITION_ENTER,
                 0.0
             )
@@ -121,18 +129,16 @@ class VehicleActivity: AppCompatActivity() {
 
         vehicleButtonStop.setOnClickListener {
             if (running) {
-                chronometer.stop()
-
                 running = false
+
+                chronometer.stop()
 
                 vehicleButtonStart.isEnabled = true
                 vehicleButtonStop.isEnabled = false
 
                 stopLocationUpdates()
 
-
                 registerActivity(
-                    DetectedActivity.IN_VEHICLE,
                     ActivityTransition.ACTIVITY_TRANSITION_EXIT,
                     totalDistance
                 )
@@ -160,16 +166,16 @@ class VehicleActivity: AppCompatActivity() {
                     } else {
                         startLocation?.let {
                             totalDistance += it.distanceTo(newLocation).toDouble()
-                            if (totalDistance < 1000)
-                                distanceTravelled.text = String.format(
-                                    "%.2f metri",
-                                    totalDistance
+
+                            if (totalDistance < 1000) {
+                                val distance = totalDistance.toInt()
+                                distanceTraveled.text = String.format("$distance metri")
+                            } else {
+                                val distanceKilometers = totalDistance / 1000
+                                distanceTraveled.text = String.format(
+                                    "$distanceKilometers km"
                                 )
-                            else
-                                distanceTravelled.text = String.format(
-                                    "%.2f km",
-                                    totalDistance / 1000
-                                )
+                            }
                         }
 
                         startLocation = newLocation
@@ -179,24 +185,27 @@ class VehicleActivity: AppCompatActivity() {
         }
     }
 
+    private fun registerActivity(transitionType: Int, distanceTraveled: Double) {
+        val intent = Intent(this, ActivityRecognitionService::class.java).apply {
+            setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
+            putExtra("ACTIVITY_TYPE", DetectedActivity.IN_VEHICLE)
+            putExtra("TRANSITION_TYPE", transitionType)
+            putExtra("DISTANCE_TRAVELED", distanceTraveled)
+        }
+
+        startService(intent)
+    }
+
     private fun startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         }
     }
 
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
-    private fun registerActivity(activityType: Int, transitionType: Int, distanceTravelled: Double) {
-        val intent = Intent().apply {
-            setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
-            putExtra("activityType", activityType)
-            putExtra("transitionType", transitionType)
-            putExtra("distanceTravelled", distanceTravelled)
-        }
-
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 }

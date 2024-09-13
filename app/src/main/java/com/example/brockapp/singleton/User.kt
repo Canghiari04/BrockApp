@@ -4,12 +4,14 @@ object User {
     var id: Long = 0
     var username: String = ""
     var password: String = ""
-    var flag: Boolean = false
+    var recognition: Boolean = false
+    var sharing: Boolean = false
 
     fun logoutUser() {
         id = 0
         username = ""
         password = ""
-        flag = false
+        recognition = false
+        sharing = false
     }
 }

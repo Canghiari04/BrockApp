@@ -80,6 +80,17 @@
         </activity>
 
         <receiver
+            android:name=".receiver.ActivityRecognitionReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action
+                    android:name="ACTIVITY_RECOGNITION_ACTION"
+                    tools:ignore="BatteryLife" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".receiver.GeofenceReceiver"
             android:enabled="true"
             android:exported="false">

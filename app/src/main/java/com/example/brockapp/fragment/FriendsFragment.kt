@@ -65,7 +65,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         syncButton = view.findViewById(R.id.user_synchronized_button)
 
         syncButton.setOnClickListener {
-            if (User.flag) {
+            if (User.sharing) {
                 syncUserData(syncButton)
             } else {
                 showShareDataDialog()
@@ -139,7 +139,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
             .setMessage(R.string.permission_share_data)
             .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                User.flag = true
+                User.sharing = true
                 viewModelUser.changeSharingDataFlag(User.username, User.password)
                 syncUserData(syncButton)
             }

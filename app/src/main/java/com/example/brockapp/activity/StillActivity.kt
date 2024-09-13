@@ -2,8 +2,9 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
+import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.worker.ActivityRecognitionWorker
-import com.example.brockapp.receiver.ActivityRecognitionReceiver
+import com.example.brockapp.service.ActivityRecognitionService
 
 import android.os.Bundle
 import androidx.work.Data
@@ -13,43 +14,35 @@ import android.os.SystemClock
 import android.content.Intent
 import androidx.work.WorkManager
 import android.widget.Chronometer
-import android.content.IntentFilter
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.ActivityTransition
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class StillActivity: AppCompatActivity() {
+class StillActivity: AppCompatActivity(), NotificationSender {
     private var running: Boolean = false
-    private var receiver: ActivityRecognitionReceiver = ActivityRecognitionReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_still)
-
         supportActionBar?.title = " "
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            receiver,
-            IntentFilter(ACTIVITY_RECOGNITION_INTENT_TYPE)
-        )
-
         val chronometer = findViewById<Chronometer>(R.id.still_chronometer)
+        val stillButtonStart = findViewById<Button>(R.id.still_button_start)
+        val stillButtonStop = findViewById<Button>(R.id.still_button_stop)
 
-        setButtonListeners(chronometer)
+        setOnClickListeners(chronometer, stillButtonStart, stillButtonStop)
         setChronometerListener(chronometer)
 
-        findViewById<Button>(R.id.still_button_start).isEnabled = true
-        findViewById<Button>(R.id.still_button_stop).isEnabled = false
+        stillButtonStart.isEnabled = true
+        stillButtonStop.isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 if (running) {
-                    registerTransition(
-                        DetectedActivity.STILL,
+                    registerActivity(
                         ActivityTransition.ACTIVITY_TRANSITION_EXIT
                     )
                 }
@@ -67,13 +60,21 @@ class StillActivity: AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        super.onDestroy()
+    override fun sendNotification(title: String, content: String) {
+        val inputData = Data.Builder()
+            .putString("title", title)
+            .putString("text", content)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
     }
 
-    private fun setButtonListeners(chronometer: Chronometer) {
-        findViewById<Button>(R.id.still_button_start).setOnClickListener {
+    private fun setOnClickListeners(chronometer: Chronometer, stillButtonStart: Button, stillButtonStop: Button) {
+        stillButtonStart.setOnClickListener {
             if (!running) {
                 chronometer.start()
                 running = true
@@ -81,14 +82,13 @@ class StillActivity: AppCompatActivity() {
                 findViewById<Button>(R.id.still_button_start).isEnabled = false
                 findViewById<Button>(R.id.still_button_stop).isEnabled = true
 
-                registerTransition(
-                    DetectedActivity.STILL,
+                registerActivity(
                     ActivityTransition.ACTIVITY_TRANSITION_ENTER
                 )
             }
         }
 
-        findViewById<Button>(R.id.still_button_stop).setOnClickListener {
+        stillButtonStop.setOnClickListener {
             if (running) {
                 chronometer.stop()
                 running = false
@@ -98,8 +98,7 @@ class StillActivity: AppCompatActivity() {
 
                 chronometer.base = SystemClock.elapsedRealtime()
 
-                registerTransition(
-                    DetectedActivity.STILL,
+                registerActivity(
                     ActivityTransition.ACTIVITY_TRANSITION_EXIT
                 )
             }
@@ -111,38 +110,26 @@ class StillActivity: AppCompatActivity() {
 
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val hours = (elapsedTime / 1000 * 60 * 60).toInt()
-            if (hours == 1 && !notificationSent) {
-                sendLazyUserNotification(
+            val hours = (elapsedTime / 1000).toInt()
+
+            if (hours >= 10 && !notificationSent) {
+                sendNotification(
                     "Torna in attività!",
                     "Sei fermo da più di un'ora"
                 )
+
                 notificationSent = true
             }
         }
     }
 
-    private fun registerTransition(activityType: Int, transitionType: Int) {
-        val intent = Intent().apply {
+    private fun registerActivity(transitionType: Int) {
+        val intent = Intent(this, ActivityRecognitionService::class.java).apply {
             setAction(ACTIVITY_RECOGNITION_INTENT_TYPE)
-            putExtra("activityType", activityType)
-            putExtra("transitionType", transitionType)
+            putExtra("ACTIVITY_TYPE", DetectedActivity.STILL)
+            putExtra("TRANSITION_TYPE", transitionType)
         }
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-    }
-
-    private fun sendLazyUserNotification(title: String, content: String) {
-        val inputData = Data.Builder()
-            .putString("type", 3.toString())
-            .putString("title", title)
-            .putString("text", content)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(this).enqueue(workRequest)
+        startService(intent)
     }
 }
