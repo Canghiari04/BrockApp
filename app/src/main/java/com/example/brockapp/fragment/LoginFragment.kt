@@ -8,6 +8,7 @@ import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.singleton.S3ClientProvider
 import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.activity.ActivityActivity
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
@@ -152,7 +153,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     }
 
     private fun goToHome() {
-        val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home")
+        val intent = Intent(requireContext(), ActivityActivity::class.java)
         startActivity(intent)
         activity?.finish()
     }

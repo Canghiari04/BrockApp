@@ -1,7 +1,5 @@
 package com.example.brockapp.activity
 
-import android.Manifest
-import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
@@ -19,27 +17,22 @@ import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
 
 import java.io.File
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Toast
 import android.view.MenuItem
 import android.content.Intent
-import android.provider.Settings
 import android.view.MenuInflater
 import android.graphics.PorterDuff
 import android.content.IntentFilter
 import androidx.fragment.app.Fragment
 import android.net.ConnectivityManager
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
-import com.example.brockapp.singleton.MyActivityRecognition
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -55,12 +48,10 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var friendsFragment: FriendsFragment
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var newActivityButton: FloatingActionButton
-    private lateinit var activityRecognitionButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page_loader)
-        supportActionBar?.title = " "
 
         checkConnectivity()
         startConnectivity()
@@ -76,7 +67,6 @@ class PageLoaderActivity: AppCompatActivity() {
         friendsFragment = FriendsFragment()
 
         newActivityButton = findViewById(R.id.new_activity_button)
-        activityRecognitionButton = findViewById(R.id.activity_recognition_button)
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.page_loader_fragment, homeFragment)
@@ -138,20 +128,6 @@ class PageLoaderActivity: AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
-        activityRecognitionButton.setOnClickListener {
-            checkActivityPermission()
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION) {
-            if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                showPermissionDialog()
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -160,7 +136,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
         return super.onCreateOptionsMenu(menu)
     }
-    
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_more_info -> {
@@ -187,8 +163,6 @@ class PageLoaderActivity: AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        MyActivityRecognition.stopActivityRecognition()
         unregisterReceiver(receiver)
     }
 
@@ -228,17 +202,14 @@ class PageLoaderActivity: AppCompatActivity() {
         when (name) {
             "Mappa" -> {
                 newActivityButton.hide()
-                activityRecognitionButton.hide()
             }
 
             "Amici" -> {
                 newActivityButton.hide()
-                activityRecognitionButton.hide()
             }
 
             else -> {
                 newActivityButton.show()
-                activityRecognitionButton.show()
             }
         }
     }
@@ -251,40 +222,6 @@ class PageLoaderActivity: AppCompatActivity() {
 
             commit()
         }
-    }
-
-    private fun checkActivityPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            MyActivityRecognition.initActivityRecognition(this)
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACTIVITY_RECOGNITION)) {
-            showPermissionDialog()
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
-                REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION
-            )
-        }
-    }
-
-    private fun showPermissionDialog() {
-        android.app.AlertDialog.Builder(this)
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_message)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
-                startActivity(intent)
-                finish()
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home")
-                startActivity(intent)
-                finish()
-            }
-            .create()
-            .show()
     }
 
     private fun showDangerousDialog() {

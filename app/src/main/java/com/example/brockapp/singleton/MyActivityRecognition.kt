@@ -16,8 +16,8 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransitionRequest
 
 object MyActivityRecognition {
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var request: ActivityTransitionRequest
+    lateinit var pendingIntent: PendingIntent
+    lateinit var request: ActivityTransitionRequest
 
     fun initActivityRecognition(context: Context) {
         val transitions = defineTransitions()
@@ -98,7 +98,7 @@ object MyActivityRecognition {
             context,
             REQUEST_CODE_ACTIVITY_RECOGNITION_BROADCAST_RECEIVER,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 }
