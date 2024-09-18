@@ -5,7 +5,7 @@ import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
 import com.example.brockapp.dialog.MarkerDialog
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.database.GeofenceAreaEntry
+import com.example.brockapp.database.GeofenceAreaEntity
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
@@ -70,7 +70,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
             val (address, location) = getAddressAndLocation(selectedLocation)
 
             if (address != null && location != null) {
-                val geofenceArea = GeofenceAreaEntry(
+                val geofenceArea = GeofenceAreaEntity(
                     longitude = location.longitude,
                     latitude = location.latitude,
                     name = address.featureName
@@ -78,6 +78,9 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
                 addNewMarker(geofenceArea)
                 viewModelGeofence.insertGeofenceArea(geofenceArea)
+
+                // Sync automatic when new geofence area is inserted
+                // viewModelFriends.uploadUserData()
             } else {
                 Toast.makeText(requireContext(), "Nessuna località individuata con questo nome", Toast.LENGTH_LONG).show()
             }
@@ -198,7 +201,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
         return Pair(address, location)
     }
 
-    private fun addNewMarker(geofenceArea: GeofenceAreaEntry) {
+    private fun addNewMarker(geofenceArea: GeofenceAreaEntity) {
         val coordinates = LatLng(geofenceArea.latitude, geofenceArea.longitude)
 
         map.addMarker(
