@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "GeofenceArea")
-data class GeofenceAreaEntry (
+data class GeofenceAreaEntity (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val longitude: Double,

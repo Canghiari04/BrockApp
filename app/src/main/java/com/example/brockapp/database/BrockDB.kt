@@ -8,7 +8,7 @@ import android.content.Context
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [UserEntity::class, UserStillActivityEntity::class, UserVehicleActivityEntity::class, UserWalkActivityEntity::class, GeofenceAreaEntry::class, FriendEntity::class],
+    entities = [UserEntity::class, UserStillActivityEntity::class, UserVehicleActivityEntity::class, UserWalkActivityEntity::class, GeofenceAreaEntity::class, FriendEntity::class],
     version = ROOM_DATABASE_VERSION
 )
 abstract class BrockDB: RoomDatabase() {
