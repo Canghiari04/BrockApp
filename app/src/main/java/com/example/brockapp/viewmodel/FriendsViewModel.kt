@@ -21,6 +21,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
+import com.example.brockapp.data.Locality
 
 class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB, private val file: File): ViewModel() {
     private val _friends = MutableLiveData<List<String>>()
@@ -32,17 +33,15 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
     private val _errorAddFriend = MutableLiveData<Boolean>()
     val errorAddFriend: LiveData<Boolean> = _errorAddFriend
 
-    private val _friendStillActivities = MutableLiveData<List<UserActivity>>()
-    val friendStillActivities: LiveData<List<UserActivity>> = _friendStillActivities
+    private val _friendGeofenceLocalities = MutableLiveData<List<Locality>>()
+    val friendGeofenceLocalities: LiveData<List<Locality>> = _friendGeofenceLocalities
 
-    private val _friendVehicleActivities = MutableLiveData<List<UserActivity>>()
-    val friendVehicleActivities: LiveData<List<UserActivity>> = _friendVehicleActivities
-
-    private val _friendWalkActivities = MutableLiveData<List<UserActivity>>()
-    val friendWalkActivities: LiveData<List<UserActivity>> = _friendWalkActivities
+    private val _friendActivities = MutableLiveData<List<UserActivity>>()
+    val friendActivities: LiveData<List<UserActivity>> = _friendActivities
 
     fun uploadUserData() {
         viewModelScope.launch(Dispatchers.Default) {
+            val geofence = db.GeofenceAreaDao().getAllGeofenceAreas()
             val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
             val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
             val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
@@ -51,7 +50,8 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 "username" to User.username,
                 "walkActivities" to walkActivities,
                 "vehicleActivities" to vehicleActivities,
-                "stillActivities" to stillActivities
+                "stillActivities" to stillActivities,
+                "geofence" to geofence
             )
 
             val gson = Gson()
@@ -67,7 +67,6 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                     Log.e("S3Upload", "Failed to upload user data", e)
                 }
             }
-
         }
     }
 
@@ -126,10 +125,16 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
         }
     }
 
-    fun getFriendActivities(username: String?) {
+    fun getFriendData(username: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             val friend = loadFriendData(username)
+            val listGeofence = ArrayList<Locality>()
             val listActivities = ArrayList<UserActivity>()
+
+            friend?.geofence?.forEach {
+                val newLocality = Locality(it.name, it.longitude, it.latitude)
+                listGeofence.add(newLocality)
+            }
 
             friend?.stillActivities?.parallelStream()?.forEach {
                 val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
@@ -146,12 +151,12 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 listActivities.add(newActivity)
             }
 
-            _friendStillActivities.postValue(listActivities.filter { it.type == STILL_ACTIVITY_TYPE }.sortedBy { it.timestamp })
-            _friendVehicleActivities.postValue(listActivities.filter { it.type == VEHICLE_ACTIVITY_TYPE }.sortedBy { it.timestamp })
-            _friendWalkActivities.postValue(listActivities.filter { it.type == WALK_ACTIVITY_TYPE }.sortedBy { it.timestamp })
+            _friendGeofenceLocalities.postValue(listGeofence)
+            _friendActivities.postValue(listActivities.sortedBy { it.timestamp })
         }
     }
 
+    // Suspend function cause called by a Coroutine
     private suspend fun loadFriendData(username: String?): Friend? {
         val friendKey = "user/$username.json"
 
@@ -160,6 +165,7 @@ class FriendsViewModel(private val s3Client: AmazonS3Client, private val db: Bro
                 val request = GetObjectRequest(BUCKET_NAME, friendKey)
                 val result = s3Client.getObject(request)
                 val content = result.objectContent.bufferedReader().use { it.readText() }
+
                 val gson = Gson()
                 gson.fromJson(content, Friend::class.java)
             }

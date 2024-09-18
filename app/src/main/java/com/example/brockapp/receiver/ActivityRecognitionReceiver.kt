@@ -1,5 +1,6 @@
 package com.example.brockapp.receiver
 
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -24,6 +25,7 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
             val result = ActivityTransitionResult.extractResult(intent)
             if (result != null) {
                 for (event in result.transitionEvents) {
+                    Toast.makeText(context, "CIAO ESTHER", Toast.LENGTH_LONG).show()
                     Log.d("ACTIVITY_RECOGNITION_RECEIVER", event.activityType.toString())
                 }
             } else {
@@ -32,43 +34,16 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
         }
     }
 
-    private fun defineIntent(intent: Intent, context: Context): Intent {
-        val activityType = intent.getIntExtra("activityType", -1)
-        val transitionType = intent.getIntExtra("transitionType", -1)
-        val timestamp = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT).withZone(ZoneOffset.UTC).format(Instant.now())
-
-        when (activityType) {
-            DetectedActivity.STILL -> {
-                serviceIntent = Intent(context, ActivityRecognitionService::class.java).apply {
-                    putExtra("ACTIVITY_TYPE", activityType)
-                    putExtra("TRANSITION_TYPE", transitionType)
-                    putExtra("TIMESTAMP", timestamp)
-                }
-            }
-
-            DetectedActivity.IN_VEHICLE -> {
-                val distanceTravelled = intent.getDoubleExtra("distanceTravelled", -1.0)
-
-                serviceIntent = Intent(context, ActivityRecognitionService::class.java).apply {
-                    putExtra("ACTIVITY_TYPE", activityType)
-                    putExtra("TRANSITION_TYPE", transitionType)
-                    putExtra("TIMESTAMP", timestamp)
-                    putExtra("DISTANCE_TRAVELLED", distanceTravelled)
-                }
-            }
-
-            DetectedActivity.WALKING -> {
-                val stepNumber = intent.getLongExtra("stepNumber", -1)
-
-                serviceIntent = Intent(context, ActivityRecognitionService::class.java).apply {
-                    putExtra("ACTIVITY_TYPE", activityType)
-                    putExtra("TRANSITION_TYPE", transitionType)
-                    putExtra("TIMESTAMP", timestamp)
-                    putExtra("STEP_NUMBER", stepNumber)
-                }
-            }
+    fun getPendingIntent(context: Context): PendingIntent {
+        val intent = Intent(context, ActivityRecognitionReceiver::class.java).apply {
+            action = ACTIVITY_RECOGNITION_INTENT_TYPE
         }
 
-        return serviceIntent
+        return PendingIntent.getBroadcast(
+            context,
+            46,
+            intent,
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 }

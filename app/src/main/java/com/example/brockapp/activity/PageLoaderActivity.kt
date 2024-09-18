@@ -47,6 +47,7 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
     private lateinit var calendarFragment: CalendarFragment
+    private lateinit var settingsButton: FloatingActionButton
     private lateinit var newActivityButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +67,7 @@ class PageLoaderActivity: AppCompatActivity() {
         chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
 
+        settingsButton = findViewById(R.id.settings_button)
         newActivityButton = findViewById(R.id.new_activity_button)
 
         supportFragmentManager.beginTransaction().apply {
@@ -121,6 +123,12 @@ class PageLoaderActivity: AppCompatActivity() {
                     false
                 }
             }
+        }
+
+        settingsButton.setOnClickListener {
+//            val intent = Intent(this, SettingsActivity::class.java)
+//            startActivity(intent)
+//            finish()
         }
 
         newActivityButton.setOnClickListener {
@@ -200,10 +208,6 @@ class PageLoaderActivity: AppCompatActivity() {
 
     private fun hideButton(name: String) {
         when (name) {
-            "Mappa" -> {
-                newActivityButton.hide()
-            }
-
             "Amici" -> {
                 newActivityButton.hide()
             }

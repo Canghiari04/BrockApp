@@ -3,7 +3,7 @@ package com.example.brockapp.singleton
 import com.example.brockapp.*
 import com.example.brockapp.data.Locality
 import com.example.brockapp.receiver.GeofenceReceiver
-import com.example.brockapp.database.GeofenceAreaEntry
+import com.example.brockapp.database.GeofenceAreaEntity
 
 import android.content.Intent
 import android.content.Context
@@ -21,14 +21,14 @@ object MyGeofence {
     lateinit var pendingIntent: PendingIntent
 
     var typeNetwork: String ?= null
-    var geofences: List<GeofenceAreaEntry> = mutableListOf()
+    var geofences: List<GeofenceAreaEntity> = mutableListOf()
 
     fun initPendingIntent(context: Context) {
         defineRadius(context)
         definePendingIntent(context)
     }
 
-    fun initAreas(areas: List<GeofenceAreaEntry>) {
+    fun initAreas(areas: List<GeofenceAreaEntity>) {
         this.geofences = areas
         defineRequest()
     }

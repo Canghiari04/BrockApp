@@ -82,7 +82,7 @@ class NotificationUtil {
             )
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setAutoCancel(true)
-            addAction(R.drawable.baseline_settings_applications_24, "Apri Impostazioni", pendingIntent)
+            addAction(R.drawable.baseline_settings_24, "Apri Impostazioni", pendingIntent)
         }
     }
 }

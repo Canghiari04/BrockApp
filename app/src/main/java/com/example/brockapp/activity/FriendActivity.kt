@@ -19,10 +19,9 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class FriendActivity: AppCompatActivity() {
-    private val tabsIconArray = mapOf(
-        0 to R.drawable.baseline_chair_24,
-        1 to R.drawable.baseline_directions_car_24,
-        2 to R.drawable.baseline_directions_walk_24
+    private val tabsTitleArray = mapOf(
+        0 to R.drawable.baseline_directions_run_24,
+        1 to R.drawable.marker_icon,
     )
 
     private lateinit var viewModel: FriendsViewModel
@@ -31,16 +30,16 @@ class FriendActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_friend)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val toolbar = findViewById<Toolbar>(R.id.toolbar_friend_activity)
         setSupportActionBar(toolbar)
 
-        val tabLayout = findViewById<TabLayout>(R.id.friends_tab_layout)
-        val viewPager = findViewById<ViewPager2>(R.id.friends_view_pager)
-
         val adapter = ViewPagerAdapter(supportFragmentManager, lifecycle)
-        viewPager.adapter = adapter
+        val tabLayout = findViewById<TabLayout>(R.id.friends_tab_layout)
 
-        val friendUsername = intent.getStringExtra("FRIEND_USERNAME")
+        val viewPager = findViewById<ViewPager2>(R.id.friends_view_pager)
+        viewPager.adapter = adapter
 
         val db = BrockDB.getInstance(this)
         val file = File(this.filesDir, "user_data.json")
@@ -49,13 +48,12 @@ class FriendActivity: AppCompatActivity() {
         val viewModelFactory = FriendsViewModelFactory(s3Client, db, file)
         viewModel = ViewModelProvider(this, viewModelFactory)[FriendsViewModel::class.java]
 
-        viewModel.getFriendActivities(friendUsername)
+        val friendUsername = intent.getStringExtra("FRIEND_USERNAME")
+        viewModel.getFriendData(friendUsername)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.setIcon(tabsIconArray[position]!!)
+            tab.setIcon(tabsTitleArray[position]!!)
         }.attach()
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

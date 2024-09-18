@@ -48,6 +48,6 @@ const val NO_CONNECTION_TYPE_CONNECTION = "NO-CONNECTION"
 const val BUCKET_NAME = "brock-app"
 
 // Tab layout
-const val NUM_TABS = 3
+const val NUM_TABS = 2
 
 const val NOT_WALKING_NOTIFICATION_TIME_MILLIS = 1200000

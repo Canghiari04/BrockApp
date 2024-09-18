@@ -29,6 +29,9 @@ class ActivityRecognitionService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
+            // Sync automatic when new activity are inserted
+            // viewModelFriends.uploadUserData()
+
             val activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
             val transitionType = intent.getIntExtra("TRANSITION_TYPE", -1)
             val timestamp = DateTimeFormatter
