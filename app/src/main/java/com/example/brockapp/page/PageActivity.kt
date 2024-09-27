@@ -1,4 +1,4 @@
-package com.example.brockapp.you
+package com.example.brockapp.page
 
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
@@ -35,7 +35,7 @@ class PageActivity: Fragment(R.layout.page_activities) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.page_activities_recycler_view)
+        recyclerView = view.findViewById(R.id.recycler_view_page_activities)
 
         spinnerType = view.findViewById(R.id.spinner_type_activity)
         setUpSpinnerActivity(spinnerType)
@@ -107,18 +107,22 @@ class PageActivity: Fragment(R.layout.page_activities) {
     private fun observeUserActivities() {
         viewModel.listExitActivities.observe(viewLifecycleOwner) { list ->
             if (!list.isNullOrEmpty()) {
-                val filteredList = list.filter { activity ->
+                val filteredList = list.filter { activities ->
                     when (selectedActivityType) {
                         "Still" -> {
-                            activity.type == "STILL"
+                            activities.type == "Still"
                         }
 
                         "Vehicle" -> {
-                            activity.type == "VEHICLE"
+                            activities.type == "Vehicle"
                         }
 
                         "Walk" -> {
-                            activity.type == "WALK"
+                            activities.type == "Walk"
+                        }
+
+                        "All" -> {
+                            true
                         }
 
                         else -> {

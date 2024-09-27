@@ -1,28 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
-    android:elevation="10dp"
-    android:layout_margin="5dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="10dp"
+    android:backgroundTint="@color/grey"
+    app:cardCornerRadius="2.5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:layout_margin="10dp">
-
-        <ImageView
-            android:id="@+id/activity_cell_image"
-            android:src="@drawable/baseline_arrow_forward_24"
-            android:contentDescription="@string/description_icon_activity"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_margin="5dp"
-            app:tint="@color/dark_grey">
-        </ImageView>
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,10 +31,21 @@
             </TextView>
 
             <TextView
+                android:id="@+id/date_activity_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:paddingStart="10dp"
+                android:textSize="16sp"
+                android:textColor="@color/black">
+            </TextView>
+
+            <TextView
                 android:id="@+id/time_activity_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
+                android:paddingStart="10dp"
                 android:textSize="16sp"
                 android:textColor="@color/black">
             </TextView>

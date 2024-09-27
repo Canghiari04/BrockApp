@@ -1,4 +1,4 @@
-package com.example.brockapp.you
+package com.example.brockapp.page
 
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.os.Bundle
 import java.time.Duration
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +25,10 @@ class PageGeofence: Fragment(R.layout.page_geofence) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.page_geofence_recycler_view)
+        view.findViewById<TextView>(R.id.text_view_welcome_geofence)
+            .setText("Geofence Area Overview: Here you'll find all the geofenced areas you've accessed. If your list is currently empty, it's time to dive in and create your first geofence!")
+
+        recyclerView = view.findViewById(R.id.recycler_view_page_geofence)
 
         val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
@@ -32,13 +36,13 @@ class PageGeofence: Fragment(R.layout.page_geofence) {
 
         observeGeofenceTransitions()
 
-        viewModel.getGeofenceTransition("")
+        viewModel.getGeofenceTransitions()
     }
 
     private fun observeGeofenceTransitions() {
         viewModel.geofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
-                val transitions = getCompressedTransitions(items)
+                val transitions = getGroupedTransitions(items)
                 populateRecyclerView(transitions)
             } else {
                 Log.d("TO_REMOVE", "None transitions found inside the db")
@@ -46,7 +50,7 @@ class PageGeofence: Fragment(R.layout.page_geofence) {
         }
     }
 
-    private fun getCompressedTransitions(items: List<GeofenceTransitionEntity>): List<TransitionAverage> {
+    private fun getGroupedTransitions(items: List<GeofenceTransitionEntity>): List<TransitionAverage> {
         val groupedByLocation = items.groupBy { it.nameLocation }
 
         return groupedByLocation.map { (locationName, locationList) ->

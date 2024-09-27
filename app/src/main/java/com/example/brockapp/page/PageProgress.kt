@@ -1,4 +1,4 @@
-package com.example.brockapp.you
+package com.example.brockapp.page
 
 import com.example.brockapp.*
 import com.example.brockapp.R
@@ -51,18 +51,19 @@ class PageProgress: Fragment(R.layout.page_progress) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<TextView>(R.id.welcome_text_view)
+        view.findViewById<TextView>(R.id.text_view_welcome_progress)
             .setText("Welcome, " + User.username + "! In this area you can check your progress done during the activities registered")
 
-        titleSecondCard = view.findViewById(R.id.title_second_column)
+        titleSecondCard = view.findViewById(R.id.text_view_title_second_card)
 
-        titleFirstColumn = view.findViewById(R.id.title_first_column)
-        contentFirstColumn = view.findViewById(R.id.content_first_column)
-        contentSecondColumn = view.findViewById(R.id.content_second_column)
+        titleFirstColumn = view.findViewById(R.id.text_view_title_first_column)
 
-        pieChart = view.findViewById(R.id.page_progress_pie_chart)
-        walkBarChart = view.findViewById(R.id.page_progress_walk_bar_chart)
-        vehicleBarChart = view.findViewById(R.id.page_progress_vehicle_bar_chart)
+        contentFirstColumn = view.findViewById(R.id.text_view_content_first_column)
+        contentSecondColumn = view.findViewById(R.id.text_view_content_second_column)
+
+        pieChart = view.findViewById(R.id.pie_char_activities)
+        walkBarChart = view.findViewById(R.id.bar_chart_walk)
+        vehicleBarChart = view.findViewById(R.id.bar_chart_vehicle)
 
         val barChartSpinner = view.findViewById<Spinner>(R.id.spinner_bar_chart)
         setUpBarChartSpinner(barChartSpinner)
