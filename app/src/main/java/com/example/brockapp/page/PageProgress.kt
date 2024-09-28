@@ -275,7 +275,7 @@ class PageProgress: Fragment(R.layout.page_progress) {
                 LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
             } ?: 0
         }?.mapValues { entry ->
-            entry.value.sumOf { it.distanceTravelled ?: 0.0 }
+            entry.value.sumOf { it.distanceTravelled ?: 0.0 } / 1000.0 // Converti in chilometri
         }
 
         for (day in 1..yearMonth.lengthOfMonth()) {
@@ -283,7 +283,7 @@ class PageProgress: Fragment(R.layout.page_progress) {
             entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
         }
 
-        val dataSet = BarDataSet(entries, "Distance traveled")
+        val dataSet = BarDataSet(entries, "Distance traveled (km)")
         dataSet.color = Color.parseColor("#BB2222")
 
         val data = BarData(dataSet)
