@@ -9,12 +9,13 @@ import android.content.Intent
 import android.content.Context
 import androidx.appcompat.widget.Toolbar
 import android.content.SharedPreferences
+import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity: AppCompatActivity() {
-    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,9 +60,30 @@ class SettingsActivity: AppCompatActivity() {
 
     // They can be used only after a change by the user
     private fun setUpSwitch(switchActivityRecognition: SwitchCompat, switchGeofenceTransition: SwitchCompat, switchShareDatabase: SwitchCompat) {
-        switchActivityRecognition.isChecked = sharedPreferences.getBoolean("ACTIVITY_RECOGNITION", false)
-        switchGeofenceTransition.isChecked = sharedPreferences.getBoolean("GEOFENCE_TRANSITION", false)
-        switchShareDatabase.isChecked = sharedPreferences.getBoolean("DUMP_DATABASE", false)
+        switchActivityRecognition.run {
+            isChecked = sharedPreferences.getBoolean("ACTIVITY_RECOGNITION", false)
+
+            if (isChecked) {
+                trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
+            }
+        }
+
+        switchGeofenceTransition.run {
+            isChecked = sharedPreferences.getBoolean("GEOFENCE_TRANSITION", false)
+
+            if (isChecked) {
+                trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
+            }
+        }
+
+
+        switchShareDatabase.run {
+            isChecked = sharedPreferences.getBoolean("DUMP_DATABASE", false)
+
+            if (isChecked) {
+                trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
+            }
+        }
 
         switchActivityRecognition.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
