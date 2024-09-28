@@ -1,6 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_new_memo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/uni_red"
+        app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
+        android:theme="?attr/actionBarTheme"
+        app:titleTextColor="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+
+        <Spinner
+            android:id="@+id/spinner_activity_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp">
+        </Spinner>
+
+        <EditText
+            android:id="@+id/edit_text_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Memo Title"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:importantForAccessibility="yes"
+            android:maxLength="50" />
+
+        <EditText
+            android:id="@+id/edit_text_description"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:hint="Enter Memo Description"
+            android:textSize="16sp"
+            android:gravity="top"
+            android:padding="12dp"
+            android:importantForAccessibility="yes"
+            android:inputType="textMultiLine"
+            android:scrollbars="vertical"
+            android:maxLength="300" />
+
+        <Button
+            android:id="@+id/button_add_memo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Memo"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="@color/uni_red"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:importantForAccessibility="yes"/>
+    </LinearLayout>
+</LinearLayout>

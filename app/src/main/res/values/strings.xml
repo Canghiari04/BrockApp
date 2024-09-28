@@ -37,15 +37,15 @@
     <string name="permissions_title">Permessi richiesti</string>
     <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere a tutte le funzionalità richieste.</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_activity">Calendario</string>
-    <string name="menu_map">Mappa</string>
-    <string name="menu_plot">Grafici</string>
-    <string name="menu_friends">Amici</string>
-    <string name="menu_register">Registra</string>
+    <string name="menu_activity">Calendar</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_you">You</string>
+    <string name="menu_friends">Friends</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_register">Register</string>
     <string name="item_more_info">Info</string>
     <string name="item_more_logout">Logout</string>
-    <string name="item_more_delete">Elimina account</string>
+    <string name="item_more_delete">Delete account</string>
 
     <string name="title_home_fragment">In primo piano</string>
     <string name="title_spinner">Visualizza per</string>
@@ -59,13 +59,13 @@
 
     <string name="description_back_month_button">Back arrow</string>
     <string name="description_forward_month_button">Forward arrow</string>
-    <string name="lunedi_text_view">LUN</string>
-    <string name="martedi_text_view">MAR</string>
-    <string name="mercoledi_text_view">MER</string>
-    <string name="giovedi_text_view">GIO</string>
-    <string name="venerdi_text_view">VEN</string>
-    <string name="sabato_text_view">SAB</string>
-    <string name="domenica_text_view">DOM</string>
+    <string name="monday_text_view">MON</string>
+    <string name="thursday_text_view">THU</string>
+    <string name="wednesday_text_view">WES</string>
+    <string name="tuesday_text_view">TUE</string>
+    <string name="friday_text_view">FRI</string>
+    <string name="saturday_text_view">SAT</string>
+    <string name="sunday_text_view">SUN</string>
 
     <string name="empty_icon_description">Icona per empty page</string>
 
@@ -143,7 +143,7 @@
 
     <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
     <string name="edit_text_map_fragment">Cerca una nuova area</string>
-    <string name="activity_recognition_icon_description">Icona per abilitare activity recognition</string>
+    <string name="settings_icon_description">Icona del bottone per accedere ai settings</string>
     <string name="new_activity_icon_description">Icona per registrare una nuova attività</string>
     <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
 
@@ -157,9 +157,28 @@
     <string name="search_user_button">Cerca</string>
     <string name="friend_data_text_view">Attività dell\'utente</string>
     <string name="height_difference_text">Dislivello:</string>
+    <string name="select_from_memo">SELECT * FROM Memo</string>
 
     <string-array name="spinner_items">
         <item>Giorno</item>
         <item>Settimana</item>
+    </string-array>
+
+    <string-array name="spinner_bar_chart_items">
+        <item>Vehicle</item>
+        <item>Walk</item>
+    </string-array>
+
+    <string-array name="spinner_activity">
+        <item>Still</item>
+        <item>Vehicle</item>
+        <item>Walk</item>
+        <item>All</item>
+    </string-array>
+
+    <string-array name="spinner_pie_chart_items">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
     </string-array>
 </resources>

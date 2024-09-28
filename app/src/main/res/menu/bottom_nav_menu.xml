@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navbar_item_home"
-        android:icon="@drawable/baseline_home_24"
-        android:title="@string/menu_home" />
-    <item
-        android:id="@+id/navbar_item_calendar"
-        android:icon="@drawable/baseline_calendar_month_24"
-        android:title="@string/menu_activity" />
+        android:id="@+id/navbar_item_you"
+        android:icon="@drawable/baseline_query_stats_24"
+        android:title="@string/menu_you" />
     <item
         android:id="@+id/navbar_item_map"
         android:icon="@drawable/baseline_map_24"
         android:title="@string/menu_map" />
     <item
-        android:id="@+id/navbar_item_charts"
-        android:icon="@drawable/baseline_auto_graph_24"
-        android:title="@string/menu_plot" />
+        android:id="@+id/navbar_item_calendar"
+        android:icon="@drawable/baseline_calendar_month_24"
+        android:title="@string/menu_activity" />
     <item
         android:id="@+id/navbar_item_friends"
         android:icon="@drawable/baseline_people_24"

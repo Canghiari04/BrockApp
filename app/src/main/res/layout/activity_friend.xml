@@ -9,7 +9,6 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_friend_activity"
-        app:title=" "
         app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,13 +21,24 @@
         android:id="@+id/friends_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabIconTint="@color/white"
-        app:tabIndicatorColor="@color/white"
-        android:background="@color/uni_red" />
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:tabTextColor="@color/uni_red"
+        app:tabIconTint="@color/uni_red"
+        app:tabIndicatorColor="@color/uni_red"
+        android:background="@color/white" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/friends_view_pager"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.viewpager2.widget.ViewPager2>
+        android:layout_height="match_parent"
+        android:layout_margin="20dp">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/friends_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="6dp">
+        </androidx.viewpager2.widget.ViewPager2>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

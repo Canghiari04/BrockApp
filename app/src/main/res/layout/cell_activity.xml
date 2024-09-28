@@ -18,10 +18,12 @@
             android:id="@+id/activity_cell_image"
             android:src="@drawable/baseline_arrow_forward_24"
             android:contentDescription="@string/description_icon_activity"
+            android:layout_gravity="center_vertical"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_margin="5dp"
-            app:tint="@color/dark_grey">
+            android:layout_margin="10dp"
+            android:padding="2.5dp"
+            app:tint="@color/uni_red">
         </ImageView>
 
         <LinearLayout

@@ -13,16 +13,14 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/still_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"/>
+                android:layout_gravity="center"/>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 </RelativeLayout>
