@@ -4,17 +4,13 @@ import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.util.PermissionUtil
-import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.singleton.S3ClientProvider
-import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import java.io.File
 import android.util.Log
-import android.Manifest
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -24,10 +20,7 @@ import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.location.LocationServices
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
     private var listener: OnFragmentInteractionListener? = null
@@ -36,7 +29,6 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     private lateinit var password: String
     private lateinit var util: PermissionUtil
     private lateinit var viewModelUser: UserViewModel
-    private lateinit var viewModelGeofence: GeofenceViewModel
 
     interface OnFragmentInteractionListener {
         fun showSignInFragment()
@@ -53,7 +45,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
         util = PermissionUtil(requireActivity()) {
-            startBackgroundOperations()
+            goToHome()
         }
 
         observeLogin()
@@ -103,51 +95,9 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 User.id = currentUser.id
                 User.username = currentUser.username.toString()
                 User.password = currentUser.password.toString()
-                User.recognition = currentUser.recognitionFlag
-                User.sharing = currentUser.sharingFlag
             } else {
                 Log.e("LOGIN_FRAGMENT", "User not found.")
             }
-        }
-    }
-
-    private fun startBackgroundOperations() {
-        val db = BrockDB.getInstance(requireContext())
-        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
-        viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
-
-        observeGeofenceAreas()
-
-        viewModelGeofence.fetchGeofenceAreas()
-    }
-
-    private fun observeGeofenceAreas() {
-        viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
-            if (areas.isNotEmpty()) {
-                MyGeofence.initAreas(areas)
-
-                startGeofence()
-            } else {
-                viewModelGeofence.insertStaticGeofenceAreas()
-            }
-        }
-    }
-
-    private fun startGeofence() {
-        val geofencingClient = LocationServices.getGeofencingClient(requireContext())
-
-        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            geofencingClient.addGeofences(MyGeofence.request, MyGeofence.pendingIntent).run {
-                addOnSuccessListener {
-                    goToHome()
-                }
-                addOnFailureListener {
-                    goToHome()
-                    Log.e("GEOFENCING_RECEIVER", "Unsuccessful connection")
-                }
-            }
-        } else {
-            Log.wtf("GEOFENCE_PERMISSION", "Permission denied")
         }
     }
 

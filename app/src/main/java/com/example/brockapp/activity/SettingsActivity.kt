@@ -25,7 +25,7 @@ class SettingsActivity: AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         sharedPreferences = this.getSharedPreferences(
-            User.id.toString() + "_" + User.username + "_" + User.password,
+            "${User.id}_${User.username}_${User.password}",
             Context.MODE_PRIVATE
         )
 
