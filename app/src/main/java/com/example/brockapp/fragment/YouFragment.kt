@@ -1,4 +1,34 @@
 package com.example.brockapp.fragment
 
-class YouFragment {
+import com.example.brockapp.R
+import com.example.brockapp.adapter.ViewPagerYouAdapter
+
+import android.os.Bundle
+import android.view.View
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+
+// Inside this fragment I will put plot and all the activities done by the user
+class YouFragment: Fragment(R.layout.fragment_you) {
+    private val tabsTitleArray = mapOf(
+        0 to "Progress",
+        1 to "Activities",
+        2 to "Areas"
+    )
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val adapter = ViewPagerYouAdapter(childFragmentManager, lifecycle)
+        val tabLayout = view.findViewById<TabLayout>(R.id.you_tab_layout)
+
+        val viewPager = view.findViewById<ViewPager2>(R.id.you_view_pager)
+        viewPager.adapter = adapter
+
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.setText(tabsTitleArray[position]!!)
+        }.attach()
+    }
 }

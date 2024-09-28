@@ -235,12 +235,6 @@ class PageProgress: Fragment(R.layout.page_progress) {
             pieChart.visibility = View.VISIBLE
         } else {
             pieChart.visibility = View.GONE
-
-            Toast.makeText(
-                requireContext(),
-                "None activity, register some!",
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
