@@ -21,6 +21,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.brockapp.activity.ActivityActivity
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
     private var listener: OnFragmentInteractionListener? = null
@@ -102,7 +103,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     }
 
     private fun goToHome() {
-        val intent = Intent(requireContext(), PageLoaderActivity::class.java)
+        val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "You")
         startActivity(intent)
         activity?.finish()
     }
