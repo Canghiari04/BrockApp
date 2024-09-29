@@ -18,15 +18,6 @@ interface UserDao {
     @Query("SELECT * FROM User WHERE username=:username AND password=:password")
     suspend fun getUserFromUsernameAndPassword(username: String, password: String): UserEntity?
 
-    @Query("SELECT sharing_flag FROM User WHERE username=:username AND password=:password")
-    suspend fun getSharingFlagFromUsernameAndPassword(username: String, password: String): Boolean
-
-    @Query("UPDATE User SET recognition_flag=1 WHERE username=:username AND password=:password")
-    suspend fun changeRecognitionFlag(username: String, password: String)
-
-    @Query("UPDATE User SET sharing_flag=1 WHERE username=:username AND password=:password")
-    suspend fun changeSharingFlag(username: String, password: String)
-
     @Query("DELETE FROM User WHERE username=:username AND password=:password")
     suspend fun deleteUserByUsernameAndPassword(username: String, password: String)
 }

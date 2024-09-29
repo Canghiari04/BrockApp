@@ -8,7 +8,5 @@ import androidx.room.PrimaryKey
 data class UserEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val username: String?,
-    val password: String?,
-    @ColumnInfo(name = "recognition_flag") val recognitionFlag: Boolean,
-    @ColumnInfo(name = "sharing_flag") val sharingFlag: Boolean
+    val password: String?
 )
