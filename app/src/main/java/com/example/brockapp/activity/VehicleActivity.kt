@@ -171,10 +171,8 @@ class VehicleActivity: AppCompatActivity(), NotificationSender {
                                 val distance = totalDistance.toInt()
                                 distanceTraveled.text = String.format("$distance metri")
                             } else {
-                                val distanceKilometers = totalDistance / 1000
-                                distanceTraveled.text = String.format(
-                                    "$distanceKilometers km"
-                                )
+                                val distanceKilometers = (totalDistance / 1000).toInt()
+                                distanceTraveled.text = String.format("$distanceKilometers km")
                             }
                         }
 

@@ -36,14 +36,13 @@ class NewUserActivity: AppCompatActivity() {
             val intent = Intent(this, WalkActivity::class.java)
             startActivity(intent)
             finish()
-
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "Home")
+                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "You")
                 startActivity(intent)
                 finish()
                 true
