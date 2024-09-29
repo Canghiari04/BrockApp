@@ -2,8 +2,8 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.singleton.User
-import com.example.brockapp.permission.ActivityRecognitionPermission
-import com.example.brockapp.permission.GeofenceTransitionPermissions
+import com.example.brockapp.util.ActivityRecognitionPermissionUtil
+import com.example.brockapp.util.GeofenceTransitionPermissionsUtil
 
 import android.os.Build
 import android.os.Bundle
@@ -23,8 +23,8 @@ class SettingsActivity: AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var switchGeofenceTransition: SwitchCompat
     private lateinit var switchActivityRecognition: SwitchCompat
-    private lateinit var geofenceUtil: GeofenceTransitionPermissions
-    private lateinit var recognitionUtil: ActivityRecognitionPermission
+    private lateinit var geofenceUtil: GeofenceTransitionPermissionsUtil
+    private lateinit var recognitionUtil: ActivityRecognitionPermissionUtil
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,13 +47,13 @@ class SettingsActivity: AppCompatActivity() {
         switchActivityRecognition = findViewById(R.id.switch_activity_recognition_service)
 
         // Creating the launcher for the permissions required by the app
-        geofenceUtil = GeofenceTransitionPermissions(
+        geofenceUtil = GeofenceTransitionPermissionsUtil(
             this,
             { changeCheckSwitch("GEOFENCE_TRANSITION", switchGeofenceTransition) },
             switchGeofenceTransition
         )
 
-        recognitionUtil = ActivityRecognitionPermission(
+        recognitionUtil = ActivityRecognitionPermissionUtil(
             this,
             { changeCheckSwitch("ACTIVITY_RECOGNITION", switchActivityRecognition) },
             switchActivityRecognition

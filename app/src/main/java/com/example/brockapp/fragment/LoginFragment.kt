@@ -7,7 +7,7 @@ import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.singleton.S3ClientProvider
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.permission.PostNotificationsPermission
+import com.example.brockapp.util.PostNotificationsPermissionUtil
 
 import java.io.File
 import android.util.Log
@@ -29,7 +29,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
 
     private lateinit var username: String
     private lateinit var password: String
-    private lateinit var util: PostNotificationsPermission
+    private lateinit var util: PostNotificationsPermissionUtil
     private lateinit var viewModelUser: UserViewModel
 
     interface OnFragmentInteractionListener {
@@ -47,7 +47,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
-        util = PostNotificationsPermission(requireActivity()) {
+        util = PostNotificationsPermissionUtil(requireActivity()) {
             observeUser()
         }
 

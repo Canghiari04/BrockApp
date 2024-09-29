@@ -10,7 +10,7 @@ import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
-import com.example.brockapp.permission.PostNotificationsPermission
+import com.example.brockapp.util.PostNotificationsPermissionUtil
 
 import java.io.File
 import android.util.Log
@@ -36,7 +36,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private lateinit var password: String
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelNetwork: NetworkViewModel
-    private lateinit var util: PostNotificationsPermission
+    private lateinit var util: PostNotificationsPermissionUtil
 
     interface OnFragmentInteractionListener {
         fun showLoginFragment()
@@ -57,7 +57,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
-        util = PostNotificationsPermission(requireActivity()) {
+        util = PostNotificationsPermissionUtil(requireActivity()) {
             setUpSharedPreferences()
         }
 
