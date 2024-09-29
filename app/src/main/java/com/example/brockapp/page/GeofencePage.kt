@@ -18,7 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
-class PageGeofence: Fragment(R.layout.page_geofence) {
+class GeofencePage: Fragment(R.layout.page_geofence) {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewModel: GeofenceViewModel
 

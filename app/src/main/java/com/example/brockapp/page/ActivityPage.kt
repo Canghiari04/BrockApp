@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
-class PageActivity: Fragment(R.layout.page_activities) {
+class ActivityPage: Fragment(R.layout.page_activities) {
     private var rangeUtil = PeriodRangeImpl()
 
     // The spinner's items are initially set to the first element of their array string

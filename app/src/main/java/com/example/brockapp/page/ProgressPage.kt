@@ -15,7 +15,6 @@ import android.os.Bundle
 import android.view.View
 import java.time.LocalDate
 import java.time.YearMonth
-import android.widget.Toast
 import android.widget.Spinner
 import android.graphics.Color
 import android.widget.TextView
@@ -36,7 +35,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
-class PageProgress: Fragment(R.layout.page_progress) {
+class ProgressPage: Fragment(R.layout.page_progress) {
     private var rangeUtil = PeriodRangeImpl()
 
     private lateinit var pieChart: PieChart

@@ -1,9 +1,9 @@
 package com.example.brockapp.adapter
 
 import com.example.brockapp.*
-import com.example.brockapp.page.PageActivity
-import com.example.brockapp.page.PageGeofence
-import com.example.brockapp.page.PageProgress
+import com.example.brockapp.page.ActivityPage
+import com.example.brockapp.page.GeofencePage
+import com.example.brockapp.page.ProgressPage
 
 import androidx.lifecycle.Lifecycle
 import androidx.fragment.app.Fragment
@@ -18,15 +18,15 @@ class ViewPagerYouAdapter (fragmentManager: FragmentManager, lifecycle: Lifecycl
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> {
-                PageProgress()
+                ProgressPage()
             }
 
             1 -> {
-                PageActivity()
+                ActivityPage()
             }
 
             else -> {
-                PageGeofence()
+                GeofencePage()
             }
         }
     }
