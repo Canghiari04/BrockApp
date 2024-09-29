@@ -4,16 +4,17 @@ import com.example.brockapp.R
 import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.MyNetwork
-import com.example.brockapp.util.PermissionUtil
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.singleton.S3ClientProvider
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.permission.PostNotificationsPermission
 
 import java.io.File
 import android.util.Log
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -23,6 +24,7 @@ import android.widget.EditText
 import android.content.Context
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
@@ -32,14 +34,15 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private lateinit var db: BrockDB
     private lateinit var username: String
     private lateinit var password: String
-    private lateinit var util: PermissionUtil
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelNetwork: NetworkViewModel
+    private lateinit var util: PostNotificationsPermission
 
     interface OnFragmentInteractionListener {
         fun showLoginFragment()
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,7 +57,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
-        util = PermissionUtil(requireActivity()) {
+        util = PostNotificationsPermission(requireActivity()) {
             setUpSharedPreferences()
         }
 
@@ -106,11 +109,12 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun observeSignIn() {
         viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
             if (auth) {
                 viewModelUser.getUser(username, password)
-                util.requestPermissions()
+                util.requestPostNotificationPermission()
             } else {
                 Toast.makeText(requireContext(), "Credentials already present", Toast.LENGTH_SHORT).show()
             }
