@@ -1,4 +1,4 @@
-package com.example.brockapp.permission
+package com.example.brockapp.util
 
 import com.example.brockapp.R
 
@@ -15,7 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-class PostNotificationsPermission(private val activity: FragmentActivity, private val onPermissionGranted: () -> Unit) {
+class PostNotificationsPermissionUtil(private val activity: FragmentActivity, private val onPermissionGranted: () -> Unit) {
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
 
     init {

@@ -53,11 +53,4 @@ class CalendarUtil {
 
         return ArrayList(MutableList(daysDistance.toInt()) {""})
     }
-
-    fun getPrettyDate(strDate: String?): String {
-        val tokens = strDate!!.split(DATE_SEPARATOR)
-        val date = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
-
-        return "${date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ITALIAN)}, ${tokens[2]} ${date.month.getDisplayName(TextStyle.FULL, Locale.ITALIAN)}".lowercase()
-    }
 }

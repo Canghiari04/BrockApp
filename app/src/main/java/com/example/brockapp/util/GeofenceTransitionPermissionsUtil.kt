@@ -1,4 +1,4 @@
-package com.example.brockapp.permission
+package com.example.brockapp.util
 
 import com.example.brockapp.R
 
@@ -13,7 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
-class GeofenceTransitionPermissions(private val activity: AppCompatActivity, private val onPermissionsGranted: () -> Unit, private val switch: SwitchCompat) {
+class GeofenceTransitionPermissionsUtil(private val activity: AppCompatActivity, private val onPermissionsGranted: () -> Unit, private val switch: SwitchCompat) {
     private lateinit var requestBackgroundPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
     

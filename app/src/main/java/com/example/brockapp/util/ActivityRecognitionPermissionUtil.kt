@@ -1,4 +1,4 @@
-package com.example.brockapp.permission
+package com.example.brockapp.util
 
 import com.example.brockapp.R
 
@@ -13,7 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
-class ActivityRecognitionPermission(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit, private val switch: SwitchCompat) {
+class ActivityRecognitionPermissionUtil(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit, private val switch: SwitchCompat) {
     private lateinit var requestRecognitionPermissionLauncher: ActivityResultLauncher<String>
 
     init {
