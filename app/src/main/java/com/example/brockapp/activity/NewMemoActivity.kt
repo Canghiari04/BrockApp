@@ -2,7 +2,7 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.*
-import com.example.brockapp.singleton.User
+import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.MemoEntity
 import com.example.brockapp.viewmodel.MemoViewModel
@@ -103,7 +103,7 @@ class NewMemo: AppCompatActivity() {
                 Toast.makeText(this, "You must insert something about the memo", Toast.LENGTH_SHORT).show()
             } else {
                 val memoEntity = MemoEntity(
-                    userId = User.id,
+                    userId = MyUser.id,
                     title = title,
                     description = description,
                     activityType = typeActivity,

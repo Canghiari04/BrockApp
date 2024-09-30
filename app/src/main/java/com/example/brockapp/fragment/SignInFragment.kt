@@ -1,11 +1,11 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.singleton.User
+import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
@@ -52,7 +52,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
 
         db = BrockDB.getInstance(requireContext())
         val file = File(context?.filesDir, "user_data.json")
-        val s3Client = S3ClientProvider.getInstance(requireContext())
+        val s3Client = MyS3ClientProvider.getInstance(requireContext())
 
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
@@ -124,9 +124,9 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private fun observeUser() {
         viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
             if (currentUser != null) {
-                User.id = currentUser.id
-                User.username = currentUser.username.toString()
-                User.password = currentUser.password.toString()
+                MyUser.id = currentUser.id
+                MyUser.username = currentUser.username.toString()
+                MyUser.password = currentUser.password.toString()
             } else {
                 Log.e("SIGN_IN_FRAGMENT", "User not found")
             }
@@ -136,7 +136,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private fun setUpSharedPreferences() {
         // I create an unique shared preferences for every user signed in the app
         val sharedPreferences = requireContext().getSharedPreferences(
-            "${User.id}_${User.username}_${User.password}",
+            "${MyUser.id}_${MyUser.username}_${MyUser.password}",
             Context.MODE_PRIVATE
         )
 

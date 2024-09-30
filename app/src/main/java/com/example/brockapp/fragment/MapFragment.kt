@@ -1,6 +1,7 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
+import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
 import com.example.brockapp.dialog.MarkerDialog
@@ -71,6 +72,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
             if (address != null && location != null) {
                 val geofenceArea = GeofenceAreaEntity(
+                    userId = MyUser.id,
                     longitude = location.longitude,
                     latitude = location.latitude,
                     name = address.featureName
@@ -82,7 +84,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 // Sync automatic when new geofence area is inserted
                 // viewModelFriends.uploadUserData()
             } else {
-                Toast.makeText(requireContext(), "Nessuna località individuata con questo nome", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "None location found with this name", Toast.LENGTH_LONG).show()
             }
 
             input.setText(R.string.text_blank)

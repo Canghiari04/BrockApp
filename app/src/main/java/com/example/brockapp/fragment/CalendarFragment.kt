@@ -3,7 +3,7 @@ package com.example.brockapp.fragment
 import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.util.CalendarUtil
-import com.example.brockapp.activity.DailyMemo
+import com.example.brockapp.activity.DailyMemoActivity
 import com.example.brockapp.adapter.CalendarAdapter
 
 import android.os.Bundle
@@ -80,7 +80,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun showMemos(date: String) {
-        val intent = Intent(requireContext(), DailyMemo::class.java).putExtra("CALENDAR_DATE", date)
+        val intent = Intent(requireContext(), DailyMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
         startActivity(intent)
         activity?.finish()
     }

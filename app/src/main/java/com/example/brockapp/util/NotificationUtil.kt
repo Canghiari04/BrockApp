@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.Context
 import android.app.PendingIntent
 import android.provider.Settings
+import androidx.core.text.HtmlCompat
 import androidx.core.app.NotificationCompat
 
 class NotificationUtil {
@@ -27,7 +28,7 @@ class NotificationUtil {
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
             setSmallIcon(R.drawable.baseline_directions_run_24)
-            setContentTitle(title)
+            setContentTitle(HtmlCompat.fromHtml("<b>${title}</b>", HtmlCompat.FROM_HTML_MODE_LEGACY))
             setContentText(text)
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText(text))

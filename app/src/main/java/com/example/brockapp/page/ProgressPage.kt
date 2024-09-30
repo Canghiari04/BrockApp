@@ -2,7 +2,7 @@ package com.example.brockapp.page
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.singleton.User
+import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.interfaces.PeriodRangeImpl
 import com.example.brockapp.viewmodel.ActivitiesViewModel
@@ -30,6 +30,7 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
@@ -51,7 +52,7 @@ class ProgressPage: Fragment(R.layout.page_progress) {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<TextView>(R.id.text_view_welcome_progress)
-            .setText("Welcome, " + User.username + "! In this area you can check your progress done during the activities registered")
+            .setText("Welcome, " + MyUser.username + "! In this area you can check your progress done during the activities registered")
 
         titleSecondCard = view.findViewById(R.id.text_view_title_second_card)
 
@@ -208,33 +209,30 @@ class ProgressPage: Fragment(R.layout.page_progress) {
             }
         }
 
-        if (entries.isNotEmpty()) {
-            val redGradientColors = listOf(
-                Color.parseColor("#D32F2F"),
-                Color.parseColor("#B71C1C"),
-                Color.parseColor("#FF1744")
-            )
 
-            val dataSet = PieDataSet(entries, " ").apply {
-                colors = redGradientColors
-                valueTextSize = 12f
-                valueTypeface = Typeface.DEFAULT_BOLD
-            }
+        val redGradientColors = listOf(
+            Color.parseColor("#D32F2F"),
+            Color.parseColor("#B71C1C"),
+            Color.parseColor("#FF1744")
+        )
 
-            val data = PieData(dataSet)
-            pieChart.data = data
-
-            pieChart.legend.xEntrySpace = 16f
-            pieChart.description?.isEnabled = false
-
-            pieChart.invalidate()
-            pieChart.setUsePercentValues(true)
-            pieChart.setDrawEntryLabels(false)
-
-            pieChart.visibility = View.VISIBLE
-        } else {
-            pieChart.visibility = View.GONE
+        val dataSet = PieDataSet(entries, " ").apply {
+            colors = redGradientColors
+            valueTextSize = 12f
+            valueTypeface = Typeface.DEFAULT_BOLD
         }
+
+        val data = PieData(dataSet)
+        pieChart.data = data
+
+        pieChart.legend.xEntrySpace = 16f
+        pieChart.description?.isEnabled = false
+
+        pieChart.invalidate()
+        pieChart.setUsePercentValues(true)
+        pieChart.setDrawEntryLabels(false)
+
+        pieChart.visibility = View.VISIBLE
     }
 
     private fun observeUserKilometers() {
@@ -289,12 +287,19 @@ class ProgressPage: Fragment(R.layout.page_progress) {
         data.setDrawValues(false)
         vehicleBarChart.data = data
 
-        vehicleBarChart.legend.isEnabled = false
+        vehicleBarChart.legend.isEnabled = true
+        vehicleBarChart.legend.textSize = 12f
+        vehicleBarChart.legend.form = Legend.LegendForm.LINE
+
         vehicleBarChart.description.isEnabled = false
 
         vehicleBarChart.xAxis.setDrawGridLines(false)
         vehicleBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         vehicleBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..yearMonth.lengthOfMonth()).map { it.toString() })
+        vehicleBarChart.xAxis.granularity = 1f
+        vehicleBarChart.xAxis.isGranularityEnabled = true
+
+        vehicleBarChart.setExtraOffsets(0f, 0f, 0f, 20f)
 
         vehicleBarChart.axisLeft.axisMinimum = 0f
         vehicleBarChart.axisRight.axisMinimum = 0f
@@ -354,7 +359,10 @@ class ProgressPage: Fragment(R.layout.page_progress) {
         val data = BarData(dataSet)
         walkBarChart.data = data
 
-        walkBarChart.legend.isEnabled = false
+        walkBarChart.legend.isEnabled = true
+        walkBarChart.legend.textSize = 12f
+        walkBarChart.legend.form = Legend.LegendForm.LINE
+
         walkBarChart.description.isEnabled = false
 
         walkBarChart.xAxis.setDrawGridLines(false)
