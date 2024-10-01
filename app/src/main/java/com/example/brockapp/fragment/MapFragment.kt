@@ -1,7 +1,7 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.singleton.MyUser
+import com.example.brockapp.`object`.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
 import com.example.brockapp.dialog.MarkerDialog
@@ -19,12 +19,15 @@ import android.widget.Toast
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import kotlinx.coroutines.launch
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import android.widget.AutoCompleteTextView
+import android.widget.ProgressBar
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -36,29 +39,44 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 
-class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
+class MapFragment: Fragment(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
+    private lateinit var progressBar: ProgressBar
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
         val db = BrockDB.getInstance(requireContext())
         val factoryViewModel = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModel)[GeofenceViewModel::class.java]
+    }
 
-        observeNetwork()
-        observeUpdatesGeofenceAreas()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val rootView =  inflater.inflate(R.layout.fragment_map, container, false)
+
+        progressBar = rootView.findViewById(R.id.progress_bar_map_fragment)
+        progressBar.visibility = View.VISIBLE
+
+        val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val input = view.findViewById<AutoCompleteTextView>(R.id.text_new_area)
 
-        input.addTextChangedListener {
+        input?.addTextChangedListener {
             val userInput = input.text.toString()
 
             if (userInput.isNotEmpty() && userInput.length >= 3) {
@@ -66,7 +84,7 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
             }
         }
 
-        input.setOnItemClickListener { parent, _, position, _ ->
+        input?.setOnItemClickListener { parent, _, position, _ ->
             val selectedLocation = parent.getItemAtPosition(position) as String
             val (address, location) = getAddressAndLocation(selectedLocation)
 
@@ -84,11 +102,18 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 // Sync automatic when new geofence area is inserted
                 // viewModelFriends.uploadUserData()
             } else {
-                Toast.makeText(requireContext(), "None location found with this name", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "None location found with this name",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             input.setText(R.string.text_blank)
         }
+
+        observeNetwork()
+        observeUpdatesGeofenceAreas()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -96,13 +121,15 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
         observeInitialGeofenceAreas()
 
-        viewModelGeofence.fetchGeofenceAreas()
-
         val startingPoint = LatLng(41.8719, 12.5674)
         val position = CameraPosition.Builder()
             .target(startingPoint)
             .zoom(5.5f)
             .build()
+
+        map.setOnMapLoadedCallback {
+            progressBar.visibility = View.GONE
+        }
 
         map.moveCamera(
             CameraUpdateFactory.newCameraPosition(position)
@@ -112,6 +139,8 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
             activity?.let { MarkerDialog(marker, viewModelGeofence).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG") }
             true
         }
+
+        viewModelGeofence.fetchGeofenceAreas()
     }
 
     private fun observeNetwork() {
@@ -144,11 +173,13 @@ class MapFragment: Fragment(R.layout.fragment_map), OnMapReadyCallback {
     }
 
     private fun observeUpdatesGeofenceAreas() {
-        viewModelGeofence.dynamicAreas.observe(viewLifecycleOwner) { areas ->
-            MyGeofence.geofences = areas
+        viewModelGeofence.dynamicAreas.observe(viewLifecycleOwner) {
+            if (!it.isNullOrEmpty()) {
+                MyGeofence.defineAreas(it)
 
-            val serviceIntent = Intent(requireContext(), MapService::class.java)
-            activity?.startService(serviceIntent)
+                val serviceIntent = Intent(requireContext(), MapService::class.java)
+                activity?.startService(serviceIntent)
+            }
         }
     }
 
