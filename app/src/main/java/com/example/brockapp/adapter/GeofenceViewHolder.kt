@@ -4,6 +4,7 @@ import com.example.brockapp.R
 import com.example.brockapp.data.TransitionAverage
 
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.GoogleMap
@@ -14,11 +15,13 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.MarkerOptions
 
 class GeofenceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), OnMapReadyCallback {
+    var progressBar = itemView.findViewById<ProgressBar>(R.id.progress_bar_cell_geofence)
+
     private var latitude = 0.0
     private var longitude = 0.0
     private var geofenceMap = itemView.findViewById<MapView>(R.id.map_view_geofence)
-    private var geofenceCount = itemView.findViewById<TextView>(R.id.text_view_access_count)
     private var geofenceHours = itemView.findViewById<TextView>(R.id.text_view_spent_time)
+    private var geofenceCount = itemView.findViewById<TextView>(R.id.text_view_access_count)
     private var geofenceTitle = itemView.findViewById<TextView>(R.id.text_view_title_geofence)
 
     private lateinit var map: GoogleMap
@@ -29,11 +32,17 @@ class GeofenceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), OnM
         // Iif the map is ready I put the coordinates for the geofence area
         setMapLocation(LatLng(latitude, longitude))
 
-        map.uiSettings.isZoomGesturesEnabled = false
-        map.uiSettings.isScrollGesturesEnabled = false
-        map.uiSettings.isRotateGesturesEnabled = false
-        map.uiSettings.isTiltGesturesEnabled = false
-        map.uiSettings.isMapToolbarEnabled = false
+        map.setOnMapLoadedCallback {
+            progressBar.visibility = View.GONE
+        }
+
+        map.uiSettings.run {
+            isZoomGesturesEnabled = false
+            isScrollGesturesEnabled = false
+            isRotateGesturesEnabled = false
+            isTiltGesturesEnabled = false
+            isMapToolbarEnabled = false
+        }
     }
 
     fun initMapView() {
