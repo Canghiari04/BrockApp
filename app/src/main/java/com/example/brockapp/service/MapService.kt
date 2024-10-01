@@ -16,21 +16,22 @@ class MapService: Service() {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             val geofenceClient = LocationServices.getGeofencingClient(this)
 
-            geofenceClient.removeGeofences(MyGeofence.pendingIntent).run {
+            val request = MyGeofence.getRequest()
+            val pendingIntent = MyGeofence.getPendingIntent(this)
+
+            geofenceClient.removeGeofences(pendingIntent).run {
                 addOnSuccessListener {
                     Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
                 }
             }
 
-            MyGeofence.defineRequest()
-
-            geofenceClient.addGeofences(MyGeofence.request, MyGeofence.pendingIntent).run {
+            geofenceClient.addGeofences(request, pendingIntent).run {
                 addOnSuccessListener {
                     Log.d("CONNECTIVITY_SERVICE", "Geofence added.")
                 }
             }
         } else {
-            Log.e("WTF", "WTF.")
+            Log.e("MAP_SERVICE", "Permission access background location denied")
         }
 
         return super.onStartCommand(intent, flags, startId)
