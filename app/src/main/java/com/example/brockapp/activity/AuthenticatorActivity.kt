@@ -10,8 +10,9 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.interfaces.ShowAuthFragment
 
-class AuthenticatorActivity: AppCompatActivity(), LoginFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener {
+class AuthenticatorActivity: AppCompatActivity(), ShowAuthFragment {
     private lateinit var loginFragment: LoginFragment
     private lateinit var signInFragment: SignInFragment
     private lateinit var receiver: AuthenticatorReceiver

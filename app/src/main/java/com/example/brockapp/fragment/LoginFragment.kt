@@ -1,12 +1,14 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.`object`.MyUser
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.util.PostNotificationsPermissionUtil
 
 import java.io.File
@@ -17,31 +19,23 @@ import android.view.View
 import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
-import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.annotation.RequiresApi
-import com.example.brockapp.`object`.SharedPreferences
 import androidx.lifecycle.ViewModelProvider
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
-    private var listener: OnFragmentInteractionListener? = null
-
     private lateinit var username: String
     private lateinit var password: String
-    private lateinit var util: PostNotificationsPermissionUtil
     private lateinit var viewModelUser: UserViewModel
-
-    interface OnFragmentInteractionListener {
-        fun showSignInFragment()
-    }
+    private lateinit var util: PostNotificationsPermissionUtil
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val (id, savedUsername, savedPassword) = SharedPreferences.getCredentialsSaved(requireContext())
+        val (id, savedUsername, savedPassword) = MySharedPreferences.getCredentialsSaved(requireContext())
 
         // If the user is already sign in he can pass to the page loader activity
         if (id != 0L && savedUsername != null && savedPassword != null) {
@@ -77,19 +71,8 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         }
 
         view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
-            listener?.showSignInFragment()
+            (requireActivity() as AuthenticatorActivity).showSignInFragment()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        if (context is OnFragmentInteractionListener)
-            listener = context
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        listener = null
-        super.onDetach()
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

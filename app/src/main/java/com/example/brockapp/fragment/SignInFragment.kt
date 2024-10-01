@@ -1,16 +1,17 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.`object`.SharedPreferences
-import com.example.brockapp.`object`.MyUser
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.`object`.MyNetwork
+import com.example.brockapp.extraObject.MyUser
+import com.example.brockapp.extraObject.MyNetwork
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.extraObject.MySharedPreferences
+import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.util.PostNotificationsPermissionUtil
 
 import java.io.File
@@ -22,15 +23,13 @@ import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
-import android.content.Context
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 
 class SignInFragment: Fragment(R.layout.fragment_sign_in) {
-    private val networkUtil = NetworkAvailableImpl()
-    private var listener: OnFragmentInteractionListener? = null
+    private val networkUtil = InternetAvailableImpl()
 
     private lateinit var db: BrockDB
     private lateinit var username: String
@@ -38,10 +37,6 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var util: PostNotificationsPermissionUtil
-
-    interface OnFragmentInteractionListener {
-        fun showLoginFragment()
-    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,21 +72,8 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         }
 
         view.findViewById<TextView>(R.id.login_text_view).setOnClickListener {
-            listener?.showLoginFragment()
+            (requireActivity() as AuthenticatorActivity).showLoginFragment()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        if(context is OnFragmentInteractionListener){
-            listener = context
-        }
-
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        listener = null
-        super.onDetach()
     }
 
     private fun checkConnectivity() {
@@ -128,7 +110,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
                 MyUser.username = currentUser.username!!
                 MyUser.password = currentUser.password!!
 
-                SharedPreferences.setUpSharedPreferences(requireContext())
+                MySharedPreferences.setUpSharedPreferences(requireContext())
                 goToHome()
             } else {
                 Log.e("SIGN_IN_FRAGMENT", "User not found")

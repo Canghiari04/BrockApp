@@ -1,4 +1,4 @@
-package com.example.brockapp.`object`
+package com.example.brockapp.extraObject
 
 object MyUser {
     var id: Long = 0

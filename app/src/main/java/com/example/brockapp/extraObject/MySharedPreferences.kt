@@ -1,9 +1,9 @@
-package com.example.brockapp.`object`
+package com.example.brockapp.extraObject
 
 import android.content.Context
 import android.content.SharedPreferences
 
-object SharedPreferences {
+object MySharedPreferences {
     private const val PREFERENCES_NAME = "MY_APP_PREFERENCES"
     private const val KEY_ID = "ID"
     private const val KEY_USERNAME = "USERNAME"
