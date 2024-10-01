@@ -1,7 +1,7 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.`object`.SharedPreferences
+import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.util.ActivityRecognitionPermissionUtil
 import com.example.brockapp.util.GeofenceTransitionPermissionsUtil
 
@@ -79,7 +79,7 @@ class SettingsActivity: AppCompatActivity() {
 
     // Callback provided to set true a switch when the permission is allowed
     private fun changeCheckSwitch(key: String, switch: SwitchCompat) {
-        SharedPreferences.setService(key, true, this)
+        MySharedPreferences.setService(key, true, this)
 
         switch.isChecked = true
         switch.trackTintList = ContextCompat.getColorStateList(baseContext, R.color.uni_red)
@@ -87,7 +87,7 @@ class SettingsActivity: AppCompatActivity() {
 
     private fun setUpSwitchDumpDatabase() {
         switchDumpDatabase.run {
-            isChecked = SharedPreferences.checkService("DUMP_DATABASE", context)
+            isChecked = MySharedPreferences.checkService("DUMP_DATABASE", context)
 
             trackTintList = if (isChecked) {
                 ContextCompat.getColorStateList(context, R.color.uni_red)
@@ -97,10 +97,10 @@ class SettingsActivity: AppCompatActivity() {
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    SharedPreferences.setService("DUMP_DATABASE", true, context)
+                    MySharedPreferences.setService("DUMP_DATABASE", true, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
                 } else {
-                    SharedPreferences.setService("DUMP_DATABASE", false, context)
+                    MySharedPreferences.setService("DUMP_DATABASE", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
                 }
             }
@@ -109,7 +109,7 @@ class SettingsActivity: AppCompatActivity() {
 
     private fun setUpSwitchGeofenceTransition() {
         switchGeofenceTransition.run {
-            isChecked = SharedPreferences.checkService("GEOFENCE_TRANSITION", context)
+            isChecked = MySharedPreferences.checkService("GEOFENCE_TRANSITION", context)
 
             trackTintList = if (isChecked) {
                 ContextCompat.getColorStateList(context, R.color.uni_red)
@@ -122,7 +122,7 @@ class SettingsActivity: AppCompatActivity() {
                     // The action to set true the switch is allowed iif the permission is not denied
                     geofenceUtil.requestGeofenceTransitionPermissions()
                 } else {
-                    SharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
+                    MySharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
                 }
             }
@@ -131,7 +131,7 @@ class SettingsActivity: AppCompatActivity() {
 
     private fun setUpSwitchActivityRecognition() {
         switchActivityRecognition.run {
-            isChecked = SharedPreferences.checkService("ACTIVITY_RECOGNITION", context)
+            isChecked = MySharedPreferences.checkService("ACTIVITY_RECOGNITION", context)
 
             trackTintList = if (isChecked) {
                 ContextCompat.getColorStateList(context, R.color.uni_red)
@@ -143,7 +143,7 @@ class SettingsActivity: AppCompatActivity() {
                 if (isChecked) {
                     recognitionUtil.requestActivityRecognitionPermission()
                 } else {
-                    SharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
+                    MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
                 }
             }

@@ -1,18 +1,18 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.`object`.SharedPreferences
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.`object`.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.fragment.MapFragment
 import com.example.brockapp.fragment.YouFragment
+import com.example.brockapp.extraObject.MyNetwork
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.singleton.MyActivityRecognition
+import com.example.brockapp.extraObject.MySharedPreferences
+import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.Manifest
@@ -37,7 +37,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PageLoaderActivity: AppCompatActivity() {
-    private val networkUtil = NetworkAvailableImpl()
+    private val networkUtil = InternetAvailableImpl()
     private var mapFragments = mutableMapOf<String, Fragment>()
 
     private lateinit var toolbar: Toolbar
@@ -158,7 +158,7 @@ class PageLoaderActivity: AppCompatActivity() {
     }
 
     private fun checkServicesActive() {
-        val activityRecognition = SharedPreferences.checkService("ACTIVITY_RECOGNITION",this)
+        val activityRecognition = MySharedPreferences.checkService("ACTIVITY_RECOGNITION",this)
 
         if (activityRecognition) {
             startActivityRecognition()
@@ -170,7 +170,7 @@ class PageLoaderActivity: AppCompatActivity() {
             ).show()
         }
 
-        val geofenceTransition = SharedPreferences.checkService("GEOFENCE_TRANSITION",this)
+        val geofenceTransition = MySharedPreferences.checkService("GEOFENCE_TRANSITION",this)
 
         if (geofenceTransition) {
             startGeofenceTransition()
