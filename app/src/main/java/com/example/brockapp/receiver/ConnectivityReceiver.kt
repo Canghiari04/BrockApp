@@ -38,14 +38,14 @@ class ConnectivityReceiver(private val viewModelStoreOwner: ViewModelStoreOwner)
                     }
 
                     else  -> {
-                        Log.d("CONNECTIVITY_RECEIVER", "Connectivity change not recognized.")
+                        Log.d("CONNECTIVITY_RECEIVER", "Connectivity change not recognized")
                     }
                 }
             } else {
                 handleConnectivityChange(context)
             }
         } else {
-            Log.d("CONNECTIVITY_RECEIVER", "Weird intent.")
+            Log.d("CONNECTIVITY_RECEIVER", "Intent not recognized")
         }
     }
 
