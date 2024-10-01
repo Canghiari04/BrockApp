@@ -1,7 +1,7 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.singleton.MyUser
+import com.example.brockapp.`object`.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.activity.PageLoaderActivity
@@ -22,7 +22,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.annotation.RequiresApi
-import com.example.brockapp.util.ExtraUtil
+import com.example.brockapp.`object`.SharedPreferences
 import androidx.lifecycle.ViewModelProvider
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
@@ -41,7 +41,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val (id, savedUsername, savedPassword) = ExtraUtil.getCredentialsSaved(requireContext())
+        val (id, savedUsername, savedPassword) = SharedPreferences.getCredentialsSaved(requireContext())
 
         // If the user is already sign in he can pass to the page loader activity
         if (id != 0L && savedUsername != null && savedPassword != null) {

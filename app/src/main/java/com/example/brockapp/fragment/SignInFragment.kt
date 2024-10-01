@@ -1,10 +1,10 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.util.ExtraUtil
-import com.example.brockapp.singleton.MyUser
+import com.example.brockapp.`object`.SharedPreferences
+import com.example.brockapp.`object`.MyUser
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyNetwork
+import com.example.brockapp.`object`.MyNetwork
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
@@ -128,7 +128,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
                 MyUser.username = currentUser.username!!
                 MyUser.password = currentUser.password!!
 
-                ExtraUtil.setUpSharedPreferences(requireContext())
+                SharedPreferences.setUpSharedPreferences(requireContext())
                 goToHome()
             } else {
                 Log.e("SIGN_IN_FRAGMENT", "User not found")
