@@ -5,7 +5,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
-class S3ClientProvider private constructor() {
+class MyS3ClientProvider private constructor() {
     companion object {
         @Volatile
         private var s3Client: AmazonS3Client? = null

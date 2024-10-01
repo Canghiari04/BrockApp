@@ -8,110 +8,135 @@ import com.example.brockapp.database.GeofenceAreaEntity
 import android.content.Intent
 import android.content.Context
 import android.app.PendingIntent
-import android.net.NetworkCapabilities
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
-object MyGeofence {
-    private var radius = 0
-    private var duration = 86400000L
+class MyGeofence private constructor() {
+    companion object {
+        private var radius = 0
+        private var duration = 86400000L
+        private var typeNetwork: String? = ""
 
-    lateinit var request: GeofencingRequest
-    lateinit var pendingIntent: PendingIntent
+        @Volatile
+        private var pendingIntent: PendingIntent? = null
+        @Volatile
+        private var areas = mutableListOf<GeofenceAreaEntity>()
 
-    var typeNetwork: String ?= null
-    var geofences: List<GeofenceAreaEntity> = mutableListOf()
-
-    fun initPendingIntent(context: Context) {
-        defineRadius(context)
-        definePendingIntent(context)
-    }
-
-    fun initAreas(areas: List<GeofenceAreaEntity>) {
-        this.geofences = areas
-        defineRequest()
-    }
-
-    fun defineRadius(context: Context) {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        val network = connectivityManager.activeNetwork
-        val activeNetwork = connectivityManager.getNetworkCapabilities(network)
-
-        if (activeNetwork != null) {
-            when {
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
-                    typeNetwork = WI_FI_TYPE_CONNECTION
-                    radius = 150
-                }
-
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
-                    typeNetwork = CELLULAR_TYPE_CONNECTION
-                    radius = 200
-                }
-
-                else -> {
-                    typeNetwork = NO_CONNECTION_TYPE_CONNECTION
-                    radius = 250
+        // Pending intent must never to change
+        fun getPendingIntent(context: Context): PendingIntent {
+            synchronized(this) {
+                if (pendingIntent == null) {
+                    pendingIntent = createPendingIntent(context)
                 }
             }
-        } else {
-            typeNetwork = NO_CONNECTION_TYPE_CONNECTION
-            radius = 250
-        }
-    }
 
-    fun defineRequest() {
-        val list = getAreas()
-
-        request = GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-            addGeofences(list)
-        }.build()
-    }
-
-    private fun definePendingIntent(context: Context) {
-        val intent = Intent(context, GeofenceReceiver::class.java).apply {
-            action = GEOFENCE_INTENT_TYPE
+            return pendingIntent!!
         }
 
-        pendingIntent = PendingIntent.getBroadcast(
-            context,
-            REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-        )
-    }
+        // Var like request, areas and radius can change in base of conditions of the device
+        fun getRequest(): GeofencingRequest {
+            synchronized(this) {
+                return createRequest()
+            }
+        }
 
-    private fun getAreas(): List<Geofence> {
-        val entries = getEntries()
-        val listGeofence: MutableList<Geofence> = mutableListOf()
+        fun getNetwork(context: Context): String {
+            synchronized(this) {
+                if (typeNetwork == null) {
+                    defineRadius(context)
+                }
 
-        for(entry in entries) {
-            listGeofence.add(
-                Geofence.Builder()
-                    .setRequestId(entry.id)
-                    .setCircularRegion(entry.latitude, entry.longitude, radius.toFloat())
-                    .setExpirationDuration(duration)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-                    .setLoiteringDelay(5000)
-                    .build()
+                return typeNetwork!!
+            }
+        }
+
+        fun defineRadius(context: Context) {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            val network = connectivityManager.activeNetwork
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network)
+
+            if (activeNetwork != null) {
+                when {
+                    activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        typeNetwork = WI_FI_TYPE_CONNECTION
+                        radius = 150
+                    }
+
+                    activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                        typeNetwork = CELLULAR_TYPE_CONNECTION
+                        radius = 200
+                    }
+
+                    else -> {
+                        typeNetwork = NO_CONNECTION_TYPE_CONNECTION
+                        radius = 250
+                    }
+                }
+            } else {
+                typeNetwork = NO_CONNECTION_TYPE_CONNECTION
+                radius = 250
+            }
+        }
+
+        fun defineAreas(items: List<GeofenceAreaEntity>) {
+            synchronized(this) {
+                areas = mutableListOf()
+                areas = items.toMutableList()
+            }
+        }
+
+        private fun createPendingIntent(context: Context): PendingIntent {
+            val intent = Intent(context, GeofenceReceiver::class.java).apply {
+                action = GEOFENCE_INTENT_TYPE
+            }
+
+            return PendingIntent.getBroadcast(
+                context,
+                REQUEST_CODE_GEOFENCE_BROADCAST_RECEIVER,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
         }
 
-        return listGeofence
-    }
+        private fun createRequest(): GeofencingRequest {
+            val list = createEntries()
 
-    private fun getEntries(): List<Locality> {
-        val listLocalities: MutableList<Locality> = mutableListOf()
-
-        for (geofence in geofences) {
-            listLocalities.add(
-                Locality(geofence.id.toString(), geofence.longitude, geofence.latitude)
-            )
+            return GeofencingRequest.Builder().apply {
+                setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+                addGeofences(list)
+            }.build()
         }
 
-        return listLocalities
+        private fun createEntries(): List<Geofence> {
+            val listLocalities: MutableList<Locality> = mutableListOf()
+
+            for (area in areas) {
+                listLocalities.add(
+                    Locality(area.id.toString(), area.longitude, area.latitude)
+                )
+            }
+
+            val listGeofence = mutableListOf<Geofence>()
+
+            for(locality in listLocalities) {
+                listGeofence.add(
+                    Geofence.Builder()
+                        .setRequestId(locality.id)
+                        .setCircularRegion(locality.latitude, locality.longitude, radius.toFloat())
+                        .setExpirationDuration(duration)
+                        .setTransitionTypes(
+                            Geofence.GEOFENCE_TRANSITION_DWELL
+                            or
+                            Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setLoiteringDelay(5000)
+                        .build()
+                )
+            }
+
+            return listGeofence
+        }
     }
 }
