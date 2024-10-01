@@ -1,11 +1,9 @@
-package com.example.brockapp.util
-
-import com.example.brockapp.singleton.MyUser
+package com.example.brockapp.`object`
 
 import android.content.Context
 import android.content.SharedPreferences
 
-object ExtraUtil {
+object SharedPreferences {
     private const val PREFERENCES_NAME = "MY_APP_PREFERENCES"
     private const val KEY_ID = "ID"
     private const val KEY_USERNAME = "USERNAME"
