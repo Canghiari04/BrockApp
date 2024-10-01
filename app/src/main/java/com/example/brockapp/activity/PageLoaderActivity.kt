@@ -1,38 +1,38 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.singleton.User
+import com.example.brockapp.`object`.SharedPreferences
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.singleton.MyNetwork
-import com.example.brockapp.dialog.AccountDialog
+import com.example.brockapp.`object`.MyNetwork
+import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.fragment.MapFragment
-import com.example.brockapp.fragment.HomeFragment
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.fragment.ChartsFragment
+import com.example.brockapp.fragment.YouFragment
 import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
-import com.example.brockapp.singleton.S3ClientProvider
+import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.singleton.MyActivityRecognition
+import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
-import java.io.File
+import android.Manifest
+import android.util.Log
 import android.os.Bundle
-import android.view.Menu
 import android.widget.Toast
-import android.view.MenuItem
 import android.content.Intent
-import android.view.MenuInflater
-import android.graphics.PorterDuff
+import android.app.PendingIntent
 import android.content.IntentFilter
 import androidx.fragment.app.Fragment
 import android.net.ConnectivityManager
+import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
-import androidx.appcompat.app.AlertDialog
+import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.GeofencingRequest
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -42,11 +42,11 @@ class PageLoaderActivity: AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var mapFragment: MapFragment
-    private lateinit var homeFragment: HomeFragment
+    private lateinit var youFragment: YouFragment
     private lateinit var receiver: ConnectivityReceiver
-    private lateinit var chartsFragment: ChartsFragment
     private lateinit var friendsFragment: FriendsFragment
     private lateinit var calendarFragment: CalendarFragment
+    private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var settingsButton: FloatingActionButton
     private lateinit var newActivityButton: FloatingActionButton
 
@@ -54,37 +54,35 @@ class PageLoaderActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page_loader)
 
+        // Connectivity service start always, regardless of the user's preferences
         checkConnectivity()
         startConnectivity()
 
-        toolbar = findViewById(R.id.toolbar_page_loader)
-        setSupportActionBar(toolbar)
-        toolbar.overflowIcon?.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN)
+        checkServicesActive()
 
-        homeFragment = HomeFragment()
+        toolbar = findViewById(R.id.toolbar_page_loader)
+
+        youFragment = YouFragment()
         calendarFragment = CalendarFragment()
         mapFragment = MapFragment()
-        chartsFragment = ChartsFragment()
         friendsFragment = FriendsFragment()
 
-        settingsButton = findViewById(R.id.settings_button)
-        newActivityButton = findViewById(R.id.new_activity_button)
+        settingsButton = findViewById(R.id.button_settings)
+        newActivityButton = findViewById(R.id.button_new_activity)
 
         supportFragmentManager.beginTransaction().apply {
-            add(R.id.page_loader_fragment, homeFragment)
+            add(R.id.page_loader_fragment, youFragment)
             add(R.id.page_loader_fragment, calendarFragment)
             add(R.id.page_loader_fragment, mapFragment)
-            add(R.id.page_loader_fragment, chartsFragment)
             add(R.id.page_loader_fragment, friendsFragment)
             commit()
         }
 
         mapFragments.apply {
-            put("Home", homeFragment)
-            put("Calendario", calendarFragment)
-            put("Mappa", mapFragment)
-            put("Grafici", chartsFragment)
-            put("Amici", friendsFragment)
+            put("You", youFragment)
+            put("Calendar", calendarFragment)
+            put("Map", mapFragment)
+            put("Friends", friendsFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
@@ -94,28 +92,23 @@ class PageLoaderActivity: AppCompatActivity() {
 
         findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navbar_item_home -> {
-                    switchFragment("Home", homeFragment)
+                R.id.navbar_item_you -> {
+                    switchFragment("You", youFragment)
                     true
                 }
 
                 R.id.navbar_item_calendar -> {
-                    switchFragment("Calendario", calendarFragment)
+                    switchFragment("Calendar", calendarFragment)
                     true
                 }
 
                 R.id.navbar_item_map -> {
-                    switchFragment("Mappa", mapFragment)
-                    true
-                }
-
-                R.id.navbar_item_charts -> {
-                    switchFragment("Grafici", chartsFragment)
+                    switchFragment("Map", mapFragment)
                     true
                 }
 
                 R.id.navbar_item_friends -> {
-                    switchFragment("Amici", friendsFragment)
+                    switchFragment("Friends", friendsFragment)
                     true
                 }
 
@@ -126,9 +119,9 @@ class PageLoaderActivity: AppCompatActivity() {
         }
 
         settingsButton.setOnClickListener {
-//            val intent = Intent(this, SettingsActivity::class.java)
-//            startActivity(intent)
-//            finish()
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
         newActivityButton.setOnClickListener {
@@ -138,40 +131,10 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.toolbar_nav_menu, menu)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.item_more_info -> {
-                AccountDialog().show(supportFragmentManager, "CUSTOM_ACCOUNT_DIALOG")
-                true
-            }
-
-            R.id.item_more_logout -> {
-                User.logoutUser()
-                goToAuthenticator()
-                true
-            }
-
-            R.id.item_more_delete -> {
-                showDangerousDialog()
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+        MyActivityRecognition.removeTask(this)
     }
 
     private fun checkConnectivity() {
@@ -179,7 +142,7 @@ class PageLoaderActivity: AppCompatActivity() {
             MyNetwork.isConnected = true
         } else {
             MyNetwork.isConnected = false
-            Toast.makeText(this, "Sei offline", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "You are offline", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -194,6 +157,88 @@ class PageLoaderActivity: AppCompatActivity() {
         )
     }
 
+    private fun checkServicesActive() {
+        val activityRecognition = SharedPreferences.checkService("ACTIVITY_RECOGNITION",this)
+
+        if (activityRecognition) {
+            startActivityRecognition()
+        } else {
+            Toast.makeText(
+                this,
+                "Please, check the activity recognition service to utilize all the features of the app",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        val geofenceTransition = SharedPreferences.checkService("GEOFENCE_TRANSITION",this)
+
+        if (geofenceTransition) {
+            startGeofenceTransition()
+        } else {
+            Toast.makeText(
+                this,
+                "Please, check the geofence transition service to utilize all the features of the app",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun startActivityRecognition() {
+        val task = MyActivityRecognition.getTask(this)
+
+        task.run {
+            addOnSuccessListener {
+                Log.d("PAGE_LOADER_ACTIVITY", "Correct implementation")
+            }
+            addOnFailureListener {
+                Log.d("PAGE_LOADER_ACTIVITY", "Bad implementation")
+            }
+        }
+    }
+
+    private fun startGeofenceTransition() {
+        val db = BrockDB.getInstance(this)
+        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
+        viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
+
+        observeGeofenceAreas()
+
+        viewModelGeofence.fetchGeofenceAreas()
+    }
+
+    private fun observeGeofenceAreas() {
+        viewModelGeofence.staticAreas.observe(this) {
+            if (it.isNotEmpty()) {
+                MyGeofence.defineAreas(it)
+                MyGeofence.defineRadius(this)
+
+                val request = MyGeofence.getRequest()
+                val pendingIntent = MyGeofence.getPendingIntent(this)
+
+                startGeofence(request, pendingIntent)
+            } else {
+                viewModelGeofence.insertStaticGeofenceAreas()
+            }
+        }
+    }
+
+    private fun startGeofence(request: GeofencingRequest, pendingIntent: PendingIntent) {
+        val geofencingClient = LocationServices.getGeofencingClient(this)
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            geofencingClient.addGeofences(request, pendingIntent).run {
+                addOnSuccessListener {
+                    Log.d("PAGE_LOADER_ACTIVITY", "Successful connection")
+                }
+                addOnFailureListener {
+                    Log.e("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
+                }
+            }
+        } else {
+            Log.wtf("PAGE_LOADER_ACTIVITY", "Permission denied")
+        }
+    }
+
     private fun switchFragment(name: String, fragment: Fragment) {
         hideButton(name)
         hideAllFragment(supportFragmentManager)
@@ -206,15 +251,11 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
-    private fun hideButton(name: String) {
-        when (name) {
-            "Amici" -> {
-                newActivityButton.hide()
-            }
-
-            else -> {
-                newActivityButton.show()
-            }
+    private fun hideButton(item: String) {
+        if (item == "Calendar") {
+            newActivityButton.hide()
+        } else {
+            newActivityButton.show()
         }
     }
 
@@ -226,39 +267,5 @@ class PageLoaderActivity: AppCompatActivity() {
 
             commit()
         }
-    }
-
-    private fun showDangerousDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.dangerous_dialog_title)
-            .setMessage(R.string.dangerous_dialog_message)
-            .setPositiveButton(R.string.dangerous_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                deleteUser()
-                User.logoutUser()
-                goToAuthenticator()
-            }
-            .setNegativeButton(R.string.dangerous_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
-    private fun deleteUser() {
-        val db = BrockDB.getInstance(this)
-        val file = File(this.filesDir, "user_data.json")
-        val s3Client = S3ClientProvider.getInstance(this)
-
-        val factoryViewModel = UserViewModelFactory(db, s3Client, file)
-        val viewModel = ViewModelProvider(this, factoryViewModel)[UserViewModel::class.java]
-
-        viewModel.deleteUser(User.username, User.password)
-    }
-
-    private fun goToAuthenticator() {
-        val intent = Intent(this, AuthenticatorActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }
