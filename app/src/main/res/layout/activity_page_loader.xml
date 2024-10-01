@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="23dp"
-            android:layout_marginBottom="76dp"
+            android:layout_marginBottom="86dp"
             android:backgroundTint="@color/uni_red" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="23dp"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/uni_red" />
     </FrameLayout>
 

@@ -14,6 +14,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_daily_memo"
             app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
+            app:title="Close"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"

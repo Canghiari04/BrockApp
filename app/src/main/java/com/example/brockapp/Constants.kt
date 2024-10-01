@@ -25,7 +25,7 @@ const val NAME_CHANNEL_CONNECTIVITY_NOTIFY = "CONNECTIVITY NOTIFICATION CHANNEL"
 const val DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY = "CHANNEL FOR CONNECTIVITY NOTIFY"
 
 // Versione del database
-const val ROOM_DATABASE_VERSION = 22
+const val ROOM_DATABASE_VERSION = 24
 
 // Costanti utilizzate per definire al corretta visualizzazione grafica delle date
 const val DATE_SEPARATOR = "-"
@@ -35,9 +35,9 @@ const val CHARTS_DATE_FORMAT = "M-yyyy"
 const val POSITION_UPDATE_INTERVAL_MILLIS = 10000
 
 // Suddivisione della tipologia di attività condotta dall'utente
-const val WALK_ACTIVITY_TYPE = "WALK"
-const val STILL_ACTIVITY_TYPE = "STILL"
-const val VEHICLE_ACTIVITY_TYPE = "VEHICLE"
+const val WALK_ACTIVITY_TYPE = "Walk"
+const val STILL_ACTIVITY_TYPE = "Still"
+const val VEHICLE_ACTIVITY_TYPE = "Vehicle"
 
 // Diversificazione della tipologia di connessione per il Connectivity Service
 const val WI_FI_TYPE_CONNECTION = "WI-FI"
@@ -48,6 +48,7 @@ const val NO_CONNECTION_TYPE_CONNECTION = "NO-CONNECTION"
 const val BUCKET_NAME = "brock-app"
 
 // Tab layout
-const val NUM_TABS = 2
+const val NUM_TABS_YOU = 3
+const val NUM_TABS_FRIEND = 2
 
 const val NOT_WALKING_NOTIFICATION_TIME_MILLIS = 1200000

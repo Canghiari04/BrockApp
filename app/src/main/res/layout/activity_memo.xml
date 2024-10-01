@@ -40,7 +40,8 @@
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
             android:importantForAccessibility="yes"
-            android:maxLength="50" />
+            android:maxLength="50"
+            android:backgroundTint="@color/uni_red" />
 
         <EditText
             android:id="@+id/edit_text_description"
@@ -54,7 +55,8 @@
             android:importantForAccessibility="yes"
             android:inputType="textMultiLine"
             android:scrollbars="vertical"
-            android:maxLength="300" />
+            android:maxLength="300"
+            android:backgroundTint="@color/uni_red" />
 
         <Button
             android:id="@+id/button_add_memo"

@@ -25,32 +25,6 @@
         android:textColor="@color/black"
         android:textSize="50sp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="50dp">
-
-        <TextView
-            android:id="@+id/vehicle_distance_travelled_label"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/vehicle_distance_travelled"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="22sp" />
-    </LinearLayout>
-
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

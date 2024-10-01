@@ -23,19 +23,16 @@
     <string name="description_error_signin">CREDENZIALI GIA\' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD</string>
     <string name="description_error_login">CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL\'APPLICAZIONE?</string>
 
-    <string name="permission_title">Permesso richiesto</string>
-    <string name="permission_message">Concedi il permesso dei tuoi spostamenti per usufruire di tutte le funzionalità.</string>
-    <string name="permission_positive_button">Concedi</string>
-    <string name="settings_positive_button">Concedi</string>
-    <string name="permission_negative_button">Annulla</string>
-    <string name="permission_setting_button">Settings</string>
-    <string name="permission_background">Concedi il permesso di accedere alla tua posizione anche quando l\'app è in background per garantire il corretto funzionamento di tutte le funzionalità.</string>
-    <string name="permission_notification">Concedi il permesso di inviarti notifiche per tenerti aggiornato e garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
-    <string name="permission_recognition">Concedi il permesso di monitorare le tue attività anche quando l\'app è in background.</string>
-    <string name="permission_share_data">Concedi il permesso di condividere i dati registrati per migliorare l\'esperienza offerta dall\'app.</string>
-    <string name="permissions_location">Concedi il permesso di accedere alla tua posizione per garantire il corretto funzionamento di tutte le funzionalità dell\'app.</string>
-    <string name="permissions_title">Permessi richiesti</string>
-    <string name="permissions_message">Per migliorare la tua esperienza, l\'app ha bisogno di accedere a tutte le funzionalità richieste.</string>
+    <string name="rationale_permission_title">Permission required</string>
+    <string name="rationale_permissions_title">Permissions required</string>
+    <string name="setting_permission_title">Access to settings</string>
+    <string name="rationale_location_message">This app requires access to your location to provide features location-based services</string>
+    <string name="rationale_background_message">This app requires background location access to deliver services such as geofencing, even when the app is not actively in use</string>
+    <string name="rationale_notifications_message">This app needs permission to send you important notifications, such as updates and alerts. Without it, you may miss out on critical information</string>
+    <string name="rationale_recognition_message">This app needs activity recognition access to track your physical activity, enabling features like step counting and activity detection</string>
+    <string name="settings_message">To improve your experience, allow the app to all the required permissions by the settings</string>
+    <string name="positive_button">Allow</string>
+    <string name="negative_button">Deny</string>
 
     <string name="menu_activity">Calendar</string>
     <string name="menu_map">Map</string>
