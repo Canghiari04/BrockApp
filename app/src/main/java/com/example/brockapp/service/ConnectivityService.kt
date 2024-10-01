@@ -1,7 +1,7 @@
 package com.example.brockapp.service
 
 import com.example.brockapp.*
-import com.example.brockapp.singleton.MyNetwork
+import com.example.brockapp.`object`.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.worker.ConnectivityWorker
@@ -29,7 +29,6 @@ class ConnectivityService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-
         util = NotificationUtil()
     }
 
@@ -42,7 +41,11 @@ class ConnectivityService: Service() {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 val geofenceClient = LocationServices.getGeofencingClient(this)
 
-                geofenceClient.removeGeofences(MyGeofence.pendingIntent).run {
+                MyGeofence.defineRadius(this)
+                val request = MyGeofence.getRequest()
+                val pendingIntent = MyGeofence.getPendingIntent(this)
+
+                geofenceClient.removeGeofences(pendingIntent).run {
                     addOnSuccessListener {
                         Log.d("CONNECTIVITY_SERVICE", "Geofence removed")
                     }
@@ -51,11 +54,7 @@ class ConnectivityService: Service() {
                     }
                 }
 
-                MyGeofence.typeNetwork = typeNetwork
-                MyGeofence.defineRadius(this)
-                MyGeofence.defineRequest()
-
-                geofenceClient.addGeofences(MyGeofence.request, MyGeofence.pendingIntent).run {
+                geofenceClient.addGeofences(request, pendingIntent).run {
                     addOnSuccessListener {
                         Log.d("CONNECTIVITY_SERVICE", "Geofence added")
                     }
@@ -131,6 +130,8 @@ class ConnectivityService: Service() {
             }
         }
 
-        return Pair(currentTypeNetwork != MyGeofence.typeNetwork, currentTypeNetwork)
+        val savedTypeNetwork = MyGeofence.getNetwork(this)
+
+        return Pair(currentTypeNetwork != savedTypeNetwork, currentTypeNetwork)
     }
 }
