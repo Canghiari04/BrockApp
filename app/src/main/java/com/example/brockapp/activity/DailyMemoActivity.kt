@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class DailyMemo: AppCompatActivity() {
+class DailyMemoActivity: AppCompatActivity() {
     private lateinit var viewModel: MemoViewModel
     private lateinit var button: FloatingActionButton
     private lateinit var adapter: DailyMemoAdapter
@@ -97,7 +97,7 @@ class DailyMemo: AppCompatActivity() {
     private fun setUpFloatingButton(date: String?) {
         // I'm using the date to do the right "coming back" from NewMemo to DailyMemo
         button.setOnClickListener {
-            val intent = Intent(this, NewMemo::class.java).putExtra("CALENDAR_DATE", date)
+            val intent = Intent(this, NewMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
             startActivity(intent)
             finish()
         }

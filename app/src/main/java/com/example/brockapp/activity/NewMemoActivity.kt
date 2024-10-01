@@ -2,7 +2,7 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.*
-import com.example.brockapp.singleton.MyUser
+import com.example.brockapp.`object`.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.MemoEntity
 import com.example.brockapp.viewmodel.MemoViewModel
@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
 
-class NewMemo: AppCompatActivity() {
+class NewMemoActivity: AppCompatActivity() {
     private lateinit var date: String
     private lateinit var typeActivity: String
     private lateinit var viewModel: MemoViewModel
@@ -54,7 +54,7 @@ class NewMemo: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, DailyMemo::class.java).putExtra("CALENDAR_DATE", date)
+                val intent = Intent(this, DailyMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
                 startActivity(intent)
                 finish()
 
@@ -92,24 +92,27 @@ class NewMemo: AppCompatActivity() {
 
     private fun setUpButtonAddMemo(button: Button) {
         button.setOnClickListener {
-            val title = findViewById<EditText>(R.id.edit_text_title).text.toString()
-            val description = findViewById<EditText>(R.id.edit_text_description).text.toString()
+            val titleTextView = findViewById<EditText>(R.id.edit_text_title)
+            val descriptionTextView = findViewById<EditText>(R.id.edit_text_description)
             val timestamp = DateTimeFormatter
                 .ofPattern(ISO_DATE_FORMAT)
                 .withZone(ZoneOffset.UTC)
                 .format(Instant.now())
 
-            if (typeActivity.isEmpty() && title.isEmpty() && description.isEmpty()) {
+            if (typeActivity.isEmpty() && titleTextView.text.toString().isEmpty() && descriptionTextView.text.toString().isEmpty()) {
                 Toast.makeText(this, "You must insert something about the memo", Toast.LENGTH_SHORT).show()
             } else {
                 val memoEntity = MemoEntity(
                     userId = MyUser.id,
-                    title = title,
-                    description = description,
+                    title = titleTextView.text.toString(),
+                    description = descriptionTextView.text.toString(),
                     activityType = typeActivity,
                     date = date,
                     timestamp = timestamp
                 )
+
+                titleTextView.setText("")
+                descriptionTextView.setText("")
 
                 viewModel.insertMemo(memoEntity)
             }
