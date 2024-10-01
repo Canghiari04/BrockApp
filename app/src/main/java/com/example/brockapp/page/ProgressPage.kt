@@ -2,8 +2,8 @@ package com.example.brockapp.page
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.interfaces.PeriodRangeImpl
 import com.example.brockapp.viewmodel.ActivitiesViewModel
 import com.example.brockapp.database.UserWalkActivityEntity
@@ -208,7 +208,6 @@ class ProgressPage: Fragment(R.layout.page_progress) {
                 entries.add(PieEntry(value.toFloat(), label))
             }
         }
-
 
         val redGradientColors = listOf(
             Color.parseColor("#D32F2F"),

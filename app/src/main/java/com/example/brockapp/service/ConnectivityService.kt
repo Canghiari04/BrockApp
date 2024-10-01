@@ -1,11 +1,11 @@
 package com.example.brockapp.service
 
 import com.example.brockapp.*
-import com.example.brockapp.`object`.MyNetwork
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.util.NotificationUtil
+import com.example.brockapp.extraObject.MyNetwork
 import com.example.brockapp.worker.ConnectivityWorker
-import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.interfaces.InternetAvailableImpl
 
 import android.Manifest
 import android.util.Log
@@ -23,7 +23,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import com.google.android.gms.location.LocationServices
 
 class ConnectivityService: Service() {
-    private val networkUtil = NetworkAvailableImpl()
+    private val networkUtil = InternetAvailableImpl()
 
     private lateinit var util: NotificationUtil
 

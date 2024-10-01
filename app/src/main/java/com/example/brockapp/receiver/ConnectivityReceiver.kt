@@ -2,7 +2,7 @@ package com.example.brockapp.receiver
 
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.service.ConnectivityService
-import com.example.brockapp.interfaces.NetworkAvailableImpl
+import com.example.brockapp.interfaces.InternetAvailableImpl
 
 import android.util.Log
 import android.content.Intent
@@ -50,7 +50,7 @@ class ConnectivityReceiver(private val viewModelStoreOwner: ViewModelStoreOwner)
     }
 
     private fun handleConnectivityChange(context: Context) {
-        val networkUtil = NetworkAvailableImpl()
+        val networkUtil = InternetAvailableImpl()
         val networkViewModel = ViewModelProvider(viewModelStoreOwner)[NetworkViewModel::class.java]
 
         networkViewModel.setNetwork(networkUtil.isInternetActive(context))
