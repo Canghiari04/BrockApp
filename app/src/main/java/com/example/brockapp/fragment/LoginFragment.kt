@@ -4,8 +4,8 @@ import com.example.brockapp.R
 import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.util.PostNotificationsPermissionUtil
 
@@ -22,6 +22,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.annotation.RequiresApi
+import com.example.brockapp.util.ExtraUtil
 import androidx.lifecycle.ViewModelProvider
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
@@ -40,27 +41,38 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val db = BrockDB.getInstance(requireContext())
-        val file = File(requireContext().filesDir, "user_data.json")
-        val s3Client = MyS3ClientProvider.getInstance(requireContext())
+        val (id, savedUsername, savedPassword) = ExtraUtil.getCredentialsSaved(requireContext())
 
-        val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
-        viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
+        // If the user is already sign in he can pass to the page loader activity
+        if (id != 0L && savedUsername != null && savedPassword != null) {
+            MyUser.id = id
+            MyUser.username = savedUsername
+            MyUser.password = savedPassword
 
-        util = PostNotificationsPermissionUtil(requireActivity()) {
-            observeUser()
-        }
+            goToHome()
+        } else {
+            val db = BrockDB.getInstance(requireContext())
+            val file = File(requireContext().filesDir, "user_data.json")
+            val s3Client = MyS3ClientProvider.getInstance(requireContext())
 
-        observeLogin()
+            val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
+            viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
-        view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
-            username = view.findViewById<EditText>(R.id.text_username).text.toString()
-            password = view.findViewById<EditText>(R.id.text_password).text.toString()
+            util = PostNotificationsPermissionUtil(requireActivity()) {
+                observeUser()
+            }
 
-            if (username.isNotEmpty() && password.isNotEmpty()) {
-                viewModelUser.checkIfUserExistsLocally(username, password)
-            } else {
-                Toast.makeText(requireContext(), "Inserisci le credenziali di accesso", Toast.LENGTH_SHORT).show()
+            observeLogin()
+
+            view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
+                username = view.findViewById<EditText>(R.id.text_username).text.toString()
+                password = view.findViewById<EditText>(R.id.text_password).text.toString()
+
+                if (username.isNotEmpty() && password.isNotEmpty()) {
+                    viewModelUser.checkIfUserExistsLocally(username, password)
+                } else {
+                    Toast.makeText(requireContext(), "Insert the access credentials", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -87,7 +99,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 viewModelUser.getUser(username, password)
                 util.requestPostNotificationPermission()
             } else {
-                Toast.makeText(requireContext(), "Credenziali di accesso errate", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Access credentials wrong", Toast.LENGTH_SHORT).show()
             }
         }
     }

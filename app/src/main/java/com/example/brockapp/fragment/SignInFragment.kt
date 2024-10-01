@@ -1,13 +1,14 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
+import com.example.brockapp.util.ExtraUtil
 import com.example.brockapp.singleton.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.singleton.MyNetwork
 import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.interfaces.NetworkAvailableImpl
 import com.example.brockapp.util.PostNotificationsPermissionUtil
@@ -58,12 +59,11 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
         util = PostNotificationsPermissionUtil(requireActivity()) {
-            setUpSharedPreferences()
+            observeUser()
         }
 
         observeNetwork()
         observeSignIn()
-        observeUser()
 
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.text_username).text.toString()
@@ -72,7 +72,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.registerUser(username, password)
             } else {
-                Toast.makeText(requireContext(), "Insert the credentials", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Insert the access credentials", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -99,7 +99,7 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
             MyNetwork.isConnected = true
         } else {
             MyNetwork.isConnected = false
-            Toast.makeText(requireContext(), "Check the connection to register yourself", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Check the connection to register your account", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -125,30 +125,15 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
             if (currentUser != null) {
                 MyUser.id = currentUser.id
-                MyUser.username = currentUser.username.toString()
-                MyUser.password = currentUser.password.toString()
+                MyUser.username = currentUser.username!!
+                MyUser.password = currentUser.password!!
+
+                ExtraUtil.setUpSharedPreferences(requireContext())
+                goToHome()
             } else {
                 Log.e("SIGN_IN_FRAGMENT", "User not found")
             }
         }
-    }
-
-    private fun setUpSharedPreferences() {
-        // I create an unique shared preferences for every user signed in the app
-        val sharedPreferences = requireContext().getSharedPreferences(
-            "${MyUser.id}_${MyUser.username}_${MyUser.password}",
-            Context.MODE_PRIVATE
-        )
-
-        val editor = sharedPreferences?.edit()
-        editor?.run {
-            putBoolean("ACTIVITY_RECOGNITION", false)
-            putBoolean("GEOFENCE_TRANSITION", false)
-            putBoolean("DUMP_DATABASE", false)
-        }
-        editor?.apply()
-
-        goToHome()
     }
 
     private fun goToHome() {
