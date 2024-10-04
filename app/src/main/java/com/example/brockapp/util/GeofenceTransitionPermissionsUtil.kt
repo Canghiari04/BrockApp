@@ -7,10 +7,10 @@ import android.Manifest
 import android.content.Intent
 import android.app.AlertDialog
 import android.provider.Settings
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
 class GeofenceTransitionPermissionsUtil(private val activity: AppCompatActivity, private val onPermissionsGranted: () -> Unit, private val switch: SwitchCompat) {

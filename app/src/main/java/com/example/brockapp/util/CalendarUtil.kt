@@ -1,6 +1,5 @@
 package com.example.brockapp.util
 
-
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
