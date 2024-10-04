@@ -2,17 +2,17 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.*
-import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.database.MemoEntity
 import com.example.brockapp.viewmodel.MemoViewModel
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.MemoViewModelFactory
 
 import android.view.View
 import android.os.Bundle
 import java.time.Instant
 import java.time.ZoneOffset
-import android.widget.Toast
 import android.view.MenuItem
 import android.widget.Button
 import android.content.Intent
@@ -26,6 +26,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
 
 class NewMemoActivity: AppCompatActivity() {
+    private val toastUtil = ShowCustomToastImpl()
+
     private lateinit var date: String
     private lateinit var typeActivity: String
     private lateinit var viewModel: MemoViewModel
@@ -100,7 +102,10 @@ class NewMemoActivity: AppCompatActivity() {
                 .format(Instant.now())
 
             if (typeActivity.isEmpty() && titleTextView.text.toString().isEmpty() && descriptionTextView.text.toString().isEmpty()) {
-                Toast.makeText(this, "You must insert something about the memo", Toast.LENGTH_SHORT).show()
+                toastUtil.showBasicToast(
+                    "You must inserted the field required",
+                    this
+                )
             } else {
                 val memoEntity = MemoEntity(
                     userId = MyUser.id,
@@ -111,8 +116,8 @@ class NewMemoActivity: AppCompatActivity() {
                     timestamp = timestamp
                 )
 
-                titleTextView.setText("")
-                descriptionTextView.setText("")
+                titleTextView.text.clear()
+                descriptionTextView.text.clear()
 
                 viewModel.insertMemo(memoEntity)
             }

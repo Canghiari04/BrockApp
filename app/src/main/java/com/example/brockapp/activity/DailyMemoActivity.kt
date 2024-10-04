@@ -6,12 +6,12 @@ import com.example.brockapp.database.BrockDB
 import com.example.brockapp.database.MemoEntity
 import com.example.brockapp.viewmodel.MemoViewModel
 import com.example.brockapp.adapter.DailyMemoAdapter
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.MemoViewModelFactory
 
 import android.util.Log
 import android.os.Bundle
 import java.time.LocalDate
-import android.widget.Toast
 import android.view.MenuItem
 import android.content.Intent
 import androidx.appcompat.widget.Toolbar
@@ -23,9 +23,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DailyMemoActivity: AppCompatActivity() {
+    private val toastUtil = ShowCustomToastImpl()
+
     private lateinit var viewModel: MemoViewModel
-    private lateinit var button: FloatingActionButton
     private lateinit var adapter: DailyMemoAdapter
+    private lateinit var button: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,12 +80,11 @@ class DailyMemoActivity: AppCompatActivity() {
         super.onPause()
 
         if (::adapter.isInitialized) {
-            val list = adapter.getMemosSelected()
-            list.forEach { memo ->
+            adapter.getMemosSelected().forEach { memo ->
                 viewModel.deleteMemo(memo)
             }
         } else {
-            Log.d("DAILY_ACTIVITY", "None memos inside the list")
+            Log.d("DAILY_MEMO_ACTIVITY", "No one memo inside the list")
         }
     }
 
@@ -109,11 +110,16 @@ class DailyMemoActivity: AppCompatActivity() {
                 val recyclerView = findViewById<RecyclerView>(R.id.recycler_view_memos)
                 populateRecyclerView(list, recyclerView)
             } else {
-                Toast.makeText(
-                    this,
-                    "None memo detect",
-                    Toast.LENGTH_SHORT
-                ).show()
+                setContentView(R.layout.activity_empty_page)
+
+                val toolbar = findViewById<Toolbar>(R.id.toolbar_empty_activity)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                setSupportActionBar(toolbar)
+
+                toastUtil.showBasicToast(
+                    "No one memo retrieved",
+                    this
+                )
             }
         }
     }
