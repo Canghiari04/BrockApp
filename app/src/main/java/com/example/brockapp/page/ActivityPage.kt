@@ -105,9 +105,9 @@ class ActivityPage: Fragment(R.layout.page_activities) {
     }
 
     private fun observeUserActivities() {
-        viewModel.listExitActivities.observe(viewLifecycleOwner) { list ->
-            if (!list.isNullOrEmpty()) {
-                val filteredList = list.filter { activities ->
+        viewModel.listActivities.observe(viewLifecycleOwner) {
+            if (!it.isNullOrEmpty()) {
+                val filteredList = it.filter { activities ->
                     when (selectedActivityType) {
                         "Still" -> {
                             activities.type == "Still"
@@ -133,7 +133,7 @@ class ActivityPage: Fragment(R.layout.page_activities) {
 
                 populateRecyclerView(recyclerView, filteredList)
             } else {
-                Log.d("HOME_FRAGMENT", "None activities.")
+                Log.d("ACTIVITY_PAGE", "No one activities detected")
             }
         }
     }

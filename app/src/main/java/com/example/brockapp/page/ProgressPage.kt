@@ -28,12 +28,13 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.data.BarEntry
+import kotlin.time.Duration.Companion.milliseconds
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
 class ProgressPage: Fragment(R.layout.page_progress) {
@@ -51,11 +52,10 @@ class ProgressPage: Fragment(R.layout.page_progress) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<TextView>(R.id.text_view_welcome_progress)
-            .setText("Welcome, " + MyUser.username + "! In this area you can check your progress done during the activities registered")
+        view.findViewById<TextView>(R.id.text_view_welcome_progress).text =
+            ("Welcome, " + MyUser.username + "! In this area you can check your progress done during the activities registered")
 
         titleSecondCard = view.findViewById(R.id.text_view_title_second_card)
-
         titleFirstColumn = view.findViewById(R.id.text_view_title_first_column)
 
         contentFirstColumn = view.findViewById(R.id.text_view_content_first_column)
@@ -235,10 +235,10 @@ class ProgressPage: Fragment(R.layout.page_progress) {
     }
 
     private fun observeUserKilometers() {
-        viewModel.meters.observe(viewLifecycleOwner) { meters ->
-            if (meters != 0) {
-                val kilometers = (meters/1000)
-                contentFirstColumn.setText(kilometers.toString() + " km")
+        viewModel.meters.observe(viewLifecycleOwner) {
+            if (it.isFinite()) {
+                val kilometers = (it/1000)
+                contentFirstColumn.text = ("%.1f km".format(kilometers))
             } else {
                 Log.d("PAGE_PROGRESS", "None vehicle activity detect")
             }
@@ -246,9 +246,12 @@ class ProgressPage: Fragment(R.layout.page_progress) {
     }
 
     private fun observeVehicleTimeSpent() {
-        viewModel.vehicleTime.observe(viewLifecycleOwner) { time ->
-            val minute = (time / 60).toInt()
-            contentSecondColumn.setText(minute.toString() + "m")
+        viewModel.vehicleTime.observe(viewLifecycleOwner) {
+            val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
+                "%01dh %01dm %01ds".format(hours, minutes, seconds)
+            }
+
+            contentSecondColumn.setText(duration)
         }
     }
 
@@ -313,15 +316,18 @@ class ProgressPage: Fragment(R.layout.page_progress) {
             if (steps != 0) {
                 contentFirstColumn.setText(steps.toString() + " steps")
             } else {
-                Log.d("PAGE_PROGRESS", "None walk activity detect")
+                Log.d("PAGE_PROGRESS", "No one walk activities detected")
             }
         }
     }
 
     private fun observeWalkTimeSpent() {
-        viewModel.walkTime.observe(viewLifecycleOwner) { time ->
-            val minute = (time / 60).toInt()
-            contentSecondColumn.setText(minute.toString() + "m")
+        viewModel.walkTime.observe(viewLifecycleOwner) {
+            val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
+                "%01dh %01dm %01ds".format(hours, minutes, seconds)
+            }
+
+            contentSecondColumn.setText(duration)
         }
     }
 
@@ -330,7 +336,7 @@ class ProgressPage: Fragment(R.layout.page_progress) {
             if (!activities.isNullOrEmpty()) {
                 setUpWalkBarChart(activities)
             } else {
-                Log.d("PAGE_PROGRESS", "None vehicle activity detect")
+                Log.d("PAGE_PROGRESS", "No one vehicle activities detected")
             }
         }
     }
@@ -340,7 +346,7 @@ class ProgressPage: Fragment(R.layout.page_progress) {
         val yearMonth = YearMonth.of(LocalDate.now().year, LocalDate.now().month)
 
         val stepsPerDay = activities.groupBy {
-            it.timestamp?.let { timestamp ->
+            it.timestamp.let { timestamp ->
                 LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
             } ?: 0
         }.mapValues { entry ->

@@ -1,113 +1,263 @@
 package com.example.brockapp.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.brockapp.STILL_ACTIVITY_TYPE
-import com.example.brockapp.VEHICLE_ACTIVITY_TYPE
-import com.example.brockapp.WALK_ACTIVITY_TYPE
-import com.example.brockapp.data.UserActivity
+import com.example.brockapp.*
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.interfaces.TimeSpentCounterImpl
-import com.example.brockapp.singleton.User
-import kotlinx.coroutines.Dispatchers
+import com.example.brockapp.data.UserActivity
+import com.example.brockapp.extraObject.MyUser
+import com.example.brockapp.database.UserWalkActivityEntity
+import com.example.brockapp.database.UserVehicleActivityEntity
+
 import kotlinx.coroutines.launch
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.common.util.ArrayUtils.removeAll
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
-    private val timeSpentCounter = TimeSpentCounterImpl()
+    private val _listActivities = MutableLiveData<List<UserActivity>>()
+    val listActivities: LiveData<List<UserActivity>> get() = _listActivities
 
-    private val _listExitActivities = MutableLiveData<List<UserActivity>>()
-    val listExitActivities: LiveData<List<UserActivity>> get() = _listExitActivities
-
-    private val _listTimeStampActivities = MutableLiveData<List<UserActivity>>()
-    val listTimeStampActivities: LiveData<List<UserActivity>> get() = _listTimeStampActivities
+    private val _mapCountActivities = MutableLiveData<Map<String, Int>>()
+    val mapCountActivities: MutableLiveData<Map<String, Int>> get() = _mapCountActivities
 
     private val _stillTime = MutableLiveData<Long>()
     val stillTime: LiveData<Long> get() = _stillTime
 
-    private val _meters = MutableLiveData<Int>()
-    val meters: LiveData<Int> get() = _meters
+    private val _listVehicleActivities = MutableLiveData<List<UserVehicleActivityEntity>>()
+    val listVehicleActivities: LiveData<List<UserVehicleActivityEntity>> get() = _listVehicleActivities
+
+    private val _meters = MutableLiveData<Double>()
+    val meters: LiveData<Double> get() = _meters
+
+    private val _vehicleTime = MutableLiveData<Long>()
+    val vehicleTime: LiveData<Long> get() = _vehicleTime
+
+    private val _listWalkActivities = MutableLiveData<List<UserWalkActivityEntity>>()
+    val listWalkActivities: LiveData<List<UserWalkActivityEntity>> get() = _listWalkActivities
 
     private val _steps = MutableLiveData<Int>()
     val steps: LiveData<Int> get() = _steps
 
-    fun getUserActivities(startOfDay: String, endOfDay: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val listActivities = ArrayList<UserActivity>()
+    private val _walkTime = MutableLiveData<Long>()
+    val walkTime: LiveData<Long> get() = _walkTime
 
-            val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
-            val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
-            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(User.id, startOfDay, endOfDay)
+    // Get all the activities and put inside in an unique list
+    fun getUserActivities(startOfPeriod: String, endOfPeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val listActivities = mutableListOf<UserActivity>()
+
+            val listStillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
+                MyUser.id, startOfPeriod, endOfPeriod)
+            val listVehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
+                MyUser.id, startOfPeriod, endOfPeriod)
+            val listWalkingActivities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
+                MyUser.id, startOfPeriod, endOfPeriod)
 
             listStillActivities.parallelStream().forEach {
-                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, STILL_ACTIVITY_TYPE, "")
-                listActivities.add(newActivity)
+                listActivities.add(
+                    UserActivity(
+                        it.id,
+                        it.userId,
+                        STILL_ACTIVITY_TYPE,
+                        it.timestamp,
+                        it.arrivalTime,
+                        it.exitTime,
+                        " "
+                    )
+                )
             }
 
             listVehicleActivities.parallelStream().forEach {
-                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, VEHICLE_ACTIVITY_TYPE, it.distanceTravelled.toString())
-                listActivities.add(newActivity)
+                listActivities.add(
+                    UserActivity(
+                        it.id,
+                        it.userId,
+                        VEHICLE_ACTIVITY_TYPE,
+                        it.timestamp,
+                        it.arrivalTime,
+                        it.exitTime,
+                        it.distanceTravelled
+                    )
+                )
             }
 
             listWalkingActivities.parallelStream().forEach {
-                val newActivity = UserActivity(it.id, it.userId, it.timestamp, it.transitionType, WALK_ACTIVITY_TYPE, it.stepNumber.toString())
-                listActivities.add(newActivity)
+                listActivities.add(
+                    UserActivity(
+                        it.id,
+                        it.userId,
+                        WALK_ACTIVITY_TYPE,
+                        it.timestamp,
+                        it.arrivalTime,
+                        it.exitTime,
+                        it.stepNumber
+                    )
+                )
             }
 
-            val listTimeStampActivities = listActivities
-                .sortedBy {
-                    it.timestamp
-                }
+            listActivities.sortedBy { it.timestamp }
+            listActivities.apply {
+                removeAll { it.exitTime == 0L }
+            }
 
-            val listExitActivities = listActivities
-                .filter {
-                    it.transitionType == 1
-                }
-                .sortedBy {
-                    it.timestamp
-                }
-
-            _listTimeStampActivities.postValue(listTimeStampActivities)
-            _listExitActivities.postValue(listExitActivities)
+            _listActivities.postValue(listActivities)
         }
     }
 
-    fun getStillTime(startOfDay: String, endOfDay: String) {
+    // Return the number of activities done during a certain period
+    fun getCountsOfActivities(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
-                User.id,
-                startOfDay,
-                endOfDay
+            val stillActivitiesCount = db.UserStillActivityDao()
+                .getStillActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+                .toMutableList().apply { removeAll { it.exitTime == 0L } }
+
+            val walkActivitiesCount = db.UserWalkActivityDao()
+                .getWalkActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+                .toMutableList().apply { removeAll { it.exitTime == 0L } }
+
+            val vehicleActivitiesCount = db.UserVehicleActivityDao()
+                .getVehicleActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+                .toMutableList().apply { removeAll { it.exitTime == 0L } }
+
+            val map = mutableMapOf(
+                "Still" to stillActivitiesCount.size,
+                "Vehicle" to vehicleActivitiesCount.size,
+                "Walk" to walkActivitiesCount.size
             )
 
-            val timeSpent = timeSpentCounter.computeTimeSpentStill(stillActivities)
-
-            _stillTime.postValue(timeSpent)
+            _mapCountActivities.postValue(map)
         }
     }
 
-    fun getKilometers(startOfDay: String, endOfDay: String) {
+    fun getStillTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val meters = db.UserVehicleActivityDao().getEndingVehicleActivitiesByUserIdAndPeriod(
-                User.id,
-                startOfDay,
-                endOfDay
-            ).parallelStream().mapToInt { it.distanceTravelled!!.toInt() }.sum()
+            val activities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
+                MyUser.id,
+                startOfPeriod,
+                endOfPeriod
+            )
+
+            val time = run {
+                if (activities.isNotEmpty() && activities.size % 2 == 0) {
+                    var sum = 0L
+
+                    for (activity in activities) {
+                        sum += (activity.exitTime - activity.arrivalTime)
+                    }
+
+                    sum
+                } else {
+                    0L
+                }
+            }
+
+            _stillTime.postValue(time)
+        }
+    }
+
+    fun getVehicleActivities(startOfWeek: String, endOfWeek: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val activities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod (
+                MyUser.id,
+                startOfWeek,
+                endOfWeek
+            )
+
+            _listVehicleActivities.postValue(activities)
+        }
+    }
+
+    fun getKilometers(startOfPeriod: String, endOfPeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val meters = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
+                MyUser.id,
+                startOfPeriod,
+                endOfPeriod
+            ).parallelStream().mapToDouble { it.distanceTravelled }.sum()
 
             _meters.postValue(meters)
         }
     }
 
-    fun getSteps(startOfDay: String, endOfDay: String) {
+    fun getVehicleTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val steps = db.UserWalkActivityDao().getEndingWalkActivitiesByUserIdAndPeriod(
-                User.id,
-                startOfDay,
-                endOfDay
+            val activities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
+                MyUser.id,
+                startOfPeriod,
+                endOfPeriod
+            )
+
+            val time = run {
+                if (activities.isNotEmpty() && activities.size % 2 == 0) {
+                    var sum = 0L
+
+                    for (activity in activities) {
+                        if (activity.exitTime > activity.arrivalTime) {
+                            sum += (activity.exitTime - activity.arrivalTime)
+                        }
+                    }
+
+                    sum
+                } else {
+                    0L
+                }
+            }
+
+            _vehicleTime.postValue(time)
+        }
+    }
+
+    fun getWalkActivities(startOfPeriod: String, endOfPeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val activities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod (
+                MyUser.id,
+                startOfPeriod,
+                endOfPeriod
+            )
+
+            _listWalkActivities.postValue(activities)
+        }
+    }
+
+    fun getSteps(startOfPeriod: String, endOfPeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val steps = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
+                MyUser.id,
+                startOfPeriod,
+                endOfPeriod
             ).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
 
             _steps.postValue(steps)
+        }
+    }
+
+    fun getWalkTime(startOfPeriod: String, endOfPeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val activities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
+                MyUser.id,
+                startOfPeriod,
+                endOfPeriod
+            )
+
+            val time = run {
+                if (activities.isNotEmpty()) {
+                    var sum = 0L
+
+                    for (activity in activities) {
+                        if (activity.exitTime > activity.arrivalTime) {
+                            sum += (activity.exitTime - activity.arrivalTime)
+                        }
+                    }
+
+                    sum
+                } else {
+                    0L
+                }
+            }
+
+            _walkTime.postValue(time)
         }
     }
 }
