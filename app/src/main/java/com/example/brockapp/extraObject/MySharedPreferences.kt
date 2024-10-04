@@ -36,6 +36,17 @@ object MySharedPreferences {
         return Triple(id, username, password)
     }
 
+    fun setCredentialsSaved(context: Context) {
+        val sharedPreferences = getSharedPreferences(context)
+
+        with(sharedPreferences.edit()) {
+            putLong(KEY_ID, MyUser.id)
+            putString(KEY_USERNAME, MyUser.username)
+            putString(KEY_PASSWORD, MyUser.password)
+            apply()
+        }
+    }
+
     fun checkService(key:String, context: Context): Boolean {
         val sharedPreferences = getSharedPreferences(context)
 
@@ -47,6 +58,16 @@ object MySharedPreferences {
 
         with(sharedPreferences.edit()) {
             putBoolean(key, item)
+            apply()
+        }
+    }
+
+    fun logout(context: Context) {
+        val sharedPreferences = getSharedPreferences(context)
+
+        with(sharedPreferences.edit()) {
+            remove(KEY_USERNAME)
+            remove(KEY_PASSWORD)
             apply()
         }
     }
