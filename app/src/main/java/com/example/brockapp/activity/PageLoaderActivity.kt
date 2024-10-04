@@ -10,6 +10,7 @@ import com.example.brockapp.fragment.FriendsFragment
 import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.singleton.MyActivityRecognition
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.interfaces.InternetAvailableImpl
@@ -18,7 +19,6 @@ import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 import android.Manifest
 import android.util.Log
 import android.os.Bundle
-import android.widget.Toast
 import android.content.Intent
 import android.app.PendingIntent
 import android.content.IntentFilter
@@ -31,16 +31,22 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.ActionBarDrawerToggle
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.GeofencingRequest
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PageLoaderActivity: AppCompatActivity() {
+    private val toastUtil = ShowCustomToastImpl()
     private val networkUtil = InternetAvailableImpl()
+
     private var mapFragments = mutableMapOf<String, Fragment>()
 
     private lateinit var toolbar: Toolbar
+    private lateinit var drawer: DrawerLayout
     private lateinit var mapFragment: MapFragment
     private lateinit var youFragment: YouFragment
     private lateinit var receiver: ConnectivityReceiver
@@ -49,6 +55,7 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var settingsButton: FloatingActionButton
     private lateinit var newActivityButton: FloatingActionButton
+    private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +68,9 @@ class PageLoaderActivity: AppCompatActivity() {
         checkServicesActive()
 
         toolbar = findViewById(R.id.toolbar_page_loader)
+        drawer = findViewById(R.id.drawer_page_loader)
+
+        setUpActionBar()
 
         youFragment = YouFragment()
         calendarFragment = CalendarFragment()
@@ -142,7 +152,10 @@ class PageLoaderActivity: AppCompatActivity() {
             MyNetwork.isConnected = true
         } else {
             MyNetwork.isConnected = false
-            Toast.makeText(this, "You are offline", Toast.LENGTH_LONG).show()
+            toastUtil.showWarningToast(
+                "You are offline",
+                this
+            )
         }
     }
 
@@ -157,17 +170,60 @@ class PageLoaderActivity: AppCompatActivity() {
         )
     }
 
+    private fun setUpActionBar() {
+        toolbar.run {
+            setSupportActionBar(toolbar)
+            supportActionBar?.setDisplayShowTitleEnabled(false)
+        }
+
+        actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            drawer,
+            toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
+        )
+
+        actionBarDrawerToggle.run {
+            drawerArrowDrawable.color = ContextCompat.getColor(applicationContext, R.color.white)
+        }
+
+        drawer.addDrawerListener(actionBarDrawerToggle)
+        actionBarDrawerToggle.syncState()
+
+        findViewById<NavigationView>(R.id.navigation_view_page_loader).setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.drawer_item_your_account -> {
+                    startActivity(Intent(this, AccountActivity::class.java))
+                    finish()
+                    true
+                }
+
+                R.id.drawer_item_logout -> {
+                    MySharedPreferences.logout(this)
+
+                    startActivity(Intent(this, AuthenticatorActivity::class.java))
+                    finish()
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
+        }
+    }
+
     private fun checkServicesActive() {
         val activityRecognition = MySharedPreferences.checkService("ACTIVITY_RECOGNITION",this)
 
         if (activityRecognition) {
             startActivityRecognition()
         } else {
-            Toast.makeText(
-                this,
-                "Please, check the activity recognition service to utilize all the features of the app",
-                Toast.LENGTH_LONG
-            ).show()
+            toastUtil.showWarningToast(
+                "Activity recognition service deactivated",
+                this
+            )
         }
 
         val geofenceTransition = MySharedPreferences.checkService("GEOFENCE_TRANSITION",this)
@@ -175,11 +231,10 @@ class PageLoaderActivity: AppCompatActivity() {
         if (geofenceTransition) {
             startGeofenceTransition()
         } else {
-            Toast.makeText(
-                this,
-                "Please, check the geofence transition service to utilize all the features of the app",
-                Toast.LENGTH_LONG
-            ).show()
+            toastUtil.showWarningToast(
+                "Geofence transition service deactivated",
+                this
+            )
         }
     }
 
@@ -243,8 +298,6 @@ class PageLoaderActivity: AppCompatActivity() {
         hideButton(name)
         hideAllFragment(supportFragmentManager)
 
-        toolbar.title = name
-
         supportFragmentManager.beginTransaction().apply {
             show(fragment)
             commit()
@@ -252,10 +305,10 @@ class PageLoaderActivity: AppCompatActivity() {
     }
 
     private fun hideButton(item: String) {
-        if (item == "Calendar") {
-            newActivityButton.hide()
-        } else {
+        if (item == "You") {
             newActivityButton.show()
+        } else {
+            newActivityButton.hide()
         }
     }
 
