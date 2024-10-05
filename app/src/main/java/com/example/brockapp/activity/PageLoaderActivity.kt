@@ -6,7 +6,7 @@ import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.fragment.MapFragment
 import com.example.brockapp.fragment.YouFragment
 import com.example.brockapp.extraObject.MyNetwork
-import com.example.brockapp.fragment.FriendsFragment
+import com.example.brockapp.fragment.GroupFragment
 import com.example.brockapp.fragment.CalendarFragment
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.receiver.ConnectivityReceiver
@@ -50,7 +50,7 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var mapFragment: MapFragment
     private lateinit var youFragment: YouFragment
     private lateinit var receiver: ConnectivityReceiver
-    private lateinit var friendsFragment: FriendsFragment
+    private lateinit var groupFragment: GroupFragment
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var settingsButton: FloatingActionButton
@@ -75,7 +75,7 @@ class PageLoaderActivity: AppCompatActivity() {
         youFragment = YouFragment()
         calendarFragment = CalendarFragment()
         mapFragment = MapFragment()
-        friendsFragment = FriendsFragment()
+        groupFragment = GroupFragment()
 
         settingsButton = findViewById(R.id.button_settings)
         newActivityButton = findViewById(R.id.button_new_activity)
@@ -84,7 +84,7 @@ class PageLoaderActivity: AppCompatActivity() {
             add(R.id.page_loader_fragment, youFragment)
             add(R.id.page_loader_fragment, calendarFragment)
             add(R.id.page_loader_fragment, mapFragment)
-            add(R.id.page_loader_fragment, friendsFragment)
+            add(R.id.page_loader_fragment, groupFragment)
             commit()
         }
 
@@ -92,7 +92,7 @@ class PageLoaderActivity: AppCompatActivity() {
             put("You", youFragment)
             put("Calendar", calendarFragment)
             put("Map", mapFragment)
-            put("Friends", friendsFragment)
+            put("Friends", groupFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
@@ -117,8 +117,8 @@ class PageLoaderActivity: AppCompatActivity() {
                     true
                 }
 
-                R.id.navbar_item_friends -> {
-                    switchFragment("Friends", friendsFragment)
+                R.id.navbar_item_group -> {
+                    switchFragment("Friends", groupFragment)
                     true
                 }
 
@@ -221,7 +221,7 @@ class PageLoaderActivity: AppCompatActivity() {
             startActivityRecognition()
         } else {
             toastUtil.showWarningToast(
-                "Activity recognition service deactivated",
+                "Recognition service deactivated",
                 this
             )
         }
@@ -232,7 +232,7 @@ class PageLoaderActivity: AppCompatActivity() {
             startGeofenceTransition()
         } else {
             toastUtil.showWarningToast(
-                "Geofence transition service deactivated",
+                "Geofence service deactivated",
                 this
             )
         }
