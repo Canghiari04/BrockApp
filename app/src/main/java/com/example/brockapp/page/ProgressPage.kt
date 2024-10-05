@@ -37,17 +37,18 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
-class ProgressPage: Fragment(R.layout.page_progress) {
+abstract class ProgressPage: Fragment(R.layout.page_progress) {
     private var rangeUtil = PeriodRangeImpl()
 
     private lateinit var pieChart: PieChart
-    private lateinit var walkBarChart: BarChart
-    private lateinit var vehicleBarChart: BarChart
-    private lateinit var titleSecondCard: TextView
-    private lateinit var titleFirstColumn: TextView
-    private lateinit var contentFirstColumn: TextView
     private lateinit var contentSecondColumn: TextView
-    private lateinit var viewModel: ActivitiesViewModel
+
+    protected lateinit var walkBarChart: BarChart
+    protected lateinit var vehicleBarChart: BarChart
+    protected lateinit var titleSecondCard: TextView
+    protected lateinit var titleFirstColumn: TextView
+    protected lateinit var contentFirstColumn: TextView
+    protected lateinit var viewModel: ActivitiesViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -111,9 +112,9 @@ class ProgressPage: Fragment(R.layout.page_progress) {
                         titleFirstColumn.setText("Distance")
                         contentFirstColumn.setText("0 km")
 
-                        viewModel.getVehicleActivities(range.first, range.second)
-                        viewModel.getKilometers(range.first, range.second)
-                        viewModel.getVehicleTime(range.first, range.second)
+                        loadVehicleActivities(range.first, range.second)
+                        loadKilometers(range.first, range.second)
+                        loadVehicleTime(range.first, range.second)
                     }
 
                     "Walk" -> {
@@ -123,9 +124,9 @@ class ProgressPage: Fragment(R.layout.page_progress) {
                         titleFirstColumn.setText("Steps")
                         contentFirstColumn.setText("0 steps")
 
-                        viewModel.getWalkActivities(range.first, range.second)
-                        viewModel.getSteps(range.first, range.second)
-                        viewModel.getWalkTime(range.first, range.second)
+                        loadWalkActivities(range.first, range.second)
+                        loadStepNumber(range.first, range.second)
+                        loadWalkTime(range.first, range.second)
                     }
                 }
             }
@@ -270,11 +271,11 @@ class ProgressPage: Fragment(R.layout.page_progress) {
         val yearMonth = YearMonth.of(LocalDate.now().year, LocalDate.now().month)
 
         val distancePerDay = activities?.groupBy {
-            it.timestamp?.let { timestamp ->
+            it.timestamp.let { timestamp ->
                 LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
-            } ?: 0
+            }
         }?.mapValues { entry ->
-            entry.value.sumOf { it.distanceTravelled ?: 0.0 } / 1000.0 // Converti in chilometri
+            entry.value.sumOf { it.distanceTravelled } / 1000.0
         }
 
         for (day in 1..yearMonth.lengthOfMonth()) {
@@ -381,4 +382,16 @@ class ProgressPage: Fragment(R.layout.page_progress) {
 
         walkBarChart.invalidate()
     }
+
+    protected abstract fun loadVehicleActivities(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun loadKilometers(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun loadVehicleTime(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun loadWalkActivities(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun loadWalkTime(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun loadStepNumber(startOfPeriod: String, endOfPeriod: String)
 }

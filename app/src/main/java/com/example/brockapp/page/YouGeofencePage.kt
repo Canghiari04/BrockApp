@@ -1,6 +1,6 @@
 package com.example.brockapp.page
 
-class GeofencePage: BaseGeofencePage() {
+class YouGeofencePage: GeofencePage() {
     override fun loadGeofenceTransitions() {
         viewModel.getGeofenceTransitions()
     }
