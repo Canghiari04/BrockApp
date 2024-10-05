@@ -1,33 +1,33 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.service.MapService
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.dialog.MarkerDialog
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.database.GeofenceAreaEntity
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.database.GeofenceAreaEntity
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.util.Log
 import java.util.Locale
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import android.view.ViewGroup
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import kotlinx.coroutines.launch
+import android.widget.ProgressBar
+import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import android.widget.AutoCompleteTextView
-import android.widget.ProgressBar
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -40,6 +40,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 
 class MapFragment: Fragment(), OnMapReadyCallback {
+    private val toastUtil = ShowCustomToastImpl()
+
     private lateinit var map: GoogleMap
     private lateinit var progressBar: ProgressBar
     private lateinit var viewModelNetwork: NetworkViewModel
@@ -98,15 +100,11 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
                 addNewMarker(geofenceArea)
                 viewModelGeofence.insertGeofenceArea(geofenceArea)
-
-                // Sync automatic when new geofence area is inserted
-                // viewModelFriends.uploadUserData()
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "None location found with this name",
-                    Toast.LENGTH_LONG
-                ).show()
+                toastUtil.showBasicToast(
+                    "No one location find with this address",
+                    requireContext()
+                )
             }
 
             input.setText(R.string.text_blank)
@@ -159,7 +157,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         val mapMarker = mutableMapOf<String, LatLng>()
 
         viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
-            if (areas.isNotEmpty()) {
+                if (areas.isNotEmpty()) {
                 for (area in areas) {
                     val coordinates = LatLng(area.latitude, area.longitude)
                     mapMarker[area.name] = coordinates
@@ -167,7 +165,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
                 populateMapOfMarker(mapMarker)
             } else {
-                Log.d("MAP_FRAGMENT", "No geofence areas")
+                Log.d("MAP_FRAGMENT", "No one geofence areas retrieved")
             }
         }
     }

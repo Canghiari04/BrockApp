@@ -3,8 +3,8 @@ package com.example.brockapp.fragment
 import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.util.CalendarUtil
-import com.example.brockapp.activity.DailyMemoActivity
 import com.example.brockapp.adapter.CalendarAdapter
+import com.example.brockapp.activity.DailyMemoActivity
 
 import android.os.Bundle
 import android.view.View

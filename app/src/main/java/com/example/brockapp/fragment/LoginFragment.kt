@@ -6,6 +6,7 @@ import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.activity.AuthenticatorActivity
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.extraObject.MySharedPreferences
@@ -16,7 +17,6 @@ import android.util.Log
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import android.widget.Button
 import android.content.Intent
 import android.widget.EditText
@@ -26,6 +26,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 
 class LoginFragment: Fragment(R.layout.fragment_login) {
+    private val toastUtil = ShowCustomToastImpl()
+
     private lateinit var username: String
     private lateinit var password: String
     private lateinit var viewModelUser: UserViewModel
@@ -65,7 +67,10 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 if (username.isNotEmpty() && password.isNotEmpty()) {
                     viewModelUser.checkIfUserExistsLocally(username, password)
                 } else {
-                    Toast.makeText(requireContext(), "Insert the access credentials", Toast.LENGTH_SHORT).show()
+                    toastUtil.showWarningToast(
+                        "You must insert the field required",
+                        requireContext()
+                    )
                 }
             }
         }
@@ -82,7 +87,10 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 viewModelUser.getUser(username, password)
                 util.requestPostNotificationPermission()
             } else {
-                Toast.makeText(requireContext(), "Access credentials wrong", Toast.LENGTH_SHORT).show()
+                toastUtil.showWarningToast(
+                    "Access credentials are wrong",
+                    requireContext()
+                )
             }
         }
     }
@@ -93,6 +101,8 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 MyUser.id = currentUser.id
                 MyUser.username = currentUser.username.toString()
                 MyUser.password = currentUser.password.toString()
+
+                MySharedPreferences.setCredentialsSaved(requireContext())
 
                 goToHome()
             } else {
