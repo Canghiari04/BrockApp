@@ -18,8 +18,8 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
 
     override fun doWork(): Result {
         util = NotificationUtil()
-
         type = inputData.getString("type")?.toBoolean()
+
         when (type) {
             true -> {
                 sendNotification(

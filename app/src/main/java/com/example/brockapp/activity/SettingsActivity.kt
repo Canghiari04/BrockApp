@@ -1,6 +1,7 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
+import com.example.brockapp.service.SyncDataService
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.util.ActivityRecognitionPermissionUtil
 import com.example.brockapp.util.GeofenceTransitionPermissionsUtil
@@ -99,6 +100,8 @@ class SettingsActivity: AppCompatActivity() {
                 if (isChecked) {
                     MySharedPreferences.setService("DUMP_DATABASE", true, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
+
+                    startService(Intent(context, SyncDataService::class.java))
                 } else {
                     MySharedPreferences.setService("DUMP_DATABASE", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
