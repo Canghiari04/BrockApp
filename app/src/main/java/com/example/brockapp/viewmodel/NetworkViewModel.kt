@@ -1,12 +1,13 @@
 package com.example.brockapp.viewmodel
 
+import com.example.brockapp.extraObject.MyNetwork
+
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
-import com.example.brockapp.singleton.MyNetwork
 
 class NetworkViewModel: ViewModel() {
     private val _authNetwork = MutableLiveData<Boolean>()

@@ -1,16 +1,15 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.singleton.User
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.adapter.FriendsAdapter
-import com.example.brockapp.dialog.NewFriendDialog
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.activity.FriendActivity
 import com.example.brockapp.adapter.SuggestionsAdapter
-import com.example.brockapp.singleton.S3ClientProvider
 import com.example.brockapp.viewmodel.FriendsViewModel
 import com.example.brockapp.viewmodel.NetworkViewModel
+import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.FriendsViewModelFactory
 
@@ -30,7 +29,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FriendsFragment: Fragment(R.layout.fragment_friends) {
     private lateinit var viewModelUser: UserViewModel
-    private lateinit var syncButton: FloatingActionButton
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelFriends: FriendsViewModel
 
@@ -40,7 +38,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
         val db: BrockDB = BrockDB.getInstance(requireContext())
-        val s3Client = S3ClientProvider.getInstance(requireContext())
+        val s3Client = MyS3ClientProvider.getInstance(requireContext())
         val file = File(requireContext().filesDir, "user_data.json")
 
         val viewModelFactoryFriends = FriendsViewModelFactory(s3Client, db, file)
@@ -60,21 +58,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         observeSuggestion()
         observeAddedFriend()
 
-        viewModelFriends.getCurrentFriends(User.id)
-
-        syncButton = view.findViewById(R.id.user_synchronized_button)
-
-        syncButton.setOnClickListener {
-            if (User.sharing) {
-                syncUserData(syncButton)
-            } else {
-                showShareDataDialog()
-            }
-
-            android.os.Handler().postDelayed({
-                syncButton.isEnabled = true
-            }, 5000)
-        }
+        viewModelFriends.getCurrentFriends(MyUser.id)
 
         val usernameTextView = view.findViewById<EditText>(R.id.search_user_text_area)
 
@@ -91,13 +75,7 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     
     private fun observeNetwork() {
         viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { currentNetwork ->
-            if (!currentNetwork) {
-                view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = false
-                view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.hide()
-            } else {
-                view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = true
-                view?.findViewById<FloatingActionButton>(R.id.user_synchronized_button)?.show()
-            }
+            view?.findViewById<EditText>(R.id.search_user_text_area)?.isEnabled = currentNetwork
         }
     }
 
@@ -133,23 +111,6 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
         }
     }
 
-    private fun showShareDataDialog() {
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle(R.string.permission_title)
-            .setMessage(R.string.permission_share_data)
-            .setPositiveButton(R.string.permission_positive_button) { dialog, _ ->
-                dialog.dismiss()
-                User.sharing = true
-                viewModelUser.changeSharingDataFlag(User.username, User.password)
-                syncUserData(syncButton)
-            }
-            .setNegativeButton(R.string.permission_negative_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
     private fun syncUserData(syncButton: FloatingActionButton) {
         viewModelFriends.uploadUserData()
         syncButton.isEnabled = false
@@ -182,11 +143,11 @@ class FriendsFragment: Fragment(R.layout.fragment_friends) {
     }
 
     private fun showNewFriendDialog(username: String, viewModel: FriendsViewModel) {
-        activity?.let {
-            NewFriendDialog(username, viewModel).show(
-                it.supportFragmentManager,
-                "CUSTOM_NEW_FRIEND_DIALOG"
-            )
-        }
+//        activity?.let {
+//            NewFriendDialog(username, viewModel).show(
+//                it.supportFragmentManager,
+//                "CUSTOM_NEW_FRIEND_DIALOG"
+//            )
+//        }
     }
 }
