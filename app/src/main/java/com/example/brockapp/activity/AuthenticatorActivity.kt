@@ -3,12 +3,10 @@ package com.example.brockapp.activity
 import com.example.brockapp.R
 import com.example.brockapp.fragment.LoginFragment
 import com.example.brockapp.fragment.SignInFragment
-import com.example.brockapp.service.SyncDataService
 import com.example.brockapp.interfaces.ShowAuthFragment
 import com.example.brockapp.receiver.AuthenticatorReceiver
 
 import android.os.Bundle
-import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.core.content.ContextCompat
@@ -24,7 +22,6 @@ class AuthenticatorActivity: AppCompatActivity(), ShowAuthFragment {
         setContentView(R.layout.activity_authenticator)
 
         registerReceiver()
-        startService(Intent(this, SyncDataService::class.java))
 
         supportActionBar?.hide()
 

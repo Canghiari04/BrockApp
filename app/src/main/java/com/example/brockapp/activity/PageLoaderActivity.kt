@@ -33,6 +33,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
+import com.example.brockapp.service.SyncDataService
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.material.navigation.NavigationView
@@ -63,9 +64,10 @@ class PageLoaderActivity: AppCompatActivity() {
 
         // Connectivity service start always, regardless of the user's preferences
         checkConnectivity()
-        startConnectivity()
-
         checkServicesActive()
+
+        // startService(Intent(this, SyncDataService::class.java))
+        startConnectivity()
 
         toolbar = findViewById(R.id.toolbar_page_loader)
         drawer = findViewById(R.id.drawer_page_loader)
@@ -92,7 +94,7 @@ class PageLoaderActivity: AppCompatActivity() {
             put("You", youFragment)
             put("Calendar", calendarFragment)
             put("Map", mapFragment)
-            put("Friends", groupFragment)
+            put("Group", groupFragment)
         }
 
         if(intent.hasExtra("FRAGMENT_TO_SHOW")) {
@@ -118,7 +120,7 @@ class PageLoaderActivity: AppCompatActivity() {
                 }
 
                 R.id.navbar_item_group -> {
-                    switchFragment("Friends", groupFragment)
+                    switchFragment("Group", groupFragment)
                     true
                 }
 
@@ -170,50 +172,6 @@ class PageLoaderActivity: AppCompatActivity() {
         )
     }
 
-    private fun setUpActionBar() {
-        toolbar.run {
-            setSupportActionBar(toolbar)
-            supportActionBar?.setDisplayShowTitleEnabled(false)
-        }
-
-        actionBarDrawerToggle = ActionBarDrawerToggle(
-            this,
-            drawer,
-            toolbar,
-            R.string.drawer_open,
-            R.string.drawer_close
-        )
-
-        actionBarDrawerToggle.run {
-            drawerArrowDrawable.color = ContextCompat.getColor(applicationContext, R.color.white)
-        }
-
-        drawer.addDrawerListener(actionBarDrawerToggle)
-        actionBarDrawerToggle.syncState()
-
-        findViewById<NavigationView>(R.id.navigation_view_page_loader).setNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.drawer_item_your_account -> {
-                    startActivity(Intent(this, AccountActivity::class.java))
-                    finish()
-                    true
-                }
-
-                R.id.drawer_item_logout -> {
-                    MySharedPreferences.logout(this)
-
-                    startActivity(Intent(this, AuthenticatorActivity::class.java))
-                    finish()
-                    true
-                }
-
-                else -> {
-                    false
-                }
-            }
-        }
-    }
-
     private fun checkServicesActive() {
         val activityRecognition = MySharedPreferences.checkService("ACTIVITY_RECOGNITION",this)
 
@@ -221,7 +179,7 @@ class PageLoaderActivity: AppCompatActivity() {
             startActivityRecognition()
         } else {
             toastUtil.showWarningToast(
-                "Recognition service deactivated",
+                "Recognition service is not active",
                 this
             )
         }
@@ -232,7 +190,7 @@ class PageLoaderActivity: AppCompatActivity() {
             startGeofenceTransition()
         } else {
             toastUtil.showWarningToast(
-                "Geofence service deactivated",
+                "Geofence service is not active",
                 this
             )
         }
@@ -290,7 +248,51 @@ class PageLoaderActivity: AppCompatActivity() {
                 }
             }
         } else {
-            Log.wtf("PAGE_LOADER_ACTIVITY", "Permission denied")
+            Log.wtf("PAGE_LOADER_ACTIVITY", "Permission geofence transition has denied")
+        }
+    }
+
+    private fun setUpActionBar() {
+        toolbar.run {
+            setSupportActionBar(toolbar)
+            supportActionBar?.setDisplayShowTitleEnabled(false)
+        }
+
+        actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            drawer,
+            toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
+        )
+
+        actionBarDrawerToggle.run {
+            drawerArrowDrawable.color = ContextCompat.getColor(applicationContext, R.color.white)
+        }
+
+        drawer.addDrawerListener(actionBarDrawerToggle)
+        actionBarDrawerToggle.syncState()
+
+        findViewById<NavigationView>(R.id.navigation_view_page_loader).setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.drawer_item_your_account -> {
+                    startActivity(Intent(this, AccountActivity::class.java))
+                    finish()
+                    true
+                }
+
+                R.id.drawer_item_logout -> {
+                    MySharedPreferences.logout(this)
+
+                    startActivity(Intent(this, AuthenticatorActivity::class.java))
+                    finish()
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
         }
     }
 
