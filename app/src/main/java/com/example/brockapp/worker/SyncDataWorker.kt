@@ -18,7 +18,7 @@ class SyncDataWorker(private val context: Context, workerParams: WorkerParameter
 
         sendNotification(
             "BrockApp - Sync data done!",
-            "Your data have been correctly uploaded"
+            "Your data has been correctly uploaded"
         )
 
         return Result.success()

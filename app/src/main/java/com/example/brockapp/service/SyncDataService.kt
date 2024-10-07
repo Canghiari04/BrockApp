@@ -56,8 +56,8 @@ class SyncDataService: Service() {
         if (MyNetwork.isConnected && MySharedPreferences.checkService("DUMP_DATABASE", this)) {
             CoroutineScope(Dispatchers.IO).launch {
                 val geofence = db
-                    .GeofenceAreaDao()
-                    .getAllGeofenceAreas()
+                    .GeofenceTransitionDao()
+                    .getAllGeofenceTransitionByUserId(MyUser.id)
 
                 val walkActivities = db
                     .UserWalkActivityDao()
@@ -76,7 +76,7 @@ class SyncDataService: Service() {
                     "walkActivities" to walkActivities,
                     "vehicleActivities" to vehicleActivities,
                     "stillActivities" to stillActivities,
-                    "geofenceArea" to geofence
+                    "geofenceTransitions" to geofence
                 )
 
                 withContext(Dispatchers.Default) {
