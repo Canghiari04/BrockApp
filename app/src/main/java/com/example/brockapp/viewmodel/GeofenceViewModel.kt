@@ -44,7 +44,7 @@ class GeofenceViewModel(private val db: BrockDB): ViewModel() {
 
     fun getGeofenceTransitions() {
         viewModelScope.launch(Dispatchers.IO) {
-            val transitions = db.GeofenceTransitionDao().getGeofenceTransition()
+            val transitions = db.GeofenceTransitionDao().getAllGeofenceTransitionByUserId(MyUser.id)
             _geofenceTransitions.postValue(transitions)
         }
     }
