@@ -1,4 +1,4 @@
 package com.example.brockapp.service
 
-class WalkService {
+class HeightDifferenceService {
 }

@@ -1,54 +1,76 @@
 package com.example.brockapp.page
 
-import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.extraObject.MyUser
+import com.example.brockapp.viewmodel.GroupViewModel
 import com.example.brockapp.interfaces.PeriodRangeImpl
+import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.ActivitiesViewModel
-import com.example.brockapp.database.UserWalkActivityEntity
-import com.example.brockapp.database.UserVehicleActivityEntity
+import com.example.brockapp.viewmodel.GroupViewModelFactory
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 
-import android.util.Log
 import android.os.Bundle
 import android.view.View
 import java.time.LocalDate
-import java.time.YearMonth
 import android.widget.Spinner
-import android.graphics.Color
 import android.widget.TextView
-import android.graphics.Typeface
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import java.time.format.DateTimeFormatter
+import androidx.cardview.widget.CardView
+import com.example.brockapp.util.ChartUtil
 import androidx.lifecycle.ViewModelProvider
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.data.BarEntry
-import kotlin.time.Duration.Companion.milliseconds
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.charts.LineChart
 
 abstract class ProgressPage: Fragment(R.layout.page_progress) {
     private var rangeUtil = PeriodRangeImpl()
 
-    private lateinit var pieChart: PieChart
-    private lateinit var contentSecondColumn: TextView
+    private var barChartMapper = mapOf(
+        "Vehicle" to ::showVehicleBarChart,
+        "Still" to ::showStillBarChart,
+        "Walk" to ::showWalkBarChart
+    )
 
+    private var lineChartMapper = mapOf(
+        "Vehicle" to ::showVehicleLineChart,
+        "Walk" to ::showWalkLineChart
+    )
+
+    private var pieChartMapper = mapOf(
+        "Day" to ::showDailyPieChart,
+        "Week" to ::showWeeklyPieChart,
+        "Month" to ::showMonthlyPieChart
+    )
+
+    protected var chartUtil = ChartUtil()
+
+    // Text view
+    private lateinit var titleThirdCardView: TextView
+
+    // Table
+    protected lateinit var infoFirstColumn: TextView
+    protected lateinit var infoSecondColumn: TextView
+    protected lateinit var titleSecondColumn: TextView
+
+    // Bar charts
     protected lateinit var walkBarChart: BarChart
+    protected lateinit var stillBarChart: BarChart
     protected lateinit var vehicleBarChart: BarChart
-    protected lateinit var titleSecondCard: TextView
-    protected lateinit var titleFirstColumn: TextView
-    protected lateinit var contentFirstColumn: TextView
-    protected lateinit var viewModel: ActivitiesViewModel
+
+    // Line charts
+    protected lateinit var runLineChart: LineChart
+    protected lateinit var walkLineChart: LineChart
+    protected lateinit var vehicleLineChart: LineChart
+
+    // Pie chart
+    protected lateinit var pieChart: PieChart
+
+    // View model
+    protected lateinit var groupViewModel: GroupViewModel
+    protected lateinit var activitiesViewModel: ActivitiesViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,39 +78,62 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         view.findViewById<TextView>(R.id.text_view_welcome_progress).text =
             ("Welcome, " + MyUser.username + "! In this area you can check your progress done during the activities registered")
 
-        titleSecondCard = view.findViewById(R.id.text_view_title_second_card)
-        titleFirstColumn = view.findViewById(R.id.text_view_title_first_column)
+        showWelcomeCardView(view.findViewById(R.id.card_view_welcome_progress_page))
 
-        contentFirstColumn = view.findViewById(R.id.text_view_content_first_column)
-        contentSecondColumn = view.findViewById(R.id.text_view_content_second_column)
+        titleThirdCardView = view.findViewById(R.id.text_view_title_third_card)
 
-        pieChart = view.findViewById(R.id.pie_char_activities)
+        // Table view
+        titleSecondColumn = view.findViewById(R.id.text_view_title_second_column)
+        infoFirstColumn = view.findViewById(R.id.text_view_content_first_column)
+        infoSecondColumn = view.findViewById(R.id.text_view_content_second_column)
+
+        // Bar charts
         walkBarChart = view.findViewById(R.id.bar_chart_walk)
+        stillBarChart = view.findViewById(R.id.bar_chart_still)
         vehicleBarChart = view.findViewById(R.id.bar_chart_vehicle)
 
-        val barChartSpinner = view.findViewById<Spinner>(R.id.spinner_bar_chart)
-        setUpBarChartSpinner(barChartSpinner)
+        // Line charts
+        runLineChart = view.findViewById(R.id.line_chart_run)
+        walkLineChart = view.findViewById(R.id.line_chart_walk)
+        vehicleLineChart = view.findViewById(R.id.line_chart_vehicle)
 
-        val pieChartSpinner = view.findViewById<Spinner>(R.id.spinner_pie_chart)
-        setUpPieChartSpinner(pieChartSpinner)
+        // Pie chart
+        pieChart = view.findViewById(R.id.pie_chart_activities)
+
+        setUpBarChartSpinner(view.findViewById(R.id.spinner_bar_chart))
+        setUpLineChartSpinner(view.findViewById(R.id.spinner_line_chart))
+        setUpPieChartSpinner(view.findViewById(R.id.spinner_pie_chart))
 
         val db = BrockDB.getInstance(requireContext())
-        val factoryViewModel = ActivitiesViewModelFactory(db)
-        viewModel = ViewModelProvider(this, factoryViewModel)[ActivitiesViewModel::class.java]
+        val s3Client = MyS3ClientProvider.getInstance(requireContext())
+
+        val groupViewModelFactory = GroupViewModelFactory(s3Client, db)
+        groupViewModel = ViewModelProvider(this, groupViewModelFactory)[GroupViewModel::class.java]
+
+        val activitiesFactoryViewModel = ActivitiesViewModelFactory(db)
+        activitiesViewModel = ViewModelProvider(this, activitiesFactoryViewModel)[ActivitiesViewModel::class.java]
+
+        observeVehicleTimeSpent()
+        observeUserKilometers()
+        observeVehicleBarChartEntries()
+
+        observeStillTimeSpent()
+        observeStillBarChartEntries()
+
+        observeWalkTimeSpent()
+        observeUserSteps()
+        observeWalkBarChartEntries()
+
+        observeVehicleLineChartEntries()
+        observeWalkLineChartEntries()
 
         observeUserActivities()
-
-        observeUserKilometers()
-        observeVehicleTimeSpent()
-        observeVehicleActivities()
-
-        observeUserSteps()
-        observeWalkTimeSpent()
-        observeWalkActivities()
     }
 
+    protected abstract fun showWelcomeCardView(cardView: CardView)
+
     private fun setUpBarChartSpinner(spinner: Spinner?) {
-        val spinnerItems = resources.getStringArray(R.array.spinner_bar_chart_items)
+        val spinnerItems = resources.getStringArray(R.array.spinner_bar_chart)
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -104,31 +149,33 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
                 val itemSelected = spinnerItems[position]
                 val range = rangeUtil.getWeekRange(LocalDate.now())
 
-                when (itemSelected) {
-                    "Vehicle" -> {
-                        walkBarChart.visibility = View.GONE
-                        vehicleBarChart.visibility = View.VISIBLE
+                barChartMapper[itemSelected]?.invoke(range)
+            }
 
-                        titleFirstColumn.setText("Distance")
-                        contentFirstColumn.setText("0 km")
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //
+            }
+        }
+    }
 
-                        loadVehicleActivities(range.first, range.second)
-                        loadKilometers(range.first, range.second)
-                        loadVehicleTime(range.first, range.second)
-                    }
+    private fun setUpLineChartSpinner(spinner: Spinner?) {
+        val spinnerItems = resources.getStringArray(R.array.spinner_line_chart)
 
-                    "Walk" -> {
-                        vehicleBarChart.visibility = View.GONE
-                        walkBarChart.visibility = View.VISIBLE
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner?.adapter = adapter
 
-                        titleFirstColumn.setText("Steps")
-                        contentFirstColumn.setText("0 steps")
+        spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val itemSelected = spinnerItems[position]
+                val range = rangeUtil.getWeekRange(LocalDate.now())
 
-                        loadWalkActivities(range.first, range.second)
-                        loadStepNumber(range.first, range.second)
-                        loadWalkTime(range.first, range.second)
-                    }
-                }
+                lineChartMapper[itemSelected]?.invoke(range)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -152,31 +199,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
                 id: Long
             ) {
                 val itemSelected = spinnerItems[position]
-
-                val range: Pair<String, String>
-
-                when (itemSelected) {
-                    "Day" -> {
-                        titleSecondCard.setText("This day")
-
-                        range = rangeUtil.getDayRange(LocalDate.now())
-                        viewModel.getCountsOfActivities(range.first, range.second)
-                    }
-
-                    "Week" -> {
-                        titleSecondCard.setText("This week")
-
-                        range = rangeUtil.getWeekRange(LocalDate.now())
-                        viewModel.getCountsOfActivities(range.first, range.second)
-                    }
-
-                    "Month" -> {
-                        titleSecondCard.setText("This month")
-
-                        range = rangeUtil.getMonthRange(LocalDate.now())
-                        viewModel.getCountsOfActivities(range.first, range.second)
-                    }
-                }
+                pieChartMapper[itemSelected]?.invoke()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -185,213 +208,127 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         }
     }
 
-    private fun observeUserActivities() {
-        viewModel.mapCountActivities.observe(viewLifecycleOwner) { activities ->
-            if (!activities.isNullOrEmpty()) {
-                setupActivityTypePieChart(activities)
-            } else {
-                Log.d("PAGE_PROGRESS", "None activity done in this range")
-            }
-        }
+    protected abstract fun observeVehicleTimeSpent()
+
+    protected abstract fun observeUserKilometers()
+
+    protected abstract fun observeVehicleBarChartEntries()
+
+    protected abstract fun observeStillTimeSpent()
+
+    protected abstract fun observeStillBarChartEntries()
+
+    protected abstract fun observeWalkTimeSpent()
+
+    protected abstract fun observeUserSteps()
+
+    protected abstract fun observeWalkBarChartEntries()
+
+    protected abstract fun observeVehicleLineChartEntries()
+
+    protected abstract fun observeWalkLineChartEntries()
+
+    protected abstract fun observeUserActivities()
+
+    private fun showVehicleBarChart(range: Pair<String, String>) {
+        walkBarChart.visibility = View.GONE
+        stillBarChart.visibility = View.GONE
+
+        vehicleBarChart.visibility = View.VISIBLE
+
+        infoSecondColumn.visibility = View.VISIBLE
+        titleSecondColumn.visibility = View.VISIBLE
+
+        loadVehicleTime(range.first, range.second)
+        loadKilometers(range.first, range.second)
+        defineVehicleBarChartEntries(range.first, range.second)
     }
-
-    private fun setupActivityTypePieChart(activities: Map<String, Int>) {
-        val entries = ArrayList<PieEntry>()
-
-        activities.forEach { (activityType, value) ->
-            if (value > 0) {
-                val label = when (activityType) {
-                    STILL_ACTIVITY_TYPE -> "Still"
-                    VEHICLE_ACTIVITY_TYPE -> "Vehicle"
-                    WALK_ACTIVITY_TYPE -> "Walk"
-                    else -> "Unknown"
-                }
-                entries.add(PieEntry(value.toFloat(), label))
-            }
-        }
-
-        val redGradientColors = listOf(
-            Color.parseColor("#D32F2F"),
-            Color.parseColor("#B71C1C"),
-            Color.parseColor("#FF1744")
-        )
-
-        val dataSet = PieDataSet(entries, " ").apply {
-            colors = redGradientColors
-            valueTextSize = 12f
-            valueTypeface = Typeface.DEFAULT_BOLD
-        }
-
-        val data = PieData(dataSet)
-        pieChart.data = data
-
-        pieChart.legend.xEntrySpace = 16f
-        pieChart.description?.isEnabled = false
-
-        pieChart.invalidate()
-        pieChart.setUsePercentValues(true)
-        pieChart.setDrawEntryLabels(false)
-
-        pieChart.visibility = View.VISIBLE
-    }
-
-    private fun observeUserKilometers() {
-        viewModel.meters.observe(viewLifecycleOwner) {
-            if (it.isFinite()) {
-                val kilometers = (it/1000)
-                contentFirstColumn.text = ("%.1f km".format(kilometers))
-            } else {
-                Log.d("PAGE_PROGRESS", "None vehicle activity detect")
-            }
-        }
-    }
-
-    private fun observeVehicleTimeSpent() {
-        viewModel.vehicleTime.observe(viewLifecycleOwner) {
-            val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
-                "%01dh %01dm %01ds".format(hours, minutes, seconds)
-            }
-
-            contentSecondColumn.setText(duration)
-        }
-    }
-
-    private fun observeVehicleActivities() {
-        viewModel.listVehicleActivities.observe(viewLifecycleOwner) { activities ->
-            if (!activities.isNullOrEmpty()) {
-                setUpVehicleBarChart(activities)
-            } else {
-                Log.d("PAGE_PROGRESS", "None vehicle activity detect")
-            }
-        }
-    }
-
-    private fun setUpVehicleBarChart(activities: List<UserVehicleActivityEntity>?) {
-        val entries = ArrayList<BarEntry>()
-        val yearMonth = YearMonth.of(LocalDate.now().year, LocalDate.now().month)
-
-        val distancePerDay = activities?.groupBy {
-            it.timestamp.let { timestamp ->
-                LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
-            }
-        }?.mapValues { entry ->
-            entry.value.sumOf { it.distanceTravelled } / 1000.0
-        }
-
-        for (day in 1..yearMonth.lengthOfMonth()) {
-            val totalDistanceTravelled = distancePerDay?.get(day) ?: 0.0
-            entries.add(BarEntry(day.toFloat(), totalDistanceTravelled.toFloat()))
-        }
-
-        val dataSet = BarDataSet(entries, "Distance traveled (km)")
-        dataSet.color = Color.parseColor("#BB2222")
-
-        val data = BarData(dataSet)
-        data.setDrawValues(false)
-        vehicleBarChart.data = data
-
-        vehicleBarChart.legend.isEnabled = true
-        vehicleBarChart.legend.textSize = 12f
-        vehicleBarChart.legend.form = Legend.LegendForm.LINE
-
-        vehicleBarChart.description.isEnabled = false
-
-        vehicleBarChart.xAxis.setDrawGridLines(false)
-        vehicleBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        vehicleBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..yearMonth.lengthOfMonth()).map { it.toString() })
-        vehicleBarChart.xAxis.granularity = 1f
-        vehicleBarChart.xAxis.isGranularityEnabled = true
-
-        vehicleBarChart.setExtraOffsets(0f, 0f, 0f, 20f)
-
-        vehicleBarChart.axisLeft.axisMinimum = 0f
-        vehicleBarChart.axisRight.axisMinimum = 0f
-
-        vehicleBarChart.animateY(500)
-
-        vehicleBarChart.invalidate()
-    }
-
-    private fun observeUserSteps() {
-        viewModel.steps.observe(viewLifecycleOwner) { steps ->
-            if (steps != 0) {
-                contentFirstColumn.setText(steps.toString() + " steps")
-            } else {
-                Log.d("PAGE_PROGRESS", "No one walk activities detected")
-            }
-        }
-    }
-
-    private fun observeWalkTimeSpent() {
-        viewModel.walkTime.observe(viewLifecycleOwner) {
-            val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
-                "%01dh %01dm %01ds".format(hours, minutes, seconds)
-            }
-
-            contentSecondColumn.setText(duration)
-        }
-    }
-
-    private fun observeWalkActivities() {
-        viewModel.listWalkActivities.observe(viewLifecycleOwner) { activities ->
-            if (!activities.isNullOrEmpty()) {
-                setUpWalkBarChart(activities)
-            } else {
-                Log.d("PAGE_PROGRESS", "No one vehicle activities detected")
-            }
-        }
-    }
-
-    private fun setUpWalkBarChart(activities: List<UserWalkActivityEntity>) {
-        val entries = ArrayList<BarEntry>()
-        val yearMonth = YearMonth.of(LocalDate.now().year, LocalDate.now().month)
-
-        val stepsPerDay = activities.groupBy {
-            it.timestamp.let { timestamp ->
-                LocalDate.parse(timestamp, DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)).dayOfMonth
-            } ?: 0
-        }.mapValues { entry ->
-            entry.value.sumOf { it.stepNumber }
-        }
-
-        for (day in 1..yearMonth.lengthOfMonth()) {
-            val totalSteps = stepsPerDay[day] ?: 0f
-            entries.add(BarEntry(day.toFloat(), totalSteps.toFloat()))
-        }
-
-        val dataSet = BarDataSet(entries, "Step number")
-        dataSet.color = Color.parseColor("#BB2222")
-
-        val data = BarData(dataSet)
-        walkBarChart.data = data
-
-        walkBarChart.legend.isEnabled = true
-        walkBarChart.legend.textSize = 12f
-        walkBarChart.legend.form = Legend.LegendForm.LINE
-
-        walkBarChart.description.isEnabled = false
-
-        walkBarChart.xAxis.setDrawGridLines(false)
-        walkBarChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        walkBarChart.xAxis.valueFormatter = IndexAxisValueFormatter((1..yearMonth.lengthOfMonth()).map { it.toString() })
-
-        walkBarChart.axisLeft.axisMinimum = 0f
-        walkBarChart.axisRight.axisMinimum = 0f
-
-        walkBarChart.animateY(500)
-
-        walkBarChart.invalidate()
-    }
-
-    protected abstract fun loadVehicleActivities(startOfPeriod: String, endOfPeriod: String)
-
-    protected abstract fun loadKilometers(startOfPeriod: String, endOfPeriod: String)
 
     protected abstract fun loadVehicleTime(startOfPeriod: String, endOfPeriod: String)
 
-    protected abstract fun loadWalkActivities(startOfPeriod: String, endOfPeriod: String)
+    protected abstract fun loadKilometers(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun defineVehicleBarChartEntries(startOfWeek: String, endOfWeek: String)
+
+    private fun showStillBarChart(range: Pair<String, String>) {
+        walkBarChart.visibility = View.GONE
+        vehicleBarChart.visibility = View.GONE
+
+        stillBarChart.visibility = View.VISIBLE
+
+        infoSecondColumn.visibility = View.GONE
+        titleSecondColumn.visibility = View.GONE
+
+        loadStillTime(range.first, range.second)
+        defineStillBarChartEntries(range.first, range.second)
+    }
+
+    protected abstract fun loadStillTime(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun defineStillBarChartEntries(startOfWeek: String, endOfWeek: String)
+
+    private fun showWalkBarChart(range: Pair<String, String>) {
+        stillBarChart.visibility = View.GONE
+        vehicleBarChart.visibility = View.GONE
+
+        walkBarChart.visibility = View.VISIBLE
+
+        infoSecondColumn.visibility = View.VISIBLE
+        titleSecondColumn.visibility = View.VISIBLE
+
+        loadWalkTime(range.first, range.second)
+        loadStepNumber(range.first, range.second)
+        defineWalkBarChartEntries(range.first, range.second)
+    }
 
     protected abstract fun loadWalkTime(startOfPeriod: String, endOfPeriod: String)
 
     protected abstract fun loadStepNumber(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun defineWalkBarChartEntries(startOfWeek: String, endOfWeek: String)
+
+    private fun showVehicleLineChart(range: Pair<String, String>) {
+        runLineChart.visibility = View.GONE
+        walkLineChart.visibility = View.GONE
+
+        vehicleLineChart.visibility = View.VISIBLE
+
+        defineVehicleLineChartEntries(range.first, range.second)
+    }
+
+    protected abstract fun defineVehicleLineChartEntries(startOfWeek: String, endOfWeek: String)
+
+    private fun showWalkLineChart(range: Pair<String, String>) {
+        runLineChart.visibility = View.GONE
+        vehicleLineChart.visibility = View.GONE
+
+        walkLineChart.visibility = View.VISIBLE
+
+        defineWalkLineChartEntries(range.first, range.second)
+    }
+
+    protected abstract fun defineWalkLineChartEntries(startOfWeek: String, endOfWeek: String)
+
+    private fun showDailyPieChart() {
+        titleThirdCardView.setText("This day")
+
+        val range = rangeUtil.getDayRange(LocalDate.now())
+        countActivities(range.first, range.second)
+    }
+
+    private fun showWeeklyPieChart() {
+        titleThirdCardView.setText("This week")
+
+        val range = rangeUtil.getWeekRange(LocalDate.now())
+        countActivities(range.first, range.second)
+    }
+
+    private fun showMonthlyPieChart() {
+        titleThirdCardView.setText("This month")
+
+        val range = rangeUtil.getMonthRange(LocalDate.now())
+        countActivities(range.first, range.second)
+    }
+
+    protected abstract fun countActivities(startOfPeriod: String, endOfPeriod: String)
 }
