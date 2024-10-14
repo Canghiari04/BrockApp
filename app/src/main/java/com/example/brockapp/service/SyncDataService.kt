@@ -91,7 +91,7 @@ class SyncDataService: Service() {
                         PutObjectRequest(BUCKET_NAME, "user/${MyUser.username}.json", file)
                     s3Client.putObject(request)
                 } catch (e: Exception) {
-                    Log.e("S3Upload", "Failed to upload user data", e)
+                    Log.e("SYNC_DATA_SERVICE", "Failed to upload user data $e")
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.brockapp.receiver
 
+import com.example.brockapp.service.SyncDataService
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.service.ConnectivityService
 import com.example.brockapp.interfaces.InternetAvailableImpl
@@ -28,6 +29,8 @@ class ConnectivityReceiver(private val viewModelStoreOwner: ViewModelStoreOwner)
             lastHandledTime = currentTime
 
             if (networkInfo != null && networkInfo.isConnected) {
+                context.startService(Intent(context, SyncDataService::class.java))
+
                 when (networkInfo.type) {
                     ConnectivityManager.TYPE_WIFI -> {
                         handleConnectivityChange(context)
