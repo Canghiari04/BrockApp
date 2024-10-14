@@ -21,6 +21,7 @@ class MyGeofence private constructor() {
 
         @Volatile
         private var pendingIntent: PendingIntent? = null
+
         @Volatile
         private var areas = mutableListOf<GeofenceAreaEntity>()
 

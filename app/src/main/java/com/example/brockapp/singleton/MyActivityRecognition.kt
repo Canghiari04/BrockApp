@@ -1,6 +1,7 @@
 package com.example.brockapp.singleton
 
 import com.example.brockapp.*
+import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.receiver.ActivityRecognitionReceiver
 
 import android.Manifest
@@ -23,14 +24,12 @@ class MyActivityRecognition private constructor() {
 
         private lateinit var pendingIntent: PendingIntent
 
-        fun getTask(context: Context): Task<Void> {
+        fun getTask(context: Context): Task<Void>? {
             synchronized(this) {
-                if (task == null) {
-                    task = createTask(context)
-                }
+                task = createTask(context)
             }
 
-            return task!!
+            return task
         }
 
         fun removeTask(context: Context) {
@@ -65,77 +64,51 @@ class MyActivityRecognition private constructor() {
         private fun createTask(context: Context): Task<Void>? {
             pendingIntent = createPendingIntent(context)
 
-            val transitions = createActivityTransitions()
-            val request = ActivityTransitionRequest(transitions)
+            // I will save inside the shared preferences all the interested activities by Settings
+            val transitions = createActivityTransitions(context)
 
             if (ActivityCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACTIVITY_RECOGNITION
-                ) != PackageManager.PERMISSION_GRANTED
+                ) != PackageManager.PERMISSION_GRANTED || transitions.isEmpty()
             ) {
                 return null
             }
 
-            return (
-                    ActivityRecognition
-                        .getClient(context)
-                        .requestActivityTransitionUpdates(request, pendingIntent)
+            val request = ActivityTransitionRequest(transitions)
+
+            return (ActivityRecognition
+                .getClient(context)
+                .requestActivityTransitionUpdates(request, pendingIntent)
             )
         }
 
         // Will be fine define by the user the activity he/she is interested in
-        private fun createActivityTransitions(): List<ActivityTransition> {
-            return mutableListOf<ActivityTransition>()
-                .apply {
+        private fun createActivityTransitions(context: Context): List<ActivityTransition> {
+            val list = mutableListOf(
+                MySharedPreferences.getActivity("STILL_ACTIVITY", context),
+                MySharedPreferences.getActivity("VEHICLE_ACTIVITY", context),
+                MySharedPreferences.getActivity("WALK_ACTIVITY", context),
+                MySharedPreferences.getActivity("RUN_ACTIVITY", context)
+            ).apply { removeAll { it == DetectedActivity.UNKNOWN } }
+
+            // Inside the shared preferences I will put the same type in .setActivityType
+            return mutableListOf<ActivityTransition>().apply {
+                list.forEach { item ->
                     add(
                         ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.STILL)
+                            .setActivityType(item)
                             .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
                             .build()
                     )
                     add(
                         ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.STILL)
-                            .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                            .build()
-                    )
-                    add(
-                        ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.WALKING)
-                            .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                            .build()
-                    )
-                    add(
-                        ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.WALKING)
-                            .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                            .build()
-                    )
-                    add(
-                        ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.RUNNING)
-                            .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                            .build()
-                    )
-                    add(
-                        ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.RUNNING)
-                            .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                            .build()
-                    )
-                    add(
-                        ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.IN_VEHICLE)
-                            .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                            .build()
-                    )
-                    add(
-                        ActivityTransition.Builder()
-                            .setActivityType(DetectedActivity.IN_VEHICLE)
+                            .setActivityType(item)
                             .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
                             .build()
                     )
                 }
+            }
         }
 
         private fun createPendingIntent(context: Context): PendingIntent {
@@ -145,7 +118,7 @@ class MyActivityRecognition private constructor() {
 
             return PendingIntent.getBroadcast(
                 context,
-                46,
+                REQUEST_CODE_ACTIVITY_RECOGNITION_BROADCAST_RECEIVER,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
