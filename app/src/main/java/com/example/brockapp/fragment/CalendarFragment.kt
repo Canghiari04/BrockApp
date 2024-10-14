@@ -9,9 +9,9 @@ import com.example.brockapp.activity.DailyMemoActivity
 import android.os.Bundle
 import android.view.View
 import java.time.LocalDate
+import android.widget.Button
 import android.content.Intent
 import android.widget.TextView
-import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import java.time.format.DateTimeFormatter
 import androidx.recyclerview.widget.RecyclerView
@@ -29,8 +29,8 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         val calendar = view.findViewById<RecyclerView>(R.id.recycler_view_calendar)
         populateCalendarRecyclerView(util.getCurrentDays(LocalDate.now()), util.getDates(LocalDate.now()), calendar)
 
-        val buttonBack = view.findViewById<ImageButton>(R.id.button_back_month)
-        val buttonForward = view.findViewById<ImageButton>(R.id.button_forward_month)
+        val buttonBack = view.findViewById<Button>(R.id.button_back_month)
+        val buttonForward = view.findViewById<Button>(R.id.button_forward_month)
 
         setUpButton(buttonBack, buttonForward, calendar)
     }
@@ -48,7 +48,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         calendar.layoutManager = layoutManager
     }
 
-    private fun setUpButton(buttonBack: ImageButton, buttonForward: ImageButton, calendar: RecyclerView) {
+    private fun setUpButton(buttonBack: Button, buttonForward: Button, calendar: RecyclerView) {
         buttonBack.setOnClickListener {
             val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_SEPARATOR)
 

@@ -16,11 +16,6 @@ class GroupFragment: Fragment(R.layout.page_friends) {
         1 to "Club"
     )
 
-    private val tabsIconArray = mapOf(
-        0 to R.drawable.baseline_emoji_people_24,
-        1 to R.drawable.baseline_groups_24
-    )
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -32,7 +27,6 @@ class GroupFragment: Fragment(R.layout.page_friends) {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setText(tabsTitleArray[position]!!)
-            tab.setIcon(tabsIconArray[position]!!)
         }.attach()
     }
 }

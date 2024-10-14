@@ -13,14 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 class YouFragment: Fragment(R.layout.fragment_you) {
     private val tabsTitleArray = mapOf(
         0 to "Progress",
-        1 to "Activities",
-        2 to "Areas"
-    )
-
-    private val tabsIconArray = mapOf(
-        0 to R.drawable.baseline_auto_graph_24,
-        1 to R.drawable.baseline_directions_run_24,
-        2 to R.drawable.marker_icon
+        1 to "Areas"
     )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,7 +27,6 @@ class YouFragment: Fragment(R.layout.fragment_you) {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setText(tabsTitleArray[position]!!)
-            tab.setIcon(tabsIconArray[position]!!)
         }.attach()
     }
 }

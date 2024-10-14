@@ -157,7 +157,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         val mapMarker = mutableMapOf<String, LatLng>()
 
         viewModelGeofence.staticAreas.observe(viewLifecycleOwner) { areas ->
-                if (areas.isNotEmpty()) {
+            if (areas.isNotEmpty()) {
                 for (area in areas) {
                     val coordinates = LatLng(area.latitude, area.longitude)
                     mapMarker[area.name] = coordinates
