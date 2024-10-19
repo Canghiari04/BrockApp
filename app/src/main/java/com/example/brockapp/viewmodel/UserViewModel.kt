@@ -51,19 +51,6 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         }
     }
 
-    private fun checkIfUserExistsOnS3(username: String): Boolean {
-        val userKey = "user/$username.json"
-
-        return try {
-            val request = GetObjectRequest(BUCKET_NAME, userKey)
-            s3Client.getObject(request)
-
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
     fun checkIfUserExistsLocally(username: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val userAlreadyExists = db.UserDao().checkIfUserIsPresent(username, password)
@@ -82,6 +69,19 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         viewModelScope.launch(Dispatchers.IO) {
             _currentUser.postValue(null)
             db.UserDao().deleteUserByUsernameAndPassword(username, password)
+        }
+    }
+
+    private fun checkIfUserExistsOnS3(username: String): Boolean {
+        val userKey = "user/$username.json"
+
+        return try {
+            val request = GetObjectRequest(BUCKET_NAME, userKey)
+            s3Client.getObject(request)
+
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 
