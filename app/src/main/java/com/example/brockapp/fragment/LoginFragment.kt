@@ -37,23 +37,22 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val db = BrockDB.getInstance(requireContext())
+        val file = File(requireContext().filesDir, "user_data.json")
+        val s3Client = MyS3ClientProvider.getInstance(requireContext())
+
+        val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
+        viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
+
         val (id, savedUsername, savedPassword) = MySharedPreferences.getCredentialsSaved(requireContext())
 
         // If the user is already sign in he can pass to the page loader activity
         if (id != 0L && savedUsername != null && savedPassword != null) {
-            MyUser.id = id
-            MyUser.username = savedUsername
-            MyUser.password = savedPassword
+            observeUser()
+            viewModelUser.getUser(savedUsername, savedPassword)
 
-            goToHome()
+            view.findViewById<View>(R.id.view_login).visibility = View.GONE
         } else {
-            val db = BrockDB.getInstance(requireContext())
-            val file = File(requireContext().filesDir, "user_data.json")
-            val s3Client = MyS3ClientProvider.getInstance(requireContext())
-
-            val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
-            viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
-
             util = PostNotificationsPermissionUtil(requireActivity()) {
                 observeUser()
             }
@@ -61,8 +60,8 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             observeLogin()
 
             view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
-                username = view.findViewById<EditText>(R.id.text_username).text.toString()
-                password = view.findViewById<EditText>(R.id.text_password).text.toString()
+                username = view.findViewById<EditText>(R.id.edit_text_username).text.toString()
+                password = view.findViewById<EditText>(R.id.edit_text_password).text.toString()
 
                 if (username.isNotEmpty() && password.isNotEmpty()) {
                     viewModelUser.checkIfUserExistsLocally(username, password)
@@ -75,7 +74,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
             }
         }
 
-        view.findViewById<TextView>(R.id.signin_text_view).setOnClickListener {
+        view.findViewById<TextView>(R.id.text_view_sign_in).setOnClickListener {
             (requireActivity() as AuthenticatorActivity).showSignInFragment()
         }
     }
@@ -98,12 +97,16 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     private fun observeUser() {
         viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
             if (currentUser != null) {
-                MyUser.id = currentUser.id
-                MyUser.username = currentUser.username.toString()
-                MyUser.password = currentUser.password.toString()
+                MyUser.also {
+                    it.id = currentUser.id
+                    it.username = currentUser.username
+                    it.password = currentUser.password
+                    it.typeActivity = currentUser.typeActivity
+                    it.country = currentUser.country
+                    it.city = currentUser.city
+                }
 
                 MySharedPreferences.setCredentialsSaved(requireContext())
-
                 goToHome()
             } else {
                 Log.e("LOGIN_FRAGMENT", "User not found.")
@@ -112,7 +115,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
     }
 
     private fun goToHome() {
-        val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", "You")
+        val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
         startActivity(intent)
         activity?.finish()
     }

@@ -36,8 +36,9 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun setDate(date: LocalDate) {
-        val strDate = "${date.monthValue}" + "-${date.year}"
-        view?.findViewById<TextView>(R.id.date_text_view)?.text = strDate.lowercase()
+        view?.findViewById<TextView>(R.id.date_text_view)?.apply {
+            text = "${date.month.toString().toLowerCase()}, ${date.year}"
+        }
     }
 
     private fun populateCalendarRecyclerView(days: List<String>, dates: ArrayList<String>, calendar: RecyclerView) {
@@ -50,10 +51,9 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
 
     private fun setUpButton(buttonBack: Button, buttonForward: Button, calendar: RecyclerView) {
         buttonBack.setOnClickListener {
-            val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_SEPARATOR)
+            val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_TEXT_VIEW)
 
-            var date = util.getDateByTokens(formatter, tokens!!)
-            date = date.minusMonths(1)
+            val date = util.getDateByTokens(formatter, tokens!!).minusMonths(1)
             date.format(formatter)
 
             setDate(date)
@@ -61,10 +61,9 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         }
 
         buttonForward.setOnClickListener {
-            val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_SEPARATOR)
+            val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_TEXT_VIEW)
 
-            var date = util.getDateByTokens(formatter, tokens!!)
-            date = date.plusMonths(1)
+            val date = util.getDateByTokens(formatter, tokens!!).plusMonths(1)
             date.format(formatter)
 
             setDate(date)
