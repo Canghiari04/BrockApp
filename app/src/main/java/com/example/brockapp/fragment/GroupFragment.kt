@@ -1,19 +1,19 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
+import com.example.brockapp.adapter.ViewPagerGroupAdapter
 
 import android.view.View
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
-import com.example.brockapp.adapter.ViewPagerGroupAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 
-class GroupFragment: Fragment(R.layout.page_friends) {
+class GroupFragment: Fragment(R.layout.fragment_group) {
     private val tabsTitleArray = mapOf(
-        0 to "Friend",
-        1 to "Club"
+        0 to "Subscribers",
+        1 to "Friends"
     )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

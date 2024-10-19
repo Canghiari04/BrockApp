@@ -1,13 +1,14 @@
 package com.example.brockapp.page.you
 
-import android.util.Log
-import android.view.View
-import androidx.cardview.widget.CardView
 import com.example.brockapp.page.GeofencePage
 
+import android.util.Log
+import android.view.View
+
 class YouGeofencePage: GeofencePage() {
-    override fun showCardView(cardView: CardView) {
-        cardView.visibility = View.VISIBLE
+    override fun setUpCardView() {
+        cardViewUserGeofencePage.visibility = View.GONE
+        cardViewYouGeofencePage.visibility = View.VISIBLE
     }
 
     override fun observeGeofenceTransitions() {

@@ -3,7 +3,6 @@ package com.example.brockapp.page.you
 import com.example.brockapp.page.ProgressPage
 
 import android.view.View
-import androidx.cardview.widget.CardView
 import kotlin.time.Duration.Companion.milliseconds
 
 class YouProgressPage: ProgressPage() {
@@ -11,8 +10,9 @@ class YouProgressPage: ProgressPage() {
         const val TO_KM = 1000.0
     }
 
-    override fun showWelcomeCardView(cardView: CardView) {
-        cardView.visibility = View.VISIBLE
+    override fun setUpCardView() {
+        cardViewUserProgressPage.visibility = View.GONE
+        cardViewYouProgressPage.visibility = View.VISIBLE
     }
 
     override fun observeVehicleTimeSpent() {

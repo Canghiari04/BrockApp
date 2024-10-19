@@ -7,13 +7,14 @@ import com.example.brockapp.adapter.GeofenceAdapter
 import com.example.brockapp.viewmodel.GroupViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GroupViewModelFactory
 import com.example.brockapp.database.GeofenceTransitionEntity
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
-import android.util.Log
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
@@ -25,16 +26,24 @@ import androidx.recyclerview.widget.LinearLayoutManager
 abstract class GeofencePage: Fragment(R.layout.page_geofence) {
     private lateinit var recyclerView: RecyclerView
 
+    protected val toastUtil = ShowCustomToastImpl()
+
+    protected lateinit var buttonUser: Button
     protected lateinit var groupViewModel: GroupViewModel
+    protected lateinit var cardViewYouGeofencePage: CardView
+    protected lateinit var cardViewUserGeofencePage: CardView
     protected lateinit var geofenceViewModel: GeofenceViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<TextView>(R.id.text_view_welcome_geofence).text =
-            ("Geofence Area Overview: Here you'll find all the geofenced areas you've accessed. If your list is currently empty, it's time to dive in and create your first geofence!")
+            ("Geofence Area Overview: Here you'll find all the geofenced areas you've accessed")
 
-        showCardView(view.findViewById(R.id.card_view_welcome_geofence_page))
+        cardViewYouGeofencePage = view.findViewById(R.id.card_view_welcome_you_geofence_page)
+        cardViewUserGeofencePage = view.findViewById(R.id.card_view_welcome_user_geofence_page)
+
+        buttonUser = view.findViewById(R.id.button_user_geofence_page)
 
         recyclerView = view.findViewById(R.id.recycler_view_page_geofence)
 
@@ -47,10 +56,18 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
         val groupFactoryViewModel = GroupViewModelFactory(s3Client, db)
         groupViewModel = ViewModelProvider(this, groupFactoryViewModel)[GroupViewModel::class.java]
 
+        setUpCardView()
+
         observeGeofenceTransitions()
 
         loadGeofenceTransitions()
     }
+
+    protected abstract fun setUpCardView()
+
+    protected abstract fun observeGeofenceTransitions()
+
+    protected abstract fun loadGeofenceTransitions()
 
     protected fun getGroupedTransitions(items: List<GeofenceTransitionEntity>): List<TransitionAverage> {
         val groupedByLocation = items.groupBy { it.nameLocation }
@@ -85,10 +102,4 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = layoutManager
     }
-
-    protected abstract fun showCardView(cardView: CardView)
-
-    protected abstract fun observeGeofenceTransitions()
-
-    protected abstract fun loadGeofenceTransitions()
 }

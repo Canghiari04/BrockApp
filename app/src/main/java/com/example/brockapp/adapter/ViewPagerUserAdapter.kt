@@ -1,15 +1,15 @@
 package com.example.brockapp.adapter
 
 import com.example.brockapp.data.Friend
-import com.example.brockapp.page.friend.FriendProgressPage
-import com.example.brockapp.page.friend.FriendGeofencePage
+import com.example.brockapp.page.user.UserProgressPage
+import com.example.brockapp.page.user.UserGeofencePage
 
 import androidx.lifecycle.Lifecycle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class ViewPagerFriendAdapter(private val friend: Friend, fragmentManager: FragmentManager, lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
+class ViewPagerUserAdapter(private val friend: Friend, fragmentManager: FragmentManager, lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
         return 2
     }
@@ -17,11 +17,11 @@ class ViewPagerFriendAdapter(private val friend: Friend, fragmentManager: Fragme
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> {
-                FriendProgressPage(friend)
+                UserProgressPage(friend)
             }
 
             else -> {
-                FriendGeofencePage(friend)
+                UserGeofencePage(friend)
             }
         }
     }

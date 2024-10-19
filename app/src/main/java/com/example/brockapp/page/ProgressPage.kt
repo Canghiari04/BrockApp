@@ -1,25 +1,27 @@
 package com.example.brockapp.page
 
 import com.example.brockapp.R
+import com.example.brockapp.util.ChartUtil
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.viewmodel.GroupViewModel
 import com.example.brockapp.interfaces.PeriodRangeImpl
 import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GroupViewModelFactory
 import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
 
 import android.os.Bundle
 import android.view.View
 import java.time.LocalDate
+import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
-import com.example.brockapp.util.ChartUtil
 import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
@@ -45,10 +47,13 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         "Month" to ::showMonthlyPieChart
     )
 
-    protected var chartUtil = ChartUtil()
+    protected val chartUtil = ChartUtil()
+    protected val toastUtil = ShowCustomToastImpl()
 
-    // Text view
+    protected lateinit var buttonUser: Button
     private lateinit var titleThirdCardView: TextView
+    protected lateinit var cardViewYouProgressPage: CardView
+    protected lateinit var cardViewUserProgressPage: CardView
 
     // Table
     protected lateinit var infoFirstColumn: TextView
@@ -76,9 +81,12 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<TextView>(R.id.text_view_welcome_progress).text =
-            ("Welcome, " + MyUser.username + "! In this area you can check your progress done during the activities registered")
+            ("Welcome, " + MyUser.username + "! In this area you can check your progress done")
 
-        showWelcomeCardView(view.findViewById(R.id.card_view_welcome_progress_page))
+        cardViewYouProgressPage = view.findViewById(R.id.card_view_welcome_you_progress_page)
+        cardViewUserProgressPage = view.findViewById(R.id.card_view_welcome_user_progress_page)
+
+        buttonUser = view.findViewById(R.id.button_user_progress_page)
 
         titleThirdCardView = view.findViewById(R.id.text_view_title_third_card)
 
@@ -100,10 +108,6 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         // Pie chart
         pieChart = view.findViewById(R.id.pie_chart_activities)
 
-        setUpBarChartSpinner(view.findViewById(R.id.spinner_bar_chart))
-        setUpLineChartSpinner(view.findViewById(R.id.spinner_line_chart))
-        setUpPieChartSpinner(view.findViewById(R.id.spinner_pie_chart))
-
         val db = BrockDB.getInstance(requireContext())
         val s3Client = MyS3ClientProvider.getInstance(requireContext())
 
@@ -112,6 +116,12 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
         val activitiesFactoryViewModel = ActivitiesViewModelFactory(db)
         activitiesViewModel = ViewModelProvider(this, activitiesFactoryViewModel)[ActivitiesViewModel::class.java]
+
+        setUpCardView()
+
+        setUpBarChartSpinner(view.findViewById(R.id.spinner_bar_chart))
+        setUpLineChartSpinner(view.findViewById(R.id.spinner_line_chart))
+        setUpPieChartSpinner(view.findViewById(R.id.spinner_pie_chart))
 
         observeVehicleTimeSpent()
         observeUserKilometers()
@@ -130,10 +140,10 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         observeUserActivities()
     }
 
-    protected abstract fun showWelcomeCardView(cardView: CardView)
+    protected abstract fun setUpCardView()
 
     private fun setUpBarChartSpinner(spinner: Spinner?) {
-        val spinnerItems = resources.getStringArray(R.array.spinner_bar_chart)
+        val spinnerItems = resources.getStringArray(R.array.spinner_activities)
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

@@ -3,9 +3,9 @@ package com.example.brockapp.page
 import com.example.brockapp.R
 import com.example.brockapp.data.User
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.activity.FriendActivity
+import com.example.brockapp.activity.UserActivity
 import com.example.brockapp.viewmodel.GroupViewModel
-import com.example.brockapp.adapter.SubscriberAdapter
+import com.example.brockapp.adapter.UserAdapter
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.interfaces.ShowCustomToastImpl
@@ -91,7 +91,7 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
 
     // Refactor the names
     protected fun populateRecyclerView(subscribers: List<User>) {
-        val adapter = SubscriberAdapter(subscribers) { username -> showSubscribe(username) }
+        val adapter = UserAdapter(subscribers) { username -> showSubscribe(username) }
         val layoutManager = LinearLayoutManager(context)
 
         recyclerView.adapter = adapter
@@ -99,7 +99,7 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
     }
 
     private fun showSubscribe(username: String) {
-        val intent = Intent(requireContext(), FriendActivity::class.java).putExtra("USERNAME_SUBSCRIBER", username)
+        val intent = Intent(requireContext(), UserActivity::class.java).putExtra("USERNAME_SUBSCRIBER", username)
         startActivity(intent)
         requireActivity().finish()
     }

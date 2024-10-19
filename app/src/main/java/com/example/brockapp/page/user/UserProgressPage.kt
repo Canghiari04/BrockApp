@@ -1,19 +1,83 @@
-package com.example.brockapp.page.friend
+package com.example.brockapp.page.user
 
+import com.example.brockapp.R
 import com.example.brockapp.data.Friend
 import com.example.brockapp.page.ProgressPage
+import com.example.brockapp.extraObject.MyUser
 
 import android.view.View
-import androidx.cardview.widget.CardView
+import android.widget.TextView
 import kotlin.time.Duration.Companion.milliseconds
 
-class FriendProgressPage(private val friend: Friend): ProgressPage() {
+class UserProgressPage(private val friend: Friend): ProgressPage() {
     companion object {
         const val TO_KM = 1000.0
     }
 
-    override fun showWelcomeCardView(cardView: CardView) {
-        cardView.visibility = View.GONE
+    override fun setUpCardView() {
+        cardViewYouProgressPage.visibility = View.GONE
+        cardViewUserProgressPage.visibility = View.VISIBLE
+
+        setUpTextView()
+
+        observeAddedFriend()
+        observeRemovedFriend()
+        observeCurrentFriends()
+
+        groupViewModel.getCurrentFriends(MyUser.id)
+    }
+
+    private fun setUpTextView() {
+        requireView().findViewById<TextView>(R.id.text_view_user_user_name).also {
+            it.text = friend.username
+        }
+
+        requireView().findViewById<TextView>(R.id.text_view_user_address).also {
+            it.text = "${friend.country}, ${friend.city}"
+        }
+    }
+
+    private fun observeAddedFriend() {
+        groupViewModel.errorAddFriend.observe(this) {
+            if (it) {
+                toastUtil.showBasicToast(
+                    "${friend.username} is your new friend",
+                    requireContext()
+                )
+            } else {
+                toastUtil.showWarningToast(
+                    "Encountered error while adding",
+                    requireContext()
+                )
+            }
+        }
+    }
+
+    private fun observeRemovedFriend() {
+        groupViewModel.errorDeleteFriend.observe(this) {
+            if (it) {
+                toastUtil.showBasicToast(
+                    "${friend.username} has been removed",
+                    requireContext()
+                )
+            } else {
+                toastUtil.showWarningToast(
+                    "Encountered error while removing",
+                    requireContext()
+                )
+            }
+        }
+    }
+
+    private fun observeCurrentFriends() {
+        groupViewModel.currentFriends.observe(viewLifecycleOwner) { items ->
+            if (items.contains(friend.username)) {
+                buttonUser.setText("REMOVE")
+                buttonUser.setOnClickListener { groupViewModel.deleteFriend(friend.username) }
+            } else {
+                buttonUser.setOnClickListener { groupViewModel.addFriend(friend.username) }
+            }
+        }
     }
 
     override fun observeVehicleTimeSpent() {
@@ -22,7 +86,9 @@ class FriendProgressPage(private val friend: Friend): ProgressPage() {
                 "%01dh %01dm %01ds".format(hours, minutes, seconds)
             }
 
-            infoFirstColumn.setText(duration)
+            infoFirstColumn.also {
+                it.text = duration
+            }
         }
     }
 

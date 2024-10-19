@@ -1,6 +1,5 @@
 package com.example.brockapp.adapter
 
-import com.example.brockapp.page.ClubPage
 import com.example.brockapp.page.userlist.FriendsPage
 import com.example.brockapp.page.userlist.SubscribersPage
 
@@ -11,17 +10,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerGroupAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
-        return 3
+        return 2
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> {
                 SubscribersPage()
-            }
-
-            1 -> {
-                ClubPage()
             }
 
             else -> {

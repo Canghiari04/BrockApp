@@ -36,14 +36,22 @@
                 android:layout_marginStart="10dp">
 
                 <TextView
-                    android:id="@+id/text_view_friend_name"
+                    android:id="@+id/text_view_subscriber_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Matteo"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textAlignment="textStart"
                     android:textColor="@color/black">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/text_view_subscriber_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/dark_grey">
                 </TextView>
             </LinearLayout>
 
