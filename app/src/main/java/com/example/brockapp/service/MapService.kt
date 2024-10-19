@@ -21,13 +21,13 @@ class MapService: Service() {
 
             geofenceClient.removeGeofences(pendingIntent).run {
                 addOnSuccessListener {
-                    Log.d("CONNECTIVITY_SERVICE", "Geofence removed.")
+                    Log.d("MAP_SERVICE", "Geofence removed")
                 }
             }
 
             geofenceClient.addGeofences(request, pendingIntent).run {
                 addOnSuccessListener {
-                    Log.d("CONNECTIVITY_SERVICE", "Geofence added.")
+                    Log.d("MAP_SERVICE", "Geofence added")
                 }
             }
         } else {
