@@ -2,6 +2,7 @@ package com.example.brockapp.extraObject
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.android.gms.location.DetectedActivity
 
 object MySharedPreferences {
     private const val PREFERENCES_NAME = "MY_APP_PREFERENCES"
@@ -11,6 +12,10 @@ object MySharedPreferences {
     private const val KEY_ACTIVITY_RECOGNITION = "ACTIVITY_RECOGNITION"
     private const val KEY_GEOFENCE_TRANSITION = "GEOFENCE_TRANSITION"
     private const val KEY_DUMP_DATABASE = "DUMP_DATABASE"
+    private const val KEY_STILL_ACTIVITY = "STILL_ACTIVITY"
+    private const val KEY_VEHICLE_ACTIVITY = "VEHICLE_ACTIVITY"
+    private const val KEY_WALK_ACTIVITY = "WALK_ACTIVITY"
+    private const val KEY_RUN_ACTIVITY = "RUN_ACTIVITY"
 
     fun setUpSharedPreferences(context: Context) {
         val sharedPreferences = getSharedPreferences(context)
@@ -22,6 +27,10 @@ object MySharedPreferences {
             putBoolean(KEY_ACTIVITY_RECOGNITION, false)
             putBoolean(KEY_GEOFENCE_TRANSITION, false)
             putBoolean(KEY_DUMP_DATABASE, false)
+            putInt(KEY_STILL_ACTIVITY, DetectedActivity.UNKNOWN)
+            putInt(KEY_VEHICLE_ACTIVITY, DetectedActivity.UNKNOWN)
+            putInt(KEY_WALK_ACTIVITY, DetectedActivity.UNKNOWN)
+            putInt(KEY_RUN_ACTIVITY, DetectedActivity.UNKNOWN)
             apply()
         }
     }
@@ -29,11 +38,11 @@ object MySharedPreferences {
     fun getCredentialsSaved(context: Context): Triple<Long, String?, String?> {
         val sharedPreferences = getSharedPreferences(context)
 
-        val id = sharedPreferences.getLong(KEY_ID, 0L)
-        val username = sharedPreferences.getString(KEY_USERNAME, null)
-        val password = sharedPreferences.getString(KEY_PASSWORD, null)
-
-        return Triple(id, username, password)
+        return Triple(
+            sharedPreferences.getLong(KEY_ID, 0L),
+            sharedPreferences.getString(KEY_USERNAME, null),
+            sharedPreferences.getString(KEY_PASSWORD, null)
+        )
     }
 
     fun setCredentialsSaved(context: Context) {
@@ -47,7 +56,7 @@ object MySharedPreferences {
         }
     }
 
-    fun checkService(key:String, context: Context): Boolean {
+    fun checkService(key: String, context: Context): Boolean {
         val sharedPreferences = getSharedPreferences(context)
 
         return sharedPreferences.getBoolean(key, false)
@@ -58,6 +67,21 @@ object MySharedPreferences {
 
         with(sharedPreferences.edit()) {
             putBoolean(key, item)
+            apply()
+        }
+    }
+
+    fun getActivity(key: String, context: Context): Int {
+        val sharedPreferences = getSharedPreferences(context)
+
+        return sharedPreferences.getInt(key, DetectedActivity.UNKNOWN)
+    }
+
+    fun setActivity(key: String, item: Int, context: Context) {
+        val sharedPreferences = getSharedPreferences(context)
+
+        with(sharedPreferences.edit()) {
+            putInt(key, item)
             apply()
         }
     }
