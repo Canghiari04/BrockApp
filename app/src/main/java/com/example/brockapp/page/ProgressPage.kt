@@ -74,8 +74,8 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
     protected lateinit var pieChart: PieChart
 
     // View model
-    protected lateinit var groupViewModel: GroupViewModel
-    protected lateinit var activitiesViewModel: ActivitiesViewModel
+    protected lateinit var viewModelGroup: GroupViewModel
+    protected lateinit var viewModelActivities: ActivitiesViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -112,10 +112,10 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         val s3Client = MyS3ClientProvider.getInstance(requireContext())
 
         val groupViewModelFactory = GroupViewModelFactory(s3Client, db)
-        groupViewModel = ViewModelProvider(this, groupViewModelFactory)[GroupViewModel::class.java]
+        viewModelGroup = ViewModelProvider(this, groupViewModelFactory)[GroupViewModel::class.java]
 
         val activitiesFactoryViewModel = ActivitiesViewModelFactory(db)
-        activitiesViewModel = ViewModelProvider(this, activitiesFactoryViewModel)[ActivitiesViewModel::class.java]
+        viewModelActivities = ViewModelProvider(this, activitiesFactoryViewModel)[ActivitiesViewModel::class.java]
 
         setUpCardView()
 

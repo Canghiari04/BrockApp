@@ -29,10 +29,10 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
     protected val toastUtil = ShowCustomToastImpl()
 
     protected lateinit var buttonUser: Button
-    protected lateinit var groupViewModel: GroupViewModel
+    protected lateinit var viewModelGroup: GroupViewModel
     protected lateinit var cardViewYouGeofencePage: CardView
     protected lateinit var cardViewUserGeofencePage: CardView
-    protected lateinit var geofenceViewModel: GeofenceViewModel
+    protected lateinit var viewModelGeofence: GeofenceViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,11 +50,11 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
         val db = BrockDB.getInstance(requireContext())
         val s3Client = MyS3ClientProvider.getInstance(requireContext())
 
-        val geofenceFactoryViewModel = GeofenceViewModelFactory(db)
-        geofenceViewModel = ViewModelProvider(this, geofenceFactoryViewModel)[GeofenceViewModel::class.java]
+        val factoryGeofenceViewModel = GeofenceViewModelFactory(db)
+        viewModelGeofence = ViewModelProvider(this, factoryGeofenceViewModel)[GeofenceViewModel::class.java]
 
-        val groupFactoryViewModel = GroupViewModelFactory(s3Client, db)
-        groupViewModel = ViewModelProvider(this, groupFactoryViewModel)[GroupViewModel::class.java]
+        val factoryGroupViewModel = GroupViewModelFactory(s3Client, db)
+        viewModelGroup = ViewModelProvider(this, factoryGroupViewModel)[GroupViewModel::class.java]
 
         setUpCardView()
 

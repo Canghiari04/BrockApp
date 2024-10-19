@@ -12,7 +12,7 @@ class YouGeofencePage: GeofencePage() {
     }
 
     override fun observeGeofenceTransitions() {
-        geofenceViewModel.geofenceTransitions.observe(viewLifecycleOwner) { items ->
+        viewModelGeofence.geofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
                 populateRecyclerView(transitions)
@@ -23,6 +23,6 @@ class YouGeofencePage: GeofencePage() {
     }
 
     override fun loadGeofenceTransitions() {
-        geofenceViewModel.getGeofenceTransitions()
+        viewModelGeofence.getGeofenceTransitions()
     }
 }

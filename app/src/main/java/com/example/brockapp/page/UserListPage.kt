@@ -3,14 +3,13 @@ package com.example.brockapp.page
 import com.example.brockapp.R
 import com.example.brockapp.data.User
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.adapter.UserAdapter
 import com.example.brockapp.activity.UserActivity
 import com.example.brockapp.viewmodel.GroupViewModel
-import com.example.brockapp.adapter.UserAdapter
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GroupViewModelFactory
-
 
 import android.os.Bundle
 import android.view.View
@@ -37,16 +36,15 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         recyclerView = view.findViewById(R.id.recycler_view_user_list_page)
 
         searchTextView = view.findViewById(R.id.auto_complete_text_view_user_list_page)
-        setUpSearchTextView()
-
-        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
         val db: BrockDB = BrockDB.getInstance(requireContext())
         val s3Client = MyS3ClientProvider.getInstance(requireContext())
-
         val viewModelFactoryGroup = GroupViewModelFactory(s3Client, db)
-        viewModelGroup =
-            ViewModelProvider(requireActivity(), viewModelFactoryGroup)[GroupViewModel::class.java]
+
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
+        viewModelGroup = ViewModelProvider(requireActivity(), viewModelFactoryGroup)[GroupViewModel::class.java]
+
+        setUpSearchTextView()
 
         observeNetwork()
         observeUsers()

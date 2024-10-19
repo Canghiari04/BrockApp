@@ -20,7 +20,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
         observeRemovedFriend()
         observeCurrentFriends()
 
-        groupViewModel.getCurrentFriends(MyUser.id)
+        viewModelGroup.getCurrentFriends(MyUser.id)
     }
 
     private fun setUpTextView() {
@@ -34,7 +34,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     }
 
     private fun observeAddedFriend() {
-        groupViewModel.errorAddFriend.observe(this) {
+        viewModelGroup.errorAddFriend.observe(this) {
             if (it) {
                 toastUtil.showBasicToast(
                     "${friend.username} is your new friend",
@@ -50,7 +50,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     }
 
     private fun observeRemovedFriend() {
-        groupViewModel.errorDeleteFriend.observe(this) {
+        viewModelGroup.errorDeleteFriend.observe(this) {
             if (it) {
                 toastUtil.showBasicToast(
                     "${friend.username} has been removed",
@@ -66,18 +66,18 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     }
 
     private fun observeCurrentFriends() {
-        groupViewModel.currentFriends.observe(viewLifecycleOwner) { items ->
+        viewModelGroup.currentFriends.observe(viewLifecycleOwner) { items ->
             if (items.contains(friend.username)) {
                 buttonUser.setText("REMOVE")
-                buttonUser.setOnClickListener { groupViewModel.deleteFriend(friend.username) }
+                buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
             } else {
-                buttonUser.setOnClickListener { groupViewModel.addFriend(friend.username) }
+                buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
     }
 
     override fun observeGeofenceTransitions() {
-        groupViewModel.friendGeofenceTransitions.observe(viewLifecycleOwner) { items ->
+        viewModelGroup.friendGeofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
                 populateRecyclerView(transitions)
@@ -88,6 +88,6 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     }
 
     override fun loadGeofenceTransitions() {
-        groupViewModel.getFriendGeofenceTransitions(friend)
+        viewModelGroup.getFriendGeofenceTransitions(friend)
     }
 }
