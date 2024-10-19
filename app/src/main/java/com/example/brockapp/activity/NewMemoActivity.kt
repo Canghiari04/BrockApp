@@ -70,7 +70,7 @@ class NewMemoActivity: AppCompatActivity() {
     }
 
     private fun setUpSpinnerActivity(spinner: Spinner) {
-        val spinnerItems = resources.getStringArray(R.array.spinner_activity)
+        val spinnerItems = resources.getStringArray(R.array.spinner_activities)
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

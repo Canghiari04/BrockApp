@@ -23,17 +23,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DailyMemoActivity: AppCompatActivity() {
+    private var date: String? = null
+
     private val toastUtil = ShowCustomToastImpl()
 
     private lateinit var viewModel: MemoViewModel
     private lateinit var adapter: DailyMemoAdapter
+    private lateinit var recyclerView: RecyclerView
     private lateinit var button: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_daily_memo)
 
-        val date: String? = intent.getStringExtra("CALENDAR_DATE")
+        recyclerView = findViewById(R.id.recycler_view_memos)
+
+        date = intent.getStringExtra("CALENDAR_DATE")
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_daily_memo)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -41,12 +46,7 @@ class DailyMemoActivity: AppCompatActivity() {
 
         // Check if date is persistent to the current date
         button = findViewById(R.id.button_new_memo)
-
-        if (checkCurrentDate(date)) {
-            setUpFloatingButton(date)
-        } else {
-            button.hide()
-        }
+        setUpFloatingButton(date)
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = MemoViewModelFactory(db)
@@ -62,7 +62,7 @@ class DailyMemoActivity: AppCompatActivity() {
             android.R.id.home -> {
                 val intent = Intent(this, PageLoaderActivity::class.java).putExtra(
                     "FRAGMENT_TO_SHOW",
-                    "Calendar"
+                    R.id.navbar_item_calendar
                 )
                 startActivity(intent)
                 finish()
@@ -88,43 +88,47 @@ class DailyMemoActivity: AppCompatActivity() {
         }
     }
 
+    private fun setUpFloatingButton(date: String?) {
+        button.setOnClickListener {
+            val intent = Intent(this, NewMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
+            startActivity(intent)
+            finish()
+        }
+
+        if (!checkCurrentDate(date)) {
+            button.hide()
+        }
+    }
+
     private fun checkCurrentDate(date: String?): Boolean {
         val currentDate = LocalDate.now()
         val dailyDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT))
 
         return currentDate.isEqual(dailyDate) || currentDate.isBefore(dailyDate)
     }
-
-    private fun setUpFloatingButton(date: String?) {
-        // I'm using the date to do the right "coming back" from NewMemo to DailyMemo
-        button.setOnClickListener {
-            val intent = Intent(this, NewMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
-            startActivity(intent)
-            finish()
-        }
-    }
-
+    
     private fun observeMemos() {
         viewModel.memos.observe(this) { list ->
             if (!list.isNullOrEmpty()) {
-                val recyclerView = findViewById<RecyclerView>(R.id.recycler_view_memos)
-                populateRecyclerView(list, recyclerView)
+                populateRecyclerView(list)
             } else {
-                setContentView(R.layout.activity_empty_page)
-
-                val toolbar = findViewById<Toolbar>(R.id.toolbar_empty_activity)
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                setSupportActionBar(toolbar)
-
                 toastUtil.showBasicToast(
                     "No one memo retrieved",
                     this
                 )
+
+                if(!checkCurrentDate(date)) {
+                    setContentView(R.layout.activity_empty_page)
+
+                    val toolbar = findViewById<Toolbar>(R.id.toolbar_empty_activity)
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    setSupportActionBar(toolbar)
+                }
             }
         }
     }
 
-    private fun populateRecyclerView(list: List<MemoEntity>, recyclerView: RecyclerView) {
+    private fun populateRecyclerView(list: List<MemoEntity>) {
         adapter = DailyMemoAdapter(list)
         val layoutManager = LinearLayoutManager(this)
 
