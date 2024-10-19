@@ -20,16 +20,27 @@ import com.google.android.gms.location.ActivityTransitionRequest
 class MyActivityRecognition private constructor() {
     companion object {
         @Volatile
-        private var task: Task<Void>? = null
+        private var status: Boolean = false
 
         private lateinit var pendingIntent: PendingIntent
 
+        fun getStatus(): Boolean {
+            synchronized(this) {
+                return status
+            }
+        }
+
+        // Function used to define when the user do some changes by the settings control
+        fun setStatus(item: Boolean) {
+            synchronized(this) {
+                status = item
+            }
+        }
+
         fun getTask(context: Context): Task<Void>? {
             synchronized(this) {
-                task = createTask(context)
+                return createTask(context)
             }
-
-            return task
         }
 
         fun removeTask(context: Context) {
@@ -47,11 +58,12 @@ class MyActivityRecognition private constructor() {
                                     .removeActivityTransitionUpdates(pendingIntent)
 
                             task.addOnSuccessListener {
+                                status = false
                                 pendingIntent.cancel()
                             }
 
                             task.addOnFailureListener { e: Exception ->
-                                Log.e("MY_ACTIVITY_RECOGNITION", e.message!!)
+                                Log.e("MY_ACTIVITY_RECOGNITION", e.message.toString())
                             }
                         }
                     }
@@ -86,10 +98,10 @@ class MyActivityRecognition private constructor() {
         // Will be fine define by the user the activity he/she is interested in
         private fun createActivityTransitions(context: Context): List<ActivityTransition> {
             val list = mutableListOf(
-                MySharedPreferences.getActivity("STILL_ACTIVITY", context),
                 MySharedPreferences.getActivity("VEHICLE_ACTIVITY", context),
-                MySharedPreferences.getActivity("WALK_ACTIVITY", context),
-                MySharedPreferences.getActivity("RUN_ACTIVITY", context)
+                MySharedPreferences.getActivity("RUN_ACTIVITY", context),
+                MySharedPreferences.getActivity("STILL_ACTIVITY", context),
+                MySharedPreferences.getActivity("WALK_ACTIVITY", context)
             ).apply { removeAll { it == DetectedActivity.UNKNOWN } }
 
             // Inside the shared preferences I will put the same type in .setActivityType

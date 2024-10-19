@@ -20,10 +20,25 @@ class MyGeofence private constructor() {
         private var typeNetwork: String? = ""
 
         @Volatile
+        private var status = false
+
+        @Volatile
         private var pendingIntent: PendingIntent? = null
 
         @Volatile
         private var areas = mutableListOf<GeofenceAreaEntity>()
+
+        fun getStatus(): Boolean {
+            synchronized(this) {
+                return status
+            }
+        }
+
+        fun setStatus(item: Boolean) {
+            synchronized(this) {
+                status = item
+            }
+        }
 
         // Pending intent must never to change
         fun getPendingIntent(context: Context): PendingIntent {
