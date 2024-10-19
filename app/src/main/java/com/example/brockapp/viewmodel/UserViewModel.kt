@@ -26,14 +26,22 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
     private var _currentUser = MutableLiveData<UserEntity?>()
     val currentUser: LiveData<UserEntity?> get() = _currentUser
 
-    fun registerUser(username: String, password: String) {
+    fun registerUser(username: String, password: String, typeActivity: String, country: String, city: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val userAlreadyExistsOnS3 = checkIfUserExistsOnS3(username)
 
             if (userAlreadyExistsOnS3) {
                 _auth.postValue(false)
             } else {
-                db.UserDao().insertUser(UserEntity(username = username, password = password))
+                db.UserDao().insertUser(
+                    UserEntity(
+                        username = username,
+                        password = password,
+                        typeActivity = typeActivity,
+                        country = country,
+                        city = city
+                    )
+                )
 
                 val jsonFile = createUserDataFile(username)
                 uploadUserToS3(username, jsonFile)
@@ -56,33 +64,6 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         }
     }
 
-    private fun createUserDataFile(username: String): File {
-        try {
-            val gson = Gson()
-            val jsonObject = JsonObject()
-            jsonObject.addProperty("username", username)
-
-            FileWriter(file).use { writer ->
-                writer.write(gson.toJson(jsonObject))
-            }
-        } catch (e: Exception) {
-            Log.e("FileCreationError", e.toString())
-        }
-
-        return file
-    }
-
-    private fun uploadUserToS3(username: String, jsonFile: File) {
-        val userKey = "user/$username.json"
-
-        try {
-            val request = PutObjectRequest(BUCKET_NAME, userKey, jsonFile)
-            s3Client.putObject(request)
-        } catch (e: Exception) {
-            Log.e("UploadError", e.toString())
-        }
-    }
-
     fun checkIfUserExistsLocally(username: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val userAlreadyExists = db.UserDao().checkIfUserIsPresent(username, password)
@@ -101,6 +82,34 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         viewModelScope.launch(Dispatchers.IO) {
             _currentUser.postValue(null)
             db.UserDao().deleteUserByUsernameAndPassword(username, password)
+        }
+    }
+
+    private fun createUserDataFile(username: String): File {
+        try {
+            val gson = Gson()
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("username", username)
+
+            FileWriter(file).use { writer ->
+                writer.write(gson.toJson(jsonObject))
+            }
+        } catch (e: Exception) {
+            Log.e("FileCreationError", e.toString())
+        }
+
+        return file
+    }
+
+    // Here is defined the first upload inside the bucket
+    private fun uploadUserToS3(username: String, jsonFile: File) {
+        val userKey = "user/$username.json"
+
+        try {
+            val request = PutObjectRequest(BUCKET_NAME, userKey, jsonFile)
+            s3Client.putObject(request)
+        } catch (e: Exception) {
+            Log.e("UploadError", e.toString())
         }
     }
 }
