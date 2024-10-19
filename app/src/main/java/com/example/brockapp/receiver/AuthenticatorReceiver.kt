@@ -34,7 +34,6 @@ class AuthenticatorReceiver(private val viewModelStoreOwner: ViewModelStoreOwner
 
     private fun handleChange(isConnected: Boolean) {
         val networkViewModel = ViewModelProvider(viewModelStoreOwner)[NetworkViewModel::class.java]
-
         networkViewModel.setAuthNetwork(isConnected)
     }
 }
