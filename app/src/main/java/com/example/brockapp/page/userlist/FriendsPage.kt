@@ -1,13 +1,19 @@
-package com.example.brockapp.page
+package com.example.brockapp.page.userlist
 
-import android.os.Bundle
-import android.view.View
-import com.example.brockapp.R
+import com.example.brockapp.page.UserListPage
 
-import androidx.fragment.app.Fragment
+class FriendsPage: UserListPage() {
+    override fun loadUsers() {
+        viewModelGroup.getAllFriends()
+    }
 
-class FriendsPage: Fragment(R.layout.page_friends) {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun observeUsers() {
+        viewModelGroup.friends.observe(viewLifecycleOwner) { items ->
+            if (items.isNullOrEmpty()) {
+                showToastUtil()
+            } else {
+                populateRecyclerView(items.filterNotNull())
+            }
+        }
     }
 }
