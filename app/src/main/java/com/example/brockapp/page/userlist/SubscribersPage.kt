@@ -1,13 +1,15 @@
 package com.example.brockapp.page
 
 import com.example.brockapp.R
+import com.example.brockapp.data.Subscriber
 import com.example.brockapp.database.BrockDB
-import com.example.brockapp.adapter.FriendAdapter
 import com.example.brockapp.activity.FriendActivity
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.GroupViewModel
+import com.example.brockapp.adapter.SubscriberAdapter
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.viewmodel.GroupViewModelFactory
 
@@ -22,7 +24,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 
-class FriendPage: Fragment(R.layout.fragment_friends) {
+class SubscribersPage: Fragment(R.layout.page_subscribers) {
+    private val toastUtil = ShowCustomToastImpl()
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewModelUser: UserViewModel
     private lateinit var viewModelGroup: GroupViewModel
@@ -32,9 +36,9 @@ class FriendPage: Fragment(R.layout.fragment_friends) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.recycler_view_page_friend)
+        recyclerView = view.findViewById(R.id.recycler_view_subscribers_page)
 
-        searchTextView = view.findViewById(R.id.auto_complete_text_view_friend_page)
+        searchTextView = view.findViewById(R.id.auto_complete_text_view_subscribers_page)
         setUpSearchTextView()
 
         viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
@@ -51,8 +55,8 @@ class FriendPage: Fragment(R.layout.fragment_friends) {
         viewModelUser =
             ViewModelProvider(requireActivity(), viewModelFactoryUser)[UserViewModel::class.java]
 
-        observeUsers()
         observeNetwork()
+        observeUsers()
         observeSuggestion()
     }
 
@@ -61,28 +65,6 @@ class FriendPage: Fragment(R.layout.fragment_friends) {
             val user = searchTextView.text.toString()
             viewModelGroup.getSuggestions(user)
         }
-    }
-
-    private fun observeUsers() {
-        viewModelGroup.users.observe(viewLifecycleOwner) { items ->
-            if (items.isNotEmpty()) {
-                populateRecyclerView(items.take(27))
-            }
-        }
-    }
-
-    private fun populateRecyclerView(usernames: List<String>) {
-        val adapter = FriendAdapter(usernames) { username -> showFriend(username) }
-        val layoutManager = LinearLayoutManager(context)
-
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = layoutManager
-    }
-
-    private fun showFriend(username: String) {
-        val intent = Intent(requireContext(), FriendActivity::class.java).putExtra("USERNAME_USER", username)
-        startActivity(intent)
-        requireActivity().finish()
     }
 
     // Able or disable the feature in base of the state of the network
@@ -96,24 +78,45 @@ class FriendPage: Fragment(R.layout.fragment_friends) {
         }
     }
 
-    private fun observeSuggestion() {
-        viewModelGroup.suggestions.observe(viewLifecycleOwner) { items ->
-            if (items.isNotEmpty()) {
-                populateRecyclerView(items)
+    private fun observeUsers() {
+        viewModelGroup.subscribers.observe(viewLifecycleOwner) { items ->
+            if (items.isNullOrEmpty()) {
+                // Populate must be done after the friend's loading
+                toastUtil.showBasicToast(
+                    "Nobody found in Subscribers section",
+                    requireContext()
+                )
+            } else {
+                populateRecyclerView(items.filterNotNull())
             }
         }
     }
 
-//    private fun observeAddedFriend() {
-//        viewModelGroup.errorAddFriend.observe(viewLifecycleOwner) { errorAddFriend ->
-//            if (errorAddFriend) {
-//                Log.d("FRIEND_PAGE", "Friend added to the list")
-//            } else {
-//                toastUtil.showBasicToast(
-//                    "User is already a friend",
-//                    requireContext()
-//                )
-//            }
-//        }
-//    }
+    // Refactor the names
+    private fun populateRecyclerView(subscribers: List<Subscriber>) {
+        val adapter = SubscriberAdapter(subscribers) { username -> showSubscribe(username) }
+        val layoutManager = LinearLayoutManager(context)
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = layoutManager
+    }
+
+    private fun showSubscribe(username: String) {
+        val intent = Intent(requireContext(), FriendActivity::class.java).putExtra("USERNAME_SUBSCRIBER", username)
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
+    private fun observeSuggestion() {
+        viewModelGroup.suggestions.observe(viewLifecycleOwner) { items ->
+            if (items.isNotEmpty()) {
+                populateRecyclerView(items.filterNotNull())
+            } else {
+                toastUtil.showWarningToast(
+                    "Username not found",
+                    requireContext()
+                )
+            }
+        }
+    }
 }

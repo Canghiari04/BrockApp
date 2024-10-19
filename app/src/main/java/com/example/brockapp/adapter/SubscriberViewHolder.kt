@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class FriendViewHolder(itemView: View, private val onItemClick: (String) -> Unit): RecyclerView.ViewHolder(itemView) {
-    private val usernameTextView: TextView = itemView.findViewById(R.id.friend_name_text_view)
-    private val viewFriendActivityButton: Button = itemView.findViewById(R.id.button_view_friend)
+    private val usernameTextView: TextView = itemView.findViewById(R.id.text_view_friend_name)
+    private val viewFriendActivityButton: TextView = itemView.findViewById(R.id.text_view_view_friend)
 
     fun bindFriend (friend: String) {
         usernameTextView.text = friend
