@@ -23,8 +23,8 @@ class MyS3ClientProvider private constructor() {
         private fun createS3Client(context: Context): AmazonS3Client {
             val credentialsProvider = CognitoCachingCredentialsProvider(
                 context,
-                "eu-west-3:8fe18ff5-1fe5-429d-b11c-16e8401d3a00",
-                Regions.EU_WEST_3
+                "eu-north-1:cf6fc8c3-1985-47fe-9dfa-3c972c4d64c4",
+                Regions.EU_NORTH_1
             )
 
             return AmazonS3Client(credentialsProvider)
