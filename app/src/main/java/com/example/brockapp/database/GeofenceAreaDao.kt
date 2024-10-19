@@ -10,6 +10,9 @@ interface GeofenceAreaDao {
     @Query("SELECT COUNT(*) FROM GeofenceArea")
     suspend fun countAllGeofenceAreas(): Int
 
+    @Query("SELECT COUNT(*)>0 FROM GeofenceArea WHERE name=:locationName")
+    suspend fun countGeofenceAreaName(locationName: String): Boolean
+
     @Query("SELECT * FROM GeofenceArea")
     suspend fun getAllGeofenceAreas(): List<GeofenceAreaEntity>
 

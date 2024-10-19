@@ -17,5 +17,5 @@ import androidx.room.PrimaryKey
 data class FriendEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "user_id") val userId: Long,
-    val followedUsername: String
+    val username: String
 )
