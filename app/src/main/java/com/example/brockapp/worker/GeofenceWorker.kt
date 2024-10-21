@@ -16,8 +16,10 @@ class GeofenceWorker(private val context: Context, workerParams: WorkerParameter
     override fun doWork(): Result {
         util = NotificationUtil()
 
+        val nameLocation = inputData.getString("LOCATION_NAME")
+
         sendNotification(
-            "BrockApp - You are inside a geofence area",
+            "BrockApp - You are near $nameLocation",
             "Be sure to track your activities. Open the app and record your movements so you don't lose your progress"
         )
 
