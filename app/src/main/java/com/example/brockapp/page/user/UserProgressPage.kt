@@ -81,7 +81,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeVehicleTimeSpent() {
-        viewModelGroup.friendVehicleTime.observe(viewLifecycleOwner) {
+        viewModelGroup.userVehicleTime.observe(viewLifecycleOwner) {
             val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
                 "%01dh %01dm %01ds".format(hours, minutes, seconds)
             }
@@ -92,8 +92,8 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
         }
     }
 
-    override fun observeUserKilometers() {
-        viewModelGroup.friendMetersTravelled.observe(viewLifecycleOwner) {
+    override fun observeUserKilometersTravelled() {
+        viewModelGroup.userMetersTravelled.observe(viewLifecycleOwner) {
             val kilometers = (it / TO_KM)
 
             titleSecondColumn.setText("Distance travelled")
@@ -102,7 +102,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeVehicleBarChartEntries() {
-        viewModelGroup.friendVehicleBarChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userVehicleBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(vehicleBarChart, entries, requireContext())
             }
@@ -110,7 +110,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeRunTimeSpent() {
-        viewModelGroup.friendRunTime.observe(viewLifecycleOwner) {
+        viewModelGroup.userRunTime.observe(viewLifecycleOwner) {
             val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
                 "%01dh %01dm %01ds".format(hours, minutes, seconds)
             }
@@ -122,7 +122,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeUserRunDistanceDone() {
-        viewModelGroup.friendMetersRun.observe(viewLifecycleOwner) {
+        viewModelGroup.userMetersRun.observe(viewLifecycleOwner) {
             val kilometers = (it / TO_KM)
 
             titleSecondColumn.setText("Distance done")
@@ -131,7 +131,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeRunBarChartEntries() {
-        viewModelGroup.friendRunBarChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userRunBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(runBarChart, entries, requireContext())
             }
@@ -139,7 +139,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeStillTimeSpent() {
-        viewModelGroup.friendStillTime.observe(viewLifecycleOwner) {
+        viewModelGroup.userStillTime.observe(viewLifecycleOwner) {
             val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
                 "%01dh %01dm %01ds".format(hours, minutes, seconds)
             }
@@ -149,7 +149,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeStillBarChartEntries() {
-        viewModelGroup.friendStillBarChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userStillBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(stillBarChart, entries, requireContext())
             }
@@ -157,7 +157,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeWalkTimeSpent() {
-        viewModelGroup.friendWalkTime.observe(viewLifecycleOwner) {
+        viewModelGroup.userWalkTime.observe(viewLifecycleOwner) {
             val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
                 "%01dh %01dm %01ds".format(hours, minutes, seconds)
             }
@@ -167,14 +167,14 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeUserSteps() {
-        viewModelGroup.friendSteps.observe(viewLifecycleOwner) { item ->
+        viewModelGroup.userSteps.observe(viewLifecycleOwner) { item ->
             titleSecondColumn.setText("Steps")
             infoSecondColumn.setText(item.toString() + " steps")
         }
     }
 
     override fun observeWalkBarChartEntries() {
-        viewModelGroup.friendWalkBarChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userWalkBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(walkBarChart, entries, requireContext())
             }
@@ -182,7 +182,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeVehicleLineChartEntries() {
-        viewModelGroup.friendVehicleLineChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userVehicleLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateLineChart("Distance travelled", vehicleLineChart, entries)
             }
@@ -190,7 +190,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeRunLineChartEntries() {
-        viewModelGroup.friendRunLineChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userRunLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateLineChart("Distance done", runLineChart, entries)
             }
@@ -198,7 +198,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeWalkLineChartEntries() {
-        viewModelGroup.friendWalkLineChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userWalkLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateLineChart("Steps done", walkLineChart, entries)
             }
@@ -206,7 +206,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun observeUserActivities() {
-        viewModelGroup.friendPieChartEntries.observe(viewLifecycleOwner) { entries ->
+        viewModelGroup.userPieChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populatePieChart(entries, pieChart, requireContext())
             }
@@ -214,62 +214,62 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     }
 
     override fun loadVehicleTime(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendVehicleTime(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserVehicleTime(startOfPeriod, endOfPeriod, friend)
     }
 
-    override fun loadKilometers(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendKilometers(startOfPeriod, endOfPeriod, friend)
+    override fun loadKilometersTravelled(startOfPeriod: String, endOfPeriod: String) {
+        viewModelGroup.getUserKilometersTravelled(startOfPeriod, endOfPeriod, friend)
     }
 
     override fun defineVehicleBarChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendVehicleBarChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserVehicleBarChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun loadRunTime(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendRunTime(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserRunTime(startOfPeriod, endOfPeriod, friend)
     }
 
     override fun loadRunDistanceDone(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendKilometersRun(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserKilometersRun(startOfPeriod, endOfPeriod, friend)
     }
 
     override fun defineRunBarChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendRunBarChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserRunBarChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun loadStillTime(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendStillTime(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserStillTime(startOfPeriod, endOfPeriod, friend)
     }
 
     override fun defineStillBarChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendStillBarChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserStillBarChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun loadWalkTime(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendWalkTime(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserWalkTime(startOfPeriod, endOfPeriod, friend)
     }
 
     override fun loadStepNumber(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendSteps(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserSteps(startOfPeriod, endOfPeriod, friend)
     }
 
     override fun defineWalkBarChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendWalkBarChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserWalkBarChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun defineVehicleLineChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendVehicleLineChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserVehicleLineChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun defineRunLineChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendRunLineChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserRunLineChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun defineWalkLineChartEntries(startOfWeek: String, endOfWeek: String) {
-        viewModelGroup.getFriendWalkLineChartEntries(startOfWeek, endOfWeek, friend)
+        viewModelGroup.getUserWalkLineChartEntries(startOfWeek, endOfWeek, friend)
     }
 
     override fun countActivities(startOfPeriod: String, endOfPeriod: String) {
-        viewModelGroup.getFriendCountOfActivities(startOfPeriod, endOfPeriod, friend)
+        viewModelGroup.getUserCountOfActivities(startOfPeriod, endOfPeriod, friend)
     }
 }

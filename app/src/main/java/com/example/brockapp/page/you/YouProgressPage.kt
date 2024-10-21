@@ -25,7 +25,7 @@ class YouProgressPage: ProgressPage() {
         }
     }
 
-    override fun observeUserKilometers() {
+    override fun observeUserKilometersTravelled() {
         viewModelActivities.metersTravelled.observe(viewLifecycleOwner) {
             val kilometers = (it / TO_KM)
 
@@ -148,7 +148,7 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.getVehicleTime(startOfPeriod, endOfPeriod)
     }
 
-    override fun loadKilometers(startOfPeriod: String, endOfPeriod: String) {
+    override fun loadKilometersTravelled(startOfPeriod: String, endOfPeriod: String) {
         viewModelActivities.getKilometers(startOfPeriod, endOfPeriod)
     }
 

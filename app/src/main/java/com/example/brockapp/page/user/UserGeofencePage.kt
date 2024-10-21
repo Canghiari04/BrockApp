@@ -67,17 +67,17 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
 
     private fun observeCurrentFriends() {
         viewModelGroup.currentFriends.observe(viewLifecycleOwner) { items ->
-            if (items.contains(friend.username)) {
+            if (!items.contains(friend.username)) {
+                buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
+            } else {
                 buttonUser.setText("REMOVE")
                 buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
-            } else {
-                buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
     }
 
     override fun observeGeofenceTransitions() {
-        viewModelGroup.friendGeofenceTransitions.observe(viewLifecycleOwner) { items ->
+        viewModelGroup.userGeofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
                 populateRecyclerView(transitions)
@@ -88,6 +88,6 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     }
 
     override fun loadGeofenceTransitions() {
-        viewModelGroup.getFriendGeofenceTransitions(friend)
+        viewModelGroup.getUserGeofenceTransitions(friend)
     }
 }

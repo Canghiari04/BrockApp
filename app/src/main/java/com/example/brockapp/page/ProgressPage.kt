@@ -128,7 +128,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         setUpPieChartSpinner(view.findViewById(R.id.spinner_pie_chart))
 
         observeVehicleTimeSpent()
-        observeUserKilometers()
+        observeUserKilometersTravelled()
         observeVehicleBarChartEntries()
 
         observeRunTimeSpent()
@@ -229,7 +229,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
     protected abstract fun observeVehicleTimeSpent()
 
-    protected abstract fun observeUserKilometers()
+    protected abstract fun observeUserKilometersTravelled()
 
     protected abstract fun observeVehicleBarChartEntries()
 
@@ -268,13 +268,13 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         titleSecondColumn.visibility = View.VISIBLE
 
         loadVehicleTime(range.first, range.second)
-        loadKilometers(range.first, range.second)
+        loadKilometersTravelled(range.first, range.second)
         defineVehicleBarChartEntries(range.first, range.second)
     }
 
     protected abstract fun loadVehicleTime(startOfPeriod: String, endOfPeriod: String)
 
-    protected abstract fun loadKilometers(startOfPeriod: String, endOfPeriod: String)
+    protected abstract fun loadKilometersTravelled(startOfPeriod: String, endOfPeriod: String)
 
     protected abstract fun defineVehicleBarChartEntries(startOfWeek: String, endOfWeek: String)
 
