@@ -18,6 +18,6 @@ interface UserVehicleActivityDao {
     @Insert()
     suspend fun insertVehicleActivity(userVehicleActivity: UserVehicleActivityEntity)
 
-    @Query("UPDATE UserVehicleActivity SET exit_time=:exitTime, distance_travelled=:distanceTraveled WHERE id=:id")
-    suspend fun updateLastRecord(id: Long, exitTime: Long, distanceTraveled: Double)
+    @Query("UPDATE UserVehicleActivity SET exit_time=:exitTime, distance_travelled=:distanceTravelled WHERE id=:id")
+    suspend fun updateLastRecord(id: Long, exitTime: Long, distanceTravelled: Double)
 }

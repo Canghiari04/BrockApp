@@ -4,9 +4,6 @@ import androidx.room.Entity
 import androidx.room.ColumnInfo
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.amazonaws.transform.TimestampFormat
-import com.google.firebase.Timestamp
-import java.util.Date
 
 @Entity(
     tableName = "Memo",

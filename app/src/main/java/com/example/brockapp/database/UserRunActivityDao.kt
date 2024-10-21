@@ -18,7 +18,7 @@ interface UserRunActivityDao {
     @Insert()
     suspend fun insertRunActivity(userRunActivity: UserRunActivityEntity)
 
-    @Query("UPDATE UserRunActivity SET exit_time=:exitTime, step_number=:stepsNumber, height_difference=:heightDifference WHERE id=:id")
-    suspend fun updateLastRecord(id: Long, exitTime: Long, stepsNumber: Long, heightDifference: Float)
+    @Query("UPDATE UserRunActivity SET exit_time=:exitTime, distance_done=:distanceDone, height_difference=:heightDifference WHERE id=:id")
+    suspend fun updateLastRecord(id: Long, exitTime: Long, distanceDone: Double, heightDifference: Float)
 
 }
