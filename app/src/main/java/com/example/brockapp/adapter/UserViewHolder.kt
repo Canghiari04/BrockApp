@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class SubscriberViewHolder(itemView: View, private val onItemClick: (String) -> Unit): RecyclerView.ViewHolder(itemView) {
+class UserViewHolder(itemView: View, private val onItemClick: (String) -> Unit): RecyclerView.ViewHolder(itemView) {
     private val usernameTextView: TextView = itemView.findViewById(R.id.text_view_subscriber_name)
     private val addressTextView: TextView = itemView.findViewById(R.id.text_view_subscriber_address)
     private val viewFriendActivityButton: TextView = itemView.findViewById(R.id.text_view_view_friend)
