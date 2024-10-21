@@ -16,7 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.MarkerOptions
 
 class GeofenceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), OnMapReadyCallback {
-    var progressBar = itemView.findViewById<ProgressBar>(R.id.progress_bar_cell_geofence)
+    var progressBar: ProgressBar = itemView.findViewById(R.id.progress_bar_cell_geofence)
 
     private var latitude = 0.0
     private var longitude = 0.0
