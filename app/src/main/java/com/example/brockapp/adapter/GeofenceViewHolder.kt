@@ -4,8 +4,9 @@ import com.example.brockapp.R
 import com.example.brockapp.data.TransitionAverage
 
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.ProgressBar
+import androidx.core.text.HtmlCompat
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -52,8 +53,20 @@ class GeofenceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), OnM
 
     fun bindGeofence(transition: TransitionAverage) {
         geofenceTitle.setText(transition.nameLocation)
-        geofenceHours.setText("Average time spent: " + transition.averageTime.toString())
-        geofenceCount.setText("Number of access: " + transition.count.toString())
+        geofenceHours.setText(
+            HtmlCompat
+                .fromHtml(
+                    "Average time spent: <b>${transition.averageTime}</b>",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+        )
+        geofenceCount.setText(
+            HtmlCompat
+                .fromHtml(
+                    "Number of access: <b>${transition.count}</b>",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+        )
 
         latitude = transition.latitude
         longitude = transition.longitude
