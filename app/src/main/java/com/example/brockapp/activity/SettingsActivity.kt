@@ -1,22 +1,33 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.service.SyncDataService
+import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.worker.SyncDataWorker
+import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.extraObject.MySharedPreferences
+import com.example.brockapp.singleton.MyActivityRecognition
+import com.example.brockapp.service.ActivityRecognitionService
 import com.example.brockapp.util.ActivityRecognitionPermissionUtil
 import com.example.brockapp.util.GeofenceTransitionPermissionsUtil
 
+import android.util.Log
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.content.Intent
+import androidx.work.WorkManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.SwitchCompat
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.LocationServices
 
 class SettingsActivity: AppCompatActivity() {
+    private var switchMapper = mapOf<SwitchCompat, Pair<String, Int>>()
+
     private lateinit var switchDumpDatabase: SwitchCompat
     private lateinit var switchGeofenceTransition: SwitchCompat
     private lateinit var switchActivityRecognition: SwitchCompat
@@ -35,6 +46,16 @@ class SettingsActivity: AppCompatActivity() {
         switchDumpDatabase = findViewById(R.id.switch_share_dump_database)
         switchGeofenceTransition = findViewById(R.id.switch_geofence_transition_service)
         switchActivityRecognition = findViewById(R.id.switch_activity_recognition_service)
+
+        switchMapper = mapOf(
+            findViewById<SwitchCompat>(R.id.switch_run_activity) to Pair("RUN_ACTIVITY", DetectedActivity.RUNNING),
+            findViewById<SwitchCompat>(R.id.switch_vehicle_activity) to Pair("VEHICLE_ACTIVITY", DetectedActivity.IN_VEHICLE),
+            findViewById<SwitchCompat>(R.id.switch_still_activity) to Pair("STILL_ACTIVITY", DetectedActivity.STILL),
+            findViewById<SwitchCompat>(R.id.switch_walk_activity) to Pair("WALK_ACTIVITY", DetectedActivity.WALKING)
+        )
+
+        setUpSwitchActivities()
+        setUpSwitchDumpDatabase()
 
         // Creating the launcher for the permissions required by the app
         geofenceUtil = GeofenceTransitionPermissionsUtil(
@@ -55,7 +76,7 @@ class SettingsActivity: AppCompatActivity() {
             android.R.id.home -> {
                 val intent = Intent(this, PageLoaderActivity::class.java).putExtra(
                     "FRAGMENT_TO_SHOW",
-                    "You"
+                    R.id.navbar_item_you
                 )
                 startActivity(intent)
                 finish()
@@ -73,7 +94,6 @@ class SettingsActivity: AppCompatActivity() {
         super.onResume()
 
         // Set up switches in base of the user's shared preferences
-        setUpSwitchDumpDatabase()
         setUpSwitchGeofenceTransition()
         setUpSwitchActivityRecognition()
     }
@@ -86,22 +106,58 @@ class SettingsActivity: AppCompatActivity() {
         switch.trackTintList = ContextCompat.getColorStateList(baseContext, R.color.uni_red)
     }
 
+    // I used the mapper to retrieve all the data saved inside the shared preferences
+    private fun setUpSwitchActivities() {
+        val isActive = MySharedPreferences.checkService("ACTIVITY_RECOGNITION", this)
+
+        switchMapper.let {
+            it.forEach { (key, value) ->
+                key.run {
+                    isActivated = isActive
+                    isChecked = (MySharedPreferences.getActivity(value.first, context) != DetectedActivity.UNKNOWN)
+
+                    trackTintList = colorStateList()
+
+                    setOnCheckedChangeListener { _, isChecked ->
+                        handleSwitchToggle(
+                            isChecked,
+                            value.first,
+                            value.second,
+                            key
+                        )
+
+                        MyActivityRecognition.setStatus(false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleSwitchToggle(isChecked: Boolean, key: String, constant: Int, switch: SwitchCompat) {
+        if (isChecked) {
+            MySharedPreferences.setActivity(key, constant, this)
+            switch.trackTintList = ContextCompat.getColorStateList(this, R.color.uni_red)
+        } else {
+            MySharedPreferences.setActivity(key, DetectedActivity.UNKNOWN, this)
+            switch.trackTintList = ContextCompat.getColorStateList(this, R.color.grey)
+        }
+    }
+
     private fun setUpSwitchDumpDatabase() {
         switchDumpDatabase.run {
             isChecked = MySharedPreferences.checkService("DUMP_DATABASE", context)
 
-            trackTintList = if (isChecked) {
-                ContextCompat.getColorStateList(context, R.color.uni_red)
-            } else {
-                ContextCompat.getColorStateList(context, R.color.grey)
-            }
+            trackTintList = colorStateList()
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     MySharedPreferences.setService("DUMP_DATABASE", true, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
 
-                    startService(Intent(context, SyncDataService::class.java))
+                    // When the user allow the permission I define the first database dump to AWS
+                    OneTimeWorkRequestBuilder<SyncDataWorker>().build().also {
+                        WorkManager.getInstance(context).enqueue(it)
+                    }
                 } else {
                     MySharedPreferences.setService("DUMP_DATABASE", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
@@ -114,11 +170,7 @@ class SettingsActivity: AppCompatActivity() {
         switchGeofenceTransition.run {
             isChecked = MySharedPreferences.checkService("GEOFENCE_TRANSITION", context)
 
-            trackTintList = if (isChecked) {
-                ContextCompat.getColorStateList(context, R.color.uni_red)
-            } else {
-                ContextCompat.getColorStateList(context, R.color.grey)
-            }
+            trackTintList = colorStateList()
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -127,6 +179,26 @@ class SettingsActivity: AppCompatActivity() {
                 } else {
                     MySharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
+
+                    // I will stop the service when the user decide to stop the autonomous services
+                    Intent(context, GeofenceService::class.java).also {
+                        it.action = GeofenceService.Actions.STOP.toString()
+                        startService(it)
+                    }
+
+                    val geofenceClient = LocationServices.getGeofencingClient(context)
+                    val pendingIntent = MyGeofence.getPendingIntent(context)
+
+                    geofenceClient.removeGeofences(pendingIntent).run {
+                        addOnSuccessListener {
+                            Log.d("CONNECTIVITY_SERVICE", "Geofence removed")
+                        }
+                        addOnFailureListener {
+                            Log.e("CONNECTIVITY_SERVICE", "Geofence not removed")
+                        }
+                    }
+
+                    MyGeofence.setStatus(false)
                 }
             }
         }
@@ -136,11 +208,7 @@ class SettingsActivity: AppCompatActivity() {
         switchActivityRecognition.run {
             isChecked = MySharedPreferences.checkService("ACTIVITY_RECOGNITION", context)
 
-            trackTintList = if (isChecked) {
-                ContextCompat.getColorStateList(context, R.color.uni_red)
-            } else {
-                ContextCompat.getColorStateList(context, R.color.grey)
-            }
+            trackTintList = colorStateList()
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -148,8 +216,21 @@ class SettingsActivity: AppCompatActivity() {
                 } else {
                     MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
+
+                    Intent(context, ActivityRecognitionService::class.java).also {
+                        it.action = ActivityRecognitionService.Actions.STOP.toString()
+                        startService(it)
+                    }
+
+                    MyActivityRecognition.removeTask(context)
                 }
             }
         }
+    }
+
+    private fun SwitchCompat.colorStateList() = if (isChecked) {
+        ContextCompat.getColorStateList(context, R.color.uni_red)
+    } else {
+        ContextCompat.getColorStateList(context, R.color.grey)
     }
 }
