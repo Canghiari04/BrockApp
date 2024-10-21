@@ -26,8 +26,10 @@ class YouProgressPage: ProgressPage() {
     }
 
     override fun observeUserKilometers() {
-        viewModelActivities.meters.observe(viewLifecycleOwner) {
+        viewModelActivities.metersTravelled.observe(viewLifecycleOwner) {
             val kilometers = (it / TO_KM)
+
+            titleSecondColumn.setText("Distance travelled")
             infoSecondColumn.text = ("%.1f km".format(kilometers))
         }
     }
@@ -36,6 +38,33 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.vehicleBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(vehicleBarChart, entries, requireContext())
+            }
+        }
+    }
+
+    override fun observeRunTimeSpent() {
+        viewModelActivities.runTime.observe(viewLifecycleOwner) {
+            val duration = it.milliseconds.toComponents { hours, minutes, seconds, _ ->
+                "%01dh %01dm %01ds".format(hours, minutes, seconds)
+            }
+
+            infoFirstColumn.setText(duration)
+        }
+    }
+
+    override fun observeUserRunDistanceDone() {
+        viewModelActivities.metersRun.observe(viewLifecycleOwner) {
+            val kilometers = (it / TO_KM)
+
+            titleSecondColumn.setText("Distance done")
+            infoSecondColumn.text = ("%.1f km".format(kilometers))
+        }
+    }
+
+    override fun observeRunBarChartEntries() {
+        viewModelActivities.runBarChartEntries.observe(viewLifecycleOwner) { entries ->
+            if (entries.isNotEmpty()) {
+                chartUtil.populateBarChart(runBarChart, entries, requireContext())
             }
         }
     }
@@ -91,6 +120,14 @@ class YouProgressPage: ProgressPage() {
         }
     }
 
+    override fun observeRunLineChartEntries() {
+        viewModelActivities.runLineChartEntries.observe(viewLifecycleOwner) { entries ->
+            if (entries.isNotEmpty()) {
+                chartUtil.populateLineChart("Kilometers done", runLineChart, entries)
+            }
+        }
+    }
+
     override fun observeWalkLineChartEntries() {
         viewModelActivities.walkLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
@@ -119,6 +156,18 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.getVehicleBarChartEntries(startOfWeek, endOfWeek)
     }
 
+    override fun loadRunTime(startOfPeriod: String, endOfPeriod: String) {
+        viewModelActivities.getRunTime(startOfPeriod, endOfPeriod)
+    }
+
+    override fun loadRunDistanceDone(startOfPeriod: String, endOfPeriod: String) {
+        viewModelActivities.getKilometersRun(startOfPeriod, endOfPeriod)
+    }
+
+    override fun defineRunBarChartEntries(startOfWeek: String, endOfWeek: String) {
+        viewModelActivities.getRunBarChartEntries(startOfWeek, endOfWeek)
+    }
+
     override fun loadStillTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelActivities.getStillTime(startOfPeriod, endOfPeriod)
     }
@@ -141,6 +190,10 @@ class YouProgressPage: ProgressPage() {
 
     override fun defineVehicleLineChartEntries(startOfWeek: String, endOfWeek: String) {
         viewModelActivities.getVehicleLineChartEntries(startOfWeek, endOfWeek)
+    }
+
+    override fun defineRunLineChartEntries(startOfWeek: String, endOfWeek: String) {
+        viewModelActivities.getRunLineChartEntries(startOfWeek, endOfWeek)
     }
 
     override fun defineWalkLineChartEntries(startOfWeek: String, endOfWeek: String) {

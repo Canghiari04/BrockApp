@@ -32,12 +32,14 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
     private var barChartMapper = mapOf(
         "Vehicle" to ::showVehicleBarChart,
+        "Run" to ::showRunBarChart,
         "Still" to ::showStillBarChart,
         "Walk" to ::showWalkBarChart
     )
 
     private var lineChartMapper = mapOf(
         "Vehicle" to ::showVehicleLineChart,
+        "Run" to ::showRunLineChart,
         "Walk" to ::showWalkLineChart
     )
 
@@ -61,6 +63,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
     protected lateinit var titleSecondColumn: TextView
 
     // Bar charts
+    protected lateinit var runBarChart: BarChart
     protected lateinit var walkBarChart: BarChart
     protected lateinit var stillBarChart: BarChart
     protected lateinit var vehicleBarChart: BarChart
@@ -96,6 +99,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         infoSecondColumn = view.findViewById(R.id.text_view_content_second_column)
 
         // Bar charts
+        runBarChart = view.findViewById(R.id.bar_chart_run)
         walkBarChart = view.findViewById(R.id.bar_chart_walk)
         stillBarChart = view.findViewById(R.id.bar_chart_still)
         vehicleBarChart = view.findViewById(R.id.bar_chart_vehicle)
@@ -127,6 +131,10 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         observeUserKilometers()
         observeVehicleBarChartEntries()
 
+        observeRunTimeSpent()
+        observeUserRunDistanceDone()
+        observeRunBarChartEntries()
+
         observeStillTimeSpent()
         observeStillBarChartEntries()
 
@@ -135,6 +143,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         observeWalkBarChartEntries()
 
         observeVehicleLineChartEntries()
+        observeRunLineChartEntries()
         observeWalkLineChartEntries()
 
         observeUserActivities()
@@ -224,6 +233,12 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
     protected abstract fun observeVehicleBarChartEntries()
 
+    protected abstract fun observeRunTimeSpent()
+
+    protected abstract fun observeUserRunDistanceDone()
+
+    protected abstract fun observeRunBarChartEntries()
+
     protected abstract fun observeStillTimeSpent()
 
     protected abstract fun observeStillBarChartEntries()
@@ -236,11 +251,14 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
     protected abstract fun observeVehicleLineChartEntries()
 
+    protected abstract fun observeRunLineChartEntries()
+
     protected abstract fun observeWalkLineChartEntries()
 
     protected abstract fun observeUserActivities()
 
     private fun showVehicleBarChart(range: Pair<String, String>) {
+        runBarChart.visibility = View.GONE
         walkBarChart.visibility = View.GONE
         stillBarChart.visibility = View.GONE
 
@@ -260,7 +278,29 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
     protected abstract fun defineVehicleBarChartEntries(startOfWeek: String, endOfWeek: String)
 
+    private fun showRunBarChart(range: Pair<String, String>) {
+        walkBarChart.visibility = View.GONE
+        stillBarChart.visibility = View.GONE
+        vehicleBarChart.visibility = View.GONE
+
+        runBarChart.visibility = View.VISIBLE
+
+        infoSecondColumn.visibility = View.VISIBLE
+        titleSecondColumn.visibility = View.VISIBLE
+
+        loadRunTime(range.first, range.second)
+        loadRunDistanceDone(range.first, range.second)
+        defineRunBarChartEntries(range.first, range.second)
+    }
+
+    protected abstract fun loadRunTime(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun loadRunDistanceDone(startOfPeriod: String, endOfPeriod: String)
+
+    protected abstract fun defineRunBarChartEntries(startOfWeek: String, endOfWeek: String)
+
     private fun showStillBarChart(range: Pair<String, String>) {
+        runBarChart.visibility = View.GONE
         walkBarChart.visibility = View.GONE
         vehicleBarChart.visibility = View.GONE
 
@@ -278,6 +318,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
     protected abstract fun defineStillBarChartEntries(startOfWeek: String, endOfWeek: String)
 
     private fun showWalkBarChart(range: Pair<String, String>) {
+        runBarChart.visibility = View.GONE
         stillBarChart.visibility = View.GONE
         vehicleBarChart.visibility = View.GONE
 
@@ -307,6 +348,17 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
     }
 
     protected abstract fun defineVehicleLineChartEntries(startOfWeek: String, endOfWeek: String)
+
+    private fun showRunLineChart(range: Pair<String, String>) {
+        walkLineChart.visibility = View.GONE
+        vehicleLineChart.visibility = View.GONE
+
+        runLineChart.visibility = View.VISIBLE
+
+        defineRunLineChartEntries(range.first, range.second)
+    }
+
+    protected abstract fun defineRunLineChartEntries(startOfWeek: String, endOfWeek: String)
 
     private fun showWalkLineChart(range: Pair<String, String>) {
         runLineChart.visibility = View.GONE
