@@ -40,11 +40,11 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
 
     private lateinit var db: BrockDB
     private lateinit var city: String
-    private lateinit var country: String
     private lateinit var username: String
     private lateinit var password: String
     private lateinit var typeActivity: String
     private lateinit var viewModelUser: UserViewModel
+    private lateinit var country: Pair<String, String?>
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var util: PostNotificationsPermissionUtil
 
@@ -73,16 +73,16 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
             observeUser()
         }
 
+        observeCities()
         observeNetwork()
         observeSignIn()
 
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.edit_text_username).text.toString()
             password = view.findViewById<EditText>(R.id.edit_text_password).text.toString()
-            city = view.findViewById<EditText>(R.id.edit_text_city).text.toString()
 
             if(username.isNotEmpty() && password.isNotEmpty()) {
-                viewModelUser.registerUser(username, password, typeActivity, country, city)
+                viewModelUser.registerUser(username, password, typeActivity, country.first, city)
             } else {
                 Toast.makeText(requireContext(), "Insert the access credentials", Toast.LENGTH_LONG).show()
             }
@@ -93,8 +93,12 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         }
     }
 
+    private fun checkConnectivity() {
+        MyNetwork.isConnected = networkUtil.isInternetActive(requireContext())
+    }
+
     private fun setUpSpinnerActivity(spinner: Spinner) {
-        val spinnerItems = resources.getStringArray(R.array.spinner_sign_in)
+        val spinnerItems = resources.getStringArray(R.array.spinner_activities)
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -118,9 +122,15 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
 
     private fun setUpSpinnerCountry(spinner: Spinner) {
         val locales = Locale.getAvailableLocales()
-        val spinnerItems = locales.mapNotNull {
-            locale -> locale.displayCountry.takeIf{ it.isNotEmpty() }
-        }.distinct().sorted()
+        val spinnerItems = locales
+            .mapNotNull { locale ->
+                val country = locale.displayCountry.takeIf { it.isNotEmpty() }
+                val countryCode = locale.country.takeIf { it.isNotEmpty() }
+
+                country?.let { it to countryCode}
+            }
+            .distinctBy { it.first }
+            .sortedBy { it.first }
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -134,39 +144,11 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
                 id: Long
             ) {
                 country = spinnerItems[position]
+                viewModelUser.getCitiesFromCountry(country.second!!)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 //
-            }
-        }
-    }
-
-    private fun checkConnectivity() {
-        if (networkUtil.isInternetActive(requireContext())) {
-            MyNetwork.isConnected = true
-        } else {
-            MyNetwork.isConnected = false
-        }
-    }
-
-    private fun observeNetwork() {
-        viewModelNetwork.authNetwork.observe(viewLifecycleOwner) { authNetwork ->
-            view?.findViewById<Button>(R.id.button_sign_in)?.isEnabled = authNetwork
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun observeSignIn() {
-        viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
-            if (auth) {
-                viewModelUser.getUser(username, password)
-                util.requestPostNotificationPermission()
-            } else {
-                toastUtil.showWarningToast(
-                    "Credentials already present",
-                    requireContext()
-                )
             }
         }
     }
@@ -187,6 +169,64 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
                 goToHome()
             } else {
                 Log.e("SIGN_IN_FRAGMENT", "User not found")
+            }
+        }
+    }
+
+    private fun observeCities() {
+        viewModelUser.cities.observe(viewLifecycleOwner) { items ->
+            if (items.isEmpty()) {
+                toastUtil.showWarningToast(
+                    "No cities retrieved",
+                    requireContext()
+                )
+            } else {
+                setUpSpinnerCity(
+                    items,
+                    requireView().findViewById(R.id.spinner_city)
+                )
+            }
+        }
+    }
+
+    private fun setUpSpinnerCity(spinnerItems: List<String>, spinner: Spinner) {
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                city = spinnerItems[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //
+            }
+        }
+    }
+
+    private fun observeNetwork() {
+        viewModelNetwork.authNetwork.observe(viewLifecycleOwner) { authNetwork ->
+            view?.findViewById<Button>(R.id.button_sign_in)?.isEnabled = authNetwork
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun observeSignIn() {
+        viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
+            if (auth) {
+                viewModelUser.getUser(username, password)
+                util.requestPostNotificationPermission()
+            } else {
+                toastUtil.showWarningToast(
+                    "Credentials already present",
+                    requireContext()
+                )
             }
         }
     }

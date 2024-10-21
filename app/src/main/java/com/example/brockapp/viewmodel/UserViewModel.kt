@@ -2,10 +2,15 @@ package com.example.brockapp.viewmodel
 
 import com.example.brockapp.*
 import com.example.brockapp.database.BrockDB
+import com.example.brockapp.data.CityResponse
 import com.example.brockapp.database.UserEntity
+import com.example.brockapp.retrofit.RetrofitClientInstance
 
 import java.io.File
+import retrofit2.Call
 import android.util.Log
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.FileWriter
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -20,11 +25,29 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 
 class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Client, private val file: File): ViewModel() {
+    private var _cities = MutableLiveData<List<String>>()
+    val cities: LiveData<List<String>> get() = _cities
+
     private var _auth = MutableLiveData<Boolean>()
     val auth: LiveData<Boolean> get() = _auth
 
     private var _currentUser = MutableLiveData<UserEntity?>()
     val currentUser: LiveData<UserEntity?> get() = _currentUser
+
+    fun getCitiesFromCountry(countryCode: String) {
+        RetrofitClientInstance.api
+            .getCitiesByCountryId(API_KEY_GEO_DB, countryCode)
+            .enqueue(object : Callback<CityResponse> {
+                override fun onResponse(call: Call<CityResponse>, response: Response<CityResponse>) {
+                    val items = response.body()?.data?.map { it.name } ?: mutableListOf()
+                    _cities.postValue(items)
+                }
+
+                override fun onFailure(call: Call<CityResponse>, t: Throwable) {
+                    Log.e("USER_VIEW_MODEL", t.message.toString())
+                }
+            })
+    }
 
     fun registerUser(username: String, password: String, typeActivity: String, country: String, city: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -95,7 +118,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
                 writer.write(gson.toJson(jsonObject))
             }
         } catch (e: Exception) {
-            Log.e("FileCreationError", e.toString())
+            Log.e("USER_VIEW_MODEL", e.toString())
         }
 
         return file
@@ -109,7 +132,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
             val request = PutObjectRequest(BUCKET_NAME, userKey, jsonFile)
             s3Client.putObject(request)
         } catch (e: Exception) {
-            Log.e("UploadError", e.toString())
+            Log.e("USER_VIEW_MODEL", e.toString())
         }
     }
 }
