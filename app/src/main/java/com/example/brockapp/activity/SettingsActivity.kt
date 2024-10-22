@@ -151,16 +151,17 @@ class SettingsActivity: AppCompatActivity() {
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    MySharedPreferences.setService("DUMP_DATABASE", true, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
 
-                    // When the user allow the permission I define the first database dump to AWS
+                    MySharedPreferences.setService("DUMP_DATABASE", true, context)
                     OneTimeWorkRequestBuilder<SyncDataWorker>().build().also {
                         WorkManager.getInstance(context).enqueue(it)
                     }
                 } else {
-                    MySharedPreferences.setService("DUMP_DATABASE", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
+
+                    MySharedPreferences.setService("DUMP_DATABASE", false, context)
+                    WorkManager.getInstance(context).cancelUniqueWork("SyncDataWorker")
                 }
             }
         }
@@ -177,10 +178,9 @@ class SettingsActivity: AppCompatActivity() {
                     // The action to set true the switch is allowed iif the permission is not denied
                     geofenceUtil.requestGeofenceTransitionPermissions()
                 } else {
-                    MySharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
 
-                    // I will stop the service when the user decide to stop the autonomous services
+                    MySharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
                     Intent(context, GeofenceService::class.java).also {
                         it.action = GeofenceService.Actions.STOP.toString()
                         startService(it)
@@ -214,9 +214,9 @@ class SettingsActivity: AppCompatActivity() {
                 if (isChecked) {
                     recognitionUtil.requestActivityRecognitionPermission()
                 } else {
-                    MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
 
+                    MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
                     Intent(context, ActivityRecognitionService::class.java).also {
                         it.action = ActivityRecognitionService.Actions.STOP.toString()
                         startService(it)
