@@ -62,8 +62,9 @@ class GeofenceService: Service() {
     private fun notify(item: String) {
         val inputData = Data.Builder().putString("LOCATION_NAME", item).build()
 
-        val request = OneTimeWorkRequestBuilder<GeofenceWorker>().setInputData(inputData).build()
-        WorkManager.getInstance(this).enqueue(request)
+        OneTimeWorkRequestBuilder<GeofenceWorker>().setInputData(inputData).build().also {
+            WorkManager.getInstance(this).enqueue(it)
+        }
     }
 
     private fun insert(nameLocation: String, latitude: Double, longitude: Double, arrivalTime: Long) {

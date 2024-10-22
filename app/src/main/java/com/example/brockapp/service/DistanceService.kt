@@ -17,9 +17,9 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.FusedLocationProviderClient
 
-class VehicleService: Service() {
-    private var distance: Double = 0.0
+class DistanceService: Service() {
     private var binder = LocalBinder()
+    private var distance: Double = 0.0
     private var startLocation: Location? = null
 
     private lateinit var locationRequest: LocationRequest
@@ -27,7 +27,7 @@ class VehicleService: Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     inner class LocalBinder: Binder() {
-        fun getService(): VehicleService = this@VehicleService
+        fun getService(): DistanceService = this@DistanceService
     }
 
     override fun onCreate() {
@@ -63,9 +63,7 @@ class VehicleService: Service() {
         locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             10000
-        )
-            .setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong())
-            .build()
+        ).setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong()).build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
