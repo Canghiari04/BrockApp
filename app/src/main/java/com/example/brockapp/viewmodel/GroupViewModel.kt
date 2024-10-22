@@ -1,6 +1,7 @@
 package com.example.brockapp.viewmodel
 
 import com.example.brockapp.*
+import com.example.brockapp.data.User
 import com.example.brockapp.data.Friend
 import com.example.brockapp.database.BrockDB
 import com.example.brockapp.extraObject.MyUser
@@ -10,6 +11,7 @@ import com.example.brockapp.database.GeofenceTransitionEntity
 import android.util.Log
 import java.time.LocalDate
 import com.google.gson.Gson
+import java.time.LocalDateTime
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -23,8 +25,6 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.data.BarEntry
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
-import com.google.type.DateTime
-import java.time.LocalDateTime
 
 class GroupViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB): ViewModel() {
     companion object {
@@ -34,11 +34,14 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
 
     private val pattern = DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
 
-    private val _users = MutableLiveData<List<String>>()
-    val users: LiveData<List<String>> get() = _users
+    private val _subscribers = MutableLiveData<List<User?>>()
+    val subscribers: LiveData<List<User?>> get() = _subscribers
 
-    private val _suggestions = MutableLiveData<List<String>>()
-    val suggestions: LiveData<List<String>> get() = _suggestions
+    private val _friends = MutableLiveData<List<User?>>()
+    val friends: LiveData<List<User?>> get() = _friends
+
+    private val _suggestions = MutableLiveData<List<User?>>()
+    val suggestions: LiveData<List<User?>> get() = _suggestions
 
     private val _currentFriends = MutableLiveData<List<String>>()
     val currentFriends: LiveData<List<String>> get() = _currentFriends
@@ -46,59 +49,117 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     private val _friend = MutableLiveData<Friend>()
     val friend: LiveData<Friend> get() = _friend
 
-    private val _friendMeters = MutableLiveData<Double>()
-    val friendMeters: LiveData<Double> get() = _friendMeters
+    private val _userVehicleTime = MutableLiveData<Long>()
+    val userVehicleTime: LiveData<Long> get() = _userVehicleTime
 
-    private val _friendVehicleTime = MutableLiveData<Long>()
-    val friendVehicleTime: LiveData<Long> get() = _friendVehicleTime
+    private val _userMetersTravelled = MutableLiveData<Double>()
+    val userMetersTravelled: LiveData<Double> get() = _userMetersTravelled
 
-    private val _friendVehicleBarChartEntries = MutableLiveData<List<BarEntry>>()
-    val friendVehicleBarChartEntries: LiveData<List<BarEntry>> get() = _friendVehicleBarChartEntries
+    private val _userVehicleBarChartEntries = MutableLiveData<List<BarEntry>>()
+    val userVehicleBarChartEntries: LiveData<List<BarEntry>> get() = _userVehicleBarChartEntries
 
-    private val _friendStillTime = MutableLiveData<Long>()
-    val friendStillTime: LiveData<Long> get() = _friendStillTime
+    private val _userRunTime = MutableLiveData<Long>()
+    val userRunTime: LiveData<Long> get() = _userRunTime
 
-    private val _friendStillBarChartEntries = MutableLiveData<List<BarEntry>>()
-    val friendStillBarChartEntries: LiveData<List<BarEntry>> get() = _friendStillBarChartEntries
+    private val _userMetersRun = MutableLiveData<Double>()
+    val userMetersRun: LiveData<Double> get() = _userMetersRun
 
-    private val _friendSteps = MutableLiveData<Int>()
-    val friendSteps: LiveData<Int> get() = _friendSteps
+    private val _userRunBarChartEntries = MutableLiveData<List<BarEntry>>()
+    val userRunBarChartEntries: LiveData<List<BarEntry>> get() = _userRunBarChartEntries
 
-    private val _friendWalkTime = MutableLiveData<Long>()
-    val friendWalkTime: LiveData<Long> get() = _friendWalkTime
+    private val _userStillTime = MutableLiveData<Long>()
+    val userStillTime: LiveData<Long> get() = _userStillTime
 
-    private val _friendWalkBarChartEntries = MutableLiveData<List<BarEntry>>()
-    val friendWalkBarChartEntries: LiveData<List<BarEntry>> get() = _friendWalkBarChartEntries
+    private val _userStillBarChartEntries = MutableLiveData<List<BarEntry>>()
+    val userStillBarChartEntries: LiveData<List<BarEntry>> get() = _userStillBarChartEntries
 
-    private val _friendVehicleLineChartEntries = MutableLiveData<List<Entry>>()
-    val friendVehicleLineChartEntries: LiveData<List<Entry>> get() = _friendVehicleLineChartEntries
+    private val _userWalkTime = MutableLiveData<Long>()
+    val userWalkTime: LiveData<Long> get() = _userWalkTime
 
-    private val _friendWalkLineChartEntries = MutableLiveData<List<Entry>>()
-    val friendWalkLineChartEntries: LiveData<List<Entry>> get() = _friendWalkLineChartEntries
+    private val _userSteps = MutableLiveData<Int>()
+    val userSteps: LiveData<Int> get() = _userSteps
 
-    private val _friendPieChartEntries = MutableLiveData<List<PieEntry>>()
-    val friendPieChartEntries: MutableLiveData<List<PieEntry>> get() = _friendPieChartEntries
+    private val _userWalkBarChartEntries = MutableLiveData<List<BarEntry>>()
+    val userWalkBarChartEntries: LiveData<List<BarEntry>> get() = _userWalkBarChartEntries
+
+    private val _userVehicleLineChartEntries = MutableLiveData<List<Entry>>()
+    val userVehicleLineChartEntries: LiveData<List<Entry>> get() = _userVehicleLineChartEntries
+
+    private val _userRunLineChartEntries = MutableLiveData<List<Entry>>()
+    val userRunLineChartEntries: LiveData<List<Entry>> get() = _userRunLineChartEntries
+
+    private val _userWalkLineChartEntries = MutableLiveData<List<Entry>>()
+    val userWalkLineChartEntries: LiveData<List<Entry>> get() = _userWalkLineChartEntries
+
+    private val _userPieChartEntries = MutableLiveData<List<PieEntry>>()
+    val userPieChartEntries: MutableLiveData<List<PieEntry>> get() = _userPieChartEntries
+
+    private val _userGeofenceTransitions = MutableLiveData<List<GeofenceTransitionEntity>>()
+    val userGeofenceTransitions: LiveData<List<GeofenceTransitionEntity>> = _userGeofenceTransitions
 
     private val _errorAddFriend = MutableLiveData<Boolean>()
     val errorAddFriend: LiveData<Boolean> = _errorAddFriend
 
-    private val _friendGeofenceTransitions = MutableLiveData<List<GeofenceTransitionEntity>>()
-    val friendGeofenceTransitions: LiveData<List<GeofenceTransitionEntity>> = _friendGeofenceTransitions
+    private val _errorDeleteFriend = MutableLiveData<Boolean>()
+    val errorDeleteFriend: LiveData<Boolean> = _errorDeleteFriend
 
-    fun getAllUsers() {
-        viewModelScope.launch(Dispatchers.Default) {
+    // This function must be called while the app is starting
+    fun getAllSubscribers() {
+        viewModelScope.launch(Dispatchers.IO) {
             val listObjectsRequest = ListObjectsRequest().withBucketName(BUCKET_NAME)
 
             val objectListing = s3Client.listObjects(listObjectsRequest)
             val s3Objects = objectListing.objectSummaries
 
-            val matchingUsers = s3Objects
+            val items = s3Objects
                 .filter { it.key.endsWith(".json") && it.key != "user/${MyUser.username}.json" }
                 .map { it.key.removePrefix("user/").removeSuffix(".json") }
 
-            if (matchingUsers.isNotEmpty()) {
-                _users.postValue(matchingUsers)
+            val subscribers = mutableListOf<User?>()
+            val friends = db.FriendDao().getAllFriends()
+
+            // Items contains all the usernames
+            if (items.isNotEmpty()) {
+                for (item in items) {
+                    if (!friends.contains(item)) subscribers.add(loadDataUser(item))
+                }
             }
+
+            _subscribers.postValue(subscribers)
+        }
+    }
+
+    fun getAllFriends() {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Define all the username to search inside the Bucket
+            val listUsernames = mutableListOf<String>().also {
+                val usernames = db.FriendDao().getAllFriends()
+
+                for (username in usernames) {
+                    it.add("user/$username.json")
+                }
+            }
+
+            val listObjectsRequest = ListObjectsRequest().withBucketName(BUCKET_NAME)
+
+            val objectListing = s3Client.listObjects(listObjectsRequest)
+            val s3Objects = objectListing.objectSummaries
+
+            val items = s3Objects
+                .filter { listUsernames.contains(it.key) }
+                .filter { it.key.endsWith(".json") }
+                .filter { it.key != "user/${MyUser.username}.json" }
+                .map { it.key.removePrefix("user/").removeSuffix(".json") }
+
+            val friends = mutableListOf<User?>()
+
+            if (items.isNotEmpty()) {
+                for (item in items) {
+                    friends.add(loadDataUser(item))
+                }
+            }
+
+            _friends.postValue(friends)
         }
     }
 
@@ -112,7 +173,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
 
                 val objectListing = s3Client.listObjects(listObjectsRequest)
                 val s3Objects = objectListing.objectSummaries
-                val matchingUsers = s3Objects
+                val matchingSubscribers = s3Objects
                     .filter {
                         it.key.endsWith(".json") && it.key != "user/${MyUser.username}.json"
                     }
@@ -120,13 +181,37 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                         it.key.removePrefix("user/").removeSuffix(".json")
                     }
 
-                if(matchingUsers.isNotEmpty()) {
-                    _suggestions.postValue(matchingUsers)
+                if(matchingSubscribers.isNotEmpty()) {
+                    val subscribers = mutableListOf<User?>()
+
+                    for (match in matchingSubscribers) {
+                        subscribers.add(loadDataUser(match))
+                    }
+
+                    _suggestions.postValue(subscribers)
                 } else {
                     _suggestions.postValue(listOf())
                 }
             } catch (e: Exception) {
-                Log.e("FRIENDS_VIEW_MODEL", e.toString())
+                Log.e("GROUP_VIEW_MODEL", e.toString())
+            }
+        }
+    }
+
+    // Function used to retrieve all the data about the user
+    fun loadDataFriend(username: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val key = "user/$username.json"
+
+            try {
+                val request = GetObjectRequest(BUCKET_NAME, key)
+                val result = s3Client.getObject(request)
+                val content = result.objectContent.bufferedReader().use { it.readText() }
+
+                val gson = Gson()
+                _friend.postValue(gson.fromJson(content, Friend::class.java))
+            } catch (e: Exception) {
+                Log.e("GROUP_VIEW_MODEL", e.toString())
             }
         }
     }
@@ -139,24 +224,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         }
     }
 
-    fun loadData(username: String?) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val friendKey = "user/$username.json"
-
-            try {
-                val request = GetObjectRequest(BUCKET_NAME, friendKey)
-                val result = s3Client.getObject(request)
-                val content = result.objectContent.bufferedReader().use { it.readText() }
-
-                val gson = Gson()
-                _friend.postValue(gson.fromJson(content, Friend::class.java))
-            } catch (e: Exception) {
-                Log.e("FRIENDS_VIEW_MODEL", e.toString())
-            }
-        }
-    }
-
-    fun getFriendVehicleTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+    fun getUserVehicleTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
         var time = 0L
 
         val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
@@ -169,10 +237,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendVehicleTime.postValue(time)
+        _userVehicleTime.postValue(time)
     }
 
-    fun getFriendKilometers(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+    fun getUserKilometersTravelled(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
         var meters = 0.0
 
         val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
@@ -185,10 +253,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendMeters.postValue(meters)
+        _userMetersTravelled.postValue(meters)
     }
 
-    fun getFriendVehicleBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+    fun getUserVehicleBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
         val firstDay = LocalDate.parse(startOfWeek, pattern)
         val lastDay = LocalDate.parse(endOfWeek, pattern)
 
@@ -216,10 +284,73 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             )
         }
 
-        _friendVehicleBarChartEntries.postValue(entries)
+        _userVehicleBarChartEntries.postValue(entries)
     }
 
-    fun getFriendStillTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+    fun getUserRunTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+        var time = 0L
+
+        val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
+
+        friend.runActivities.forEach {
+            val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
+
+            if (timeStamp.isAfter(start) && timeStamp.isBefore(end)) {
+                time += (it.exitTime - it.arrivalTime)
+            }
+        }
+
+        _userRunTime.postValue(time)
+    }
+
+    fun getUserKilometersRun(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+        var meters = 0.0
+
+        val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
+
+        friend.runActivities.forEach {
+            val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
+
+            if ((timeStamp.isAfter(start) && timeStamp.isBefore(end)) || timeStamp.isEqual(start)) {
+                meters += it.distanceDone
+            }
+        }
+
+        _userMetersRun.postValue(meters)
+    }
+
+    fun getUserRunBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+        val firstDay = LocalDate.parse(startOfWeek, pattern)
+        val lastDay = LocalDate.parse(endOfWeek, pattern)
+
+        val vehicleItems = friend.runActivities
+
+        val groupedItems = vehicleItems.groupBy {
+            it.timestamp.let { timestamp ->
+                LocalDate.parse(
+                    timestamp,
+                    pattern
+                ).dayOfMonth
+            }
+        }
+
+        val timePerDay = groupedItems.mapValues { it ->
+            (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
+        }
+
+        val entries = ArrayList<BarEntry>()
+
+        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
+            val item = timePerDay[day]
+            if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(
+                BarEntry(day.toFloat(), 0f)
+            )
+        }
+
+        _userRunBarChartEntries.postValue(entries)
+    }
+
+    fun getUserStillTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
         var time = 0L
 
         val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
@@ -232,10 +363,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendStillTime.postValue(time)
+        _userStillTime.postValue(time)
     }
 
-    fun getFriendStillBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+    fun getUserStillBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
         val firstDay = LocalDate.parse(startOfWeek, pattern)
         val lastDay = LocalDate.parse(endOfWeek, pattern)
 
@@ -263,26 +394,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             )
         }
 
-        _friendStillBarChartEntries.postValue(entries)
+        _userStillBarChartEntries.postValue(entries)
     }
 
-    fun getFriendSteps(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
-        var steps = 0
-
-        val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
-
-        friend.walkActivities.forEach {
-            val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
-
-            if (timeStamp.isAfter(start) && timeStamp.isBefore(end)) {
-                steps += it.stepNumber.toInt()
-            }
-        }
-
-        _friendSteps.postValue(steps)
-    }
-
-    fun getFriendWalkTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+    fun getUserWalkTime(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
         var time = 0L
 
         val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
@@ -295,10 +410,26 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendWalkTime.postValue(time)
+        _userWalkTime.postValue(time)
     }
 
-    fun getFriendWalkBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+    fun getUserSteps(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+        var steps = 0
+
+        val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
+
+        friend.walkActivities.forEach {
+            val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
+
+            if (timeStamp.isAfter(start) && timeStamp.isBefore(end)) {
+                steps += it.stepNumber.toInt()
+            }
+        }
+
+        _userSteps.postValue(steps)
+    }
+
+    fun getUserWalkBarChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
         val firstDay = LocalDate.parse(startOfWeek, pattern)
         val lastDay = LocalDate.parse(endOfWeek, pattern)
 
@@ -326,10 +457,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             )
         }
 
-        _friendWalkBarChartEntries.postValue(entries)
+        _userWalkBarChartEntries.postValue(entries)
     }
 
-    fun getFriendVehicleLineChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+    fun getUserVehicleLineChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
         val firstDay = LocalDate.parse(startOfWeek, pattern)
         val lastDay = LocalDate.parse(endOfWeek, pattern)
 
@@ -358,10 +489,42 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendVehicleLineChartEntries.postValue(entries)
+        _userVehicleLineChartEntries.postValue(entries)
     }
 
-    fun getFriendWalkLineChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+    fun getUserRunLineChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
+        val firstDay = LocalDate.parse(startOfWeek, pattern)
+        val lastDay = LocalDate.parse(endOfWeek, pattern)
+
+        val groupedItems = friend.runActivities.groupBy {
+            it.timestamp.let { timestamp ->
+                LocalDate.parse(
+                    timestamp,
+                    pattern
+                ).dayOfMonth
+            }
+        }
+
+        val stepsPerDay = groupedItems.mapValues { it ->
+            (it.value.sumOf { it.distanceDone } / TO_KM).toFloat()
+        }
+
+        val entries = ArrayList<Entry>()
+
+        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
+            val item = stepsPerDay[day]
+
+            if (item != null) {
+                entries.add(Entry(day.toFloat(), item))
+            } else {
+                entries.add(Entry(day.toFloat(), 0f))
+            }
+        }
+
+        _userRunLineChartEntries.postValue(entries)
+    }
+
+    fun getUserWalkLineChartEntries(startOfWeek: String, endOfWeek: String, friend: Friend) {
         val firstDay = LocalDate.parse(startOfWeek, pattern)
         val lastDay = LocalDate.parse(endOfWeek, pattern)
 
@@ -390,10 +553,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendWalkLineChartEntries.postValue(entries)
+        _userWalkLineChartEntries.postValue(entries)
     }
 
-    fun getFriendCountOfActivities(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+    fun getUserCountOfActivities(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
         val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
 
         // I use scope function filter to avoid concurrent exceptions
@@ -439,23 +602,10 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendPieChartEntries.postValue(entries)
+        _userPieChartEntries.postValue(entries)
     }
 
-    fun addFriend(username: String?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (username != null) {
-                val friend = FriendEntity(userId = MyUser.id, followedUsername = username)
-                db.FriendDao().insertFriend(friend)
-
-                _errorAddFriend.postValue(true)
-            } else {
-                _errorAddFriend.postValue(false)
-            }
-        }
-    }
-
-    fun getFriendGeofenceTransitions(friend: Friend) {
+    fun getUserGeofenceTransitions(friend: Friend) {
         val list = ArrayList<GeofenceTransitionEntity>()
 
         if (friend.geofenceTransitions.isNotEmpty()) {
@@ -474,9 +624,51 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _friendGeofenceTransitions.postValue(list)
+        _userGeofenceTransitions.postValue(list.filter { it.nameLocation.isNotBlank() })
     }
 
+    fun addFriend(username: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (username != null) {
+                db.FriendDao().insertFriend(FriendEntity(userId = MyUser.id, username = username))
+                _errorAddFriend.postValue(true)
+            } else {
+                _errorAddFriend.postValue(false)
+            }
+        }
+    }
+
+    fun deleteFriend(username: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (username != null) {
+                db.FriendDao().deleteFriend(MyUser.id, username)
+                _errorDeleteFriend.postValue(true)
+            } else {
+                _errorDeleteFriend.postValue(false)
+            }
+        }
+    }
+
+    private fun loadDataUser(username: String?): User? {
+        val key = "user/$username.json"
+
+        var subscriber: User? = null
+
+        try {
+            val request = GetObjectRequest(BUCKET_NAME, key)
+            val result = s3Client.getObject(request)
+            val content = result.objectContent.bufferedReader().use { it.readText() }
+
+            val gson = Gson()
+            subscriber = gson.fromJson(content, User::class.java)
+        } catch (e: Exception) {
+            Log.e("GROUP_VIEW_MODEL", e.toString())
+        }
+
+        return subscriber
+    }
+
+    // Function used to convert time stamp format from String to LocalDateTime
     private fun getLocalDateFromTimeStamp(startOfPeriod: String, endOfPeriod: String): Pair<LocalDateTime, LocalDateTime> {
         val start = LocalDateTime.parse(startOfPeriod, pattern)
         val end = LocalDateTime.parse(endOfPeriod, pattern)
