@@ -42,6 +42,7 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
 
         cardViewYouGeofencePage = view.findViewById(R.id.card_view_welcome_you_geofence_page)
         cardViewUserGeofencePage = view.findViewById(R.id.card_view_welcome_user_geofence_page)
+        setUpCardView()
 
         buttonUser = view.findViewById(R.id.button_user_geofence_page)
 
@@ -55,8 +56,6 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
 
         val factoryGroupViewModel = GroupViewModelFactory(s3Client, db)
         viewModelGroup = ViewModelProvider(this, factoryGroupViewModel)[GroupViewModel::class.java]
-
-        setUpCardView()
 
         observeGeofenceTransitions()
 
