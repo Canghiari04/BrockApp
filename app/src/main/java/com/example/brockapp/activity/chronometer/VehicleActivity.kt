@@ -1,49 +1,73 @@
 package com.example.brockapp.activity.chronometer
 
+import com.example.brockapp.extraObject.MyUser
+import com.example.brockapp.service.DistanceService
 import com.example.brockapp.activity.ChronometerActivity
-import com.example.brockapp.service.ActivityRecognitionService
+import com.example.brockapp.extraObject.MyServiceConnection
+import com.example.brockapp.database.UserVehicleActivityEntity
 
-import android.content.Intent
+import android.view.View
 import android.os.SystemClock
-import com.google.android.gms.location.DetectedActivity
+import android.content.Intent
+import android.content.Context
+import android.content.ServiceConnection
 
 class VehicleActivity: ChronometerActivity() {
+    private var distanceService: DistanceService? = null
+
+    private lateinit var serviceConnection: ServiceConnection
+
+    override fun onStart() {
+        super.onStart()
+
+        serviceConnection = MyServiceConnection.createDistanceServiceConnection(
+            onConnected = { service ->
+                distanceService = service
+            }
+        )
+    }
+
     override fun registerActivity() {
-        Intent(this, ActivityRecognitionService::class.java).also {
-            it.action = ActivityRecognitionService.Actions.START.toString()
-
-            it.putExtra("ACTIVITY_TYPE", DetectedActivity.IN_VEHICLE)
-            it.putExtra("ARRIVAL_TIME", System.currentTimeMillis())
-
+        Intent(this, DistanceService::class.java).also {
             startService(it)
+            bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        viewModel.insertVehicleActivity(
+            UserVehicleActivityEntity(
+                userId = MyUser.id,
+                timestamp = getInstant(),
+                arrivalTime = System.currentTimeMillis(),
+                exitTime = 0L,
+                distanceTravelled = 0.0,
+                heightDifference = 0f
+            )
+        )
     }
 
     override fun updateActivity() {
-        Intent(this, ActivityRecognitionService::class.java).also {
-            it.action = ActivityRecognitionService.Actions.UPDATE.toString()
+        val distanceTravelled = distanceService?.getDistance()
+        unbindService(serviceConnection)
 
-            it.putExtra("ACTIVITY_TYPE", DetectedActivity.IN_VEHICLE)
-            it.putExtra("EXIT_TIME", System.currentTimeMillis())
-
-            startService(it)
-        }
+        setKindOfSensors()
+        viewModel.updateVehicleActivity(System.currentTimeMillis(), distanceTravelled)
     }
 
+    override fun setKindOfSensors() {
+        secondTableRow.visibility = View.GONE
+
+        textViewTitleFirstSensor.text = "Distance travelled"
+        textViewValueFirstSensor.text = "0.0 km"
+    }
+
+    // I used the chronometer view to update the value of the distance done
     override fun setUpChronometer() {
         chronometer.setOnChronometerTickListener {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val hours = (elapsedTime / 1000).toInt()
 
-            // TODO
-            /*
-             * I need a condition to check if is passed more than an hour, or few hours (2 - 3)
-             */
-            if (hours >= 10) {
-//                sendNotification(
-//                    "BrockApp - Take a break",
-//                    "You have been driving for a while, take a pause"
-//                )
+            if ((elapsedTime % 10).toInt() == 0) {
+                val data = (distanceService?.getDistance()?.div(TO_KM))
+                textViewValueFirstSensor.text = ("%.1f km".format(data))
             }
         }
     }

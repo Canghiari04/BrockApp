@@ -1,33 +1,32 @@
 package com.example.brockapp.activity.chronometer
 
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.activity.ChronometerActivity
-import com.example.brockapp.service.ActivityRecognitionService
+import com.example.brockapp.database.UserStillActivityEntity
 
-import android.content.Intent
+import android.view.View
 import android.os.SystemClock
-import com.google.android.gms.location.DetectedActivity
 
 class StillActivity: ChronometerActivity() {
     override fun registerActivity() {
-        Intent(this, ActivityRecognitionService::class.java).also {
-            it.action = ActivityRecognitionService.Actions.START.toString()
-
-            it.putExtra("ACTIVITY_TYPE", DetectedActivity.STILL)
-            it.putExtra("ARRIVAL_TIME", System.currentTimeMillis())
-
-            startService(it)
-        }
+        viewModel.insertStillActivity(
+            UserStillActivityEntity(
+                userId = MyUser.id,
+                timestamp = getInstant(),
+                arrivalTime = System.currentTimeMillis(),
+                exitTime = 0L
+            )
+        )
     }
 
     override fun updateActivity() {
-        Intent(this, ActivityRecognitionService::class.java).also {
-            it.action = ActivityRecognitionService.Actions.UPDATE.toString()
+        setKindOfSensors()
+        viewModel.updateStillActivity(System.currentTimeMillis())
+    }
 
-            it.putExtra("ACTIVITY_TYPE", DetectedActivity.STILL)
-            it.putExtra("EXIT_TIME", System.currentTimeMillis())
-
-            startService(it)
-        }
+    override fun setKindOfSensors() {
+        firstTableRow.visibility = View.GONE
+        secondTableRow.visibility = View.GONE
     }
 
     override fun setUpChronometer() {
