@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -16,6 +18,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val fileProjectProperties = project.rootProject.file("project.properties")
+        val properties = Properties()
+        properties.load(fileProjectProperties.inputStream())
+
+        val mapApiKey = properties.getProperty("MAPS_API_KEY") ?: ""
+        val bucketName = properties.getProperty("BUCKET_NAME") ?: ""
+        val geoApiKey = properties.getProperty("GEO_DB_API_KEY") ?: ""
+        val identityPoolId = properties.getProperty("IDENTITY_POOL_ID") ?: ""
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapApiKey
+
+        buildConfigField(type = "String", name = "BUCKET_NAME", value = bucketName)
+        buildConfigField(type = "String", name = "GEO_DB_API_KEY", value = geoApiKey)
+        buildConfigField(type = "String", name = "IDENTITY_POOL_ID", value = identityPoolId)
     }
 
     buildTypes {
@@ -34,49 +51,65 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
 }
 
 dependencies {
+    // Core Android libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.androidx.constraintlayout)
+
+    // Material Design
     implementation(libs.material)
+    implementation(libs.material.v180)
+
+    // Google Play Services
     implementation(libs.play.services.auth)
-
-    // chart
-    implementation(libs.mpandroidchart)
-    
-    implementation ("com.prolificinteractive:material-calendarview:1.4.3") {
-        exclude(group = "com.android.support")
-    }
-    implementation(libs.androidx.work.runtime.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.play.services.location)
-    implementation(libs.material)
+    implementation(libs.play.services.location.v1800)
+    implementation(libs.play.services.maps)
 
-    // firebase
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
-
-    // room
+    // Room (Persistence)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     kapt("androidx.room:room-compiler:2.6.1")
 
-    // scope view model
+    // ViewModel
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
-    // maps
-    implementation(libs.play.services.maps)
+    // Navigation
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
-    // aws
+    // Work Manager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Charts
+    implementation(libs.mpandroidchart)
+
+    // AWS
     implementation(libs.aws.android.sdk.s3)
     implementation(libs.aws.android.sdk.core)
-    implementation (libs.gson)
 
-    // tab layout
-    implementation(libs.material.v130)
+    // Image View
+    implementation(libs.circleimageview)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    // Gson
+    implementation(libs.gson)
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
