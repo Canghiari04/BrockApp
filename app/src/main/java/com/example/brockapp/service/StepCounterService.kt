@@ -16,7 +16,7 @@ import android.hardware.SensorManager
 import android.hardware.SensorEventListener
 import androidx.work.OneTimeWorkRequestBuilder
 
-class WalkService: Service(), SensorEventListener, NotificationSender {
+class StepCounterService: Service(), SensorEventListener, NotificationSender {
     private var initialStepCount = 0L
     private var sessionStepCount = 0L
     private var sensor: Sensor? = null
@@ -25,7 +25,7 @@ class WalkService: Service(), SensorEventListener, NotificationSender {
     private lateinit var sensorManager: SensorManager
 
     inner class LocalBinder: Binder() {
-        fun getService(): WalkService = this@WalkService
+        fun getService(): StepCounterService = this@StepCounterService
     }
 
     override fun onCreate() {
@@ -54,6 +54,13 @@ class WalkService: Service(), SensorEventListener, NotificationSender {
         }
 
         sessionStepCount = event.values[0].toInt() - initialStepCount
+
+        if (sessionStepCount > 20) {
+            sendNotification(
+                "BrockApp - Keep walking",
+                "You're going great! Continue walking for few minutes and take a deep breathe"
+            )
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -63,25 +70,6 @@ class WalkService: Service(), SensorEventListener, NotificationSender {
     override fun onDestroy() {
         super.onDestroy()
         stopMonitoring()
-    }
-
-    fun getSteps(): Long {
-        return sessionStepCount
-    }
-
-    private fun startMonitoring() {
-        if (sensor == null) {
-            sendNotification(
-                "BrockApp - Step Counter Sensor",
-                "The step counter sensor is not present in this device"
-            )
-        } else {
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST)
-        }
-    }
-
-    private fun stopMonitoring() {
-        sensorManager.unregisterListener(this)
     }
 
     override fun sendNotification(title: String, content: String) {
@@ -95,5 +83,24 @@ class WalkService: Service(), SensorEventListener, NotificationSender {
             .build()
 
         WorkManager.getInstance(this).enqueue(workRequest)
+    }
+
+    fun getSteps(): Long {
+        return sessionStepCount
+    }
+
+    private fun stopMonitoring() {
+        sensorManager.unregisterListener(this)
+    }
+
+    private fun startMonitoring() {
+        if (sensor == null) {
+            sendNotification(
+                "BrockApp - Step Counter Sensor",
+                "The step counter sensor is not present in this device"
+            )
+        } else {
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST)
+        }
     }
 }

@@ -63,7 +63,7 @@ class DistanceService: Service() {
         locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             10000
-        ).setMinUpdateIntervalMillis(POSITION_UPDATE_INTERVAL_MILLIS.toLong()).build()
+        ).setMinUpdateIntervalMillis(10000L).build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -86,6 +86,10 @@ class DistanceService: Service() {
         }
     }
 
+    private fun stopMonitoring() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
     private fun startMonitoring() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -93,9 +97,5 @@ class DistanceService: Service() {
             ) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         }
-    }
-
-    private fun stopMonitoring() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }
