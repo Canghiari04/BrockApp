@@ -57,7 +57,7 @@ class YouProgressPage: ProgressPage() {
             val kilometers = (it / TO_KM)
 
             titleSecondColumn.setText("Distance done")
-            infoSecondColumn.text = ("%.1f km".format(kilometers))
+            infoSecondColumn.text = ("%.3f km".format(kilometers))
         }
     }
 
