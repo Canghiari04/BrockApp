@@ -36,7 +36,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun setDate(date: LocalDate) {
-        view?.findViewById<TextView>(R.id.date_text_view)?.apply {
+        view?.findViewById<TextView>(R.id.text_view_date)?.apply {
             text = "${date.month.toString().toLowerCase()}, ${date.year}"
         }
     }
@@ -51,7 +51,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
 
     private fun setUpButton(buttonBack: Button, buttonForward: Button, calendar: RecyclerView) {
         buttonBack.setOnClickListener {
-            val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_TEXT_VIEW)
+            val tokens = (view?.findViewById<TextView>(R.id.text_view_date)?.text)?.split(DATE_TEXT_VIEW)
 
             val date = util.getDateByTokens(formatter, tokens!!).minusMonths(1)
             date.format(formatter)
@@ -61,7 +61,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
         }
 
         buttonForward.setOnClickListener {
-            val tokens = (view?.findViewById<TextView>(R.id.date_text_view)?.text)?.split(DATE_TEXT_VIEW)
+            val tokens = (view?.findViewById<TextView>(R.id.text_view_date)?.text)?.split(DATE_TEXT_VIEW)
 
             val date = util.getDateByTokens(formatter, tokens!!).plusMonths(1)
             date.format(formatter)
@@ -72,7 +72,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun onItemClick(date: String) {
-        val tokens = date.split(DATE_SEPARATOR).toList()
+        val tokens = date.split("-").toList()
         val item = LocalDate.of(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt())
 
         setDate(item)

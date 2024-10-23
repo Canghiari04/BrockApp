@@ -20,9 +20,9 @@ class GroupFragment: Fragment(R.layout.fragment_group) {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = ViewPagerGroupAdapter(childFragmentManager, lifecycle)
-        val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout_group)
+        val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout_group_fragment)
 
-        val viewPager = view.findViewById<ViewPager2>(R.id.view_page_group)
+        val viewPager = view.findViewById<ViewPager2>(R.id.view_pager_group_fragment)
         viewPager.adapter = adapter
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->

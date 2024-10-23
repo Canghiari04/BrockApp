@@ -48,10 +48,11 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
 
         // If the user is already sign in he can pass to the page loader activity
         if (id != 0L && savedUsername != null && savedPassword != null) {
-            observeUser()
-            viewModelUser.getUser(savedUsername, savedPassword)
-
             view.findViewById<View>(R.id.view_login).visibility = View.GONE
+
+            observeUser()
+
+            viewModelUser.getUser(savedUsername, savedPassword)
         } else {
             util = PostNotificationsPermissionUtil(requireActivity()) {
                 observeUser()

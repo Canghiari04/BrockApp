@@ -20,9 +20,9 @@ class YouFragment: Fragment(R.layout.fragment_you) {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = ViewPagerYouAdapter(childFragmentManager, lifecycle)
-        val tabLayout = view.findViewById<TabLayout>(R.id.you_tab_layout)
+        val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout_you_fragment)
 
-        val viewPager = view.findViewById<ViewPager2>(R.id.you_view_pager)
+        val viewPager = view.findViewById<ViewPager2>(R.id.view_pager_you_fragment)
         viewPager.adapter = adapter
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
