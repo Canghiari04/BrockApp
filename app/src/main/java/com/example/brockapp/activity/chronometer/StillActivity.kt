@@ -20,7 +20,6 @@ class StillActivity: ChronometerActivity() {
     }
 
     override fun updateActivity() {
-        setKindOfSensors()
         viewModel.updateStillActivity(System.currentTimeMillis())
     }
 

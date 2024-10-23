@@ -9,20 +9,28 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 
 object MyServiceConnection {
-    fun createDistanceServiceConnection(onConnected: (DistanceService) -> Unit): ServiceConnection {
+    // I passed a callback inside the function parameters, so I can get the service instance
+    fun createDistanceServiceConnection(
+        onConnected: (DistanceService) -> Unit,
+        onDisconnected: () -> Unit
+    ): ServiceConnection {
         return object : ServiceConnection {
+            // When the binding is completed I will obtain the instance by the binder
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 val binder = service as DistanceService.LocalBinder
                 onConnected(binder.getService())
             }
 
             override fun onServiceDisconnected(arg0: ComponentName) {
-                //
+                onDisconnected()
             }
         }
     }
 
-    fun createStepCounterService(onConnected: (StepCounterService) -> Unit): ServiceConnection {
+    fun createStepCounterService(
+        onConnected: (StepCounterService) -> Unit,
+        onDisconnected: () -> Unit
+    ): ServiceConnection {
         return object : ServiceConnection {
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 val binder = service as StepCounterService.LocalBinder
@@ -30,12 +38,15 @@ object MyServiceConnection {
             }
 
             override fun onServiceDisconnected(arg0: ComponentName) {
-                //
+                onDisconnected()
             }
         }
     }
 
-    fun createHeightDifferenceService(onConnected: (HeightDifferenceService) -> Unit): ServiceConnection {
+    fun createHeightDifferenceService(
+        onConnected: (HeightDifferenceService) -> Unit,
+        onDisconnected: () -> Unit
+    ): ServiceConnection {
         return object : ServiceConnection {
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 val binder = service as HeightDifferenceService.LocalBinder
@@ -43,7 +54,7 @@ object MyServiceConnection {
             }
 
             override fun onServiceDisconnected(arg0: ComponentName) {
-                //
+                onDisconnected()
             }
         }
     }

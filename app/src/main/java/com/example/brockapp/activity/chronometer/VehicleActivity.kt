@@ -13,7 +13,8 @@ import android.content.Context
 import android.content.ServiceConnection
 
 class VehicleActivity: ChronometerActivity() {
-    private var distanceService: DistanceService? = null
+    private var isBound = false
+    private var service: DistanceService? = null
 
     private lateinit var serviceConnection: ServiceConnection
 
@@ -22,7 +23,11 @@ class VehicleActivity: ChronometerActivity() {
 
         serviceConnection = MyServiceConnection.createDistanceServiceConnection(
             onConnected = { service ->
-                distanceService = service
+                this.service = service
+                isBound = true
+            },
+            onDisconnected = {
+                isBound = false
             }
         )
     }
@@ -46,11 +51,13 @@ class VehicleActivity: ChronometerActivity() {
     }
 
     override fun updateActivity() {
-        val distanceTravelled = distanceService?.getDistance()
-        unbindService(serviceConnection)
+        if (isBound) {
+            val distanceTravelled = service?.getDistance()
+            unbindService(serviceConnection)
 
-        setKindOfSensors()
-        viewModel.updateVehicleActivity(System.currentTimeMillis(), distanceTravelled)
+            setKindOfSensors()
+            viewModel.updateVehicleActivity(System.currentTimeMillis(), distanceTravelled)
+        }
     }
 
     override fun setKindOfSensors() {
@@ -66,8 +73,9 @@ class VehicleActivity: ChronometerActivity() {
             val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
 
             if ((elapsedTime % 10).toInt() == 0) {
-                val data = (distanceService?.getDistance()?.div(TO_KM))
-                textViewValueFirstSensor.text = ("%.1f km".format(data))
+                service?.getDistance()?.div(TO_KM).also {
+                    if (it != null) textViewValueFirstSensor.text = ("%.1f km".format(it))
+                }
             }
         }
     }
