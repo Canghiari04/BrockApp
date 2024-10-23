@@ -36,7 +36,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
 
     fun getCitiesFromCountry(countryCode: String) {
         RetrofitClientInstance.api
-            .getCitiesByCountryId(API_KEY_GEO_DB, countryCode)
+            .getCitiesByCountryId(BuildConfig.GEO_DB_API_KEY, countryCode)
             .enqueue(object : Callback<CityResponse> {
                 override fun onResponse(call: Call<CityResponse>, response: Response<CityResponse>) {
                     val items = response.body()?.data?.map { it.name } ?: mutableListOf()
@@ -99,7 +99,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         val userKey = "user/$username.json"
 
         return try {
-            val request = GetObjectRequest(BUCKET_NAME, userKey)
+            val request = GetObjectRequest(BuildConfig.BUCKET_NAME, userKey)
             s3Client.getObject(request)
 
             true
@@ -129,7 +129,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         val userKey = "user/$username.json"
 
         try {
-            val request = PutObjectRequest(BUCKET_NAME, userKey, jsonFile)
+            val request = PutObjectRequest(BuildConfig.BUCKET_NAME, userKey, jsonFile)
             s3Client.putObject(request)
         } catch (e: Exception) {
             Log.e("USER_VIEW_MODEL", e.toString())

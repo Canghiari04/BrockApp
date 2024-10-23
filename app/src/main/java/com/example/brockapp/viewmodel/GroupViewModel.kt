@@ -106,7 +106,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     // This function must be called while the app is starting
     fun getAllSubscribers() {
         viewModelScope.launch(Dispatchers.IO) {
-            val listObjectsRequest = ListObjectsRequest().withBucketName(BUCKET_NAME)
+            val listObjectsRequest = ListObjectsRequest().withBucketName(BuildConfig.BUCKET_NAME)
 
             val objectListing = s3Client.listObjects(listObjectsRequest)
             val s3Objects = objectListing.objectSummaries
@@ -140,7 +140,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                 }
             }
 
-            val listObjectsRequest = ListObjectsRequest().withBucketName(BUCKET_NAME)
+            val listObjectsRequest = ListObjectsRequest().withBucketName(BuildConfig.BUCKET_NAME)
 
             val objectListing = s3Client.listObjects(listObjectsRequest)
             val s3Objects = objectListing.objectSummaries
@@ -168,7 +168,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             try {
                 val userKey = "user/$user"
                 val listObjectsRequest = ListObjectsRequest()
-                    .withBucketName(BUCKET_NAME)
+                    .withBucketName(BuildConfig.BUCKET_NAME)
                     .withPrefix(userKey)
 
                 val objectListing = s3Client.listObjects(listObjectsRequest)
@@ -204,7 +204,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             val key = "user/$username.json"
 
             try {
-                val request = GetObjectRequest(BUCKET_NAME, key)
+                val request = GetObjectRequest(BuildConfig.BUCKET_NAME, key)
                 val result = s3Client.getObject(request)
                 val content = result.objectContent.bufferedReader().use { it.readText() }
 
@@ -567,6 +567,13 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                 (timeStamp.isBefore(end) && timeStamp.isAfter(start))
             }
 
+        val runActivities = friend.runActivities
+            .filter { it.exitTime > it.arrivalTime }
+            .filter {
+                val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
+                (timeStamp.isBefore(end) && timeStamp.isAfter(start))
+            }
+
         val stillActivities = friend.stillActivities
             .filter { it.exitTime > it.arrivalTime }
             .filter {
@@ -583,6 +590,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
 
         val map = mutableMapOf(
             "Vehicle" to vehicleActivities.size,
+            "Run" to runActivities.size,
             "Still" to stillActivities.size,
             "Walk" to walkActivities.size
         )
@@ -593,6 +601,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             if (value > 0) {
                 val label = when (activityType) {
                     VEHICLE_ACTIVITY_TYPE -> "Vehicle"
+                    RUN_ACTIVITY_TYPE -> "Run"
                     STILL_ACTIVITY_TYPE -> "Still"
                     WALK_ACTIVITY_TYPE -> "Walk"
                     else -> "Unknown"
@@ -655,7 +664,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         var subscriber: User? = null
 
         try {
-            val request = GetObjectRequest(BUCKET_NAME, key)
+            val request = GetObjectRequest(BuildConfig.BUCKET_NAME, key)
             val result = s3Client.getObject(request)
             val content = result.objectContent.bufferedReader().use { it.readText() }
 
