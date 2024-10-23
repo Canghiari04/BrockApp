@@ -1,49 +1,44 @@
 package com.example.brockapp.receiver
 
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import com.example.brockapp.*
 import com.example.brockapp.service.ActivityRecognitionService
-import com.google.android.gms.location.ActivityTransitionResult
-import com.google.android.gms.location.DetectedActivity
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
+import android.util.Log
+import android.content.Intent
+import android.content.Context
+import android.content.BroadcastReceiver
+import com.google.android.gms.location.ActivityTransitionResult
 
 class ActivityRecognitionReceiver: BroadcastReceiver() {
-    private lateinit var serviceIntent: Intent
-
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d("ACTIVITY_RECOGNITION_RECEIVER", "Ricevuto broadcast con azione: ${intent.action}")
-        if (ActivityTransitionResult.hasResult(intent)) {
-            val result = ActivityTransitionResult.extractResult(intent)
-            if (result != null) {
-                for (event in result.transitionEvents) {
-                    Toast.makeText(context, "CIAO ESTHER", Toast.LENGTH_LONG).show()
-                    Log.d("ACTIVITY_RECOGNITION_RECEIVER", event.activityType.toString())
+        if (intent.action == ACTIVITY_RECOGNITION_INTENT_TYPE) {
+            if (ActivityTransitionResult.hasResult(intent)) {
+                val result = ActivityTransitionResult.extractResult(intent)!!
+                val events = result.transitionEvents
+
+                for (event in events) {
+                    val type = event.activityType
+                    val transition = event.transitionType
+
+                    // Service are naturally a singleton
+                    val serviceIntent = buildIntent(type, transition, context)
+                    context.startService(serviceIntent)
                 }
-            } else {
-                Log.d("ACTIVITY_RECOGNITION_RECEIVER", "Null result")
             }
+        } else {
+            Log.d("ACTIVITY_RECOGNITION_RECEIVER", "Intent action not recognized")
         }
     }
 
-    fun getPendingIntent(context: Context): PendingIntent {
-        val intent = Intent(context, ActivityRecognitionReceiver::class.java).apply {
-            action = ACTIVITY_RECOGNITION_INTENT_TYPE
-        }
+    private fun buildIntent(type: Int, transition: Int, context: Context): Intent {
+        return Intent(context, ActivityRecognitionService::class.java).also {
+            val key = if (transition == 0) "ARRIVAL_TIME" else "EXIT_TIME"
 
-        return PendingIntent.getBroadcast(
-            context,
-            46,
-            intent,
-            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+            it.action = ActivityRecognitionService.Actions.START.toString()
+
+            it.putExtra("ACTIVITY_TYPE", type)
+            it.putExtra("TRANSITION_TYPE", transition)
+            it.putExtra(key, System.currentTimeMillis())
+        }
     }
 }
