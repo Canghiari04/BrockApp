@@ -1,5 +1,6 @@
 package com.example.brockapp.util
 
+import java.time.Month
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -10,7 +11,7 @@ import java.time.temporal.TemporalAdjusters
 class CalendarUtil {
     fun getDateByTokens(formatter: DateTimeFormatter, tokens: List<String>): LocalDate {
         val year = tokens[1].toInt()
-        val month = tokens[0].toInt()
+        val month = Month.valueOf(tokens[0].toUpperCase())
         val lastDay = YearMonth.of(year, month).atEndOfMonth()
 
         return LocalDate.parse(lastDay.toString(), formatter)

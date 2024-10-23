@@ -553,18 +553,23 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val vehicleActivitiesCount = db.UserVehicleActivityDao()
                 .getVehicleActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
-                .toMutableList().apply { removeAll { it.exitTime == 0L } }
+                .toMutableList()
+
+            val runActivitiesCount = db.UserRunActivityDao()
+                .getRunActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+                .toMutableList()
 
             val stillActivitiesCount = db.UserStillActivityDao()
                 .getStillActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
-                .toMutableList().apply { removeAll { it.exitTime == 0L } }
+                .toMutableList()
 
             val walkActivitiesCount = db.UserWalkActivityDao()
                 .getWalkActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
-                .toMutableList().apply { removeAll { it.exitTime == 0L } }
+                .toMutableList()
 
             val map = mutableMapOf(
                 "Vehicle" to vehicleActivitiesCount.size,
+                "Run" to runActivitiesCount.size,
                 "Still" to stillActivitiesCount.size,
                 "Walk" to walkActivitiesCount.size
             )
@@ -575,6 +580,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 if (value > 0) {
                     val label = when (activityType) {
                         VEHICLE_ACTIVITY_TYPE -> "Vehicle"
+                        RUN_ACTIVITY_TYPE -> "Run"
                         STILL_ACTIVITY_TYPE -> "Still"
                         WALK_ACTIVITY_TYPE -> "Walk"
                         else -> "Unknown"
