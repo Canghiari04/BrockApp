@@ -2,7 +2,6 @@ package com.example.brockapp
 
 // Activity Recognition
 const val ID_ACTIVITY_NOTIFY = 10
-const val REQUEST_CODE_PERMISSION_ACTIVITY_RECOGNITION = 1101010
 const val CHANNEL_ID_ACTIVITY_NOTIFY = "ACTIVITY RECOGNITION"
 const val REQUEST_CODE_ACTIVITY_RECOGNITION_BROADCAST_RECEIVER = 2
 const val ACTIVITY_RECOGNITION_INTENT_TYPE = "ACTIVITY_RECOGNITION_ACTION"
@@ -24,31 +23,36 @@ const val CHANNEL_ID_CONNECTIVITY_NOTIFY = "CONNECTIVITY"
 const val NAME_CHANNEL_CONNECTIVITY_NOTIFY = "CONNECTIVITY NOTIFICATION CHANNEL"
 const val DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY = "CHANNEL FOR CONNECTIVITY NOTIFY"
 
-// Versione del database
-const val ROOM_DATABASE_VERSION = 24
+// External storage
+const val REQUEST_CODE_PICKING_IMAGE = 4
 
-// Costanti utilizzate per definire al corretta visualizzazione grafica delle date
-const val DATE_SEPARATOR = "-"
+// SyncData
+const val ID_SYNC_DATA = 13
+const val CHANNEL_ID_SYNC_DATA_NOTIFY = "SYNC_DATA"
+const val NAME_CHANNEL_SYNC_DATA_NOTIFY = "SYNC DATA NOTIFICATION CHANNEL"
+const val DESCRIPTION_CHANNEL_SYNC_DATA_NOTIFY = "CHANNEL FOR SYNC DATA"
+
+// Memo
+const val ID_MEMO = 14
+const val CHANNEL_ID_MEMO_NOTIFY = "MEMO"
+const val NAME_CHANNEL_ID_MEMO_NOTIFY = "MEMO NOTIFICATION CHANNEL"
+const val DESCRIPTION_CHANNEL_ID_MEMO_NOTIFY = "CHANNEL FOR MEMO NOTIFY"
+
+// Database Version
+const val ROOM_DATABASE_VERSION = 28
+
+// Date Formatting
+const val DATE_TEXT_VIEW = ", "
 const val CALENDAR_DATE_FORMAT = "yyyy-MM-dd"
 const val ISO_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
-const val CHARTS_DATE_FORMAT = "M-yyyy"
-const val POSITION_UPDATE_INTERVAL_MILLIS = 10000
 
-// Suddivisione della tipologia di attività condotta dall'utente
+// Activity Types
+const val RUN_ACTIVITY_TYPE = "Run"
 const val WALK_ACTIVITY_TYPE = "Walk"
 const val STILL_ACTIVITY_TYPE = "Still"
 const val VEHICLE_ACTIVITY_TYPE = "Vehicle"
 
-// Diversificazione della tipologia di connessione per il Connectivity Service
+// Connectivity Types
 const val WI_FI_TYPE_CONNECTION = "WI-FI"
 const val CELLULAR_TYPE_CONNECTION = "CELLULAR"
 const val NO_CONNECTION_TYPE_CONNECTION = "NO-CONNECTION"
-
-// Bucket di Aws
-const val BUCKET_NAME = "brock-app"
-
-// Tab layout
-const val NUM_TABS_YOU = 3
-const val NUM_TABS_FRIEND = 2
-
-const val NOT_WALKING_NOTIFICATION_TIME_MILLIS = 1200000
