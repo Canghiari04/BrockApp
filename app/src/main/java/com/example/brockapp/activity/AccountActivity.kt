@@ -37,7 +37,7 @@ class AccountActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_account)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_account_activity)
         setSupportActionBar(toolbar)
 
         toolbar.run {

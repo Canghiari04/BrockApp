@@ -38,7 +38,7 @@ class NewMemoActivity: AppCompatActivity() {
 
         date = intent.getStringExtra("CALENDAR_DATE").toString()
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_memo)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_memo_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
 

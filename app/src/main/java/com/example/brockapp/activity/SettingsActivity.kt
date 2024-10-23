@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.content.Intent
+import android.widget.TextView
 import androidx.work.WorkManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
@@ -39,17 +40,23 @@ class SettingsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_activity_settings)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
+
+        findViewById<TextView>(R.id.text_view_description_dump_database).text =
+            "Sharing your data allows the app to provide a personalized experience!"
+
+        findViewById<TextView>(R.id.text_view_description_activities).text =
+            "Choose the activities that you want to detect"
 
         switchDumpDatabase = findViewById(R.id.switch_share_dump_database)
         switchGeofenceTransition = findViewById(R.id.switch_geofence_transition_service)
         switchActivityRecognition = findViewById(R.id.switch_activity_recognition_service)
 
         switchMapper = mapOf(
-            findViewById<SwitchCompat>(R.id.switch_run_activity) to Pair("RUN_ACTIVITY", DetectedActivity.RUNNING),
             findViewById<SwitchCompat>(R.id.switch_vehicle_activity) to Pair("VEHICLE_ACTIVITY", DetectedActivity.IN_VEHICLE),
+            findViewById<SwitchCompat>(R.id.switch_run_activity) to Pair("RUN_ACTIVITY", DetectedActivity.RUNNING),
             findViewById<SwitchCompat>(R.id.switch_still_activity) to Pair("STILL_ACTIVITY", DetectedActivity.STILL),
             findViewById<SwitchCompat>(R.id.switch_walk_activity) to Pair("WALK_ACTIVITY", DetectedActivity.WALKING)
         )
