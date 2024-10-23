@@ -2,8 +2,9 @@
 .gradle/
 build/
 
-# Local configuration file (sdk path, etc)
+# Local configuration file
 local.properties
+project.properties
 
 # Log/OS Files
 *.log
@@ -26,13 +27,13 @@ render.experimental.xml
 *.jks
 *.keystore
 
-# Google Services (e.g. APIs or Firebase)
+# Google Services
 google-services.json
 
 # Android Profiling
 *.hprof
 
-## Core latex/pdflatex auxiliary files:
+# LaTeX auxiliary and intermediate files
 *.aux
 *.lof
 *.log
@@ -45,78 +46,43 @@ google-services.json
 *.cb
 *.cb2
 .*.lb
-
-## Intermediate documents:
 *.dvi
 *.xdv
 *-converted-to.*
-# these rules might exclude image files for figures etc.
-# *.ps
-# *.eps
-
-## Bibliography auxiliary files (bibtex/biblatex/biber):
+*.ps
+*.eps
 *.bbl
 *.bcf
 *.blg
 *-blx.aux
 *-blx.bib
 *.run.xml
-
-## Build tool auxiliary files:
 *.fdb_latexmk
 *.synctex
 *.synctex(busy)
 *.synctex.gz
 *.synctex.gz(busy)
 *.pdfsync
-
-## Build tool directories for auxiliary files
-# latexrun
 latex.out/
-
-## Auxiliary and intermediate files from other packages:
-# algorithms
 *.alg
 *.loa
-
-# achemso
 acs-*.bib
-
-# amsthm
 *.thm
-
-# beamer
 *.nav
 *.pre
 *.snm
 *.vrb
-
-# changes
 *.soc
-
-# comment
 *.cut
-
-# cprotect
 *.cpt
-
-# elsarticle (documentclass of Elsevier journals)
 *.spl
-
-# endnotes
 *.ent
-
-# fixme
 *.lox
-
-# feynmf/feynmp
 *.mf
 *.mp
 *.t[1-9]
 *.t[1-9][0-9]
 *.tfm
-
-#(r)(e)ledmac/(r)(e)ledpar
 *.end
 *.?end
 *.[1-9]
@@ -131,8 +97,6 @@ acs-*.bib
 *.eledsec[1-9][0-9]R
 *.eledsec[1-9][0-9][0-9]
 *.eledsec[1-9][0-9][0-9]R
-
-# glossaries
 *.acn
 *.acr
 *.glg
@@ -144,51 +108,28 @@ acs-*.bib
 *.slg
 *.slo
 *.sls
-
-# uncomment this for glossaries-extra (will ignore makeindex's style files!)
-# *.ist
-
-# gnuplot
+*.ist
 *.gnuplot
 *.table
-
-# gnuplottex
 *-gnuplottex-*
-
-# gregoriotex
 *.gaux
 *.glog
 *.gtex
-
-# htlatex
 *.4ct
 *.4tc
 *.idv
 *.lg
 *.trc
 *.xref
-
-# hyperref
 *.brf
-
-# knitr
 *-concordance.tex
-# TODO Uncomment the next line if you use knitr and want to ignore its generated tikz files
-# *.tikz
+*.tikz
 *-tikzDictionary
-
-# listings
 *.lol
-
-# luatexja-ruby
 *.ltjruby
-
-# makeidx
 *.idx
 *.ilg
 *.ind
-
-# minitoc
 *.maf
 *.mlf
 *.mlt
@@ -196,131 +137,58 @@ acs-*.bib
 *.slf[0-9]*
 *.slt[0-9]*
 *.stc[0-9]*
-
-# minted
 _minted*
 *.pyg
-
-# morewrites
 *.mw
-
-# newpax
 *.newpax
-
-# nomencl
 *.nlg
 *.nlo
 *.nls
-
-# pax
 *.pax
-
-# pdfpcnotes
 *.pdfpc
-
-# sagetex
 *.sagetex.sage
 *.sagetex.py
 *.sagetex.scmd
-
-# scrwfile
 *.wrt
-
-# svg
 svg-inkscape/
-
-# sympy
 *.sout
 *.sympy
 sympy-plots-for-*.tex/
-
-# pdfcomment
 *.upa
 *.upb
-
-# pythontex
 *.pytxcode
 pythontex-files-*/
-
-# tcolorbox
 *.listing
-
-# thmtools
 *.loe
-
-# TikZ & PGF
 *.dpth
 *.md5
 *.auxlock
-
-# titletoc
 *.ptc
-
-# todonotes
 *.tdo
-
-# vhistory
 *.hst
 *.ver
-
-# easy-todo
 *.lod
-
-# xcolor
 *.xcp
-
-# xmpincl
 *.xmpi
-
-# xindy
 *.xdy
-
-# xypic precompiled matrices and outlines
 *.xyc
 *.xyd
-
-# endfloat
 *.ttt
 *.fff
-
-# Latexian
 TSWLatexianTemp*
 
-## Editors:
-# WinEdt
+# Editors specific files
 *.bak
 *.sav
-
-# Texpad
 .texpadtmp
-
-# LyX
 *.lyx~
-
-# Kile
 *.backup
-
-# gummi
 .*.swp
-
-# KBibTeX
 *~[0-9]*
-
-# TeXnicCenter
 *.tps
-
-# auto folder when using emacs and auctex
 ./auto/*
 *.el
-
-# expex forward references with \gathertags
 *-tags.tex
-
-# standalone packages
 *.sta
-
-# Makeindex log files
 *.lpz
-
-# xwatermark package
 *.xwm
