@@ -2,22 +2,20 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_new_memo"
-        android:theme="?attr/actionBarTheme"
+        android:id="@+id/toolbar_empty_activity"
         app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
         app:titleTextColor="@color/white"
         android:background="@color/uni_red"/>
 
     <ImageView
-        android:contentDescription="@string/empty_icon_description"
+        android:contentDescription="@string/description_empty_icon"
         android:src="@drawable/baseline_directions_run_24"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

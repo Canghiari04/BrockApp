@@ -3,15 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:elevation="15dp"
-    android:layout_margin="10dp">
+    android:layout_margin="10dp"
+    android:elevation="15dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,17 +20,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_gravity="center_vertical"
                 android:layout_margin="5dp"
-                android:layout_gravity="center_vertical">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/text_view_title_geofence"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:paddingBottom="5dp"
                     android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="5dp"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/black" />
@@ -42,6 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
                     android:textSize="16sp"
                     android:textColor="@color/black" />
 
@@ -51,6 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
                     android:textSize="16sp"
                     android:textColor="@color/black" />
             </LinearLayout>

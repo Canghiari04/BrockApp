@@ -1,6 +1,7 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.BrockApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="fontFamily">@font/avenir</item>
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/uni_red</item>
         <item name="colorOnPrimary">@color/white</item>

@@ -1,138 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:background="@color/grey"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content"
+        app:cardElevation="15dp"
+        app:cardCornerRadius="2.5dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="25dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp">
+            android:layout_width="250dp"
+            android:layout_height="325dp"
+            android:orientation="vertical">
 
-            <TextView
-                android:text="@string/locality_marker_dialog"
-                android:layout_width="125dp"
-                android:layout_height="20dp"
-                android:gravity="start|center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@android:color/transparent">
-            </TextView>
-
-            <TextView
-                android:id="@+id/text_locality_marker"
-                android:layout_width="125dp"
-                android:layout_height="20dp"
-                android:gravity="end|center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginStart="16dp"
-                android:background="@android:color/transparent">
-            </TextView>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp">
-
-            <TextView
-                android:text="@string/longitude_marker_dialog"
-                android:layout_width="125dp"
-                android:layout_height="20dp"
-                android:gravity="start|center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@android:color/transparent">
-            </TextView>
-
-            <TextView
-                android:id="@+id/text_longitude_marker"
-                android:layout_width="125dp"
-                android:layout_height="20dp"
-                android:gravity="end|center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginStart="16dp"
-                android:background="@android:color/transparent">
-            </TextView>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp">
-
-            <TextView
-                android:text="@string/latitude_marker_dialog"
-                android:layout_width="125dp"
-                android:layout_height="20dp"
-                android:gravity="start|center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@android:color/transparent">
-            </TextView>
-
-            <TextView
-                android:id="@+id/text_latitude_marker"
-                android:layout_width="125dp"
-                android:layout_height="20dp"
-                android:gravity="end|center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginStart="16dp"
-                android:background="@android:color/transparent">
-            </TextView>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:layout_marginBottom="25dp"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/dismiss_dialog_button"
-                android:text="@string/exit_dialog_button"
-                android:layout_width="125dp"
-                android:layout_height="40dp"
-                android:textColor="@color/white"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:gravity="center"
                 android:background="@color/uni_red">
-            </Button>
 
-            <Button
-                android:id="@+id/delete_marker_button"
-                android:text="@string/delete_marker_button"
-                android:layout_width="125dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/white"
-                android:background="@color/uni_red">
-            </Button>
+                <ImageView
+                    android:contentDescription="@string/description_marker_icon"
+                    android:src="@drawable/marker_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:gravity="center">
+                </ImageView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2.5"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/text_view_feature_name"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/text_view_feature_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2.5dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/dark_grey">
+                </TextView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/text_view_city"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/text_view_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2.5dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/dark_grey">
+                </TextView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/text_view_address"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/text_view_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2.5dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/dark_grey">
+                </TextView>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/button_delete_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:paddingStart="20dp"
+                android:paddingEnd="30dp"
+                android:paddingBottom="20dp"
+                android:text="@string/text_view_delete_marker"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/uni_red">
+            </TextView>
         </LinearLayout>
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

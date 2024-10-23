@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
-  
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="700"
+        android:font="@font/avenir_black">
+    </font>
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        android:font="@font/avenir_book">
+    </font>
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        android:font="@font/avenir_heavy">
+    </font>
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="300"
+        android:font="@font/avenir_light">
+    </font>
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="450"
+        android:font="@font/avenir_medium">
+    </font>
 </font-family>

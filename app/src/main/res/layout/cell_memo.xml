@@ -26,41 +26,34 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
-            android:layout_gravity="center_vertical">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/text_view_memo_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Memo Title"
-                android:textColor="@color/black"
+                android:layout_marginBottom="4dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
+                android:textColor="@color/black" />
 
             <TextView
                 android:id="@+id/text_view_memo_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Memo description goes here. It can be multiline and should provide more details."
-                android:textColor="@color/dark_grey"
+                android:layout_marginBottom="8dp"
                 android:textSize="14sp"
-                android:maxLines="3"
-                android:ellipsize="end"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@color/dark_grey" />
 
             <TextView
                 android:id="@+id/text_view_type_activity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Memo activity goes here. It can be in one line and a list of possible activities."
-                android:textColor="@color/dark_grey"
+                android:layout_marginBottom="8dp"
                 android:textSize="14sp"
-                android:maxLines="3"
-                android:ellipsize="end"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@color/dark_grey" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -1,52 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp">
+        android:layout_height="52dp"
+        android:layout_margin="10dp">
 
-        <ImageButton
+        <Button
             android:id="@+id/button_back_month"
-            android:contentDescription="@string/description_back_month_button"
-            android:src="@drawable/baseline_arrow_back_24"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_margin="2dp"
-            app:tint="@color/white"
+            android:text="@string/button_calendar_back"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             android:backgroundTint="@color/uni_red">
-        </ImageButton>
+        </Button>
 
         <TextView
-            android:id="@+id/date_text_view"
+            android:id="@+id/text_view_date"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
             android:textAlignment="center"
-            android:textSize="20sp"
             android:textColor="@color/black">
         </TextView>
 
-        <ImageButton
+        <Button
             android:id="@+id/button_forward_month"
-            android:contentDescription="@string/description_forward_month_button"
-            android:src="@drawable/baseline_arrow_forward_24"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_margin="2dp"
-            app:tint="@color/white"
+            android:textStyle="bold"
+            android:text="@string/button_calendar_forward"
+            android:textColor="@color/white"
             android:backgroundTint="@color/uni_red">
-        </ImageButton>
+        </Button>
     </LinearLayout>
 
     <LinearLayout
@@ -56,71 +54,79 @@
         android:layout_margin="10dp">
 
         <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/monday_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
             android:textColor="@color/black">
         </TextView>
 
         <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/thursday_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
             android:textColor="@color/black">
         </TextView>
 
         <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/wednesday_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
             android:textColor="@color/black">
         </TextView>
 
         <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/tuesday_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
             android:textColor="@color/black">
         </TextView>
 
         <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/friday_text_view"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/black">
+        </TextView>
+
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAlignment="center"
+            android:text="@string/saturday_text_view"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
             android:textColor="@color/black">
         </TextView>
 
         <TextView
-            android:text="@string/saturday_text_view" android:layout_width="0dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAlignment="center"
-            android:textSize="16sp"
-            android:textColor="@color/black">
-        </TextView>
-
-        <TextView
             android:text="@string/sunday_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAlignment="center"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
             android:textColor="@color/black">
         </TextView>
     </LinearLayout>
@@ -135,7 +141,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:orientation="vertical"
-            android:layout_margin="15dp"/>
+            android:layout_margin="10dp"
+            android:orientation="vertical" />
     </LinearLayout>
 </LinearLayout>

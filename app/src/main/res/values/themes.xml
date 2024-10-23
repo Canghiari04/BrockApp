@@ -9,7 +9,11 @@
         <item name="colorOnSecondary">@color/black</item>
 
         <item name="android:statusBarColor">@color/dark_grey</item>
+
+        <item name="android:fontFamily">@font/avenir</item>
+        <item name="fontFamily">@font/avenir</item>
     </style>
+
     <style name="NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/uni_red</item>
@@ -21,4 +25,13 @@
 
         <item name="android:statusBarColor">@color/dark_grey</item>
     </style>
+
+    <style name="Theme.BrockApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.BrockApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.BrockApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

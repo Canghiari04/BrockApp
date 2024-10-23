@@ -3,25 +3,79 @@
 
     <string name="text_blank"> </string>
 
-    <string name="main_message">Corri con RUNIBO</string>
-    <string name="sign_in_button">SIGN IN</string>
-    <string name="login_button">LOGIN</string>
-    <string name="google_button">ACCEDI CON GOOGLE</string>
-    <string name="web_view_button">REPOSITORY</string>
+    <string name="text_view_sign_in">Sign In</string>
+    <string name="text_view_login">Login</string>
+    <string name="edit_text_username">Username</string>
+    <string name="edit_text_password">Password</string>
+    <string name="text_view_select_type_activity">Select your favourite activity</string>
+    <string name="text_view_select_country">Select your country</string>
+    <string name="edit_text_city">Type your city</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="login_button">Login</string>
+    <string name="text_view_switch_to_login">Switch to Login</string>
+    <string name="text_view_switch_to_sign_in">Switch to Sign In</string>
 
-    <string name="authenticator_username">Username</string>
-    <string name="authenticator_password">Password</string>
+    <string-array name="spinner_activities">
+        <item>Vehicle</item>
+        <item>Run</item>
+        <item>Still</item>
+        <item>Walk</item>
+    </string-array>
 
-    <string name="login_welcome_text_view">Login</string>
-    <string name="message_to_signin">Non hai un account?</string>
-    <string name="on_click_signin">Clicca qui!</string>
+    <string name="menu_you">You</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_activity">Calendar</string>
+    <string name="menu_group">Group</string>
 
-    <string name="signin_welcome_text_view">Sign In</string>
-    <string name="message_to_login">Hai già un account?</string>
-    <string name="on_click_login">Clicca qui!</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="drawer_account">ACCOUNT</string>
 
-    <string name="description_error_signin">CREDENZIALI GIA\' PRESENTI. UTILIZZA UN ALTRO USERNAME E PASSWORD</string>
-    <string name="description_error_login">CREDENZIALI ERRATE. SEI SICURO DI ESSERE GIÀ ISCRITTO ALL\'APPLICAZIONE?</string>
+    <string name="text_view_title_page_progress">Look your progress!</string>
+    <string name="text_view_title_fist_card">This week</string>
+    <string name="text_view_title_second_card">Your stats</string>
+    <string name="text_view_title_third_card">This day</string>
+    <string name="text_view_distance">Distance</string>
+    <string name="text_view_time">Average time</string>
+    <string-array name="spinner_line_chart">
+        <item>Vehicle</item>
+        <item>Run</item>
+        <item>Walk</item>
+    </string-array>
+    <string-array name="spinner_pie_chart_items">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+    </string-array>
+
+    <string name="text_view_title_page_area">Look your areas!</string>
+
+    <string name="button_new_activity">Icon add</string>
+    <string name="button_settings">Icon settings</string>
+
+    <string name="title_new_activity">Choose one of them to register</string>
+    <string name="title_vehicle">Vehicle Activity</string>
+    <string name="description_vehicle_icon">Car icon</string>
+    <string name="title_run">Run Activity</string>
+    <string name="description_run_icon">Running icon</string>
+    <string name="title_still">Still Activity</string>
+    <string name="description_still_icon">Still icon</string>
+    <string name="title_walk">Walk Activity</string>
+    <string name="description_walk_icon">Walking icon</string>
+
+    <string name="stop_button">STOP</string>
+    <string name="start_button">START</string>
+
+    <string name="text_view_service">Check the active service</string>
+    <string name="text_view_activity_recognition">Daily activity recognition</string>
+    <string name="text_view_geofence_transition">Geofence transition service</string>
+    <string name="text_view_dump_service">Share your dump database</string>
+    <string name="text_view_dump_database">Share your progress</string>
+    <string name="text_view_activities">Choose the activities to detect</string>
+    <string name="text_view_in_vehicle">In vehicle</string>
+    <string name="text_view_run">Run</string>
+    <string name="text_view_still">Still</string>
+    <string name="text_view_walk">Walk</string>
 
     <string name="rationale_permission_title">Permission required</string>
     <string name="rationale_permissions_title">Permissions required</string>
@@ -29,153 +83,55 @@
     <string name="rationale_location_message">This app requires access to your location to provide features location-based services</string>
     <string name="rationale_background_message">This app requires background location access to deliver services such as geofencing, even when the app is not actively in use</string>
     <string name="rationale_notifications_message">This app needs permission to send you important notifications, such as updates and alerts. Without it, you may miss out on critical information</string>
-    <string name="rationale_recognition_message">This app needs activity recognition access to track your physical activity, enabling features like step counting and activity detection</string>
+    <string name="rationale_recognition_message">This app needs external storage access to upload your profile image</string>
+    <string name="rationale_read_storage_message">This app needs activity recognition access to track your physical activity, enabling features like step counting and activity detection</string>
     <string name="settings_message">To improve your experience, allow the app to all the required permissions by the settings</string>
     <string name="positive_button">Allow</string>
     <string name="negative_button">Deny</string>
 
-    <string name="menu_activity">Calendar</string>
-    <string name="menu_map">Map</string>
-    <string name="menu_you">You</string>
-    <string name="menu_friends">Friends</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_register">Register</string>
-    <string name="item_more_info">Info</string>
-    <string name="item_more_logout">Logout</string>
-    <string name="item_more_delete">Delete account</string>
+    <string name="description_user_icon">User icon</string>
+    <string name="text_view_impressions">Impressions</string>
+    <string name="text_view_following">Following</string>
+    <string name="text_view_danger">Danger</string>
+    <string name="text_view_logout_account">Logout</string>
+    <string name="text_view_delete_account">Delete Account</string>
 
-    <string name="title_home_fragment">In primo piano</string>
-    <string name="title_spinner">Visualizza per</string>
-    <string name="subtitle_activities">Le tue ultime attività</string>
-    <string name="subtitle_features">Le funzionalità dell\'app</string>
-    <string name="register_text_view">REGISTRAZIONE</string>
-    <string name="calendar_text_view">CALENDARIO</string>
-    <string name="friends_text_view">AMICI</string>
-    <string name="charts_text_view">GRAFICI</string>
-    <string name="spinner_prompt">Visualizza per</string>
+    <string name="dangerous_dialog_title">Attention</string>
+    <string name="dangerous_dialog_message">If you decide to delete your account, you will lose all the data stored</string>
+    <string name="dangerous_positive_button">DELETE</string>
+    <string name="dangerous_negative_button">DENY</string>
 
-    <string name="description_back_month_button">Back arrow</string>
-    <string name="description_forward_month_button">Forward arrow</string>
-    <string name="monday_text_view">MON</string>
-    <string name="thursday_text_view">THU</string>
-    <string name="wednesday_text_view">WES</string>
-    <string name="tuesday_text_view">TUE</string>
-    <string name="friday_text_view">FRI</string>
-    <string name="saturday_text_view">SAT</string>
-    <string name="sunday_text_view">SUN</string>
+    <string name="auto_complete_text_view_search_new_area">Search a new area</string>
 
-    <string name="empty_icon_description">Icona per empty page</string>
+    <string name="description_marker_icon">Icon marker</string>
+    <string name="text_view_feature_name">Feature name</string>
+    <string name="text_view_city">City</string>
+    <string name="text_view_address">Address</string>
+    <string name="text_view_delete_marker">Delete</string>
 
-    <string name="title_new_activity">Seleziona una delle seguenti attività</string>
-    <string name="title_still">Attività sedentaria</string>
-    <string name="description_still_icon">Chair icon</string>
-    <string name="title_vehicle">Viaggio in macchina</string>
-    <string name="description_vehicle_icon">Vehicle icon</string>
-    <string name="title_walk">Camminata</string>
-    <string name="description_walk_icon">Walking icon</string>
+    <string name="button_calendar_back">Back</string>
+    <string name="button_calendar_forward">Forward</string>
+    <string name="monday_text_view">mon</string>
+    <string name="tuesday_text_view">tue</string>
+    <string name="wednesday_text_view">wes</string>
+    <string name="thursday_text_view">thu</string>
+    <string name="friday_text_view">fry</string>
+    <string name="saturday_text_view">sat</string>
+    <string name="sunday_text_view">sun</string>
 
-    <string name="stop_button">STOP</string>
-    <string name="start_button">START</string>
+    <string name="description_daily_memo_icon">Icon add memo</string>
 
-    <string name="description_icon_activity">Activity icon</string>
+    <string name="edit_text_title_memo">Enter memo title</string>
+    <string name="edit_text_description_memo">Enter memo description</string>
+    <string name="button_add_memo">ADD MEMO</string>
 
-    <string name="charts_step_count_text">Numero di passi giornaliero</string>
-    <string name="charts_distance_travelled_text">Distanza percorsa giornaliera</string>
-    <string name="charts_pie_chart_text">Suddivisione delle attività nel mese</string>
+    <string name="auto_complete_search_users">Type an username</string>
+    <string name="text_view_show_user">Show</string>
+    <string name="button_follow_user">Follow</string>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="activity_main_text">Le tue attività</string>
-    <string name="historical_main_text">Il tuo storico</string>
-    <string name="calendar_main_text">Il tuo calendario</string>
-    <string name="charts_main_text">I tuoi grafici</string>
-    <string name="friends_main_text">I tuoi amici</string>
+    <string name="description_activity_icon">Activity icon</string>
 
-    <string name="vehicle_distance_travelled">Distanza percorsa</string>
-    <string name="initial_distance_travelled">0 metri</string>
+    <string name="description_empty_icon">Icon empty page</string>
 
-    <string name="account_text_view">Account</string>
-    <string name="description_icon_account">Account icon</string>
-    <string name="logout_text_view">Logout</string>
-    <string name="description_icon_logout">Logout icon</string>
-    <string name="dangerous_text_view">Zona pericolosa</string>
-    <string name="description_icon_dangerous">Dangerous icon</string>
-    <string name="dangerous_dialog_title">Attenzione</string>
-    <string name="dangerous_dialog_message">Se cliccherai su ELIMINA perderai il tuo account e tutti i dati associati.</string>
-    <string name="dangerous_positive_button">Elimina</string>
-    <string name="dangerous_negative_button">Annulla</string>
-
-    <string name="username_account_dialog">Username:</string>
-    <string name="password_account_dialog">Password:</string>
-    <string name="locality_marker_dialog">Località:</string>
-    <string name="longitude_marker_dialog">Longitudine:</string>
-    <string name="latitude_marker_dialog">Latitudine:</string>
-    <string name="exit_dialog_button">ESCI</string>
-    <string name="add_friend_dialog_button">AGGIUNGI</string>
-    <string name="delete_marker_button">ELIMINA</string>
-
-    <string name="distance_label">Distanza:</string>
-    <string name="insert_username_text">Inserisci lo username:</string>
-    <string name="insert_password_text">Inserisci la password:</string>
-    <string name="daily_static_text">Durata delle attività statiche di oggi</string>
-    <string name="weekly_static_text">Durata della attività statiche nella settimana</string>
-    <string name="daily_static_counter_home_text">0/24 ore</string>
-    <string name="weekly_static_counter_home_text">0/168 ore</string>
-    <string name="static_count_text">Il tempo speso:</string>
-    <string name="static_count_initial_value">0</string>
-    <string name="daily_kilometers_text">Chilometri accumulati oggi</string>
-    <string name="weekly_kilometers_text">Chilometri accumulati nella settimana</string>
-    <string name="daily_kilometers_counter_home_text">0/100 km</string>
-    <string name="weekly_kilometers_counter_home_text">0/700 km</string>
-    <string name="kilometers_count_text">Chilometri fatti:</string>
-    <string name="kilometers_count_initial_value">0</string>
-    <string name="daily_step_text">Passi effettuati oggi</string>
-    <string name="weekly_step_text">Passi effettuati nella settimana</string>
-    <string name="daily_step_counter_home_text">0/10000 passi</string>
-    <string name="weekly_step_counter_home_text">0/70000 passi</string>
-    <string name="step_count_text">Passi fatti:</string>
-    <string name="step_count_initial_value">0</string>
-    <string name="walk_title">CAMMINATA</string>
-    <string name="vehicle_title">VIAGGIO IN MACCHINA</string>
-    <string name="still_title">ATTIVITÀ SEDENTARIA</string>
-
-    <string name="description_icon_add">Icona add per aggiungere area di geofence</string>
-    <string name="edit_text_map_fragment">Cerca una nuova area</string>
-    <string name="settings_icon_description">Icona del bottone per accedere ai settings</string>
-    <string name="new_activity_icon_description">Icona per registrare una nuova attività</string>
-    <string name="new_user_activity_text">Scegli il tipo di attività da registrare:</string>
-
-    <string name="search_friends_icon">Icona per cercare utenti sulla piattaforma</string>
-    <string name="friends_synchronized_icon_description">Icona per sincronizzare i dati</string>
-    <string name="title_friends">I tuoi amici</string>
-    <string name="title_suggestion">Suggerimenti</string>
-    <string name="search_user_text">Cerca un utente</string>
-    <string name="button_view">Mostra</string>
-    <string name="button_follow">Segui</string>
-    <string name="search_user_button">Cerca</string>
-    <string name="friend_data_text_view">Attività dell\'utente</string>
-    <string name="height_difference_text">Dislivello:</string>
-    <string name="select_from_memo">SELECT * FROM Memo</string>
-
-    <string-array name="spinner_items">
-        <item>Giorno</item>
-        <item>Settimana</item>
-    </string-array>
-
-    <string-array name="spinner_bar_chart_items">
-        <item>Vehicle</item>
-        <item>Walk</item>
-    </string-array>
-
-    <string-array name="spinner_activity">
-        <item>Still</item>
-        <item>Vehicle</item>
-        <item>Walk</item>
-        <item>All</item>
-    </string-array>
-
-    <string-array name="spinner_pie_chart_items">
-        <item>Day</item>
-        <item>Week</item>
-        <item>Month</item>
-    </string-array>
+    <string name="description_toast_icon">Warning icon</string>
 </resources>

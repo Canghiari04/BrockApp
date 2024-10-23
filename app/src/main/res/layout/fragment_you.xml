@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/you_tab_layout"
+        android:id="@+id/tab_layout_you_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabTextColor="@color/white"
@@ -17,10 +17,10 @@
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/you_view_pager"
+        android:id="@+id/view_pager_you_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/you_tab_layout">
+        app:layout_constraintTop_toBottomOf="@id/tab_layout_you_fragment">
     </androidx.viewpager2.widget.ViewPager2>
 </androidx.constraintlayout.widget.ConstraintLayout>
