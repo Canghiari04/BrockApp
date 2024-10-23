@@ -1,5 +1,7 @@
 package com.example.brockapp.singleton
 
+import com.example.brockapp.BuildConfig
+
 import android.content.Context
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
@@ -23,7 +25,7 @@ class MyS3ClientProvider private constructor() {
         private fun createS3Client(context: Context): AmazonS3Client {
             val credentialsProvider = CognitoCachingCredentialsProvider(
                 context,
-                "eu-north-1:cf6fc8c3-1985-47fe-9dfa-3c972c4d64c4",
+                BuildConfig.IDENTITY_POOL_ID,
                 Regions.EU_NORTH_1
             )
 

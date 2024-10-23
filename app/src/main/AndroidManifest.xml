@@ -7,12 +7,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
     <application
         android:name=".MyApplication"
@@ -26,15 +27,18 @@
         android:theme="@style/Theme.BrockApp"
         tools:targetApi="31">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
         <activity
             android:name=".activity.AuthenticatorActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action
-                    android:name="android.intent.action.MAIN" />
-                <category
-                    android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -45,10 +49,47 @@
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
+            android:name=".activity.AccountActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        </activity>
+        <activity
             android:name=".activity.SettingsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        </activity>
+        <activity
+            android:name=".activity.NewUserActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        </activity>
+        <activity
+            android:name=".activity.chronometer.VehicleActivity"
+            android:exported="false"
+            android:parentActivityName=".activity.NewUserActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activity.chronometer.RunActivity"
+            android:exported="false"
+            android:parentActivityName=".activity.NewUserActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activity.chronometer.StillActivity"
+            android:exported="false"
+            android:parentActivityName=".activity.NewUserActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activity.chronometer.WalkActivity"
+            android:exported="false"
+            android:parentActivityName=".activity.NewUserActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activity.DailyMemoActivity"
@@ -63,34 +104,10 @@
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
-            android:name=".activity.NewUserActivity"
+            android:name=".activity.UserActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        </activity>
-        <activity
-            android:name=".activity.StillActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".activity.NewUserActivity">
-        </activity>
-        <activity
-            android:name=".activity.VehicleActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".activity.NewUserActivity">
-        </activity>
-        <activity
-            android:name=".activity.WalkActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".activity.NewUserActivity">
-        </activity>
-        <activity
-            android:name=".activity.FriendActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".activity.NewUserActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
 
@@ -104,7 +121,6 @@
                     tools:ignore="BatteryLife" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.GeofenceReceiver"
             android:enabled="true"
@@ -123,16 +139,22 @@
         </service>
         <service
             android:name=".service.ActivityRecognitionService"
+            android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="false">
         </service>
         <service
-            android:name=".service.VehicleService"
+            android:name=".service.DistanceService"
             android:enabled="true"
             android:exported="false">
         </service>
         <service
-            android:name=".service.WalkService"
+            android:name=".service.StepCounterService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".service.HeightDifferenceService"
             android:enabled="true"
             android:exported="false">
         </service>
@@ -146,9 +168,5 @@
             android:enabled="true"
             android:exported="false">
         </service>
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAnPk3xVtkNq2nbIgwi3VLp1HkvpoPW4ig" />
     </application>
 </manifest>
