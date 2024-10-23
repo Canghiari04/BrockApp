@@ -9,7 +9,7 @@ interface GeofenceTransitionDao {
     @Query("SELECT id FROM GeofenceTransition ORDER BY id DESC LIMIT 1")
     suspend fun getLastInsertedId(): Long?
 
-    @Query("SELECT * FROM GeofenceTransition WHERE user_id=:userId AND exit_time!=0")
+    @Query("SELECT * FROM GeofenceTransition WHERE user_id=:userId AND exit_time>arrival_time")
     suspend fun getAllGeofenceTransitionByUserId(userId: Long): List<GeofenceTransitionEntity>
 
     @Insert()

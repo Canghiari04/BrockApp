@@ -19,5 +19,5 @@ interface UserWalkActivityDao {
     suspend fun insertWalkActivity(userWalkActivity: UserWalkActivityEntity)
 
     @Query("UPDATE UserWalkActivity SET exit_time=:exitTime, step_number=:stepsNumber, height_difference=:heightDifference WHERE id=:id")
-    suspend fun updateLastRecord(id: Long, exitTime: Long, stepsNumber: Long, heightDifference: Float)
+    suspend fun updateLastRecord(id: Long, exitTime: Long, stepsNumber: Long?, heightDifference: Float?)
 }
