@@ -33,7 +33,7 @@ class SyncDataWorker(private val context: Context, workerParams: WorkerParameter
         file = File(context.filesDir, "user_data.json")
         s3Client = MyS3ClientProvider.getInstance(context)
 
-        // syncData()
+        syncData()
 
         return Result.success()
     }
@@ -53,21 +53,25 @@ class SyncDataWorker(private val context: Context, workerParams: WorkerParameter
 
     private fun syncData() {
         CoroutineScope(Dispatchers.IO).launch {
-            val geofence = db
-                .GeofenceTransitionDao()
-                .getAllGeofenceTransitionByUserId(MyUser.id)
+            val vehicleActivities = db
+                .UserVehicleActivityDao()
+                .getVehicleActivitiesByUserId(MyUser.id)
+
+            val runActivities = db
+                .UserRunActivityDao()
+                .getRunActivitiesByUserId(MyUser.id)
+
+            val stillActivities = db
+                .UserStillActivityDao()
+                .getStillActivitiesByUserId(MyUser.id)
 
             val walkActivities = db
                 .UserWalkActivityDao()
                 .getWalkActivitiesByUserId(MyUser.id)
 
-            val vehicleActivities = db
-                .UserVehicleActivityDao()
-                .getVehicleActivitiesByUserId(MyUser.id)
-
-            val stillActivities = db
-                .UserStillActivityDao()
-                .getStillActivitiesByUserId(MyUser.id)
+            val geofence = db
+                .GeofenceTransitionDao()
+                .getAllGeofenceTransitionByUserId(MyUser.id)
 
             val userData = mapOf(
                 "username" to MyUser.username,
@@ -75,6 +79,7 @@ class SyncDataWorker(private val context: Context, workerParams: WorkerParameter
                 "country" to MyUser.country,
                 "city" to MyUser.city,
                 "vehicleActivities" to vehicleActivities,
+                "runActivities" to runActivities,
                 "stillActivities" to stillActivities,
                 "walkActivities" to walkActivities,
                 "geofenceTransitions" to geofence
@@ -87,7 +92,7 @@ class SyncDataWorker(private val context: Context, workerParams: WorkerParameter
 
             try {
                 val request =
-                    PutObjectRequest(BUCKET_NAME, "user/${MyUser.username}.json", file)
+                    PutObjectRequest(BuildConfig.BUCKET_NAME, "user/${MyUser.username}.json", file)
                 s3Client.putObject(request)
             } catch (e: Exception) {
                 Log.e("SYNC_DATA_SERVICE", "Failed to upload user data $e")
