@@ -20,6 +20,5 @@ data class UserVehicleActivityEntity (
     @ColumnInfo(name = "time_stamp") val timestamp: String,
     @ColumnInfo(name = "arrival_time") val arrivalTime: Long,
     @ColumnInfo(name = "exit_time") val exitTime: Long,
-    @ColumnInfo(name = "distance_travelled") val distanceTravelled: Double,
-    @ColumnInfo(name = "height_difference") val heightDifference: Float
+    @ColumnInfo(name = "distance_travelled") val distanceTravelled: Double
 )

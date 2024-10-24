@@ -422,7 +422,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
 
             if (timeStamp.isAfter(start) && timeStamp.isBefore(end)) {
-                steps += it.stepNumber.toInt()
+                steps += it.stepsNumber.toInt()
             }
         }
 
@@ -538,7 +538,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         }
 
         val stepsPerDay = groupedItems.mapValues { it ->
-            (it.value.sumOf { it.stepNumber }).toFloat()
+            (it.value.sumOf { it.stepsNumber }).toFloat()
         }
 
         val entries = ArrayList<Entry>()

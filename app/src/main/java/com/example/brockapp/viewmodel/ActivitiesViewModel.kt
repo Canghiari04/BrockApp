@@ -387,7 +387,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.id,
                 startOfPeriod,
                 endOfPeriod
-            ).parallelStream().mapToInt { it.stepNumber.toInt() }.sum()
+            ).parallelStream().mapToInt { it.stepsNumber.toInt() }.sum()
 
             _steps.postValue(steps)
         }
@@ -530,7 +530,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             }
 
             val stepsPerDay = groupedItems.mapValues { it ->
-                (it.value.sumOf { it.stepNumber }).toFloat()
+                (it.value.sumOf { it.stepsNumber }).toFloat()
             }
 
             val entries = ArrayList<Entry>()
