@@ -44,8 +44,7 @@ class VehicleActivity: ChronometerActivity() {
                 timestamp = getInstant(),
                 arrivalTime = System.currentTimeMillis(),
                 exitTime = 0L,
-                distanceTravelled = 0.0,
-                heightDifference = 0f
+                distanceTravelled = 0.0
             )
         )
     }

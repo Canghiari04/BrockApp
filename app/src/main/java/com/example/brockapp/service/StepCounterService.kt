@@ -18,7 +18,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 
 class StepCounterService: Service(), SensorEventListener, NotificationSender {
     private var initialStepCount = 0L
-    private var sessionStepCount = 0L
+    private var sessionStepsCount = 0L
     private var sensor: Sensor? = null
     private var binder = LocalBinder()
 
@@ -53,9 +53,9 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
             initialStepCount = event.values[0].toLong()
         }
 
-        sessionStepCount = event.values[0].toInt() - initialStepCount
+        sessionStepsCount = event.values[0].toInt() - initialStepCount
 
-        if (sessionStepCount > 20) {
+        if (sessionStepsCount > 20) {
             sendNotification(
                 "BrockApp - Keep walking",
                 "You're going great! Continue walking for few minutes and take a deep breathe"
@@ -86,7 +86,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
     }
 
     fun getSteps(): Long {
-        return sessionStepCount
+        return sessionStepsCount
     }
 
     private fun stopMonitoring() {

@@ -62,7 +62,7 @@ class WalkActivity: ChronometerActivity() {
                 timestamp = getInstant(),
                 arrivalTime = System.currentTimeMillis(),
                 exitTime = 0L,
-                stepNumber = 0L,
+                stepsNumber = 0L,
                 heightDifference = 0f
             )
         )
@@ -70,7 +70,7 @@ class WalkActivity: ChronometerActivity() {
 
     override fun updateActivity() {
         if (isStepCounterServiceBound && isHeightDifferenceServiceBound) {
-            val stepNumber = stepCounterService?.getSteps()
+            val stepsNumber = stepCounterService?.getSteps()
             unbindService(stepCounterServiceConnection)
 
             val heightDifference = heightDifferenceService?.getAltitude()
@@ -79,7 +79,7 @@ class WalkActivity: ChronometerActivity() {
             setKindOfSensors()
             viewModel.updateWalkActivity(
                 System.currentTimeMillis(),
-                stepNumber,
+                stepsNumber,
                 heightDifference
             )
         }
