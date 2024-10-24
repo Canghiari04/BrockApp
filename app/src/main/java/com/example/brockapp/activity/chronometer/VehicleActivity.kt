@@ -3,8 +3,8 @@ package com.example.brockapp.activity.chronometer
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.service.DistanceService
 import com.example.brockapp.activity.ChronometerActivity
+import com.example.brockapp.room.UserVehicleActivityEntity
 import com.example.brockapp.extraObject.MyServiceConnection
-import com.example.brockapp.database.UserVehicleActivityEntity
 
 import android.view.View
 import android.os.SystemClock

@@ -1,7 +1,7 @@
 package com.example.brockapp.adapter
 
 import com.example.brockapp.R
-import com.example.brockapp.database.MemoEntity
+import com.example.brockapp.room.MemoEntity
 
 import android.view.ViewGroup
 import android.view.LayoutInflater

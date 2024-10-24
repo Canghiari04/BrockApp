@@ -1,8 +1,8 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
+import com.example.brockapp.room.MemoEntity
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.database.MemoEntity
 
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData

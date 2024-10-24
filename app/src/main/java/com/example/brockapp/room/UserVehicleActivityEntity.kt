@@ -1,4 +1,4 @@
-package com.example.brockapp.database
+package com.example.brockapp.room
 
 import androidx.room.Entity
 import androidx.room.ColumnInfo
@@ -6,7 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "UserWalkActivity",
+    tableName = "UserVehicleActivity",
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
         parentColumns = arrayOf("id"),
@@ -14,12 +14,11 @@ import androidx.room.PrimaryKey
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class UserWalkActivityEntity (
+data class UserVehicleActivityEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "user_id") val userId: Long,
     @ColumnInfo(name = "time_stamp") val timestamp: String,
     @ColumnInfo(name = "arrival_time") val arrivalTime: Long,
     @ColumnInfo(name = "exit_time") val exitTime: Long,
-    @ColumnInfo(name = "steps_number") val stepsNumber: Long,
-    @ColumnInfo(name = "height_difference") val heightDifference: Float
+    @ColumnInfo(name = "distance_travelled") val distanceTravelled: Double
 )

@@ -1,4 +1,4 @@
-package com.example.brockapp.database
+package com.example.brockapp.room
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.ROOM_DATABASE_VERSION

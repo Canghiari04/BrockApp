@@ -1,10 +1,10 @@
 package com.example.brockapp.data
 
-import com.example.brockapp.database.UserWalkActivityEntity
-import com.example.brockapp.database.UserStillActivityEntity
-import com.example.brockapp.database.GeofenceTransitionEntity
-import com.example.brockapp.database.UserRunActivityEntity
-import com.example.brockapp.database.UserVehicleActivityEntity
+import com.example.brockapp.room.UserRunActivityEntity
+import com.example.brockapp.room.UserWalkActivityEntity
+import com.example.brockapp.room.UserStillActivityEntity
+import com.example.brockapp.room.GeofenceTransitionEntity
+import com.example.brockapp.room.UserVehicleActivityEntity
 
 data class Friend (
     val username: String,

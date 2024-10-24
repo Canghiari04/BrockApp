@@ -1,6 +1,6 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

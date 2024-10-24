@@ -1,4 +1,4 @@
-package com.example.brockapp.database
+package com.example.brockapp.room
 
 import androidx.room.Dao
 import androidx.room.Query

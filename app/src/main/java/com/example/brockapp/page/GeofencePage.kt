@@ -1,15 +1,15 @@
 package com.example.brockapp.page
 
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.data.TransitionAverage
 import com.example.brockapp.adapter.GeofenceAdapter
 import com.example.brockapp.viewmodel.GroupViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.room.GeofenceTransitionEntity
 import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GroupViewModelFactory
-import com.example.brockapp.database.GeofenceTransitionEntity
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.os.Bundle

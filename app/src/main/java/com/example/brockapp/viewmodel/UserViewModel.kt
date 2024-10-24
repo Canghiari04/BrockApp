@@ -1,9 +1,9 @@
 package com.example.brockapp.viewmodel
 
 import com.example.brockapp.*
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
+import com.example.brockapp.room.UserEntity
 import com.example.brockapp.data.CityResponse
-import com.example.brockapp.database.UserEntity
 import com.example.brockapp.retrofit.RetrofitClientInstance
 
 import java.io.File

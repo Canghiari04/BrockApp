@@ -1,14 +1,14 @@
 package com.example.brockapp.fragment
 
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.service.MapService
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.dialog.MarkerDialog
 import com.example.brockapp.singleton.MyGeofence
+import com.example.brockapp.room.GeofenceAreaEntity
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.database.GeofenceAreaEntity
 import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 

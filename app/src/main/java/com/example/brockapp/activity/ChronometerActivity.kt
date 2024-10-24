@@ -2,7 +2,7 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.viewmodel.ActivitiesViewModel
 import com.example.brockapp.worker.ActivityRecognitionWorker

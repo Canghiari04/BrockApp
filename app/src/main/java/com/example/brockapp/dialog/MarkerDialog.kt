@@ -1,7 +1,7 @@
 package com.example.brockapp.dialog
 
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.viewmodel.GeofenceViewModel
 
 import java.util.Locale
@@ -12,10 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.location.Address
 import android.location.Geocoder
-import kotlinx.coroutines.launch
 import android.view.LayoutInflater
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
 import androidx.fragment.app.DialogFragment
 import com.google.android.gms.maps.model.Marker
 

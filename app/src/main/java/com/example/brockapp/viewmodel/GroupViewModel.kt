@@ -3,10 +3,10 @@ package com.example.brockapp.viewmodel
 import com.example.brockapp.*
 import com.example.brockapp.data.User
 import com.example.brockapp.data.Friend
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
+import com.example.brockapp.room.FriendEntity
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.database.FriendEntity
-import com.example.brockapp.database.GeofenceTransitionEntity
+import com.example.brockapp.room.GeofenceTransitionEntity
 
 import android.util.Log
 import java.time.LocalDate

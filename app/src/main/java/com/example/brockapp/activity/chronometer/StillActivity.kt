@@ -2,7 +2,7 @@ package com.example.brockapp.activity.chronometer
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.activity.ChronometerActivity
-import com.example.brockapp.database.UserStillActivityEntity
+import com.example.brockapp.room.UserStillActivityEntity
 
 import android.view.View
 import android.os.SystemClock

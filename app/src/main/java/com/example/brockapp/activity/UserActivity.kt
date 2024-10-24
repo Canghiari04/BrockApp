@@ -1,7 +1,7 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.viewmodel.GroupViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.adapter.ViewPagerUserAdapter

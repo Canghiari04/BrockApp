@@ -1,9 +1,9 @@
 package com.example.brockapp.service
 
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.worker.GeofenceWorker
-import com.example.brockapp.database.GeofenceTransitionEntity
+import com.example.brockapp.room.GeofenceTransitionEntity
 
 import java.util.Locale
 import android.os.IBinder

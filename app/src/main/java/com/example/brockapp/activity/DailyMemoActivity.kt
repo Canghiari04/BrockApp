@@ -2,8 +2,8 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.database.BrockDB
-import com.example.brockapp.database.MemoEntity
+import com.example.brockapp.room.BrockDB
+import com.example.brockapp.room.MemoEntity
 import com.example.brockapp.viewmodel.MemoViewModel
 import com.example.brockapp.adapter.DailyMemoAdapter
 import com.example.brockapp.interfaces.ShowCustomToastImpl

@@ -2,8 +2,8 @@ package com.example.brockapp.singleton
 
 import com.example.brockapp.*
 import com.example.brockapp.data.Locality
+import com.example.brockapp.room.GeofenceAreaEntity
 import com.example.brockapp.receiver.GeofenceReceiver
-import com.example.brockapp.database.GeofenceAreaEntity
 
 import android.content.Intent
 import android.content.Context

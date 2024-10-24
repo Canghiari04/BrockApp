@@ -1,12 +1,12 @@
 package com.example.brockapp.viewmodel
 
 import com.example.brockapp.*
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.database.UserRunActivityEntity
-import com.example.brockapp.database.UserWalkActivityEntity
-import com.example.brockapp.database.UserStillActivityEntity
-import com.example.brockapp.database.UserVehicleActivityEntity
+import com.example.brockapp.room.UserRunActivityEntity
+import com.example.brockapp.room.UserWalkActivityEntity
+import com.example.brockapp.room.UserStillActivityEntity
+import com.example.brockapp.room.UserVehicleActivityEntity
 
 import java.time.LocalDate
 import kotlinx.coroutines.launch

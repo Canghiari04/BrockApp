@@ -2,8 +2,8 @@ package com.example.brockapp.activity.chronometer
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.service.DistanceService
+import com.example.brockapp.room.UserRunActivityEntity
 import com.example.brockapp.activity.ChronometerActivity
-import com.example.brockapp.database.UserRunActivityEntity
 import com.example.brockapp.service.HeightDifferenceService
 import com.example.brockapp.extraObject.MyServiceConnection
 

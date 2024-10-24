@@ -9,7 +9,7 @@ class RetrofitClientInstance {
     companion object {
         val api: GeoApiService by lazy {
             Retrofit.Builder()
-                .baseUrl(BuildConfig.BASE_URL)
+                .baseUrl(BuildConfig.GEO_DB_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(GeoApiService::class.java)

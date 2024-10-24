@@ -2,7 +2,7 @@ package com.example.brockapp.page
 
 import com.example.brockapp.R
 import com.example.brockapp.data.User
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.adapter.UserAdapter
 import com.example.brockapp.activity.UserActivity
 import com.example.brockapp.viewmodel.GroupViewModel

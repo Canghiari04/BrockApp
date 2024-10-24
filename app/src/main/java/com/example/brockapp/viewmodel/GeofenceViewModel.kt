@@ -1,9 +1,9 @@
 package com.example.brockapp.viewmodel
 
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.database.GeofenceAreaEntity
-import com.example.brockapp.database.GeofenceTransitionEntity
+import com.example.brockapp.room.GeofenceAreaEntity
+import com.example.brockapp.room.GeofenceTransitionEntity
 
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
