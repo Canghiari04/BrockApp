@@ -8,7 +8,6 @@ import com.example.brockapp.activity.UserActivity
 import com.example.brockapp.viewmodel.GroupViewModel
 import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
-import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.GroupViewModelFactory
 
 import android.os.Bundle
@@ -22,8 +21,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 
 abstract class UserListPage: Fragment(R.layout.page_user_list) {
-    private val toastUtil = ShowCustomToastImpl()
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var searchTextView: AutoCompleteTextView
@@ -58,7 +55,7 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         }
     }
 
-    // Able or disable the feature in base of the state of the network
+    // User can search subscribers or friends only when there is connection
     private fun observeNetwork() {
         viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { item ->
             if (item) loadUsers()
@@ -74,17 +71,8 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         viewModelGroup.suggestions.observe(viewLifecycleOwner) { items ->
             if (items.isNotEmpty()) {
                 populateRecyclerView(items.filterNotNull())
-            } else {
-                showToastUtil()
             }
         }
-    }
-
-    protected fun showToastUtil() {
-        toastUtil.showWarningToast(
-            "Username not found",
-            requireContext()
-        )
     }
 
     // Refactor the names

@@ -9,9 +9,7 @@ class FriendsPage: UserListPage() {
 
     override fun observeUsers() {
         viewModelGroup.friends.observe(viewLifecycleOwner) { items ->
-            if (items.isNullOrEmpty()) {
-                showToastUtil()
-            } else {
+            if (!items.isNullOrEmpty()) {
                 populateRecyclerView(items.filterNotNull())
             }
         }

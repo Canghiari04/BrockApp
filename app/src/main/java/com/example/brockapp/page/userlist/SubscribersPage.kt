@@ -9,9 +9,7 @@ class SubscribersPage: UserListPage() {
 
     override fun observeUsers() {
         viewModelGroup.subscribers.observe(viewLifecycleOwner) { items ->
-            if (items.isNullOrEmpty()) {
-                showToastUtil()
-            } else {
+            if (!items.isNullOrEmpty()) {
                 populateRecyclerView(items.filterNotNull())
             }
         }
