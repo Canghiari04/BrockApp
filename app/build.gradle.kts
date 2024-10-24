@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.fir.resolve.dfa.cfg.NormalPath.label
 import java.util.Properties
 
 plugins {
@@ -23,13 +24,19 @@ android {
         val properties = Properties()
         properties.load(fileProjectProperties.inputStream())
 
+        val baseUrl = properties.getProperty("BASE_URL") ?: ""
         val mapApiKey = properties.getProperty("MAPS_API_KEY") ?: ""
         val bucketName = properties.getProperty("BUCKET_NAME") ?: ""
         val geoApiKey = properties.getProperty("GEO_DB_API_KEY") ?: ""
         val identityPoolId = properties.getProperty("IDENTITY_POOL_ID") ?: ""
 
-        manifestPlaceholders["MAPS_API_KEY"] = mapApiKey
+        addManifestPlaceholders(
+            mapOf(
+                "MAPS_API_KEY" to mapApiKey
+            )
+        )
 
+        buildConfigField(type = "String", name = "BASE_URL", value = baseUrl)
         buildConfigField(type = "String", name = "BUCKET_NAME", value = bucketName)
         buildConfigField(type = "String", name = "GEO_DB_API_KEY", value = geoApiKey)
         buildConfigField(type = "String", name = "IDENTITY_POOL_ID", value = identityPoolId)
