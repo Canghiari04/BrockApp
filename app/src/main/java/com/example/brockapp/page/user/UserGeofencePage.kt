@@ -36,6 +36,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     private fun observeAddedFriend() {
         viewModelGroup.errorAddFriend.observe(this) {
             if (it) {
+                buttonUser.setText("REMOVE")
                 toastUtil.showBasicToast(
                     "${friend.username} is your new friend",
                     requireContext()
@@ -52,6 +53,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     private fun observeRemovedFriend() {
         viewModelGroup.errorDeleteFriend.observe(this) {
             if (it) {
+                buttonUser.setText("FOLLOW")
                 toastUtil.showBasicToast(
                     "${friend.username} has been removed",
                     requireContext()

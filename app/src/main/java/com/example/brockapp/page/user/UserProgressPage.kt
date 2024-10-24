@@ -44,6 +44,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
                     "${friend.username} is your new friend",
                     requireContext()
                 )
+                viewModelGroup.getCurrentFriends(MyUser.id)
             } else {
                 toastUtil.showWarningToast(
                     "Encountered error while adding",
@@ -60,6 +61,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
                     "${friend.username} has been removed",
                     requireContext()
                 )
+                viewModelGroup.getCurrentFriends(MyUser.id)
             } else {
                 toastUtil.showWarningToast(
                     "Encountered error while removing",
@@ -75,6 +77,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
                 buttonUser.setText("REMOVE")
                 buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
             } else {
+                buttonUser.setText("ADD")
                 buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
