@@ -44,54 +44,28 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         val factoryViewModelUser = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryViewModelUser)[UserViewModel::class.java]
 
-        val (id, savedUsername, savedPassword) = MySharedPreferences.getCredentialsSaved(requireContext())
-
-        // If the user is already sign in he can pass to the page loader activity
-        if (id != 0L && savedUsername != null && savedPassword != null) {
-            view.findViewById<View>(R.id.view_login).visibility = View.GONE
-
+        util = PostNotificationsPermissionUtil(requireActivity()) {
             observeUser()
+        }
 
-            viewModelUser.getUser(savedUsername, savedPassword)
-        } else {
-            util = PostNotificationsPermissionUtil(requireActivity()) {
-                observeUser()
-            }
+        observeLogin()
 
-            observeLogin()
+        view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
+            username = view.findViewById<EditText>(R.id.edit_text_username).text.toString()
+            password = view.findViewById<EditText>(R.id.edit_text_password).text.toString()
 
-            view.findViewById<Button>(R.id.button_login)?.setOnClickListener {
-                username = view.findViewById<EditText>(R.id.edit_text_username).text.toString()
-                password = view.findViewById<EditText>(R.id.edit_text_password).text.toString()
-
-                if (username.isNotEmpty() && password.isNotEmpty()) {
-                    viewModelUser.checkIfUserExistsLocally(username, password)
-                } else {
-                    toastUtil.showWarningToast(
-                        "You must insert the field required",
-                        requireContext()
-                    )
-                }
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                viewModelUser.checkIfUserExistsLocally(username, password)
+            } else {
+                toastUtil.showWarningToast(
+                    "You must insert the field required",
+                    requireContext()
+                )
             }
         }
 
         view.findViewById<TextView>(R.id.text_view_sign_in).setOnClickListener {
             (requireActivity() as AuthenticatorActivity).showSignInFragment()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun observeLogin() {
-        viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
-            if (auth) {
-                viewModelUser.getUser(username, password)
-                util.requestPostNotificationPermission()
-            } else {
-                toastUtil.showWarningToast(
-                    "Access credentials are wrong",
-                    requireContext()
-                )
-            }
         }
     }
 
@@ -110,7 +84,7 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
                 MySharedPreferences.setCredentialsSaved(requireContext())
                 goToHome()
             } else {
-                Log.e("LOGIN_FRAGMENT", "User not found.")
+                Log.e("LOGIN_FRAGMENT", "User not found")
             }
         }
     }
@@ -119,5 +93,20 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
         val intent = Intent(requireContext(), PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
         startActivity(intent)
         activity?.finish()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun observeLogin() {
+        viewModelUser.auth.observe(viewLifecycleOwner) { auth ->
+            if (auth) {
+                viewModelUser.getUser(username, password)
+                util.requestPostNotificationPermission()
+            } else {
+                toastUtil.showWarningToast(
+                    "Access credentials are wrong",
+                    requireContext()
+                )
+            }
+        }
     }
 }

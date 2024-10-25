@@ -60,8 +60,6 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         val spinnerCountry = view.findViewById<Spinner>(R.id.spinner_country)
         setUpSpinnerCountry(spinnerCountry)
 
-        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
-
         db = BrockDB.getInstance(requireContext())
         val file = File(context?.filesDir, "user_data.json")
         val s3Client = MyS3ClientProvider.getInstance(requireContext())
@@ -69,13 +67,15 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         val factoryUserViewModel = UserViewModelFactory(db, s3Client, file)
         viewModelUser = ViewModelProvider(this, factoryUserViewModel)[UserViewModel::class.java]
 
-        util = PostNotificationsPermissionUtil(requireActivity()) {
-            observeUser()
-        }
+        viewModelNetwork = ViewModelProvider(requireActivity())[NetworkViewModel::class.java]
 
         observeCities()
         observeNetwork()
         observeSignIn()
+
+        util = PostNotificationsPermissionUtil(requireActivity()) {
+            observeUser()
+        }
 
         view.findViewById<Button>(R.id.button_sign_in)?.setOnClickListener {
             username = view.findViewById<EditText>(R.id.edit_text_username).text.toString()
@@ -153,26 +153,6 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
         }
     }
 
-    private fun observeUser() {
-        viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
-            if (currentUser != null) {
-                MyUser.apply {
-                    id = currentUser.id
-                    username = currentUser.username
-                    password = currentUser.password
-                    typeActivity = currentUser.typeActivity
-                    country = currentUser.country
-                    city = currentUser.city
-                }
-
-                MySharedPreferences.setUpSharedPreferences(requireContext())
-                goToHome()
-            } else {
-                Log.e("SIGN_IN_FRAGMENT", "User not found")
-            }
-        }
-    }
-
     private fun observeCities() {
         viewModelUser.cities.observe(viewLifecycleOwner) { items ->
             if (items.isEmpty()) {
@@ -227,6 +207,26 @@ class SignInFragment: Fragment(R.layout.fragment_sign_in) {
                     "Credentials already present",
                     requireContext()
                 )
+            }
+        }
+    }
+
+    private fun observeUser() {
+        viewModelUser.currentUser.observe(viewLifecycleOwner) { currentUser ->
+            if (currentUser != null) {
+                MyUser.apply {
+                    id = currentUser.id
+                    username = currentUser.username
+                    password = currentUser.password
+                    typeActivity = currentUser.typeActivity
+                    country = currentUser.country
+                    city = currentUser.city
+                }
+
+                MySharedPreferences.setUpSharedPreferences(requireContext())
+                goToHome()
+            } else {
+                Log.e("SIGN_IN_FRAGMENT", "User not found")
             }
         }
     }
