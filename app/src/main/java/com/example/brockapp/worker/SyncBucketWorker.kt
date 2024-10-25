@@ -30,12 +30,12 @@ class SyncBucketWorker(private val context: Context, workerParams: WorkerParamet
         s3Client = MyS3ClientProvider.getInstance(context)
         file = File(context.filesDir, "user_data.json")
 
-        syncData()
+        syncBucket()
 
         return Result.success()
     }
 
-    private fun syncData() {
+    private fun syncBucket() {
         CoroutineScope(Dispatchers.IO).launch {
             val vehicleActivities = db
                 .UsersVehicleActivityDao()
