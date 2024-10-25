@@ -27,8 +27,8 @@ class SyncBucketWorker(private val context: Context, workerParams: WorkerParamet
     override fun doWork(): Result {
         util = NotificationUtil()
         db = BrockDB.getInstance(context)
-        file = File(context.filesDir, "user_data.json")
         s3Client = MyS3ClientProvider.getInstance(context)
+        file = File(context.filesDir, "user_data.json")
 
         syncData()
 
