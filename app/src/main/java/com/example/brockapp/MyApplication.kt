@@ -1,6 +1,6 @@
 package com.example.brockapp
 
-import com.example.brockapp.worker.SyncDataWorker
+import com.example.brockapp.worker.SyncBucketWorker
 import com.example.brockapp.extraObject.MySharedPreferences
 
 import android.app.Application
@@ -36,12 +36,12 @@ class MyApplication: Application() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = PeriodicWorkRequestBuilder<SyncDataWorker>(2, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<SyncBucketWorker>(2, TimeUnit.HOURS)
             .setConstraints(constraint)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "SyncDataWorker",
+            "SyncBucketWorker",
             ExistingPeriodicWorkPolicy.UPDATE,
             request
         )

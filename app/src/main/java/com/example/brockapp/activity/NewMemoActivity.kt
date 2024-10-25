@@ -102,7 +102,7 @@ class NewMemoActivity: AppCompatActivity() {
                 .format(Instant.now())
 
             if (typeActivity.isEmpty() && titleTextView.text.toString().isEmpty() && descriptionTextView.text.toString().isEmpty()) {
-                toastUtil.showBasicToast(
+                toastUtil.showWarningToast(
                     "You must inserted the field required",
                     this
                 )

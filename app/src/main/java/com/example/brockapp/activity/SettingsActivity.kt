@@ -2,7 +2,7 @@ package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.worker.SyncDataWorker
+import com.example.brockapp.worker.SyncBucketWorker
 import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.singleton.MyActivityRecognition
@@ -161,14 +161,14 @@ class SettingsActivity: AppCompatActivity() {
                     trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
 
                     MySharedPreferences.setService("DUMP_DATABASE", true, context)
-                    OneTimeWorkRequestBuilder<SyncDataWorker>().build().also {
+                    OneTimeWorkRequestBuilder<SyncBucketWorker>().build().also {
                         WorkManager.getInstance(context).enqueue(it)
                     }
                 } else {
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
 
                     MySharedPreferences.setService("DUMP_DATABASE", false, context)
-                    WorkManager.getInstance(context).cancelUniqueWork("SyncDataWorker")
+                    WorkManager.getInstance(context).cancelUniqueWork("SyncBucketWorker")
                 }
             }
         }
