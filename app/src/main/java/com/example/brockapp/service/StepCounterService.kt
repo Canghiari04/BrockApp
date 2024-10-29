@@ -63,9 +63,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        //
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
 
     override fun onDestroy() {
         super.onDestroy()

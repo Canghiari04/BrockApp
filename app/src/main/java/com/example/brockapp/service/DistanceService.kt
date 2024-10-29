@@ -1,7 +1,5 @@
 package com.example.brockapp.service
 
-import com.example.brockapp.*
-
 import android.Manifest
 import android.os.Binder
 import android.os.IBinder
@@ -60,10 +58,11 @@ class DistanceService: Service() {
     }
 
     private fun setUpLocationUpdates() {
-        locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            10000
-        ).setMinUpdateIntervalMillis(10000L).build()
+        locationRequest = LocationRequest
+            .Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                5000)
+            .build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {

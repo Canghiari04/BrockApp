@@ -1,10 +1,8 @@
 package com.example.brockapp.service
 
 import com.example.brockapp.interfaces.NotificationSender
-import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.worker.ActivityRecognitionWorker
 
-import kotlin.math.pow
 import android.os.Binder
 import android.os.IBinder
 import androidx.work.Data
@@ -69,9 +67,7 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
             }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        //
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
 
     override fun sendNotification(title: String, content: String) {
         val inputData = Data.Builder()

@@ -4,22 +4,21 @@ import androidx.room.Entity
 import androidx.room.ColumnInfo
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
-    tableName = "GeofenceTransition",
+    tableName = "GeofenceAreas",
     foreignKeys = [ForeignKey(
-        entity = UserEntity::class,
+        entity = UsersEntity::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("user_id"),
         onDelete = ForeignKey.CASCADE
     )]
-)
-data class GeofenceTransitionEntity (
+)data class GeofenceAreasEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    @ColumnInfo(name = "user_id") val userId: Long?,
-    @ColumnInfo(name = "name_location") val nameLocation: String,
-    val latitude: Double,
+    @ColumnInfo(name = "user_id") val userId: Long,
     val longitude: Double,
-    @ColumnInfo(name = "arrival_time") val arrivalTime: Long,
-    @ColumnInfo(name = "exit_time") val exitTime: Long
+    val latitude: Double,
+    val name: String
 )
