@@ -20,6 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My Application"
+rootProject.name = "BrockApp"
 include(":app")
- 
