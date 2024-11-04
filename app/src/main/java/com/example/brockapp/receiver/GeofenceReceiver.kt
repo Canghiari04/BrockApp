@@ -13,11 +13,11 @@ import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 
 class GeofenceReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if(intent.action == GEOFENCE_INTENT_TYPE) {
+        if (intent.action == GEOFENCE_INTENT_TYPE) {
             val event = GeofencingEvent.fromIntent(intent)
 
-            if(event != null) {
-                if(event.hasError()) {
+            if (event != null) {
+                if (event.hasError()) {
                     Log.e("GEOFENCE_RECEIVER", event.errorCode.toString())
                 } else {
                     val geofenceTransition = event.geofenceTransition
@@ -30,13 +30,12 @@ class GeofenceReceiver: BroadcastReceiver() {
                                 val arrivalTime = System.currentTimeMillis()
 
                                 context.startService(
-                                    Intent(context, GeofenceService::class.java)
-                                        .also {
-                                            it.action = GeofenceService.Actions.INSERT.toString()
-                                            it.putExtra("LATITUDE", geofenceLocation.latitude)
-                                            it.putExtra("LONGITUDE", geofenceLocation.longitude)
-                                            it.putExtra("ARRIVAL_TIME", arrivalTime)
-                                            it.putExtra("EXIT_TIME", 0L)
+                                    Intent(context, GeofenceService::class.java).also {
+                                        it.action = GeofenceService.Actions.INSERT.toString()
+                                        it.putExtra("LATITUDE", geofenceLocation.latitude)
+                                        it.putExtra("LONGITUDE", geofenceLocation.longitude)
+                                        it.putExtra("ARRIVAL_TIME", arrivalTime)
+                                        it.putExtra("EXIT_TIME", 0L)
                                     }
                                 )
                             }

@@ -2,27 +2,36 @@ package com.example.brockapp.service
 
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
+import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.worker.GeofenceWorker
-import com.example.brockapp.room.GeofenceTransitionEntity
+import com.example.brockapp.room.GeofenceTransitionsEntity
+import com.example.brockapp.interfaces.ReverseGeocodingImpl
 
-import java.util.Locale
+import android.Manifest
+import android.util.Log
 import android.os.IBinder
 import androidx.work.Data
 import android.app.Service
 import android.content.Intent
-import android.location.Geocoder
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import androidx.work.WorkManager
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
 import kotlinx.coroutines.CoroutineScope
 import androidx.work.OneTimeWorkRequestBuilder
+import com.google.android.gms.location.LocationServices
 
 class GeofenceService: Service() {
     private lateinit var db: BrockDB
+    private lateinit var geocodingUtil: ReverseGeocodingImpl
 
     override fun onCreate() {
         super.onCreate()
+
         db = BrockDB.getInstance(this)
+        geocodingUtil = ReverseGeocodingImpl(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -32,10 +41,17 @@ class GeofenceService: Service() {
                 val longitude = intent.getDoubleExtra("LONGITUDE", 0.0)
                 val arrivalTime = intent.getLongExtra("ARRIVAL_TIME", 0L)
 
-                val nameLocation = getLocationName(latitude, longitude)
+                CoroutineScope(Dispatchers.IO).launch {
+                    var featureName: String? = null
 
-                notify(nameLocation)
-                insert(nameLocation, latitude, longitude, arrivalTime)
+                    val job = async {
+                        featureName = geocodingUtil.getGeofenceName(latitude, longitude)
+                    }
+
+                    job.await()
+                    notify(featureName)
+                    insert(featureName, latitude, longitude, arrivalTime)
+                }
             }
 
             Actions.UPDATE.toString() -> {
@@ -43,7 +59,15 @@ class GeofenceService: Service() {
                 update(exitTime)
             }
 
-            Actions.STOP.toString() -> {
+            Actions.RESTART.toString() -> {
+                CoroutineScope(Dispatchers.IO).launch {
+                    restartMonitoring()
+                    stopSelf()
+                }
+            }
+
+            Actions.TERMINATE.toString() -> {
+                terminateMonitoring()
                 stopSelf()
             }
         }
@@ -56,61 +80,89 @@ class GeofenceService: Service() {
     }
 
     enum class Actions {
-        INSERT, UPDATE, STOP
+        INSERT, UPDATE, RESTART, TERMINATE
     }
 
-    private fun notify(item: String) {
-        val inputData = Data.Builder().putString("LOCATION_NAME", item).build()
+    private fun notify(item: String?) {
+        val inputData = Data.Builder().putString("LOCATION_NAME", item ?: "Unknown").build()
 
         OneTimeWorkRequestBuilder<GeofenceWorker>().setInputData(inputData).build().also {
             WorkManager.getInstance(this).enqueue(it)
         }
     }
 
-    private fun insert(nameLocation: String, latitude: Double, longitude: Double, arrivalTime: Long) {
-        val transition = GeofenceTransitionEntity(
-            userId = MyUser.id,
-            nameLocation = nameLocation,
-            latitude = latitude,
-            longitude = longitude,
-            arrivalTime = arrivalTime,
-            exitTime = 0L
-        )
-
+    private fun insert(nameLocation: String?, latitude: Double, longitude: Double, arrivalTime: Long) {
         CoroutineScope(Dispatchers.IO).launch {
-            db.GeofenceTransitionDao().insertGeofenceTransition(transition)
-        }
-    }
+            val transition = GeofenceTransitionsEntity(
+                username = MyUser.username,
+                nameLocation = nameLocation ?: " ",
+                longitude = longitude,
+                latitude = latitude,
+                arrivalTime = arrivalTime,
+                exitTime = 0L
+            )
 
-    private fun getLocationName(latitude: Double, longitude: Double): String {
-        val geocoder = Geocoder(this, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(latitude, longitude, 10)
-
-        if (!addresses.isNullOrEmpty()) {
-            var locationName = " "
-
-            for (address in addresses) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    // Check if the feature name found by the geocoder is already equal to the name inside the db
-                    if (db.GeofenceAreaDao().countGeofenceAreaName(address.featureName)) {
-                        locationName = address.featureName
-                        return@launch
-                    }
-                }
-
-                continue
+            val job = async {
+                db.GeofenceTransitionsDao().insertGeofenceTransition(transition)
             }
 
-            return locationName
+            job.await()
+            stopSelf()
         }
-
-        return " "
     }
 
     private fun update(exitTime: Long) {
         CoroutineScope(Dispatchers.IO).launch {
-            val lastId = db.GeofenceTransitionDao().getLastInsertedId()!!
-            db.GeofenceTransitionDao().updateExitTime(lastId, exitTime)
+            val job = async {
+                val lastId = db.GeofenceTransitionsDao().getLastInsertedId()
+                db.GeofenceTransitionsDao().updateExitTime(lastId, exitTime)
+            }
+
+            job.await()
+            stopSelf()
+        }
+    }
+
+    private suspend fun restartMonitoring() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            stopSelf()
+        }
+
+        MyGeofence.defineAreas(db.GeofenceAreasDao().getAllGeofenceAreasByUsername(MyUser.username))
+        MyGeofence.defineRadius(this)
+
+        val geofenceClient = LocationServices.getGeofencingClient(this)
+        val pendingIntent = MyGeofence.getPendingIntent(this)
+        val request = MyGeofence.getRequest()
+
+        geofenceClient.removeGeofences(pendingIntent).run {
+            addOnSuccessListener {
+                Log.d("GEOFENCE_SERVICE", "Geofence removed")
+            }
+        }
+
+        geofenceClient.addGeofences(request, pendingIntent).run {
+            addOnSuccessListener {
+                Log.d("GEOFENCE_SERVICE", "Geofence added")
+            }
+        }
+    }
+
+    private fun terminateMonitoring() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            stopSelf()
+        }
+
+        val geofenceClient = LocationServices.getGeofencingClient(this)
+        val pendingIntent = MyGeofence.getPendingIntent(this)
+
+        geofenceClient.removeGeofences(pendingIntent).run {
+            addOnSuccessListener {
+                Log.d("CONNECTIVITY_SERVICE", "Geofence removed")
+            }
+            addOnFailureListener {
+                Log.e("CONNECTIVITY_SERVICE", "Geofence not removed")
+            }
         }
     }
 }
