@@ -4,12 +4,16 @@ import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
+import com.example.brockapp.extraObject.MyNetwork
+import com.example.brockapp.service.SupabaseService
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.GroupViewModel
+import com.example.brockapp.viewmodel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.receiver.ConnectivityReceiver
 import com.example.brockapp.viewmodel.UserViewModelFactory
-import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.viewmodel.GroupViewModelFactory
+import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.util.AccountActivityPermissionUtil
 
 import java.io.File
@@ -19,19 +23,29 @@ import android.view.MenuItem
 import android.content.Intent
 import android.widget.TextView
 import android.widget.ImageView
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.content.BroadcastReceiver
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
+import com.example.brockapp.interfaces.SchedulePeriodicWorkerImpl
 
 class AccountActivity: AppCompatActivity() {
+    private var networkUtil = InternetAvailableImpl()
+
     private lateinit var imageView: ImageView
     private lateinit var deleteTextView: TextView
     private lateinit var logoutTextView: TextView
+    private lateinit var receiver: BroadcastReceiver
     private lateinit var contentFirstColumn: TextView
-    private lateinit var userViewModel: UserViewModel
-    private lateinit var groupViewModel: GroupViewModel
+    private lateinit var viewModelUser: UserViewModel
+    private lateinit var viewModelGroup: GroupViewModel
+    private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var permissionUtil: AccountActivityPermissionUtil
+    private lateinit var scheduleWorkerUtil: SchedulePeriodicWorkerImpl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +65,9 @@ class AccountActivity: AppCompatActivity() {
         deleteTextView = findViewById(R.id.text_view_delete_account)
         logoutTextView = findViewById(R.id.text_view_logout_account)
 
+        checkConnectivity()
+        registerReceiver()
+
         setUpView()
 
         findViewById<TextView>(R.id.text_view_username_account).text =
@@ -62,6 +79,8 @@ class AccountActivity: AppCompatActivity() {
         findViewById<TextView>(R.id.text_view_danger_zone).text =
             ("You are entering a danger area. Please proceed with caution or exit immediately")
 
+        scheduleWorkerUtil = SchedulePeriodicWorkerImpl(this)
+
         // Inside there is the callback to start the new intent
         permissionUtil = AccountActivityPermissionUtil(this) { pickImage() }
 
@@ -69,16 +88,18 @@ class AccountActivity: AppCompatActivity() {
         val file = File(this.filesDir, "user_data.json")
         val s3Client = MyS3ClientProvider.getInstance(this)
 
-        val groupViewModelFactory = GroupViewModelFactory(s3Client, db)
-        groupViewModel = ViewModelProvider(this, groupViewModelFactory)[GroupViewModel::class.java]
+        val viewModelGroupFactory = GroupViewModelFactory(s3Client, db)
+        viewModelGroup = ViewModelProvider(this, viewModelGroupFactory)[GroupViewModel::class.java]
 
-        val userViewModelFactory = UserViewModelFactory(db, s3Client, file)
-        userViewModel = ViewModelProvider(this, userViewModelFactory)[UserViewModel::class.java]
+        val viewModelUserFactory = UserViewModelFactory(db, s3Client, file)
+        viewModelUser = ViewModelProvider(this, viewModelUserFactory)[UserViewModel::class.java]
 
-        observeAccountDeleted()
+        viewModelNetwork = ViewModelProvider(this)[NetworkViewModel::class.java]
+
+        observeNetwork()
         observeNumberOfFollower()
 
-        groupViewModel.getCurrentFriends(MyUser.id)
+        viewModelGroup.getCurrentFriends()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -110,6 +131,26 @@ class AccountActivity: AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+    }
+
+    private fun checkConnectivity() {
+        MyNetwork.isConnected = networkUtil.isInternetActive(this)
+    }
+
+    private fun registerReceiver() {
+        receiver = ConnectivityReceiver(this)
+
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
     private fun setUpView() {
         imageView.setOnClickListener {
             permissionUtil.requestReadStoragePermission()
@@ -120,8 +161,7 @@ class AccountActivity: AppCompatActivity() {
         }
 
         logoutTextView.setOnClickListener {
-            MySharedPreferences.logout(this)
-            goToAuthenticator()
+            sync(SupabaseService.Actions.SYNC.toString())
         }
     }
 
@@ -131,8 +171,7 @@ class AccountActivity: AppCompatActivity() {
             .setMessage(R.string.dangerous_dialog_message)
             .setPositiveButton(R.string.dangerous_positive_button) { dialog, _ ->
                 dialog.dismiss()
-                MySharedPreferences.deleteAll(this)
-                userViewModel.deleteUser(MyUser.username, MyUser.password)
+                sync(SupabaseService.Actions.DELETE.toString())
             }
             .setNegativeButton(R.string.dangerous_negative_button) { dialog, _ ->
                 dialog.dismiss()
@@ -141,9 +180,13 @@ class AccountActivity: AppCompatActivity() {
             .show()
     }
 
-    private fun goToAuthenticator() {
-        startActivity(Intent(this, AuthenticatorActivity::class.java))
-        finish()
+    private fun sync(action: String) {
+        scheduleWorkerUtil.deleteSyncPeriodic()
+
+        Intent(this, SupabaseService::class.java).also {
+            it.action = action
+            startService(it)
+        }
     }
 
     private fun defineSubscriberAddress(country: String?, city: String?): String {
@@ -168,14 +211,33 @@ class AccountActivity: AppCompatActivity() {
         )
     }
 
-    private fun observeAccountDeleted() {
-        userViewModel.currentUser.observe(this) {
-            goToAuthenticator()
+    private fun observeNetwork() {
+        viewModelNetwork.currentNetwork.observe(this) { item ->
+            logoutTextView.also {
+                it.isEnabled = item
+
+                if (item) {
+                    it.setBackgroundResource(R.drawable.border_red)
+                } else {
+                    it.setBackgroundResource(R.drawable.border_background_grey)
+                }
+            }
+
+
+            deleteTextView.also {
+                it.isEnabled = item
+
+                if (item) {
+                    it.setBackgroundResource(R.drawable.border_red)
+                } else {
+                    it.setBackgroundResource(R.drawable.border_background_grey)
+                }
+            }
         }
     }
 
     private fun observeNumberOfFollower() {
-        groupViewModel.currentFriends.observe(this) {
+        viewModelGroup.currentFriends.observe(this) {
             if (it.isNotEmpty()) {
                 contentFirstColumn.text = it.size.toString()
             } else {
