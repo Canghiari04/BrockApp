@@ -1,37 +1,45 @@
 package com.example.brockapp.activity
 
 import com.example.brockapp.R
+import com.example.brockapp.room.BrockDB
+import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.worker.SyncBucketWorker
 import com.example.brockapp.service.GeofenceService
+import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.singleton.MyActivityRecognition
 import com.example.brockapp.service.ActivityRecognitionService
+import com.example.brockapp.interfaces.SchedulePeriodicWorkerImpl
 import com.example.brockapp.util.ActivityRecognitionPermissionUtil
 import com.example.brockapp.util.GeofenceTransitionPermissionsUtil
 
-import android.util.Log
+import java.io.File
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.content.Intent
 import android.widget.TextView
-import androidx.work.WorkManager
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
+import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.widget.SwitchCompat
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.LocationServices
 
 class SettingsActivity: AppCompatActivity() {
     private var switchMapper = mapOf<SwitchCompat, Pair<String, Int>>()
 
+    private lateinit var viewModel: UserViewModel
     private lateinit var switchDumpDatabase: SwitchCompat
     private lateinit var switchGeofenceTransition: SwitchCompat
     private lateinit var switchActivityRecognition: SwitchCompat
+    private lateinit var scheduleWorkerUtil: SchedulePeriodicWorkerImpl
     private lateinit var geofenceUtil: GeofenceTransitionPermissionsUtil
     private lateinit var recognitionUtil: ActivityRecognitionPermissionUtil
 
@@ -43,6 +51,8 @@ class SettingsActivity: AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
+
+        scheduleWorkerUtil = SchedulePeriodicWorkerImpl(this)
 
         findViewById<TextView>(R.id.text_view_description_dump_database).text =
             "Sharing your data allows the app to provide a personalized experience!"
@@ -61,8 +71,17 @@ class SettingsActivity: AppCompatActivity() {
             findViewById<SwitchCompat>(R.id.switch_walk_activity) to Pair("WALK_ACTIVITY", DetectedActivity.WALKING)
         )
 
+        val db = BrockDB.getInstance(this)
+        val file = File(this.filesDir, "user_data.json")
+        val s3Client = MyS3ClientProvider.getInstance(this)
+
+        val factoryViewModel = UserViewModelFactory(db, s3Client, file)
+        viewModel = ViewModelProvider(this, factoryViewModel)[UserViewModel::class.java]
+
         setUpSwitchActivities()
         setUpSwitchDumpDatabase()
+
+        observeRecordingOnS3()
 
         // Creating the launcher for the permissions required by the app
         geofenceUtil = GeofenceTransitionPermissionsUtil(
@@ -133,11 +152,23 @@ class SettingsActivity: AppCompatActivity() {
                             key
                         )
 
-                        MyActivityRecognition.setStatus(false)
+                        Intent(context, ActivityRecognitionService::class.java).also {
+                            it.action = ActivityRecognitionService.Actions.RESTART.toString()
+
+                            if (MyActivityRecognition.getStatus()) {
+                                startService(it)
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun SwitchCompat.colorStateList() = if (isChecked) {
+        ContextCompat.getColorStateList(context, R.color.uni_red)
+    } else {
+        ContextCompat.getColorStateList(context, R.color.grey)
     }
 
     private fun handleSwitchToggle(isChecked: Boolean, key: String, constant: Int, switch: SwitchCompat) {
@@ -158,25 +189,31 @@ class SettingsActivity: AppCompatActivity() {
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
+                    viewModel.registerUserToS3(MyUser.username)
                     trackTintList = ContextCompat.getColorStateList(context, R.color.uni_red)
 
                     MySharedPreferences.setService("DUMP_DATABASE", true, context)
-                    OneTimeWorkRequestBuilder<SyncBucketWorker>().build().also {
-                        WorkManager.getInstance(context).enqueue(it)
-                    }
                 } else {
+                    scheduleWorkerUtil.deleteSyncPeriodic()
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
 
                     MySharedPreferences.setService("DUMP_DATABASE", false, context)
-                    WorkManager.getInstance(context).cancelUniqueWork("SyncBucketWorker")
                 }
+            }
+        }
+    }
+
+    private fun observeRecordingOnS3() {
+        viewModel.recording.observe(this) {
+            if (it) {
+                scheduleWorkerUtil.scheduleSyncPeriodic()
             }
         }
     }
 
     private fun setUpSwitchGeofenceTransition() {
         switchGeofenceTransition.run {
-            isChecked = MySharedPreferences.checkService("GEOFENCE_TRANSITION", context)
+            isChecked = checkGeofenceService()
 
             trackTintList = colorStateList()
 
@@ -187,33 +224,29 @@ class SettingsActivity: AppCompatActivity() {
                 } else {
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
 
-                    MySharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
                     Intent(context, GeofenceService::class.java).also {
-                        it.action = GeofenceService.Actions.STOP.toString()
-                        startService(it)
-                    }
+                        it.action = GeofenceService.Actions.TERMINATE.toString()
 
-                    val geofenceClient = LocationServices.getGeofencingClient(context)
-                    val pendingIntent = MyGeofence.getPendingIntent(context)
-
-                    geofenceClient.removeGeofences(pendingIntent).run {
-                        addOnSuccessListener {
-                            Log.d("CONNECTIVITY_SERVICE", "Geofence removed")
-                        }
-                        addOnFailureListener {
-                            Log.e("CONNECTIVITY_SERVICE", "Geofence not removed")
+                        if (MyGeofence.getStatus()) {
+                            startService(it)
                         }
                     }
 
+                    MySharedPreferences.setService("GEOFENCE_TRANSITION", false, context)
                     MyGeofence.setStatus(false)
                 }
             }
         }
     }
 
+    private fun checkGeofenceService(): Boolean {
+        return MySharedPreferences.checkService("GEOFENCE_TRANSITION", this) &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun setUpSwitchActivityRecognition() {
         switchActivityRecognition.run {
-            isChecked = MySharedPreferences.checkService("ACTIVITY_RECOGNITION", context)
+            isChecked = checkActivityRecognitionService()
 
             trackTintList = colorStateList()
 
@@ -223,21 +256,23 @@ class SettingsActivity: AppCompatActivity() {
                 } else {
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)
 
-                    MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
                     Intent(context, ActivityRecognitionService::class.java).also {
-                        it.action = ActivityRecognitionService.Actions.STOP.toString()
-                        startService(it)
+                        it.action = ActivityRecognitionService.Actions.TERMINATE.toString()
+
+                        if (MyActivityRecognition.getStatus()) {
+                            startService(it)
+                        }
                     }
 
-                    MyActivityRecognition.removeTask(context)
+                    MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
+                    MyActivityRecognition.setStatus(false)
                 }
             }
         }
     }
 
-    private fun SwitchCompat.colorStateList() = if (isChecked) {
-        ContextCompat.getColorStateList(context, R.color.uni_red)
-    } else {
-        ContextCompat.getColorStateList(context, R.color.grey)
+    private fun checkActivityRecognitionService(): Boolean {
+        return MySharedPreferences.checkService("ACTIVITY_RECOGNITION", this) &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
     }
 }
