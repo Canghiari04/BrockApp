@@ -1,9 +1,9 @@
 package com.example.brockapp.activity
 
-import com.example.brockapp.R
 import com.example.brockapp.*
+import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
-import com.example.brockapp.room.MemoEntity
+import com.example.brockapp.room.MemosEntity
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.viewmodel.MemoViewModel
 import com.example.brockapp.interfaces.ShowCustomToastImpl
@@ -29,24 +29,35 @@ class NewMemoActivity: AppCompatActivity() {
     private val toastUtil = ShowCustomToastImpl()
 
     private lateinit var date: String
+    private lateinit var title: String
+    private lateinit var description: String
     private lateinit var typeActivity: String
+    private lateinit var titleTextView: EditText
     private lateinit var viewModel: MemoViewModel
+    private lateinit var descriptionTextView: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_memo)
 
-        date = intent.getStringExtra("CALENDAR_DATE").toString()
+        date = intent.getStringExtra("CALENDAR_DATE") ?: ""
+        title = intent.getStringExtra("TITLE_MEMO") ?: ""
+        description = intent.getStringExtra("DESCRIPTION_MEMO") ?: ""
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_memo_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
 
+        titleTextView = findViewById(R.id.edit_text_title)
+        descriptionTextView = findViewById(R.id.edit_text_description)
+        setUpEditText()
+
         val spinner = findViewById<Spinner>(R.id.spinner_activity_type)
         setUpSpinnerActivity(spinner)
 
+        val idMemo = intent.getLongExtra("ID_MEMO", 0L)
         val button = findViewById<Button>(R.id.button_add_memo)
-        setUpButtonAddMemo(button)
+        setUpButton(idMemo, button)
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = MemoViewModelFactory(db)
@@ -59,7 +70,6 @@ class NewMemoActivity: AppCompatActivity() {
                 val intent = Intent(this, DailyMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
                 startActivity(intent)
                 finish()
-
                 true
             }
 
@@ -67,6 +77,11 @@ class NewMemoActivity: AppCompatActivity() {
                 super.onOptionsItemSelected(item)
             }
         }
+    }
+
+    private fun setUpEditText() {
+        titleTextView.setText(title)
+        descriptionTextView.setText(description)
     }
 
     private fun setUpSpinnerActivity(spinner: Spinner) {
@@ -92,35 +107,65 @@ class NewMemoActivity: AppCompatActivity() {
         }
     }
 
-    private fun setUpButtonAddMemo(button: Button) {
-        button.setOnClickListener {
-            val titleTextView = findViewById<EditText>(R.id.edit_text_title)
-            val descriptionTextView = findViewById<EditText>(R.id.edit_text_description)
-            val timestamp = DateTimeFormatter
-                .ofPattern(ISO_DATE_FORMAT)
-                .withZone(ZoneOffset.UTC)
-                .format(Instant.now())
-
-            if (typeActivity.isEmpty() && titleTextView.text.toString().isEmpty() && descriptionTextView.text.toString().isEmpty()) {
-                toastUtil.showWarningToast(
-                    "You must inserted the field required",
-                    this
-                )
-            } else {
-                val memoEntity = MemoEntity(
-                    userId = MyUser.id,
-                    title = titleTextView.text.toString(),
-                    description = descriptionTextView.text.toString(),
-                    activityType = typeActivity,
-                    date = date,
-                    timestamp = timestamp
-                )
-
-                titleTextView.text.clear()
-                descriptionTextView.text.clear()
-
-                viewModel.insertMemo(memoEntity)
+    private fun setUpButton(id: Long, button: Button) {
+        if (id == 0L) {
+            button.also {
+                it.text = "ADD MEMO"
+                it.setOnClickListener {
+                    if (!titleTextView.text.isNullOrBlank() && !descriptionTextView.text.isNullOrBlank()) {
+                        insertMemo()
+                    } else {
+                        toastUtil.showWarningToast(
+                            "You must insert the field required",
+                            this
+                        )
+                    }
+                }
+            }
+        } else {
+            button.also {
+                it.text = "UPDATE MEMO"
+                it.setOnClickListener {
+                    if (!titleTextView.text.isNullOrBlank() && !descriptionTextView.text.isNullOrBlank()) {
+                        updateMemo(id)
+                    } else {
+                        toastUtil.showWarningToast(
+                            "You must inserted the field required",
+                            this
+                        )
+                    }
+                }
             }
         }
+    }
+
+    private fun insertMemo() {
+        val timestamp = DateTimeFormatter
+            .ofPattern(ISO_DATE_FORMAT)
+            .withZone(ZoneOffset.UTC)
+            .format(Instant.now())
+
+        val memoEntity = MemosEntity(
+            username = MyUser.username,
+            title = titleTextView.text.toString(),
+            description = descriptionTextView.text.toString(),
+            activityType = typeActivity,
+            date = date,
+            timestamp = timestamp
+        )
+
+        titleTextView.text.clear()
+        descriptionTextView.text.clear()
+
+        viewModel.insertMemo(memoEntity)
+    }
+
+    private fun updateMemo(id: Long) {
+        viewModel.updateMemo(
+            id,
+            titleTextView.text.toString(),
+            descriptionTextView.text.toString(),
+            typeActivity
+        )
     }
 }

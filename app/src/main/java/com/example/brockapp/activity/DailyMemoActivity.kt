@@ -3,7 +3,7 @@ package com.example.brockapp.activity
 import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
-import com.example.brockapp.room.MemoEntity
+import com.example.brockapp.room.MemosEntity
 import com.example.brockapp.viewmodel.MemoViewModel
 import com.example.brockapp.adapter.DailyMemoAdapter
 import com.example.brockapp.interfaces.ShowCustomToastImpl
@@ -36,13 +36,13 @@ class DailyMemoActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_daily_memo)
 
-        recyclerView = findViewById(R.id.recycler_view_memos)
-
-        date = intent.getStringExtra("CALENDAR_DATE")
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar_daily_memo_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
+
+        date = intent.getStringExtra("CALENDAR_DATE")
+
+        recyclerView = findViewById(R.id.recycler_view_memos)
 
         // Check if date is persistent to the current date
         button = findViewById(R.id.button_new_memo)
@@ -80,8 +80,8 @@ class DailyMemoActivity: AppCompatActivity() {
         super.onPause()
 
         if (::adapter.isInitialized) {
-            adapter.getMemosSelected().forEach { memo ->
-                viewModel.deleteMemo(memo)
+            adapter.getMemosSelected().forEach {
+                viewModel.deleteMemo(it)
             }
         } else {
             Log.d("DAILY_MEMO_ACTIVITY", "No one memo inside the list")
@@ -117,7 +117,7 @@ class DailyMemoActivity: AppCompatActivity() {
                     this
                 )
 
-                if(!checkCurrentDate(date)) {
+                if (!checkCurrentDate(date)) {
                     setContentView(R.layout.activity_empty_page)
 
                     val toolbar = findViewById<Toolbar>(R.id.toolbar_empty_activity)
@@ -128,8 +128,8 @@ class DailyMemoActivity: AppCompatActivity() {
         }
     }
 
-    private fun populateRecyclerView(list: List<MemoEntity>) {
-        adapter = DailyMemoAdapter(list)
+    private fun populateRecyclerView(list: List<MemosEntity>) {
+        adapter = DailyMemoAdapter(date, list, this)
         val layoutManager = LinearLayoutManager(this)
 
         recyclerView.adapter = adapter

@@ -1,14 +1,17 @@
 package com.example.brockapp.adapter
 
 import com.example.brockapp.R
-import com.example.brockapp.room.MemoEntity
+import com.example.brockapp.room.MemosEntity
+import com.example.brockapp.activity.NewMemoActivity
 
+import android.content.Intent
 import android.view.ViewGroup
+import android.content.Context
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 
-class DailyMemoAdapter(private val list: List<MemoEntity>): RecyclerView.Adapter<DailyMemoViewHolder>() {
-    private val selectedMemos = mutableListOf<MemoEntity>()
+class DailyMemoAdapter(private val date: String?, private val list: List<MemosEntity>, private val context: Context): RecyclerView.Adapter<DailyMemoViewHolder>() {
+    private val selectedMemos = mutableListOf<MemosEntity>()
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): DailyMemoViewHolder {
         val activityItem = LayoutInflater.from(parent.context).inflate(R.layout.cell_memo, parent, false)
@@ -31,9 +34,24 @@ class DailyMemoAdapter(private val list: List<MemoEntity>): RecyclerView.Adapter
                 selectedMemos.remove(memo)
             }
         }
+
+        holder.button.setOnClickListener {
+            val title = holder.titleTextView.text
+            val description = holder.descriptionTextView.text
+
+            Intent(context, NewMemoActivity::class.java).also {
+                it.putExtra("CALENDAR_DATE", date)
+
+                it.putExtra("ID_MEMO", memo.id)
+                it.putExtra("TITLE_MEMO", title)
+                it.putExtra("DESCRIPTION_MEMO", description)
+
+                context.startActivity(it)
+            }
+        }
     }
 
-    fun getMemosSelected(): List<MemoEntity> {
+    fun getMemosSelected(): List<MemosEntity> {
         return selectedMemos
     }
 }

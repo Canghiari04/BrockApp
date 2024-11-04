@@ -1,7 +1,7 @@
 package com.example.brockapp.viewmodel
 
 import com.example.brockapp.room.BrockDB
-import com.example.brockapp.room.MemoEntity
+import com.example.brockapp.room.MemosEntity
 import com.example.brockapp.extraObject.MyUser
 
 import kotlinx.coroutines.launch
@@ -12,25 +12,31 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 
 class MemoViewModel(private val db: BrockDB): ViewModel() {
-    private val _memos = MutableLiveData<List<MemoEntity>>()
-    val memos: LiveData<List<MemoEntity>> get() = _memos
+    private val _memos = MutableLiveData<List<MemosEntity>>()
+    val memos: LiveData<List<MemosEntity>> get() = _memos
 
     fun getMemos(date: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val memos = db.MemoDao().getMemoFromUsernameAndPeriod(MyUser.id, date)
+            val memos = db.MemosDao().getMemosByUsernameAndPeriod(MyUser.username, date)
             _memos.postValue(memos)
         }
     }
 
-    fun insertMemo(memo: MemoEntity) {
+    fun insertMemo(memo: MemosEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.MemoDao().insertMemo(memo)
+            db.MemosDao().insertMemo(memo)
         }
     }
 
-    fun deleteMemo(memo: MemoEntity) {
+    fun updateMemo(id: Long, title: String, description: String, activityType: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.MemoDao().deleteMemo(memo)
+            db.MemosDao().updateMemo(id, title, description, activityType)
+        }
+    }
+
+    fun deleteMemo(memo: MemosEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.MemosDao().deleteMemo(memo)
         }
     }
 }
