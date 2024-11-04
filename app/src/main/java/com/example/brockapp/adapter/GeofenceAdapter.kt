@@ -3,9 +3,9 @@ package com.example.brockapp.adapter
 import com.example.brockapp.R
 import com.example.brockapp.data.TransitionAverage
 
+import android.view.View
 import android.view.ViewGroup
 import android.view.LayoutInflater
-import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class GeofenceAdapter(private val areas: List<TransitionAverage>): RecyclerView.Adapter<GeofenceViewHolder>() {
@@ -19,9 +19,9 @@ class GeofenceAdapter(private val areas: List<TransitionAverage>): RecyclerView.
     }
 
     override fun onBindViewHolder(holder: GeofenceViewHolder, position: Int) {
-        holder.progressBar.visibility = View.VISIBLE
-
-        holder.initMapView()
-        holder.bindGeofence(areas[position])
+        holder.also {
+            it.bindGeofence(areas[position])
+            it.progressBar.visibility = View.VISIBLE
+        }
     }
 }
