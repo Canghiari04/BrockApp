@@ -1,4 +1,4 @@
-package com.example.brockapp.activity.authenticate
+package com.example.brockapp.activity
 
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
@@ -6,9 +6,9 @@ import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.extraObject.MyNetwork
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.viewmodel.NetworkViewModel
-import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.interfaces.ShowCustomToastImpl
+import com.example.brockapp.receiver.AuthenticatorReceiver
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.interfaces.InternetAvailableImpl
@@ -23,9 +23,13 @@ import android.widget.Button
 import android.content.Intent
 import android.widget.Spinner
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.content.IntentFilter
 import androidx.annotation.RequiresApi
+import android.net.ConnectivityManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
 
@@ -40,6 +44,7 @@ class SignInActivity: AppCompatActivity() {
     private lateinit var buttonSignIn: Button
     private lateinit var viewModelUser: UserViewModel
     private lateinit var country: Pair<String, String?>
+    private lateinit var receiver: AuthenticatorReceiver
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var permissionUtil: PostNotificationsPermissionUtil
 
@@ -60,6 +65,7 @@ class SignInActivity: AppCompatActivity() {
 
         viewModelNetwork = ViewModelProvider(this)[NetworkViewModel::class.java]
 
+        registerReceiver()
         checkConnectivity()
 
         observeNetwork()
@@ -77,7 +83,7 @@ class SignInActivity: AppCompatActivity() {
             username = findViewById<EditText>(R.id.edit_text_sign_in_username).text.toString()
             password = findViewById<EditText>(R.id.edit_text_sign_in_password).text.toString()
 
-            if(username.isNotEmpty() && password.isNotEmpty()) {
+            if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.registerUser(username, password, typeActivity, country.first, city)
             } else {
                 toastUtil.showWarningToast(
@@ -86,6 +92,29 @@ class SignInActivity: AppCompatActivity() {
                 )
             }
         }
+
+        findViewById<TextView>(R.id.text_view_login).setOnClickListener {
+            Intent(this, LoginActivity::class.java).also {
+                startActivity(it)
+                finish()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+    }
+
+    private fun registerReceiver() {
+        receiver = AuthenticatorReceiver(this)
+
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     private fun checkConnectivity() {
@@ -95,6 +124,14 @@ class SignInActivity: AppCompatActivity() {
     private fun observeNetwork() {
         viewModelNetwork.authNetwork.observe(this) {
             buttonSignIn.isEnabled = it
+
+            if (it) {
+                buttonSignIn.setTextColor(resources.getColor(R.color.white))
+                buttonSignIn.backgroundTintList = resources.getColorStateList(R.color.uni_red)
+            } else {
+                buttonSignIn.setTextColor(resources.getColor(R.color.black))
+                buttonSignIn.backgroundTintList = resources.getColorStateList(R.color.grey)
+            }
         }
     }
 
@@ -132,7 +169,6 @@ class SignInActivity: AppCompatActivity() {
         viewModelUser.user.observe(this) {
             if (it != null) {
                 MyUser.apply {
-                    id = it.id
                     username = it.username
                     password = it.password
                     typeActivity = it.typeActivity
@@ -140,7 +176,7 @@ class SignInActivity: AppCompatActivity() {
                     city = it.city
                 }
 
-                MySharedPreferences.setCredentialsSaved(this)
+                MySharedPreferences.setUpSharedPreferences(this)
                 goToHome()
             }
         }
@@ -148,6 +184,7 @@ class SignInActivity: AppCompatActivity() {
 
     private fun goToHome() {
         Intent(this, PageLoaderActivity::class.java).also {
+            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             it.putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
             startActivity(it)
             finish()

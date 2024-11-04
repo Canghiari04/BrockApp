@@ -2,8 +2,9 @@ package com.example.brockapp.viewmodel
 
 import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
-import com.example.brockapp.room.UserEntity
+import com.example.brockapp.room.UsersEntity
 import com.example.brockapp.data.CityResponse
+import com.example.brockapp.singleton.MySupabase
 import com.example.brockapp.retrofit.RetrofitClientInstance
 
 import java.io.File
@@ -20,19 +21,50 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
+import io.github.jan.supabase.postgrest.from
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 
 class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Client, private val file: File): ViewModel() {
-    private var _cities = MutableLiveData<List<String>>()
-    val cities: LiveData<List<String>> get() = _cities
+    private var _user = MutableLiveData<UsersEntity>()
+    val user: LiveData<UsersEntity> get() = _user
 
     private var _auth = MutableLiveData<Boolean>()
     val auth: LiveData<Boolean> get() = _auth
 
-    private var _currentUser = MutableLiveData<UserEntity?>()
-    val currentUser: LiveData<UserEntity?> get() = _currentUser
+    private var _cities = MutableLiveData<List<String>>()
+    val cities: LiveData<List<String>> get() = _cities
+
+    private var _recording = MutableLiveData<Boolean>()
+    val recording: LiveData<Boolean> get() = _recording
+
+    fun getUserFromRoom(username: String, password: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val user = db.UsersDao().getUserFromUsernameAndPassword(username, password)
+            _user.postValue(user)
+        }
+    }
+
+    fun getUserFromSupabase(username: String, password: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val user = MySupabase.getInstance().from("Users").select {
+                    filter {
+                        eq("username", username)
+                    }
+                    filter {
+                        eq("password", password)
+                    }
+                }.decodeSingle<UsersEntity>()
+
+                _user.postValue(user)
+                _auth.postValue(true)
+            } catch (e: Exception) {
+                _auth.postValue(false)
+            }
+        }
+    }
 
     fun getCitiesFromCountry(countryCode: String) {
         RetrofitClientInstance.api
@@ -51,57 +83,60 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
 
     fun registerUser(username: String, password: String, typeActivity: String, country: String, city: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val userAlreadyExistsOnS3 = checkIfUserExistsOnS3(username)
+            val userAlreadyExists = MySupabase.getInstance()
+                .from("Users")
+                .select {
+                    filter { eq("username", username)
+                    }
+                }.decodeSingleOrNull<UsersEntity>()
 
-            if (userAlreadyExistsOnS3) {
+            if (userAlreadyExists != null) {
                 _auth.postValue(false)
             } else {
-                db.UserDao().insertUser(
-                    UserEntity(
-                        username = username,
-                        password = password,
-                        typeActivity = typeActivity,
-                        country = country,
-                        city = city
-                    )
+                val user = UsersEntity(
+                    username = username,
+                    password = password,
+                    typeActivity = typeActivity,
+                    country = country,
+                    city = city
                 )
 
-                val jsonFile = createUserDataFile(username)
-                uploadUserToS3(username, jsonFile)
+                db.UsersDao().insertUser(user)
 
+                // val jsonFile = createUserDataFile(username)
+                // uploadUserToS3(username, jsonFile)
+
+                _user.postValue(user)
                 _auth.postValue(true)
             }
         }
     }
 
-    fun checkIfUserExistsLocally(username: String, password: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val userAlreadyExists = db.UserDao().checkIfUserIsPresent(username, password)
-            _auth.postValue(userAlreadyExists)
+    fun registerUserToS3(username: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            if (existUserOnS3(username)) {
+                _recording.postValue(true)
+            } else {
+                try {
+                    uploadUserToS3(
+                        username,
+                        createUserDataFile(username)
+                    )
+
+                    _recording.postValue(true)
+                } catch (e: Exception) {
+                    _recording.postValue(false)
+                }
+            }
         }
     }
 
-    fun getUser(username: String, password: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val user = db.UserDao().getUserFromUsernameAndPassword(username, password)
-            _currentUser.postValue(user)
-        }
-    }
-
-    fun deleteUser(username: String, password: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _currentUser.postValue(null)
-            db.UserDao().deleteUserByUsernameAndPassword(username, password)
-        }
-    }
-
-    private fun checkIfUserExistsOnS3(username: String): Boolean {
+    private fun existUserOnS3(username: String): Boolean {
         val userKey = "user/$username.json"
 
         return try {
             val request = GetObjectRequest(BuildConfig.BUCKET_NAME, userKey)
             s3Client.getObject(request)
-
             true
         } catch (e: Exception) {
             false
