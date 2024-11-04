@@ -23,7 +23,7 @@ class NotificationUtil {
 
     fun getGeofencePendingIntent(context: Context): PendingIntent {
         val intent = Intent(context, PageLoaderActivity::class.java).apply {
-            putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
+            putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_map)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 
