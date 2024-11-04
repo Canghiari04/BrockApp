@@ -1,6 +1,7 @@
 package com.example.brockapp.util
 
 import com.example.brockapp.R
+import com.example.brockapp.interfaces.PeriodRangeImpl
 
 import android.view.View
 import android.graphics.Color
@@ -26,27 +27,30 @@ import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 class ChartUtil {
-    inner class CustomChartMarkerView(private val context: Context, layoutResource: Int): MarkerView(context, layoutResource) {
+    private var rangeUtil = PeriodRangeImpl()
+
+    inner class CustomChartMarkerView(context: Context, layoutResource: Int): MarkerView(context, layoutResource) {
+        private val dates = rangeUtil.datesOfWeek
         private val labelTextView: TextView = findViewById(R.id.marker_value)
 
-        override fun refreshContent(e: Entry?, highlight: Highlight?) {
-            val label: String = when (e) {
+        override fun refreshContent(entry: Entry?, highlight: Highlight?) {
+            val label: String = when (entry) {
                 is BarEntry -> {
-                    String.format("Spent %.1fm at %.0fth", e.y, e.x)
+                    dates.getValue(entry.x.toInt())
                 }
 
                 is PieEntry -> {
-                    "Percentage of ${e.label} activities"
+                    "${entry.label} activities"
                 }
 
                 else -> {
-                    "Event not recognized"
+                    " "
                 }
             }
 
             labelTextView.text = label
 
-            super.refreshContent(e, highlight)
+            super.refreshContent(entry, highlight)
         }
 
         override fun getOffset(): MPPointF {
@@ -107,9 +111,7 @@ class ChartUtil {
                 }
             }
 
-            override fun onNothingSelected() {
-                //
-            }
+            override fun onNothingSelected() { }
         })
     }
 
