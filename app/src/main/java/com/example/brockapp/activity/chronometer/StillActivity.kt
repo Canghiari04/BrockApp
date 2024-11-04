@@ -2,16 +2,16 @@ package com.example.brockapp.activity.chronometer
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.activity.ChronometerActivity
-import com.example.brockapp.room.UserStillActivityEntity
+import com.example.brockapp.room.UsersStillActivityEntity
 
 import android.view.View
 import android.os.SystemClock
 
 class StillActivity: ChronometerActivity() {
-    override fun registerActivity() {
+    override fun insertActivity() {
         viewModel.insertStillActivity(
-            UserStillActivityEntity(
-                userId = MyUser.id,
+            UsersStillActivityEntity(
+                username = MyUser.username,
                 timestamp = getInstant(),
                 arrivalTime = System.currentTimeMillis(),
                 exitTime = 0L

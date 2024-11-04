@@ -2,7 +2,7 @@ package com.example.brockapp.activity.chronometer
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.service.DistanceService
-import com.example.brockapp.room.UserRunActivityEntity
+import com.example.brockapp.room.UsersRunActivityEntity
 import com.example.brockapp.activity.ChronometerActivity
 import com.example.brockapp.service.HeightDifferenceService
 import com.example.brockapp.extraObject.MyServiceConnection
@@ -45,7 +45,7 @@ class RunActivity: ChronometerActivity() {
         )
     }
 
-    override fun registerActivity() {
+    override fun insertActivity() {
         Intent(this, DistanceService::class.java).also {
             startService(it)
             bindService(it, distanceServiceConnection, Context.BIND_AUTO_CREATE)
@@ -57,8 +57,8 @@ class RunActivity: ChronometerActivity() {
         }
 
         viewModel.insertRunActivity(
-            UserRunActivityEntity(
-                userId = MyUser.id,
+            UsersRunActivityEntity(
+                username = MyUser.username,
                 timestamp = getInstant(),
                 arrivalTime = System.currentTimeMillis(),
                 exitTime = 0L,

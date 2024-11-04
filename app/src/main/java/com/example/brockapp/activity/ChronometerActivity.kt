@@ -120,7 +120,7 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
                 stopButton.isEnabled = true
                 startButton.isEnabled = false
 
-                registerActivity()
+                insertActivity()
             }
         }
 
@@ -139,7 +139,7 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         }
     }
 
-    protected abstract fun registerActivity()
+    protected abstract fun insertActivity()
 
     protected abstract fun updateActivity()
 

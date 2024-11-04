@@ -3,7 +3,7 @@ package com.example.brockapp.activity.chronometer
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.service.DistanceService
 import com.example.brockapp.activity.ChronometerActivity
-import com.example.brockapp.room.UserVehicleActivityEntity
+import com.example.brockapp.room.UsersVehicleActivityEntity
 import com.example.brockapp.extraObject.MyServiceConnection
 
 import android.view.View
@@ -32,15 +32,15 @@ class VehicleActivity: ChronometerActivity() {
         )
     }
 
-    override fun registerActivity() {
+    override fun insertActivity() {
         Intent(this, DistanceService::class.java).also {
             startService(it)
             bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
         }
 
         viewModel.insertVehicleActivity(
-            UserVehicleActivityEntity(
-                userId = MyUser.id,
+            UsersVehicleActivityEntity(
+                username = MyUser.username,
                 timestamp = getInstant(),
                 arrivalTime = System.currentTimeMillis(),
                 exitTime = 0L,
