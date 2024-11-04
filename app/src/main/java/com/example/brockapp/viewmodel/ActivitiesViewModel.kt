@@ -3,10 +3,10 @@ package com.example.brockapp.viewmodel
 import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.room.UserRunActivityEntity
-import com.example.brockapp.room.UserWalkActivityEntity
-import com.example.brockapp.room.UserStillActivityEntity
-import com.example.brockapp.room.UserVehicleActivityEntity
+import com.example.brockapp.room.UsersRunActivityEntity
+import com.example.brockapp.room.UsersWalkActivityEntity
+import com.example.brockapp.room.UsersStillActivityEntity
+import com.example.brockapp.room.UsersVehicleActivityEntity
 
 import java.time.LocalDate
 import kotlinx.coroutines.launch
@@ -73,16 +73,17 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val _pieChartEntries = MutableLiveData<List<PieEntry>>()
     val pieChartEntries: MutableLiveData<List<PieEntry>> get() = _pieChartEntries
 
-    fun insertVehicleActivity(item: UserVehicleActivityEntity) {
+    fun insertVehicleActivity(item: UsersVehicleActivityEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.UserVehicleActivityDao().insertVehicleActivity(item)
+            db.UsersVehicleActivityDao().insertVehicleActivity(item)
         }
     }
 
     fun updateVehicleActivity(exitTime: Long, distanceTravelled: Double?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val lastId = db.UserVehicleActivityDao().getLastInsertedId()!!
-            db.UserVehicleActivityDao().updateLastRecord(
+            val lastId = db.UsersVehicleActivityDao().getLastInsertedId()
+
+            db.UsersVehicleActivityDao().updateLastRecord(
                 lastId,
                 exitTime,
                 distanceTravelled ?: 0.0
@@ -92,8 +93,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getVehicleTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val activities = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val activities = db.UsersVehicleActivityDao().getVehicleActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             )
@@ -117,8 +118,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getKilometers(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val meters = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val meters = db.UsersVehicleActivityDao().getVehicleActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             ).parallelStream().mapToDouble { it.distanceTravelled }.sum()
@@ -132,8 +133,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val items = db.UsersVehicleActivityDao().getVehicleActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
@@ -153,27 +154,23 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
             }
 
-            val entries = ArrayList<BarEntry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = timePerDay[day]
-                if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(BarEntry(day.toFloat(), 0f))
-            }
+            val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
             _vehicleBarChartEntries.postValue(entries)
         }
     }
 
-    fun insertRunActivity(item: UserRunActivityEntity) {
+    fun insertRunActivity(item: UsersRunActivityEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.UserRunActivityDao().insertRunActivity(item)
+            db.UsersRunActivityDao().insertRunActivity(item)
         }
     }
 
     fun updateRunActivity(exitTime: Long, distanceRun: Double?, heightDifference: Float?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val lastId = db.UserRunActivityDao().getLastInsertedId()!!
-            db.UserRunActivityDao().updateLastRecord(
+            val lastId = db.UsersRunActivityDao().getLastInsertedId()
+
+            db.UsersRunActivityDao().updateLastRecord(
                 lastId,
                 exitTime,
                 distanceRun ?: 0.0,
@@ -184,8 +181,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getRunTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val activities = db.UserRunActivityDao().getRunActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val activities = db.UsersRunActivityDao().getRunActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             )
@@ -210,8 +207,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getKilometersRun(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val meters = db.UserRunActivityDao().getRunActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val meters = db.UsersRunActivityDao().getRunActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             ).parallelStream().mapToDouble { it.distanceDone }.sum()
@@ -225,13 +222,12 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserRunActivityDao().getRunActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val items = db.UsersRunActivityDao().getRunActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
 
-            // All the activities are grouped by the day
             val groupedItems = items.groupBy {
                 it.timestamp.let { timestamp ->
                     LocalDate.parse(
@@ -241,32 +237,27 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 }
             }
 
-            // Define the time for each week's day
             val timePerDay = groupedItems.mapValues { it ->
                 (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
             }
 
-            val entries = ArrayList<BarEntry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = timePerDay[day]
-                if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(BarEntry(day.toFloat(), 0f))
-            }
+            val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
             _runBarChartEntries.postValue(entries)
         }
     }
 
-    fun insertStillActivity(item: UserStillActivityEntity) {
+    fun insertStillActivity(item: UsersStillActivityEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.UserStillActivityDao().insertStillActivity(item)
+            db.UsersStillActivityDao().insertStillActivity(item)
         }
     }
 
     fun updateStillActivity(exitTime: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            val lastId = db.UserStillActivityDao().getLastInsertedId()!!
-            db.UserStillActivityDao().updateLastRecord(
+            val lastId = db.UsersStillActivityDao().getLastInsertedId()
+
+            db.UsersStillActivityDao().updateLastRecord(
                 lastId,
                 exitTime
             )
@@ -275,8 +266,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getStillTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val activities = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val activities = db.UsersStillActivityDao().getStillActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             )
@@ -304,47 +295,40 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserStillActivityDao().getStillActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val items = db.UsersStillActivityDao().getStillActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
 
             val groupedItems = items.groupBy {
-                it.timestamp.let { timestamp ->
-                    LocalDate.parse(
-                        timestamp,
-                        pattern
-                    ).dayOfMonth
-                }
+                LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                ).dayOfMonth
             }
 
             val timePerDay = groupedItems.mapValues { it ->
-                (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES).toFloat()
+                (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
             }
 
-            val entries = ArrayList<BarEntry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = timePerDay[day]
-
-                if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(BarEntry(day.toFloat(), 0f))
-            }
+            val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
             _stillBarChartEntries.postValue(entries)
         }
     }
 
-    fun insertWalkActivity(item: UserWalkActivityEntity) {
+    fun insertWalkActivity(item: UsersWalkActivityEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.UserWalkActivityDao().insertWalkActivity(item)
+            db.UsersWalkActivityDao().insertWalkActivity(item)
         }
     }
 
     fun updateWalkActivity(exitTime: Long, stepsNumber: Long?, heightDifference: Float?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val lastId = db.UserWalkActivityDao().getLastInsertedId()!!
-            db.UserWalkActivityDao().updateLastRecord(
+            val lastId = db.UsersWalkActivityDao().getLastInsertedId()
+
+            db.UsersWalkActivityDao().updateLastRecord(
                 lastId,
                 exitTime,
                 stepsNumber ?: 0L,
@@ -355,8 +339,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getWalkTime(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val activities = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val activities = db.UsersWalkActivityDao().getWalkActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             )
@@ -383,8 +367,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getSteps(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val steps = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val steps = db.UsersWalkActivityDao().getWalkActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfPeriod,
                 endOfPeriod
             ).parallelStream().mapToInt { it.stepsNumber.toInt() }.sum()
@@ -398,8 +382,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod(
-                MyUser.id,
+            val items = db.UsersWalkActivityDao().getWalkActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
@@ -417,13 +401,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES).toFloat()
             }
 
-            val entries = ArrayList<BarEntry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = timePerDay[day]
-
-                if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(BarEntry(day.toFloat(), 0f))
-            }
+            val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
             _walkBarChartEntries.postValue(entries)
         }
@@ -434,8 +412,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserVehicleActivityDao().getVehicleActivitiesByUserIdAndPeriod (
-                MyUser.id,
+            val items = db.UsersVehicleActivityDao().getVehicleActivitiesByUsernameAndPeriod (
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
@@ -453,17 +431,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.distanceTravelled } / TO_KM).toFloat()
             }
 
-            val entries = ArrayList<Entry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = distancePerDay[day]
-
-                if (item != null) {
-                    entries.add(Entry(day.toFloat(), item))
-                } else {
-                    entries.add(Entry(day.toFloat(), 0f))
-                }
-            }
+            val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
 
             _vehicleLineChartEntries.postValue(entries)
         }
@@ -474,8 +442,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserRunActivityDao().getRunActivitiesByUserIdAndPeriod (
-                MyUser.id,
+            val items = db.UsersRunActivityDao().getRunActivitiesByUsernameAndPeriod(
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
@@ -493,17 +461,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.distanceDone } / TO_KM).toFloat()
             }
 
-            val entries = ArrayList<Entry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = distancePerDay[day]
-
-                if (item != null) {
-                    entries.add(Entry(day.toFloat(), item))
-                } else {
-                    entries.add(Entry(day.toFloat(), 0f))
-                }
-            }
+            val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
 
             _runLineChartEntries.postValue(entries)
         }
@@ -514,8 +472,8 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
             val firstDay = LocalDate.parse(startOfWeek, pattern)
             val lastDay = LocalDate.parse(endOfWeek, pattern)
 
-            val items = db.UserWalkActivityDao().getWalkActivitiesByUserIdAndPeriod (
-                MyUser.id,
+            val items = db.UsersWalkActivityDao().getWalkActivitiesByUsernameAndPeriod (
+                MyUser.username,
                 startOfWeek,
                 endOfWeek
             )
@@ -533,17 +491,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.stepsNumber }).toFloat()
             }
 
-            val entries = ArrayList<Entry>()
-
-            for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-                val item = stepsPerDay[day]
-
-                if (item != null) {
-                    entries.add(Entry(day.toFloat(), item))
-                } else {
-                    entries.add(Entry(day.toFloat(), 0f))
-                }
-            }
+            val entries = defineLineChartEntries(firstDay, lastDay, stepsPerDay)
 
             _walkLineChartEntries.postValue(entries)
         }
@@ -551,20 +499,20 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getCountOfActivities(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val vehicleActivitiesCount = db.UserVehicleActivityDao()
-                .getVehicleActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+            val vehicleActivitiesCount = db.UsersVehicleActivityDao()
+                .getVehicleActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
                 .toMutableList()
 
-            val runActivitiesCount = db.UserRunActivityDao()
-                .getRunActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+            val runActivitiesCount = db.UsersRunActivityDao()
+                .getRunActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
                 .toMutableList()
 
-            val stillActivitiesCount = db.UserStillActivityDao()
-                .getStillActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+            val stillActivitiesCount = db.UsersStillActivityDao()
+                .getStillActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
                 .toMutableList()
 
-            val walkActivitiesCount = db.UserWalkActivityDao()
-                .getWalkActivitiesByUserIdAndPeriod(MyUser.id, startOfPeriod, endOfPeriod)
+            val walkActivitiesCount = db.UsersWalkActivityDao()
+                .getWalkActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
                 .toMutableList()
 
             val map = mutableMapOf(
@@ -592,5 +540,49 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
             _pieChartEntries.postValue(entries)
         }
+    }
+
+    private fun defineBarChartEntries(firstDay: LocalDate, lastDay: LocalDate, timePerDay: Map<Int, Float>):  List<BarEntry> {
+        val entries = ArrayList<BarEntry>()
+
+        var i = 0
+        var currentDay = firstDay
+        while (!currentDay.isAfter(lastDay)) {
+            val day = currentDay.dayOfMonth
+            val item = timePerDay[day]
+
+            currentDay = currentDay.plusDays(1)
+            i++
+
+            if (item != null) {
+                entries.add(BarEntry(i.toFloat(), item))
+            } else {
+                entries.add(BarEntry(i.toFloat(), 0f))
+            }
+        }
+
+        return entries
+    }
+
+    private fun defineLineChartEntries(firstDay: LocalDate, lastDay: LocalDate, items: Map<Int, Float>):  List<Entry> {
+        val entries = ArrayList<Entry>()
+
+        var i = 0
+        var currentDay = firstDay
+        while (!currentDay.isAfter(lastDay)) {
+            val day = currentDay.dayOfMonth
+            val item = items[day]
+
+            currentDay = currentDay.plusDays(1)
+            i++
+
+            if (item != null) {
+                entries.add(Entry(i.toFloat(), item))
+            } else {
+                entries.add(Entry(i.toFloat(), 0f))
+            }
+        }
+
+        return entries
     }
 }

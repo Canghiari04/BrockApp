@@ -5,16 +5,22 @@ import androidx.room.Query
 import androidx.room.Insert
 
 @Dao
-interface GeofenceTransitionDao {
-    @Query("SELECT id FROM GeofenceTransition ORDER BY id DESC LIMIT 1")
+interface GeofenceTransitionsDao {
+    @Query("SELECT id FROM GeofenceTransitions ORDER BY id DESC LIMIT 1")
     suspend fun getLastInsertedId(): Long
 
-    @Query("SELECT * FROM GeofenceTransition WHERE user_id=:userId AND exit_time>arrival_time")
-    suspend fun getAllGeofenceTransitionByUserId(userId: Long): List<GeofenceTransitionEntity>
+    @Query("SELECT * FROM GeofenceTransitions ORDER BY id DESC LIMIT 1")
+    suspend fun getLastTransition(): GeofenceTransitionsEntity
 
-    @Insert()
-    suspend fun insertGeofenceTransition(transition: GeofenceTransitionEntity)
+    @Query("SELECT * FROM GeofenceTransitions WHERE username=:username AND exit_time>arrival_time")
+    suspend fun getAllGeofenceTransitionsByUsername(username: String): List<GeofenceTransitionsEntity>
 
-    @Query("UPDATE GeofenceTransition SET exit_time=:exitTime WHERE id=:id")
+    @Insert
+    suspend fun insertGeofenceTransition(transition: GeofenceTransitionsEntity)
+
+    @Insert
+    suspend fun insertGeofenceTransitions(transitions: List<GeofenceTransitionsEntity>)
+
+    @Query("UPDATE GeofenceTransitions SET exit_time=:exitTime WHERE id=:id")
     suspend fun updateExitTime(id: Long, exitTime: Long)
 }

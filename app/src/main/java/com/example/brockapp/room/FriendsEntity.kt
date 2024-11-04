@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Entity(
-    tableName = "GeofenceAreas",
+    tableName = "Friends",
     foreignKeys = [
         ForeignKey(
             entity = UsersEntity::class,
@@ -17,10 +17,8 @@ import kotlinx.serialization.Serializable
             onDelete = ForeignKey.CASCADE)
     ]
 )
-data class GeofenceAreasEntity (
+data class FriendsEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val username: String,
-    val longitude: Double,
-    val latitude: Double,
-    val name: String
+    @ColumnInfo(name = "username_friend") val usernameFriend: String
 )

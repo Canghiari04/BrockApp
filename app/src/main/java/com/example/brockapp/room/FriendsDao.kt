@@ -3,16 +3,21 @@ package com.example.brockapp.room
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 
 @Dao
-interface FriendDao {
-    @Query("SELECT username FROM Friend WHERE user_id = :userId")
-    suspend fun getFriendsByUserId(userId: Long): List<String>
+interface FriendsDao {
+    @Query("SELECT username_friend FROM Friends WHERE username=:username")
+    suspend fun getUsernamesFriendsByUsername(username: String): List<String>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Query("SELECT * FROM Friends WHERE username=:username")
+    suspend fun getFriendsByUsername(username: String): List<FriendsEntity>
+
+    @Insert
     suspend fun insertFriend(friend: FriendsEntity)
 
-    @Query("DELETE FROM Friend WHERE user_id=:userId AND username=:username")
-    suspend fun deleteFriend(userId: Long, username: String): Int
+    @Insert
+    suspend fun insertFriends(friends: List<FriendsEntity>)
+
+    @Query("DELETE FROM Friends WHERE username=:username AND username_friend=:usernameFriend")
+    suspend fun deleteFriend(username: String, usernameFriend: String): Int
 }

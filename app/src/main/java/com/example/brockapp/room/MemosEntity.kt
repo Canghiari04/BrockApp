@@ -9,16 +9,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(
     tableName = "Memos",
-    foreignKeys = [ForeignKey(
-        entity = UsersEntity::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("user_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
+    foreignKeys = [
+        ForeignKey(
+            entity = UsersEntity::class,
+            parentColumns = arrayOf("username"),
+            childColumns = arrayOf("username"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
-data class MemoEntity (
+data class MemosEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    @ColumnInfo(name = "user_id") val userId: Long,
+    val username: String,
     val title: String,
     val description: String,
     @ColumnInfo(name = "activity_type") val activityType: String,

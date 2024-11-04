@@ -4,19 +4,23 @@ import androidx.room.Entity
 import androidx.room.ColumnInfo
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
-    tableName = "UserVehicleActivity",
-    foreignKeys = [ForeignKey(
-        entity = UserEntity::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("user_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
+    tableName = "UsersVehicleActivity",
+    foreignKeys = [
+        ForeignKey(
+            entity = UsersEntity::class,
+            parentColumns = arrayOf("username"),
+            childColumns = arrayOf("username"),
+            onDelete = ForeignKey.CASCADE
+        ),
+    ]
 )
-data class UserVehicleActivityEntity (
+data class UsersVehicleActivityEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    @ColumnInfo(name = "user_id") val userId: Long,
+    val username: String,
     @ColumnInfo(name = "time_stamp") val timestamp: String,
     @ColumnInfo(name = "arrival_time") val arrivalTime: Long,
     @ColumnInfo(name = "exit_time") val exitTime: Long,

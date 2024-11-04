@@ -1,80 +1,49 @@
 package com.example.brockapp.room
 
-import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.ROOM_DATABASE_VERSION
+import com.example.brockapp.*
 
 import androidx.room.Room
 import androidx.room.Database
 import android.content.Context
-import kotlinx.coroutines.launch
 import androidx.room.RoomDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
-import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [UserEntity::class, UserVehicleActivityEntity::class, UserRunActivityEntity::class, UserStillActivityEntity::class, UserWalkActivityEntity::class, GeofenceAreaEntity::class, GeofenceTransitionEntity::class, FriendEntity::class, MemoEntity::class],
+    entities = [UsersEntity::class, UsersVehicleActivityEntity::class, UsersRunActivityEntity::class, UsersStillActivityEntity::class, UsersWalkActivityEntity::class, GeofenceAreasEntity::class, GeofenceTransitionsEntity::class, FriendsEntity::class, MemosEntity::class],
     version = ROOM_DATABASE_VERSION
 )
 abstract class BrockDB: RoomDatabase() {
-    abstract fun UserDao(): UserDao
+    abstract fun UsersDao(): UsersDao
 
-    abstract fun UserVehicleActivityDao(): UserVehicleActivityDao
+    abstract fun UsersVehicleActivityDao(): UsersVehicleActivityDao
 
-    abstract fun UserStillActivityDao(): UserStillActivityDao
+    abstract fun UsersStillActivityDao(): UsersStillActivityDao
 
-    abstract fun UserRunActivityDao(): UserRunActivityDao
+    abstract fun UsersRunActivityDao(): UsersRunActivityDao
 
-    abstract fun UserWalkActivityDao(): UserWalkActivityDao
+    abstract fun UsersWalkActivityDao(): UsersWalkActivityDao
 
-    abstract fun MemoDao(): MemoDao
+    abstract fun MemosDao(): MemosDao
 
-    abstract fun GeofenceAreaDao(): GeofenceAreaDao
+    abstract fun GeofenceAreasDao(): GeofenceAreasDao
 
-    abstract fun GeofenceTransitionDao(): GeofenceTransitionDao
+    abstract fun GeofenceTransitionsDao(): GeofenceTransitionsDao
 
-    abstract fun FriendDao(): FriendDao
+    abstract fun FriendsDao(): FriendsDao
 
     companion object {
-        private val areas = listOf(
-            GeofenceAreaEntity(userId = MyUser.id, longitude = 11.326957, latitude = 44.476543, name = "Villa Ghigi"),
-            GeofenceAreaEntity(userId = MyUser.id, longitude = 11.346302, latitude = 44.502505, name = "Parco della Montagnola")
-        )
-
         @Volatile
         var INSTANCE: BrockDB? = null
 
         @Synchronized
         fun getInstance(context: Context): BrockDB {
             if (INSTANCE == null) {
-                INSTANCE ?: prepopulateDatabase(context).also { INSTANCE = it }
-            }
-
-            return INSTANCE as BrockDB
-        }
-
-        // Function used the first time when the database is created, so for the first sign in
-        private fun prepopulateDatabase(context: Context) =
-            Room.databaseBuilder(
-                    context.applicationContext,
+                INSTANCE = Room.databaseBuilder(
+                    context,
                     BrockDB::class.java,
                     "brock.db"
-                ).fallbackToDestructiveMigration()
-                .addCallback(
-                    object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            CoroutineScope(Dispatchers.IO).launch {
-                                // Instance of db
-                                val instance = getInstance(context)
-
-                                for (area in areas) {
-                                    instance.GeofenceAreaDao().insertGeofenceArea(area)
-                                }
-                            }
-                        }
-                    }
-                )
-                .build()
+                ).fallbackToDestructiveMigration().build()
+            }
+            return INSTANCE as BrockDB
+        }
     }
 }

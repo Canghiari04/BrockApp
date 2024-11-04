@@ -4,9 +4,9 @@ import com.example.brockapp.*
 import com.example.brockapp.data.User
 import com.example.brockapp.data.Friend
 import com.example.brockapp.room.BrockDB
-import com.example.brockapp.room.FriendEntity
+import com.example.brockapp.room.FriendsEntity
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.room.GeofenceTransitionEntity
+import com.example.brockapp.room.GeofenceTransitionsEntity
 
 import android.util.Log
 import java.time.LocalDate
@@ -94,8 +94,8 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     private val _userPieChartEntries = MutableLiveData<List<PieEntry>>()
     val userPieChartEntries: MutableLiveData<List<PieEntry>> get() = _userPieChartEntries
 
-    private val _userGeofenceTransitions = MutableLiveData<List<GeofenceTransitionEntity>>()
-    val userGeofenceTransitions: LiveData<List<GeofenceTransitionEntity>> = _userGeofenceTransitions
+    private val _userGeofenceTransitions = MutableLiveData<List<GeofenceTransitionsEntity>>()
+    val userGeofenceTransitions: LiveData<List<GeofenceTransitionsEntity>> = _userGeofenceTransitions
 
     private val _errorAddFriend = MutableLiveData<Boolean>()
     val errorAddFriend: LiveData<Boolean> = _errorAddFriend
@@ -116,7 +116,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                 .map { it.key.removePrefix("user/").removeSuffix(".json") }
 
             val subscribers = mutableListOf<User?>()
-            val friends = db.FriendDao().getAllFriends()
+            val friends = db.FriendsDao().getUsernamesFriendsByUsername(MyUser.username)
 
             // Items contains all the usernames
             if (items.isNotEmpty()) {
@@ -125,7 +125,11 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                 }
             }
 
-            _subscribers.postValue(subscribers)
+            val filteredSubscribers = subscribers.also { subscriber ->
+                subscriber.removeIf { it?.typeActivity?.isBlank() == true }
+            }
+
+            _subscribers.postValue(filteredSubscribers)
         }
     }
 
@@ -133,7 +137,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         viewModelScope.launch(Dispatchers.IO) {
             // Define all the username to search inside the Bucket
             val listUsernames = mutableListOf<String>().also {
-                val usernames = db.FriendDao().getAllFriends()
+                val usernames = db.FriendsDao().getUsernamesFriendsByUsername(MyUser.username)
 
                 for (username in usernames) {
                     it.add("user/$username.json")
@@ -181,7 +185,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                         it.key.removePrefix("user/").removeSuffix(".json")
                     }
 
-                if(matchingSubscribers.isNotEmpty()) {
+                if (matchingSubscribers.isNotEmpty()) {
                     val subscribers = mutableListOf<User?>()
 
                     for (match in matchingSubscribers) {
@@ -217,9 +221,9 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     }
 
     // Function used to search if an user is currently a friend
-    fun getCurrentFriends(id: Long) {
+    fun getCurrentFriends() {
         viewModelScope.launch(Dispatchers.IO) {
-            val item = db.FriendDao().getFriendsByUserId(id)
+            val item = db.FriendsDao().getUsernamesFriendsByUsername(MyUser.username)
             _currentFriends.postValue(item)
         }
     }
@@ -232,7 +236,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         friend.vehicleActivities.forEach {
             val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
 
-            if (timeStamp.isAfter(start) && timeStamp.isBefore(end)) {
+            if (timeStamp.isAfter(start) && timeStamp.isBefore(end) && (it.exitTime > it.arrivalTime) ) {
                 time += (it.exitTime - it.arrivalTime)
             }
         }
@@ -275,14 +279,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
-        val entries = ArrayList<BarEntry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = timePerDay[day]
-            if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(
-                BarEntry(day.toFloat(), 0f)
-            )
-        }
+        val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
         _userVehicleBarChartEntries.postValue(entries)
     }
@@ -295,7 +292,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         friend.runActivities.forEach {
             val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
 
-            if (timeStamp.isAfter(start) && timeStamp.isBefore(end)) {
+            if (timeStamp.isAfter(start) && timeStamp.isBefore(end) && it.exitTime > it.arrivalTime) {
                 time += (it.exitTime - it.arrivalTime)
             }
         }
@@ -338,14 +335,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
-        val entries = ArrayList<BarEntry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = timePerDay[day]
-            if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(
-                BarEntry(day.toFloat(), 0f)
-            )
-        }
+        val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
         _userRunBarChartEntries.postValue(entries)
     }
@@ -385,14 +375,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
-        val entries = ArrayList<BarEntry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = timePerDay[day]
-            if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(
-                BarEntry(day.toFloat(), 0f)
-            )
-        }
+        val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
         _userStillBarChartEntries.postValue(entries)
     }
@@ -448,14 +431,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
-        val entries = ArrayList<BarEntry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = timePerDay[day]
-            if (item != null) entries.add(BarEntry(day.toFloat(), item)) else entries.add(
-                BarEntry(day.toFloat(), 0f)
-            )
-        }
+        val entries = defineBarChartEntries(firstDay, lastDay, timePerDay)
 
         _userWalkBarChartEntries.postValue(entries)
     }
@@ -477,17 +453,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.distanceTravelled } / TO_KM).toFloat()
         }
 
-        val entries = ArrayList<Entry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = distancePerDay[day]
-
-            if (item != null) {
-                entries.add(Entry(day.toFloat(), item))
-            } else {
-                entries.add(Entry(day.toFloat(), 0f))
-            }
-        }
+        val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
 
         _userVehicleLineChartEntries.postValue(entries)
     }
@@ -505,21 +471,11 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val stepsPerDay = groupedItems.mapValues { it ->
+        val distancePerDay = groupedItems.mapValues { it ->
             (it.value.sumOf { it.distanceDone } / TO_KM).toFloat()
         }
 
-        val entries = ArrayList<Entry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = stepsPerDay[day]
-
-            if (item != null) {
-                entries.add(Entry(day.toFloat(), item))
-            } else {
-                entries.add(Entry(day.toFloat(), 0f))
-            }
-        }
+        val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
 
         _userRunLineChartEntries.postValue(entries)
     }
@@ -541,17 +497,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.stepsNumber }).toFloat()
         }
 
-        val entries = ArrayList<Entry>()
-
-        for (day in firstDay.dayOfMonth..lastDay.dayOfMonth) {
-            val item = stepsPerDay[day]
-
-            if (item != null) {
-                entries.add(Entry(day.toFloat(), item))
-            } else {
-                entries.add(Entry(day.toFloat(), 0f))
-            }
-        }
+        val entries = defineLineChartEntries(firstDay, lastDay, stepsPerDay)
 
         _userWalkLineChartEntries.postValue(entries)
     }
@@ -615,16 +561,16 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     }
 
     fun getUserGeofenceTransitions(friend: Friend) {
-        val list = ArrayList<GeofenceTransitionEntity>()
+        val list = ArrayList<GeofenceTransitionsEntity>()
 
         if (friend.geofenceTransitions.isNotEmpty()) {
             friend.geofenceTransitions.forEach {
-                val transition = GeofenceTransitionEntity(
+                val transition = GeofenceTransitionsEntity(
                     it.id,
-                    it.userId,
+                    it.username,
                     it.nameLocation,
-                    it.latitude,
                     it.longitude,
+                    it.latitude,
                     it.arrivalTime,
                     it.exitTime
                 )
@@ -639,7 +585,13 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     fun addFriend(username: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             if (username != null) {
-                db.FriendDao().insertFriend(FriendEntity(userId = MyUser.id, username = username))
+                db.FriendsDao().insertFriend(
+                    FriendsEntity(
+                        username = MyUser.username,
+                        usernameFriend = username
+                    )
+                )
+
                 _errorAddFriend.postValue(true)
             } else {
                 _errorAddFriend.postValue(false)
@@ -650,7 +602,11 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     fun deleteFriend(username: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             if (username != null) {
-                db.FriendDao().deleteFriend(MyUser.id, username)
+                db.FriendsDao().deleteFriend(
+                    MyUser.username,
+                    username
+                )
+
                 _errorDeleteFriend.postValue(true)
             } else {
                 _errorDeleteFriend.postValue(false)
@@ -677,11 +633,54 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         return subscriber
     }
 
-    // Function used to convert time stamp format from String to LocalDateTime
     private fun getLocalDateFromTimeStamp(startOfPeriod: String, endOfPeriod: String): Pair<LocalDateTime, LocalDateTime> {
         val start = LocalDateTime.parse(startOfPeriod, pattern)
         val end = LocalDateTime.parse(endOfPeriod, pattern)
 
         return Pair(start, end)
+    }
+
+    private fun defineBarChartEntries(firstDay: LocalDate, lastDay: LocalDate, timePerDay: Map<Int, Float>):  List<BarEntry> {
+        val entries = ArrayList<BarEntry>()
+
+        var i = 0
+        var currentDay = firstDay
+        while (!currentDay.isAfter(lastDay)) {
+            val day = currentDay.dayOfMonth
+            val item = timePerDay[day]
+
+            currentDay = currentDay.plusDays(1)
+            i++
+
+            if (item != null) {
+                entries.add(BarEntry(i.toFloat(), item))
+            } else {
+                entries.add(BarEntry(i.toFloat(), 0f))
+            }
+        }
+
+        return entries
+    }
+
+    private fun defineLineChartEntries(firstDay: LocalDate, lastDay: LocalDate, items: Map<Int, Float>):  List<Entry> {
+        val entries = ArrayList<Entry>()
+
+        var i = 0
+        var currentDay = firstDay
+        while (!currentDay.isAfter(lastDay)) {
+            val day = currentDay.dayOfMonth
+            val item = items[day]
+
+            currentDay = currentDay.plusDays(1)
+            i++
+
+            if (item != null) {
+                entries.add(Entry(i.toFloat(), item))
+            } else {
+                entries.add(Entry(i.toFloat(), 0f))
+            }
+        }
+
+        return entries
     }
 }
