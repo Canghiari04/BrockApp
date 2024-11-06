@@ -137,7 +137,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.username,
                 startOfWeek,
                 endOfWeek
-            )
+            ).filter { it.distanceTravelled > 0.0 }
 
             // All the activities are grouped by the day
             val groupedItems = items.groupBy {
@@ -226,7 +226,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.username,
                 startOfWeek,
                 endOfWeek
-            )
+            ).filter { it.distanceDone > 0.0 || it.heightDifference > 0f }
 
             val groupedItems = items.groupBy {
                 it.timestamp.let { timestamp ->
@@ -386,7 +386,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.username,
                 startOfWeek,
                 endOfWeek
-            )
+            ).filter { it.stepsNumber > 0 || it.heightDifference > 0f }
 
             val groupedItems = items.groupBy {
                 it.timestamp.let { timestamp ->
