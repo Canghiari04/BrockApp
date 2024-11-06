@@ -52,12 +52,9 @@ class AccountActivity: AppCompatActivity() {
         setContentView(R.layout.activity_account)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_account_activity)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
-
-        toolbar.run {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setDisplayShowTitleEnabled(false)
-        }
 
         contentFirstColumn = findViewById(R.id.text_view_content_first_column)
 
@@ -199,10 +196,9 @@ class AccountActivity: AppCompatActivity() {
     }
 
     private fun pickImage() {
-        val intent = Intent()
-        intent.run {
-            type = "image/*"
-            action = Intent.ACTION_PICK
+        val intent = Intent().also {
+            it.type = "image/*"
+            it.action = Intent.ACTION_PICK
         }
 
         startActivityForResult(
