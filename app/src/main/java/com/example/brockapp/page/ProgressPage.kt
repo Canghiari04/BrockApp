@@ -30,20 +30,20 @@ import com.github.mikephil.charting.charts.LineChart
 abstract class ProgressPage: Fragment(R.layout.page_progress) {
     private var rangeUtil = PeriodRangeImpl()
 
-    private var barChartMapper = mapOf(
+    private val barChartMapper = mapOf(
         "Vehicle" to ::showVehicleBarChart,
         "Run" to ::showRunBarChart,
         "Still" to ::showStillBarChart,
         "Walk" to ::showWalkBarChart
     )
 
-    private var lineChartMapper = mapOf(
+    private val lineChartMapper = mapOf(
         "Vehicle" to ::showVehicleLineChart,
         "Run" to ::showRunLineChart,
         "Walk" to ::showWalkLineChart
     )
 
-    private var pieChartMapper = mapOf(
+    private val pieChartMapper = mapOf(
         "Day" to ::showDailyPieChart,
         "Week" to ::showWeeklyPieChart,
         "Month" to ::showMonthlyPieChart

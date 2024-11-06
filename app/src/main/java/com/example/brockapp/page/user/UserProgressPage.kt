@@ -3,7 +3,6 @@ package com.example.brockapp.page.user
 import com.example.brockapp.R
 import com.example.brockapp.data.Friend
 import com.example.brockapp.page.ProgressPage
-import com.example.brockapp.extraObject.MyUser
 
 import android.view.View
 import android.widget.TextView
@@ -24,7 +23,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
         observeRemovedFriend()
         observeCurrentFriends()
 
-        viewModelGroup.getCurrentFriends(MyUser.id)
+        viewModelGroup.getCurrentFriends()
     }
 
     private fun setUpTextView() {
@@ -44,7 +43,8 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
                     "${friend.username} is your new friend",
                     requireContext()
                 )
-                viewModelGroup.getCurrentFriends(MyUser.id)
+
+                viewModelGroup.getCurrentFriends()
             } else {
                 toastUtil.showWarningToast(
                     "Encountered error while adding",
@@ -61,7 +61,8 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
                     "${friend.username} has been removed",
                     requireContext()
                 )
-                viewModelGroup.getCurrentFriends(MyUser.id)
+
+                viewModelGroup.getCurrentFriends()
             } else {
                 toastUtil.showWarningToast(
                     "Encountered error while removing",

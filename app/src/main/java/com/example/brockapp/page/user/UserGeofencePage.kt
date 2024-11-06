@@ -20,7 +20,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
         observeRemovedFriend()
         observeCurrentFriends()
 
-        viewModelGroup.getCurrentFriends(MyUser.id)
+        viewModelGroup.getCurrentFriends()
     }
 
     private fun setUpTextView() {
@@ -69,11 +69,12 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
 
     private fun observeCurrentFriends() {
         viewModelGroup.currentFriends.observe(viewLifecycleOwner) { items ->
-            if (!items.contains(friend.username)) {
-                buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
-            } else {
+            if (items.contains(friend.username)) {
                 buttonUser.setText("REMOVE")
                 buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
+            } else {
+                buttonUser.setText("ADD")
+                buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
     }
@@ -82,7 +83,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
         viewModelGroup.userGeofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
-                populateRecyclerView(transitions)
+                populateSpinner(transitions)
             } else {
                 Log.d("GEOFENCE_PAGE", "No one friend's transitions retrieved")
             }

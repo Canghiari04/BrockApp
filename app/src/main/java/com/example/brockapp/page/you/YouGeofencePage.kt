@@ -15,7 +15,7 @@ class YouGeofencePage: GeofencePage() {
         viewModelGeofence.geofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
-                populateRecyclerView(transitions)
+                populateSpinner(transitions)
             } else {
                 Log.d("GEOFENCE_PAGE", "No one user's transitions retrieved")
             }
