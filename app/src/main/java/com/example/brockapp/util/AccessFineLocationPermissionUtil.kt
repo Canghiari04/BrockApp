@@ -12,14 +12,14 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
-class NewUserActivityPermissionUtil(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit) {
+class AccessFineLocationPermissionUtil(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit) {
     private lateinit var requestLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
 
     init {
         setUpLocationPermissionLauncher()
     }
 
-    fun requestNewUserActivityPermissions() {
+    fun requestAccessFineLocation() {
         requestLocationPermissionLauncher.launch(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,

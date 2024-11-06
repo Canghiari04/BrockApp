@@ -47,7 +47,7 @@ class NotificationUtil {
             setContentText(text)
             setStyle(NotificationCompat.BigTextStyle()
                 .bigText(text))
-            setPriority(NotificationCompat.PRIORITY_HIGH)
+            setPriority(NotificationCompat.PRIORITY_DEFAULT)
         }
     }
 
