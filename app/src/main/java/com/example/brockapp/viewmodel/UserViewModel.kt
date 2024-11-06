@@ -103,9 +103,6 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
 
                 db.UsersDao().insertUser(user)
 
-                // val jsonFile = createUserDataFile(username)
-                // uploadUserToS3(username, jsonFile)
-
                 _user.postValue(user)
                 _auth.postValue(true)
             }

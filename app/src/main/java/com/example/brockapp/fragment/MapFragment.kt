@@ -372,7 +372,7 @@ class MapFragment: Fragment() {
             }
         } else {
             toastUtil.showBasicToast(
-                "Geo localization disabled",
+                "Geo localization is not active",
                 requireContext()
             )
         }

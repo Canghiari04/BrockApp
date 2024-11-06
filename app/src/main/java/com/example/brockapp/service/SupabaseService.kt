@@ -103,7 +103,7 @@ class SupabaseService: Service() {
                 deleteAll()
             }
 
-            Actions.STOP.toString() -> {
+            Actions.TERMINATE.toString() -> {
                 stopSelf()
             }
         }
@@ -121,7 +121,7 @@ class SupabaseService: Service() {
     }
 
     enum class Actions {
-        SYNC, READ, DELETE, STOP
+        SYNC, READ, DELETE, TERMINATE
     }
 
     enum class NextActivity {
@@ -198,7 +198,7 @@ class SupabaseService: Service() {
                     it.action = "SYNC_DATA_ACTION"
                     it.putExtra("NEXT_ACTIVITY", NextActivity.LOGIN.toString())
 
-                    MySharedPreferences.deleteSavedCredentials(applicationContext)
+                    MySharedPreferences.deleteSavedPreferences(applicationContext)
                     sendBroadcast(it)
                 }
             }
@@ -219,9 +219,9 @@ class SupabaseService: Service() {
 
     private fun start() {
         startForeground(
-            ID_SYNC_DATA,
+            ID_SUPABASE_SERVICE_NOTIFY,
             notificationUtil.getNotificationBody(
-                CHANNEL_ID_SYNC_DATA_NOTIFY,
+                CHANNEL_ID_SUPABASE_SERVICE,
                 "BrockApp - Sync to service",
                 "The app is being configured, please wait a few seconds",
                 this
@@ -335,7 +335,7 @@ class SupabaseService: Service() {
                     it.action = "SYNC_DATA_ACTION"
                     it.putExtra("NEXT_ACTIVITY", NextActivity.LOGIN.toString())
 
-                    MySharedPreferences.deleteSavedCredentials(applicationContext)
+                    MySharedPreferences.deleteSavedPreferences(applicationContext)
                     sendBroadcast(it)
                 }
             }
