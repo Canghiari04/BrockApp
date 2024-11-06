@@ -71,7 +71,7 @@
                 android:indeterminateTint="@color/uni_red">
             </ProgressBar>
 
-            <com.google.android.gms.maps.MapView
+            <org.osmdroid.views.MapView
                 android:id="@+id/map_view_geofence"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

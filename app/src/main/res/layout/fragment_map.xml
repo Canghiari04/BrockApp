@@ -26,9 +26,19 @@
         android:indeterminateTint="@color/uni_red">
     </ProgressBar>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <org.osmdroid.views.MapView
+        android:id="@+id/container_view_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_geo_localization"
+        android:contentDescription="@string/description_marker_icon"
+        android:src="@drawable/marker_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="23dp"
+        android:layout_marginBottom="86dp"
+        android:backgroundTint="@color/uni_red" />
 </FrameLayout>
