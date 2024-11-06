@@ -1,119 +1,116 @@
 package com.example.brockapp
 
-import com.example.brockapp.worker.SyncBucketWorker
-import com.example.brockapp.extraObject.MySharedPreferences
-
 import android.app.Application
-import androidx.work.WorkManager
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import java.util.concurrent.TimeUnit
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.core.app.NotificationManagerCompat
 
 class MyApplication: Application() {
+    private lateinit var manager: NotificationManagerCompat
+
     override fun onCreate() {
         super.onCreate()
 
-        // Periodic worker define to sync data if the permission has been allowed
-        if (MySharedPreferences.checkService("DUMP_DATABASE", this)) scheduleSyncPeriodic()
+        manager = NotificationManagerCompat.from(this)
 
-        val notificationManager = NotificationManagerCompat.from(this)
+        // Channel for service
+        supabaseNotificationChannel()
+        distanceNotificationChannel()
+        stepCounterNotificationChannel()
+        heightDifferenceNotificationChannel()
 
-        // Setup all the Notification Channel
-        memoNotificationChannel(notificationManager)
-        syncDataNotificationChannel(notificationManager)
-        geofencingNotificationChannel(notificationManager)
-        connectivityNotificationChannel(notificationManager)
-        activityRecognitionNotificationChannel(notificationManager)
+        // Channel for worker
+        memoNotificationChannel()
+        geofencingNotificationChannel()
+        connectivityNotificationChannel()
+        activityRecognitionNotificationChannel()
     }
 
-    private fun scheduleSyncPeriodic() {
-        val constraint = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val request = PeriodicWorkRequestBuilder<SyncBucketWorker>(2, TimeUnit.HOURS)
-            .setConstraints(constraint)
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "SyncBucketWorker",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
-        )
-    }
-
-    private fun memoNotificationChannel(manager: NotificationManagerCompat) {
-        val channel = NotificationChannel(
-            CHANNEL_ID_MEMO_NOTIFY,
-            NAME_CHANNEL_ID_MEMO_NOTIFY,
-            NotificationManager.IMPORTANCE_HIGH
-        )
-
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_ID_MEMO_NOTIFY
+    private fun supabaseNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_SUPABASE_SERVICE,
+            NAME_CHANNEL_SUPABASE_SERVICE,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_SUPABASE_SERVICE
+            manager.createNotificationChannel(it)
         }
-
-        manager.createNotificationChannel(channel)
     }
 
-    private fun syncDataNotificationChannel(manager: NotificationManagerCompat) {
-        val channel = NotificationChannel(
-            CHANNEL_ID_SYNC_DATA_NOTIFY,
-            NAME_CHANNEL_SYNC_DATA_NOTIFY,
+    private fun distanceNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_DISTANCE_SERVICE,
+            NAME_CHANNEL_DISTANCE_SERVICE,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_DISTANCE_SERVICE
+            manager.createNotificationChannel(it)
+        }
+    }
+
+    private fun stepCounterNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_STEP_COUNTER_SERVICE,
+            NAME_CHANNEL_STEP_COUNTER_SERVICE,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_STEP_COUNTER_SERVICE
+            manager.createNotificationChannel(it)
+        }
+    }
+
+    private fun heightDifferenceNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_HEIGHT_DIFFERENCE_SERVICE,
+            NAME_CHANNEL_HEIGHT_DIFFERENCE_SERVICE,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_HEIGHT_DIFFERENCE_SERVICE
+            manager.createNotificationChannel(it)
+        }
+    }
+
+    private fun memoNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_MEMO_WORKER,
+            NAME_CHANNEL_MEMO_WORKER,
+            NotificationManager.IMPORTANCE_HIGH
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_MEMO_WORKER
+            manager.createNotificationChannel(it)
+        }
+    }
+
+    private fun geofencingNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_GEOFENCE_WORKER,
+            NAME_CHANNEL_GEOFENCE_WORKER,
+            NotificationManager.IMPORTANCE_HIGH
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_GEOFENCE_WORKER
+            manager.createNotificationChannel(it)
+        }
+    }
+
+    private fun connectivityNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_CONNECTIVITY_WORKER,
+            NAME_CHANNEL_CONNECTIVITY_WORKER,
             NotificationManager.IMPORTANCE_LOW
-        )
-
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_SYNC_DATA_NOTIFY
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_CONNECTIVITY_WORKER
+            manager.createNotificationChannel(it)
         }
-
-        manager.createNotificationChannel(channel)
     }
 
-    private fun geofencingNotificationChannel(manager: NotificationManagerCompat) {
-        val channel = NotificationChannel(
-            CHANNEL_ID_GEOFENCE_NOTIFY,
-            NAME_CHANNEL_GEOFENCE_NOTIFY,
-            NotificationManager.IMPORTANCE_HIGH
-        )
-
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_GEOFENCE_NOTIFY
+    private fun activityRecognitionNotificationChannel() {
+        NotificationChannel(
+            CHANNEL_ID_ACTIVITY_RECOGNITION_WORKER,
+            NAME_CHANNEL_ACTIVITY_RECOGNITION_WORKER,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).also {
+            it.description = DESCRIPTION_CHANNEL_ACTIVITY_RECOGNITION_WORKER
+            manager.createNotificationChannel(it)
         }
-
-        manager.createNotificationChannel(channel)
-    }
-
-    private fun connectivityNotificationChannel(manager: NotificationManagerCompat) {
-        val channel = NotificationChannel(
-            CHANNEL_ID_CONNECTIVITY_NOTIFY,
-            NAME_CHANNEL_CONNECTIVITY_NOTIFY,
-            NotificationManager.IMPORTANCE_HIGH
-        )
-
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_CONNECTIVITY_NOTIFY
-        }
-
-        manager.createNotificationChannel(channel)
-    }
-
-    private fun activityRecognitionNotificationChannel(manager: NotificationManagerCompat) {
-        val channel = NotificationChannel(
-            CHANNEL_ID_ACTIVITY_NOTIFY,
-            NAME_CHANNEL_ACTIVITY_NOTIFY,
-            NotificationManager.IMPORTANCE_HIGH
-        )
-
-        channel.apply {
-            description = DESCRIPTION_CHANNEL_ACTIVITY_NOTIFY
-        }
-
-        manager.createNotificationChannel(channel)
     }
 }

@@ -30,10 +30,11 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         const val TO_KM = 1000.0
     }
 
-    private var chronometerIsActive: Boolean = false
+    private var isChronometerActive: Boolean = false
 
     private lateinit var stopButton: Button
     private lateinit var startButton: Button
+
     protected lateinit var chronometer: Chronometer
     protected lateinit var textViewTypeActivity: TextView
 
@@ -50,6 +51,8 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chronometer)
+
+        supportActionBar?.setTitle(R.string.text_blank)
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = ActivitiesViewModelFactory(db)
@@ -68,7 +71,7 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         textViewValueSecondSensor = findViewById(R.id.text_view_value_second_sensor)
 
         setUpButtons()
-        setKindOfSensors()
+        setUpSensors()
         setUpChronometer()
         setTypeActivityTextView()
 
@@ -79,10 +82,6 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                if (chronometerIsActive) {
-                    updateActivity()
-                }
-
                 val intent = Intent(this, NewUserActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -98,8 +97,8 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
 
     override fun sendNotification(title: String, content: String) {
         val inputData = Data.Builder()
-            .putString("title", title)
-            .putString("text", content)
+            .putString("TITLE", title)
+            .putString("CONTENT", content)
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
@@ -111,11 +110,11 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
 
     private fun setUpButtons() {
         startButton.setOnClickListener {
-            if (!chronometerIsActive) {
+            if (!isChronometerActive) {
                 chronometer.start()
                 chronometer.base = SystemClock.elapsedRealtime()
 
-                chronometerIsActive = true
+                isChronometerActive = true
 
                 stopButton.isEnabled = true
                 startButton.isEnabled = false
@@ -125,11 +124,11 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         }
 
         stopButton.setOnClickListener {
-            if (chronometerIsActive) {
+            if (isChronometerActive) {
                 chronometer.stop()
                 chronometer.base = SystemClock.elapsedRealtime()
 
-                chronometerIsActive = false
+                isChronometerActive = false
 
                 stopButton.isEnabled = false
                 startButton.isEnabled = true
@@ -141,18 +140,18 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
 
     protected abstract fun insertActivity()
 
-    protected abstract fun updateActivity()
-
-    protected abstract fun setKindOfSensors()
-
-    protected abstract fun setUpChronometer()
-
-    protected abstract fun setTypeActivityTextView()
-
     protected fun getInstant(): String {
         return DateTimeFormatter
             .ofPattern(ISO_DATE_FORMAT)
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
     }
+
+    protected abstract fun updateActivity()
+
+    protected abstract fun setUpSensors()
+
+    protected abstract fun setUpChronometer()
+
+    protected abstract fun setTypeActivityTextView()
 }

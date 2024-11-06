@@ -4,21 +4,25 @@ import com.example.brockapp.*
 import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.interfaces.NotificationSender
 
+import androidx.work.Worker
 import android.content.Context
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import android.app.NotificationManager
 
-class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams), NotificationSender {
+class ActivityRecognitionWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams), NotificationSender {
     private lateinit var util: NotificationUtil
     private lateinit var manager: NotificationManager
 
-    override suspend fun doWork(): Result {
+    override fun doWork(): Result {
         util = NotificationUtil()
 
-        val title = inputData.getString("title")!!
-        val text = inputData.getString("text")!!
-        sendNotification(title, text)
+        val title = inputData.getString("TITLE") ?: " "
+        val content = inputData.getString("CONTENT") ?: " "
+
+        sendNotification(
+            title,
+            content
+        )
 
         return Result.success()
     }
@@ -27,12 +31,12 @@ class ActivityRecognitionWorker(private val context: Context, workerParams: Work
         manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notification = util.getNotificationBody(
-            CHANNEL_ID_ACTIVITY_NOTIFY,
+            CHANNEL_ID_ACTIVITY_RECOGNITION_WORKER,
             title,
             content,
             context
         )
 
-        manager.notify(ID_ACTIVITY_NOTIFY, notification.build())
+        manager.notify(ID_ACTIVITY_RECOGNITION_WORKER_NOTIFY, notification.build())
     }
 }

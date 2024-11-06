@@ -31,13 +31,13 @@ class GeofenceWorker(private val context: Context, workerParams: WorkerParameter
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notification = util.getNotificationBodyWithPendingIntent(
-            CHANNEL_ID_GEOFENCE_NOTIFY,
+            CHANNEL_ID_GEOFENCE_WORKER,
             title,
             content,
             util.getGeofencePendingIntent(context),
             context
         )
 
-        manager.notify(ID_GEOFENCE_NOTIFY, notification.build())
+        manager.notify(ID_GEOFENCE_WORKER_NOTIFY, notification.build())
     }
 }

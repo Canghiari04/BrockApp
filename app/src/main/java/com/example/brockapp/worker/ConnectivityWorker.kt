@@ -4,7 +4,6 @@ import com.example.brockapp.*
 import com.example.brockapp.extraObject.MyNetwork
 import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.interfaces.NotificationSender
-import com.example.brockapp.interfaces.SchedulePeriodicWorkerImpl
 
 import android.util.Log
 import androidx.work.Worker
@@ -17,8 +16,6 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
     private var isConnected = false
 
     override fun doWork(): Result {
-        val scheduleWorkerUtil = SchedulePeriodicWorkerImpl(context)
-
         isConnected = inputData.getBoolean("IS_CONNECTED", false)
 
         if (isConnected != MyNetwork.isConnected) {
@@ -30,8 +27,6 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
                         "BrockApp - You are online again",
                         "The disabled features are now active. Resume using all the functionalities to monitor your progress"
                     )
-
-                    scheduleWorkerUtil.scheduleSyncPeriodic()
                 }
 
                 else -> {
@@ -39,8 +34,6 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
                         "BrockApp - You are offline",
                         "Some features has been disabled. Check the settings to fully use all the features offered"
                     )
-
-                    scheduleWorkerUtil.deleteSyncPeriodic()
                 }
             }
         } else {
@@ -58,7 +51,7 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
         when (isConnected) {
             true -> {
                 notification = notificationUtil.getNotificationBody(
-                    CHANNEL_ID_CONNECTIVITY_NOTIFY,
+                    CHANNEL_ID_CONNECTIVITY_WORKER,
                     title,
                     content,
                     context
@@ -67,7 +60,7 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
 
             else -> {
                 notification = notificationUtil.getNotificationBodyWithPendingIntent(
-                    CHANNEL_ID_CONNECTIVITY_NOTIFY,
+                    CHANNEL_ID_CONNECTIVITY_WORKER,
                     title,
                     content,
                     notificationUtil.getConnectivityPendingIntent(context),
@@ -76,6 +69,6 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
             }
         }
 
-        manager.notify(ID_CONNECTIVITY_NOTIFY, notification.build())
+        manager.notify(ID_CONNECTIVITY_WORKER_NOTIFY, notification.build())
     }
 }
