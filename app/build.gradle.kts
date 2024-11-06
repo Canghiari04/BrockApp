@@ -1,10 +1,12 @@
-import org.jetbrains.kotlin.fir.resolve.dfa.cfg.NormalPath.label
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    kotlin("kapt") version "1.8.0"
+
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
+
+    kotlin("kapt") version "1.9.0"
 }
 
 android {
@@ -24,21 +26,18 @@ android {
         val properties = Properties()
         properties.load(fileProjectProperties.inputStream())
 
-        val baseUrl = properties.getProperty("BASE_URL") ?: ""
-        val mapApiKey = properties.getProperty("MAPS_API_KEY") ?: ""
         val bucketName = properties.getProperty("BUCKET_NAME") ?: ""
+        val baseUrl = properties.getProperty("GEO_DB_BASE_URL") ?: ""
         val geoApiKey = properties.getProperty("GEO_DB_API_KEY") ?: ""
+        val supabaseUrl = properties.getProperty("SUPABASE_BASE_URL") ?: ""
+        val supabaseApiKey = properties.getProperty("SUPABASE_API_KEY") ?: ""
         val identityPoolId = properties.getProperty("IDENTITY_POOL_ID") ?: ""
 
-        addManifestPlaceholders(
-            mapOf(
-                "MAPS_API_KEY" to mapApiKey
-            )
-        )
-
-        buildConfigField(type = "String", name = "BASE_URL", value = baseUrl)
         buildConfigField(type = "String", name = "BUCKET_NAME", value = bucketName)
+        buildConfigField(type = "String", name = "GEO_DB_BASE_URL", value = baseUrl)
         buildConfigField(type = "String", name = "GEO_DB_API_KEY", value = geoApiKey)
+        buildConfigField(type = "String", name = "SUPABASE_BASE_URL", value = supabaseUrl)
+        buildConfigField(type = "String", name = "SUPABASE_API_KEY", value = supabaseApiKey)
         buildConfigField(type = "String", name = "IDENTITY_POOL_ID", value = identityPoolId)
     }
 
@@ -65,27 +64,33 @@ android {
 }
 
 dependencies {
-    // Core Android libraries
+    // Android libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.coordinatorlayout)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.coordinatorlayout)
 
     // Material Design
     implementation(libs.material)
     implementation(libs.material.v180)
 
     // Google Play Services
-    implementation(libs.play.services.auth)
     implementation(libs.play.services.location)
     implementation(libs.play.services.location.v1800)
-    implementation(libs.play.services.maps)
 
-    // Room (Persistence)
-    implementation(libs.androidx.room.runtime)
+    // Osmdroid
+    implementation(libs.osmdroid.wms)
+    implementation(libs.osmdroid.android)
+
+    // Room
     implementation(libs.androidx.room.ktx)
-    annotationProcessor(libs.androidx.room.compiler)
     kapt("androidx.room:room-compiler:2.6.1")
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+
+    // Supabase
+    implementation(libs.postgrest.kt)
+    implementation(libs.ktor.client.android)
 
     // ViewModel
     implementation(libs.androidx.lifecycle.livedata.ktx)
