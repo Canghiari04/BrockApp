@@ -27,12 +27,8 @@
         android:theme="@style/Theme.BrockApp"
         tools:targetApi="31">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
-
         <activity
-            android:name=".activity.AuthenticatorActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -133,7 +129,7 @@
         </receiver>
 
         <service
-            android:name=".service.ConnectivityService"
+            android:name=".service.SupabaseService"
             android:enabled="true"
             android:exported="false">
         </service>
@@ -160,11 +156,6 @@
         </service>
         <service
             android:name=".service.GeofenceService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".service.MapService"
             android:enabled="true"
             android:exported="false">
         </service>
