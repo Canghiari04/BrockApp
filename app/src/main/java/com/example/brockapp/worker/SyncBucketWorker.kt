@@ -39,23 +39,23 @@ class SyncBucketWorker(private val context: Context, workerParams: WorkerParamet
         CoroutineScope(Dispatchers.IO).launch {
             val vehicleActivities = db
                 .UsersVehicleActivityDao()
-                .getVehicleActivitiesByUserId(MyUser.id)
+                .getVehicleActivitiesByUsername(MyUser.username)
 
             val runActivities = db
                 .UsersRunActivityDao()
-                .getRunActivitiesByUserId(MyUser.id)
+                .getRunActivitiesByUsername(MyUser.username)
 
             val stillActivities = db
                 .UsersStillActivityDao()
-                .getStillActivitiesByUserId(MyUser.id)
+                .getStillActivitiesByUsername(MyUser.username)
 
             val walkActivities = db
                 .UsersWalkActivityDao()
-                .getWalkActivitiesByUserId(MyUser.id)
+                .getWalkActivitiesByUsername(MyUser.username)
 
             val geofence = db
-                .GeofenceTransitionDao()
-                .getAllGeofenceTransitionByUserId(MyUser.id)
+                .GeofenceTransitionsDao()
+                .getAllGeofenceTransitionsByUsername(MyUser.username)
 
             val userData = mapOf(
                 "username" to MyUser.username,
