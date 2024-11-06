@@ -20,9 +20,7 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
                     val type = event.activityType
                     val transition = event.transitionType
 
-                    // Service are naturally a singleton
-                    val serviceIntent = buildIntent(type, transition, context)
-                    context.startService(serviceIntent)
+                    startService(type, transition, context)
                 }
             }
         } else {
@@ -30,15 +28,24 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
         }
     }
 
-    private fun buildIntent(type: Int, transition: Int, context: Context): Intent {
+    private fun startService(type: Int, transition: Int, context: Context): Intent {
         return Intent(context, ActivityRecognitionService::class.java).also {
-            val key = if (transition == 0) "ARRIVAL_TIME" else "EXIT_TIME"
+            val key: String
+            val action: String
 
-            it.action = ActivityRecognitionService.Actions.START.toString()
+            if (transition == 0) {
+                action = ActivityRecognitionService.Actions.INSERT.toString()
+                key = "ARRIVAL_TIME"
+            } else {
+                action = ActivityRecognitionService.Actions.UPDATE.toString()
+                key = "EXIT_TIME"
+            }
 
+            it.action = action
             it.putExtra("ACTIVITY_TYPE", type)
-            it.putExtra("TRANSITION_TYPE", transition)
             it.putExtra(key, System.currentTimeMillis())
+
+            context.startService(it)
         }
     }
 }
