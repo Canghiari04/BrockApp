@@ -36,6 +36,7 @@ class UserActivity: AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_user_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
 
         val db = BrockDB.getInstance(this)

@@ -3,9 +3,9 @@ package com.example.brockapp.activity
 import com.example.brockapp.R
 import com.example.brockapp.activity.chronometer.RunActivity
 import com.example.brockapp.activity.chronometer.WalkActivity
-import com.example.brockapp.util.NewUserActivityPermissionUtil
 import com.example.brockapp.activity.chronometer.StillActivity
 import com.example.brockapp.activity.chronometer.VehicleActivity
+import com.example.brockapp.util.AccessFineLocationPermissionUtil
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -16,14 +16,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NewUserActivity: AppCompatActivity() {
-    private lateinit var newUserActivityUtil: NewUserActivityPermissionUtil
+    private lateinit var newUserActivityUtil: AccessFineLocationPermissionUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_user)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
-        toolbar.setNavigationIcon(R.drawable.baseline_home_more_24)
+        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -37,11 +37,11 @@ class NewUserActivity: AppCompatActivity() {
         val buttonRun = findViewById<FloatingActionButton>(R.id.button_run)
         setUpButtons(buttonVehicle, buttonRun, buttonStill, buttonWalk)
 
-        newUserActivityUtil = NewUserActivityPermissionUtil(
+        newUserActivityUtil = AccessFineLocationPermissionUtil(
             this
         ) { enableButtons(buttonVehicle, buttonRun) }
 
-        newUserActivityUtil.requestNewUserActivityPermissions()
+        newUserActivityUtil.requestAccessFineLocation()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

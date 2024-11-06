@@ -46,6 +46,7 @@ class NewMemoActivity: AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_memo_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
 
         titleTextView = findViewById(R.id.edit_text_title)
