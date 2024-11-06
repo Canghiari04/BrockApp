@@ -1,5 +1,8 @@
 package com.example.brockapp.service
 
+import com.example.brockapp.*
+import com.example.brockapp.util.NotificationUtil
+
 import android.Manifest
 import android.os.Binder
 import android.os.IBinder
@@ -19,6 +22,7 @@ class DistanceService: Service() {
     private var binder = LocalBinder()
     private var distance: Double = 0.0
     private var startLocation: Location? = null
+    private var notificationUtil = NotificationUtil()
 
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
@@ -30,11 +34,15 @@ class DistanceService: Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        start()
+
         setUpLocationUpdates()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        startMonitoring()
         return binder
     }
 
@@ -44,17 +52,23 @@ class DistanceService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startMonitoring()
-        return super.onStartCommand(intent, flags, startId)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopMonitoring()
+        return START_STICKY
     }
 
     fun getDistance(): Double {
         return distance
+    }
+
+    private fun start() {
+        startForeground(
+            ID_DISTANCE_SERVICE_NOTIFY,
+            notificationUtil.getNotificationBody(
+                CHANNEL_ID_DISTANCE_SERVICE,
+                "BrockApp - Distance tracking",
+                "Brock App is tracking your distance travelled in background",
+                this
+            ).build()
+        )
     }
 
     private fun setUpLocationUpdates() {
@@ -85,10 +99,6 @@ class DistanceService: Service() {
         }
     }
 
-    private fun stopMonitoring() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
     private fun startMonitoring() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -96,5 +106,10 @@ class DistanceService: Service() {
             ) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         }
+    }
+
+    private fun stopMonitoring() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        stopSelf()
     }
 }

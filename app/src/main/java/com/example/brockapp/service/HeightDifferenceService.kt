@@ -1,5 +1,7 @@
 package com.example.brockapp.service
 
+import com.example.brockapp.*
+import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.worker.ActivityRecognitionWorker
 
@@ -20,6 +22,7 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
     private var sensor: Sensor? = null
     private var binder = LocalBinder()
     private var previousAltitude: Float? = null
+    private var notificationUtil = NotificationUtil()
     private var totalNegativeHeightDifference: Float = 0f
     private var totalPositiveHeightDifference: Float = 0f
 
@@ -31,11 +34,15 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
 
     override fun onCreate() {
         super.onCreate()
+
+        start()
+
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        startMonitoring()
         return binder
     }
 
@@ -45,8 +52,7 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startMonitoring()
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -71,8 +77,8 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
 
     override fun sendNotification(title: String, content: String) {
         val inputData = Data.Builder()
-            .putString("title", title)
-            .putString("text", content)
+            .putString("TITLE", title)
+            .putString("CONTENT", content)
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
@@ -82,28 +88,38 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
         WorkManager.getInstance(this).enqueue(workRequest)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        stopMonitoring()
-    }
-
     fun getAltitude(): Float {
         return (totalPositiveHeightDifference - totalNegativeHeightDifference)
     }
 
-    private fun stopMonitoring() {
-        sensorManager.unregisterListener(this)
-    }
-
-    private fun startMonitoring() {
+    private fun start() {
         if (sensor == null) {
             sendNotification(
                 "BrockApp - Pressure sensor",
                 "Pressure sensor is not present in this device"
             )
         } else {
+            startForeground(
+                ID_HEIGHT_DIFFERENCE_SERVICE_NOTIFY,
+                notificationUtil.getNotificationBody(
+                    CHANNEL_ID_HEIGHT_DIFFERENCE_SERVICE,
+                    "Brock App - Height difference monitoring",
+                    "Brock App is tracking the height difference in background",
+                    this
+                ).build()
+            )
+        }
+    }
+
+    private fun startMonitoring() {
+        if (sensor != null) {
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
         }
+    }
+
+    private fun stopMonitoring() {
+        sensorManager.unregisterListener(this)
+        stopSelf()
     }
 
     private fun convertPressureToAltitude(sessionPressure: Float): Float {

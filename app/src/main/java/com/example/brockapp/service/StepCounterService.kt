@@ -1,5 +1,7 @@
 package com.example.brockapp.service
 
+import com.example.brockapp.*
+import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.worker.ActivityRecognitionWorker
 
@@ -21,6 +23,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
     private var sessionStepsCount = 0L
     private var sensor: Sensor? = null
     private var binder = LocalBinder()
+    private var notificationUtil = NotificationUtil()
 
     private lateinit var sensorManager: SensorManager
 
@@ -30,11 +33,15 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
 
     override fun onCreate() {
         super.onCreate()
+
+        start()
+
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        startMonitoring()
         return binder
     }
 
@@ -44,8 +51,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startMonitoring()
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -54,26 +60,14 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
         }
 
         sessionStepsCount = event.values[0].toInt() - initialStepCount
-
-        if (sessionStepsCount > 20) {
-            sendNotification(
-                "BrockApp - Keep walking",
-                "You're going great! Continue walking for few minutes and take a deep breathe"
-            )
-        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        stopMonitoring()
-    }
-
     override fun sendNotification(title: String, content: String) {
         val inputData = Data.Builder()
-            .putString("title", title)
-            .putString("text", content)
+            .putString("TITLE", title)
+            .putString("CONTENT", content)
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
@@ -87,18 +81,33 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
         return sessionStepsCount
     }
 
-    private fun stopMonitoring() {
-        sensorManager.unregisterListener(this)
-    }
-
-    private fun startMonitoring() {
+    private fun start() {
         if (sensor == null) {
             sendNotification(
                 "BrockApp - Step Counter Sensor",
-                "The step counter sensor is not present in this device"
+                "Step counter sensor is not present in this device"
             )
         } else {
+            startForeground(
+                ID_STEP_COUNTER_SERVICE_NOTIFY,
+                notificationUtil.getNotificationBody(
+                    CHANNEL_ID_STEP_COUNTER_SERVICE,
+                    "Brock App - Pedometer monitoring",
+                    "Brock App is tracking your step count in background",
+                    this
+                ).build()
+            )
+        }
+    }
+
+    private fun startMonitoring() {
+        if (sensor != null) {
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST)
         }
+    }
+
+    private fun stopMonitoring() {
+        sensorManager.unregisterListener(this)
+        stopSelf()
     }
 }
