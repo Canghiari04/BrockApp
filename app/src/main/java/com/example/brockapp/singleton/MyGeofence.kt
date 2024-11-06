@@ -2,7 +2,7 @@ package com.example.brockapp.singleton
 
 import com.example.brockapp.*
 import com.example.brockapp.data.Locality
-import com.example.brockapp.room.GeofenceAreaEntity
+import com.example.brockapp.room.GeofenceAreasEntity
 import com.example.brockapp.receiver.GeofenceReceiver
 
 import android.content.Intent
@@ -17,7 +17,6 @@ class MyGeofence private constructor() {
     companion object {
         private var radius = 0
         private var duration = 86400000L
-        private var typeNetwork: String? = ""
 
         @Volatile
         private var status = false
@@ -26,7 +25,7 @@ class MyGeofence private constructor() {
         private var pendingIntent: PendingIntent? = null
 
         @Volatile
-        private var areas = mutableListOf<GeofenceAreaEntity>()
+        private var areas = mutableListOf<GeofenceAreasEntity>()
 
         fun getStatus(): Boolean {
             synchronized(this) {
@@ -58,16 +57,6 @@ class MyGeofence private constructor() {
             }
         }
 
-        fun getNetwork(context: Context): String {
-            synchronized(this) {
-                if (typeNetwork == null) {
-                    defineRadius(context)
-                }
-
-                return typeNetwork!!
-            }
-        }
-
         fun defineRadius(context: Context) {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -75,29 +64,25 @@ class MyGeofence private constructor() {
             val activeNetwork = connectivityManager.getNetworkCapabilities(network)
 
             if (activeNetwork != null) {
-                when {
+                radius = when {
                     activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
-                        typeNetwork = WI_FI_TYPE_CONNECTION
-                        radius = 150
+                        150
                     }
 
                     activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
-                        typeNetwork = CELLULAR_TYPE_CONNECTION
-                        radius = 200
+                        200
                     }
 
                     else -> {
-                        typeNetwork = NO_CONNECTION_TYPE_CONNECTION
-                        radius = 250
+                        250
                     }
                 }
             } else {
-                typeNetwork = NO_CONNECTION_TYPE_CONNECTION
                 radius = 250
             }
         }
 
-        fun defineAreas(items: List<GeofenceAreaEntity>) {
+        fun defineAreas(items: List<GeofenceAreasEntity>) {
             synchronized(this) {
                 areas = mutableListOf()
                 areas = items.toMutableList()

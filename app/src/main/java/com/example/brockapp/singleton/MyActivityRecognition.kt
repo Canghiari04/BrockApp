@@ -30,7 +30,6 @@ class MyActivityRecognition private constructor() {
             }
         }
 
-        // Function used to define when the user do some changes by the settings control
         fun setStatus(item: Boolean) {
             synchronized(this) {
                 status = item
