@@ -27,10 +27,8 @@ import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 class ChartUtil {
-    private var rangeUtil = PeriodRangeImpl()
-
     inner class CustomChartMarkerView(context: Context, layoutResource: Int): MarkerView(context, layoutResource) {
-        private val dates = rangeUtil.datesOfWeek
+        private val dates = PeriodRangeImpl().datesOfWeek
         private val labelTextView: TextView = findViewById(R.id.marker_value)
 
         override fun refreshContent(entry: Entry?, highlight: Highlight?) {
@@ -44,7 +42,8 @@ class ChartUtil {
                 }
 
                 else -> {
-                    " "
+                    // Here I need the check about the activity's type that I clicked before
+                    "%.3f".format(entry?.y)
                 }
             }
 
@@ -59,12 +58,18 @@ class ChartUtil {
     }
 
     fun populateBarChart(barChart: BarChart, entries: List<BarEntry>, context: Context) {
-        val dataSet = BarDataSet(entries, "Bar Chart")
-            .apply {
-                colors = MutableList(entries.size) { Color.GRAY }
-                setDrawValues(false)
-            }
+        val dataSet = BarDataSet(entries, "Time spent")
 
+        dataSet.colors = MutableList(entries.size) { Color.GRAY }
+
+        dataSet.setDrawValues(false)
+
+        // Define the dataset to insert inside the chart
+        val barData = BarData(dataSet)
+        barData.setDrawValues(false)
+        barChart.data = barData
+
+        // Marker used to see the data on the chart
         val marker = CustomChartMarkerView(context, R.layout.marker_chart_view)
         barChart.marker = marker
 
@@ -94,10 +99,6 @@ class ChartUtil {
         barChart.legend.isEnabled = false
         barChart.invalidate()
 
-        val barData = BarData(dataSet)
-        barData.setDrawValues(false)
-        barChart.data = barData
-
         barChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(entry: Entry?, p1: Highlight?) {
                 if (entry is BarEntry) {
@@ -115,52 +116,52 @@ class ChartUtil {
         })
     }
 
-    fun populateLineChart(label: String, lineChart: LineChart, entries: List<Entry>) {
-        val lineDataSet = LineDataSet(entries, label)
-        lineDataSet.setDrawValues(false)
+    fun populateLineChart(label: String,  entries: List<Entry>, lineChart: LineChart, context: Context) {
+        val dataSet = LineDataSet(entries, label)
 
-        // Define the properties of the line
-        lineDataSet.lineWidth = 2f
-        lineDataSet.color = Color.RED
-        lineDataSet.fillColor = Color.RED
-        lineDataSet.valueTextColor = Color.BLACK
+        dataSet.lineWidth = 2f
+        dataSet.color = Color.RED
+        dataSet.fillColor = Color.RED
+        dataSet.setCircleColors(Color.GRAY)
+        dataSet.valueTextColor = Color.BLACK
 
-        // Define the properties of the circles
-        lineDataSet.setDrawCircles(true)
-        lineDataSet.setCircleColors(Color.GRAY)
-        lineDataSet.setDrawFilled(true)
+        dataSet.setDrawFilled(true)
+        dataSet.setDrawValues(false)
+        dataSet.setDrawCircles(true)
 
-        // Define the data inside the plot
-        val lineData = LineData(lineDataSet)
+        val lineData = LineData(dataSet)
         lineChart.data = lineData
 
-        // Define the x axis
+        val marker = CustomChartMarkerView(context, R.layout.marker_chart_view)
+        lineChart.marker = marker
+
         val xAxis = lineChart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.granularity = 1f
         xAxis.setDrawGridLines(false)
 
-        // Define the y axis
         val leftAxis = lineChart.axisLeft
         leftAxis.axisMinimum = 0f
         leftAxis.setDrawGridLines(false)
 
-        // Disable the superfluous features
         lineChart.axisRight.isEnabled = false
         lineChart.description.isEnabled = false
 
-        lineChart.animateY(1000)
+        lineChart.animateX(1000)
+        lineChart.setTouchEnabled(true)
+        lineChart.setPinchZoom(true)
         lineChart.invalidate()
     }
 
     fun populatePieChart(entries: List<PieEntry>, pieChart: PieChart, context: Context) {
         // I passed a mutable list of colors to obtain the possibility to change the color while the app running
-        val dataSet = PieDataSet(entries, " ").apply {
-            setDrawValues(true)
-            valueTextSize = 12f
-            valueTypeface = Typeface.DEFAULT_BOLD
-            colors = MutableList(entries.size) { Color.GRAY }
-        }
+        val dataSet = PieDataSet(entries, " ")
+
+        dataSet.valueTextSize = 12f
+        dataSet.valueTypeface = Typeface.DEFAULT_BOLD
+        dataSet.colors = MutableList(entries.size) { Color.GRAY }
+
+        dataSet.setDrawValues(true)
 
         val data = PieData(dataSet)
         pieChart.data = data
@@ -171,9 +172,9 @@ class ChartUtil {
         pieChart.legend.isEnabled = false
         pieChart.description?.isEnabled = false
 
-        pieChart.invalidate()
         pieChart.setUsePercentValues(true)
         pieChart.setDrawEntryLabels(false)
+        pieChart.invalidate()
 
         pieChart.visibility = View.VISIBLE
 
