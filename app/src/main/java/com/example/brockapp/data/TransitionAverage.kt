@@ -5,5 +5,5 @@ data class TransitionAverage(
     val longitude: Double,
     val latitude: Double,
     val averageTime: String,
-    val count: Long
+    val count: Int
 )
