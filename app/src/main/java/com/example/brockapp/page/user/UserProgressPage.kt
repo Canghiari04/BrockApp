@@ -78,7 +78,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
                 buttonUser.setText("REMOVE")
                 buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
             } else {
-                buttonUser.setText("ADD")
+                buttonUser.setText("FOLLOW")
                 buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
@@ -188,7 +188,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     override fun observeVehicleLineChartEntries() {
         viewModelGroup.userVehicleLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Distance travelled", vehicleLineChart, entries)
+                chartUtil.populateLineChart("Distance travelled", entries, vehicleLineChart, requireContext())
             }
         }
     }
@@ -196,7 +196,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     override fun observeRunLineChartEntries() {
         viewModelGroup.userRunLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Distance done", runLineChart, entries)
+                chartUtil.populateLineChart("Kilometers run", entries, runLineChart, requireContext())
             }
         }
     }
@@ -204,7 +204,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     override fun observeWalkLineChartEntries() {
         viewModelGroup.userWalkLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Steps done", walkLineChart, entries)
+                chartUtil.populateLineChart("Steps done", entries, walkLineChart, requireContext())
             }
         }
     }

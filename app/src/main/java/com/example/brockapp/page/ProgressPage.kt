@@ -204,7 +204,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
     }
 
     private fun setUpPieChartSpinner(spinner: Spinner?) {
-        val spinnerItems = resources.getStringArray(R.array.spinner_pie_chart_items)
+        val spinnerItems = resources.getStringArray(R.array.spinner_temporal_items)
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

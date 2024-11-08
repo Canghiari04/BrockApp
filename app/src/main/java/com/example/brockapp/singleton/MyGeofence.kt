@@ -39,7 +39,6 @@ class MyGeofence private constructor() {
             }
         }
 
-        // Pending intent must never to change
         fun getPendingIntent(context: Context): PendingIntent {
             synchronized(this) {
                 if (pendingIntent == null) {
@@ -50,7 +49,6 @@ class MyGeofence private constructor() {
             return pendingIntent!!
         }
 
-        // Var like request, areas and radius can change in base of conditions of the device
         fun getRequest(): GeofencingRequest {
             synchronized(this) {
                 return createRequest()

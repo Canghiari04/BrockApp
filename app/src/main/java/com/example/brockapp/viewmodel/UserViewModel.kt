@@ -75,9 +75,7 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
                     _cities.postValue(items)
                 }
 
-                override fun onFailure(call: Call<CityResponse>, t: Throwable) {
-                    Log.e("USER_VIEW_MODEL", t.message.toString())
-                }
+                override fun onFailure(call: Call<CityResponse>, t: Throwable) { }
             })
     }
 

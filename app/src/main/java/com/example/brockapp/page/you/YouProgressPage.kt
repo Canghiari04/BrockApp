@@ -115,7 +115,7 @@ class YouProgressPage: ProgressPage() {
     override fun observeVehicleLineChartEntries() {
         viewModelActivities.vehicleLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Distance traveled", vehicleLineChart, entries)
+                chartUtil.populateLineChart("Distance travelled", entries, vehicleLineChart, requireContext())
             }
         }
     }
@@ -123,7 +123,7 @@ class YouProgressPage: ProgressPage() {
     override fun observeRunLineChartEntries() {
         viewModelActivities.runLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Kilometers done", runLineChart, entries)
+                chartUtil.populateLineChart("Kilometers run",  entries, runLineChart, requireContext())
             }
         }
     }
@@ -131,7 +131,7 @@ class YouProgressPage: ProgressPage() {
     override fun observeWalkLineChartEntries() {
         viewModelActivities.walkLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Steps done", walkLineChart, entries)
+                chartUtil.populateLineChart("Steps done",  entries, walkLineChart, requireContext())
             }
         }
     }
