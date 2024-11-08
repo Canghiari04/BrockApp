@@ -64,6 +64,7 @@ class DistanceService: Service() {
             ID_DISTANCE_SERVICE_NOTIFY,
             notificationUtil.getNotificationBody(
                 CHANNEL_ID_DISTANCE_SERVICE,
+                R.drawable.baseline_directions_run_24,
                 "BrockApp - Distance tracking",
                 "Brock App is tracking your distance travelled in background",
                 this

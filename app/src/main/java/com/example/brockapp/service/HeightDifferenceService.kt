@@ -103,6 +103,7 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
                 ID_HEIGHT_DIFFERENCE_SERVICE_NOTIFY,
                 notificationUtil.getNotificationBody(
                     CHANNEL_ID_HEIGHT_DIFFERENCE_SERVICE,
+                    R.drawable.baseline_directions_run_24,
                     "Brock App - Height difference monitoring",
                     "Brock App is tracking the height difference in background",
                     this

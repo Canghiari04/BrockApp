@@ -92,6 +92,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
                 ID_STEP_COUNTER_SERVICE_NOTIFY,
                 notificationUtil.getNotificationBody(
                     CHANNEL_ID_STEP_COUNTER_SERVICE,
+                    R.drawable.baseline_directions_run_24,
                     "Brock App - Pedometer monitoring",
                     "Brock App is tracking your step count in background",
                     this
