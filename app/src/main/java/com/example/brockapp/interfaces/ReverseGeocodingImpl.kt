@@ -35,7 +35,7 @@ class ReverseGeocodingImpl(private val context: Context): ReverseGeocoding {
 
             if (!addresses.isNullOrEmpty()) {
                 val items = CoroutineScope(Dispatchers.IO).async {
-                    db.GeofenceAreasDao().getAllGeofenceAreasByUsername(MyUser.username).map { it.name }
+                    db.GeofenceAreasDao().getGeofenceAreasByUsername(MyUser.username).map { it.name }
                 }.await()
 
                 if (items.isNotEmpty()) {
