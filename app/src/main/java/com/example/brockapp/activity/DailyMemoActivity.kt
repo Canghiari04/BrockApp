@@ -6,6 +6,7 @@ import com.example.brockapp.room.BrockDB
 import com.example.brockapp.room.MemosEntity
 import com.example.brockapp.viewmodel.MemoViewModel
 import com.example.brockapp.adapter.DailyMemoAdapter
+import com.example.brockapp.interfaces.ScheduleWorkerImpl
 import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.MemoViewModelFactory
 
@@ -31,6 +32,7 @@ class DailyMemoActivity: AppCompatActivity() {
     private lateinit var adapter: DailyMemoAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var button: FloatingActionButton
+    private lateinit var scheduleWorkerUtil: ScheduleWorkerImpl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,20 +40,21 @@ class DailyMemoActivity: AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_daily_memo_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
+        toolbar.setTitle(R.string.text_blank)
 
         date = intent.getStringExtra("CALENDAR_DATE")
-
-        recyclerView = findViewById(R.id.recycler_view_memos)
-
-        // Check if date is persistent to the current date
-        button = findViewById(R.id.button_new_memo)
-        setUpFloatingButton(date)
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = MemoViewModelFactory(db)
         viewModel = ViewModelProvider(this, viewModelFactory)[MemoViewModel::class.java]
+
+        recyclerView = findViewById(R.id.recycler_view_memos)
+
+        button = findViewById(R.id.button_new_memo)
+        setUpFloatingButton(date)
+
+        scheduleWorkerUtil = ScheduleWorkerImpl(this)
 
         observeMemos()
 
@@ -83,6 +86,7 @@ class DailyMemoActivity: AppCompatActivity() {
         if (::adapter.isInitialized) {
             adapter.getMemosSelected().forEach {
                 viewModel.deleteMemo(it)
+                scheduleWorkerUtil.scheduleDeleteMemoWorker(it.id)
             }
         } else {
             Log.d("DAILY_MEMO_ACTIVITY", "No one memo inside the list")
