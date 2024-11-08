@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 data class GeofenceTransitionsEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val username: String,
+    @ColumnInfo(name = "time_stamp") val timestamp: String,
     @ColumnInfo(name = "name_location") val nameLocation: String,
     val longitude: Double,
     val latitude: Double,

@@ -13,7 +13,10 @@ interface GeofenceTransitionsDao {
     suspend fun getLastTransition(): GeofenceTransitionsEntity
 
     @Query("SELECT * FROM GeofenceTransitions WHERE username=:username AND exit_time>arrival_time")
-    suspend fun getAllGeofenceTransitionsByUsername(username: String): List<GeofenceTransitionsEntity>
+    suspend fun getGeofenceTransitionsByUsername(username: String): List<GeofenceTransitionsEntity>
+
+    @Query("SELECT * FROM GeofenceTransitions WHERE username=:username AND exit_time>arrival_time AND time_stamp BETWEEN :startTime AND :endTime ORDER BY time_stamp")
+    suspend fun getGeofenceTransitionsByUsernameAndPeriod(username: String, startTime: String, endTime: String): List<GeofenceTransitionsEntity>
 
     @Insert
     suspend fun insertGeofenceTransition(transition: GeofenceTransitionsEntity)

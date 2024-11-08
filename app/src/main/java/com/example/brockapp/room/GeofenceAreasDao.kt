@@ -7,14 +7,14 @@ import androidx.room.OnConflictStrategy
 
 @Dao
 interface GeofenceAreasDao {
+    @Query("SELECT COUNT(*)>0 FROM GeofenceAreas WHERE name=:name AND latitude=:latitude AND longitude=:longitude")
+    suspend fun countGeofenceArea(name: String, latitude: Double, longitude: Double): Boolean
+
     @Query("SELECT COUNT(*) FROM GeofenceAreas")
     suspend fun countAllGeofenceAreas(): Int
 
-    @Query("SELECT COUNT(*)>0 FROM GeofenceAreas WHERE name=:locationName")
-    suspend fun countGeofenceAreaName(locationName: String): Boolean
-
     @Query("SELECT * FROM GeofenceAreas WHERE username=:username AND longitude>0 AND latitude>0")
-    suspend fun getAllGeofenceAreasByUsername(username: String): List<GeofenceAreasEntity>
+    suspend fun getGeofenceAreasByUsername(username: String): List<GeofenceAreasEntity>
 
     @Query("SELECT COUNT(*)>0 FROM GeofenceAreas WHERE longitude=:longitude AND latitude=:latitude")
     suspend fun checkIfAreaIsPresent(longitude: Double, latitude: Double): Boolean
