@@ -42,13 +42,16 @@
         <item>Run</item>
         <item>Walk</item>
     </string-array>
-    <string-array name="spinner_pie_chart_items">
+
+    <string-array name="spinner_temporal_items">
         <item>Day</item>
         <item>Week</item>
         <item>Month</item>
     </string-array>
 
     <string name="text_view_title_page_area">Look your areas!</string>
+    <string name="text_view_transitions_month">Select the period</string>
+    <string name="text_view_transitions_name">Select the area</string>
 
     <string name="button_new_activity">Icon add</string>
     <string name="button_settings">Icon settings</string>
@@ -107,7 +110,7 @@
     <string name="text_view_feature_name">Feature name</string>
     <string name="text_view_city">City</string>
     <string name="text_view_address">Address</string>
-    <string name="text_view_delete_marker">Delete</string>
+    <string name="text_view_delete_marker">DELETE</string>
 
     <string name="button_calendar_back">Back</string>
     <string name="button_calendar_forward">Forward</string>
@@ -120,6 +123,7 @@
     <string name="sunday_text_view">sun</string>
 
     <string name="description_daily_memo_icon">Icon add memo</string>
+    <string name="button_modify_memo">MODIFY</string>
 
     <string name="edit_text_title_memo">Enter memo title</string>
     <string name="edit_text_description_memo">Enter memo description</string>

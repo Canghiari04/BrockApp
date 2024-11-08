@@ -47,12 +47,13 @@
                     android:gravity="center_vertical"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="@string/text_view_activity_recognition"
+                    android:text="@string/text_view_geofence_transition"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    app:thumbTint="@color/white"/>
 
                 <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_activity_recognition_service"
+                    android:id="@+id/switch_geofence_transition_service"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -72,13 +73,12 @@
                     android:gravity="center_vertical"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="@string/text_view_geofence_transition"
+                    android:text="@string/text_view_activity_recognition"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black"
-                    app:thumbTint="@color/white"/>
+                    android:textColor="@android:color/black" />
 
                 <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_geofence_transition_service"
+                    android:id="@+id/switch_activity_recognition_service"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
