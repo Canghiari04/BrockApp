@@ -63,6 +63,7 @@ class MapFragment: Fragment() {
     private lateinit var input: AutoCompleteTextView
     private lateinit var button: FloatingActionButton
     private lateinit var locationRequest: LocationRequest
+    private lateinit var geofenceArea: GeofenceAreasEntity
     private lateinit var locationCallback: LocationCallback
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var viewModelGeofence: GeofenceViewModel
@@ -102,22 +103,13 @@ class MapFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         map = view.findViewById(R.id.container_view_map)
-        map.also {
-            it.setMultiTouchControls(true)
-            it.controller.setZoom(7.0)
-            it.controller.setCenter(
-                GeoPoint(
-                    41.8719,
-                    12.5674
-                )
-            )
-        }
-
-        getCurrentLocation()
 
         observeNetwork()
         observeInitialGeofenceAreas()
         observeUpdatesGeofenceAreas()
+        observeCheckGeofenceAreaAlreadyIn()
+
+        getCurrentLocation()
 
         input.addTextChangedListener {
             val userInput = input.text.toString()
@@ -132,18 +124,17 @@ class MapFragment: Fragment() {
             val (address, location) = getAddressAndLocation(selectedLocation)
 
             if (address != null && location != null) {
-                val geofenceArea = GeofenceAreasEntity(
+                geofenceArea = GeofenceAreasEntity(
                     username = MyUser.username,
                     longitude = location.longitude,
                     latitude = location.latitude,
                     name = address.featureName
                 )
 
-                addNewMarker(geofenceArea)
-                viewModelGeofence.insertGeofenceArea(geofenceArea)
+                viewModelGeofence.checkGeofenceAreaAlreadyIn(geofenceArea)
             } else {
-                toastUtil.showBasicToast(
-                    "No one location find with this address",
+                toastUtil.showWarningToast(
+                    "Location not found",
                     requireContext()
                 )
             }
@@ -172,6 +163,14 @@ class MapFragment: Fragment() {
         if (networkUtil.isInternetActive(requireContext())) map.onPause()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (::locationCallback.isInitialized) {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        }
+    }
+
     private fun observeNetwork() {
         viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { item ->
             map.visibility = if (item) View.VISIBLE else View.GONE
@@ -187,8 +186,10 @@ class MapFragment: Fragment() {
                 val mapMarker = mutableMapOf<String, GeoPoint>()
 
                 for (area in areas) {
-                    val coordinates = GeoPoint(area.latitude, area.longitude)
-                    mapMarker[area.name] = coordinates
+                    mapMarker[area.name] = GeoPoint(
+                        area.latitude,
+                        area.longitude
+                    )
                 }
 
                 populateMapOfMarker(mapMarker)
@@ -222,6 +223,7 @@ class MapFragment: Fragment() {
                     viewModelGeofence
                 ).show(it.supportFragmentManager, "CUSTOM_MARKER_DIALOG")
             }
+
             true
         }
     }
@@ -233,6 +235,132 @@ class MapFragment: Fragment() {
                     it.action = GeofenceService.Actions.RESTART.toString()
                     requireActivity().startService(it)
                 }
+            }
+        }
+    }
+
+    private fun observeCheckGeofenceAreaAlreadyIn() {
+        viewModelGeofence.isAlreadyIn.observe(viewLifecycleOwner) {
+            if (!it) {
+                addNewMarker(geofenceArea)
+                viewModelGeofence.insertGeofenceArea(geofenceArea)
+            } else {
+                toastUtil.showWarningToast(
+                    "Geofence area is already present",
+                    requireContext()
+                )
+
+                map.also {
+                    it.controller.setZoom(16.0)
+                    it.controller.setCenter(GeoPoint(
+                        geofenceArea.latitude,
+                        geofenceArea.longitude
+                    ))
+                }
+            }
+        }
+    }
+
+    private fun addNewMarker(geofenceArea: GeofenceAreasEntity) {
+        map.also {
+            val geoPoint = GeoPoint(
+                geofenceArea.latitude,
+                geofenceArea.longitude
+            )
+
+            it.controller.setZoom(16.0)
+            it.controller.setCenter(geoPoint)
+
+            val marker = Marker(map).also {
+                it.position = geoPoint
+                it.title = geofenceArea.name
+                it.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                it.icon = resources.getDrawable(R.drawable.map_marker_icon)
+
+                setUpMarker(it)
+            }
+
+            it.overlays.add(marker)
+        }
+    }
+
+    private fun getCurrentLocation() {
+        if (checkLocalizationPermission()) {
+            setUpCurrentLocationUpdate()
+
+            if (::locationRequest.isInitialized && ::locationCallback.isInitialized) {
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+            }
+        } else {
+            map.also {
+                it.setMultiTouchControls(true)
+                it.controller.setZoom(8.0)
+                it.controller.setCenter(
+                    GeoPoint(
+                        41.8719,
+                        12.5674
+                    )
+                )
+            }
+
+            toastUtil.showWarningToast(
+                "Geo localization is not active",
+                requireContext()
+            )
+        }
+    }
+
+    private fun checkLocalizationPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun setUpCurrentLocationUpdate() {
+        locationRequest = LocationRequest
+            .Builder(
+                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                15000
+            ).build()
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+
+                locationResult.locations[0]?.takeIf {
+                    lastKnownLocation?.latitude != it.latitude && lastKnownLocation?.longitude != it.longitude
+                }?.let { location ->
+                    map.let {
+                        val geoPoint = GeoPoint(
+                            location.latitude,
+                            location.longitude
+                        )
+
+                        map.controller.setZoom(16.0)
+                        map.controller.setCenter(geoPoint)
+
+                        val marker = Marker(map).also {
+                            it.closeInfoWindow()
+                            it.position = geoPoint
+                            it.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            it.icon = resources.getDrawable(R.drawable.geo_localization_marker)
+                        }
+
+                        lastKnownMarker?.let { item ->
+                            map.overlays.remove(item)
+                        }
+
+                        lastKnownLocation = location
+                        lastKnownMarker = marker
+
+                        map.overlays.add(marker)
+                    }
+                } ?: {
+                    toastUtil.showWarningToast(
+                        "Not possible to geocode your position",
+                        requireContext()
+                    )
+                }
+
+                fusedLocationClient.removeLocationUpdates(locationCallback)
             }
         }
     }
@@ -286,99 +414,5 @@ class MapFragment: Fragment() {
         }
 
         return Pair(address, location)
-    }
-
-    private fun addNewMarker(geofenceArea: GeofenceAreasEntity) {
-        map.also {
-            val geoPoint = GeoPoint(
-                geofenceArea.latitude,
-                geofenceArea.longitude
-            )
-
-            it.controller.setZoom(10.0)
-            it.controller.setCenter(geoPoint)
-
-            val marker = Marker(map).also {
-                it.position = geoPoint
-                it.title = geofenceArea.name
-                it.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                it.icon = resources.getDrawable(R.drawable.map_marker_icon)
-
-                setUpMarker(it)
-            }
-
-            it.overlays.add(marker)
-        }
-    }
-
-    private fun setUpCurrentLocationUpdate() {
-        locationRequest = LocationRequest
-            .Builder(
-                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-                15000
-            ).build()
-
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
-
-                locationResult.locations[0]?.takeIf {
-                    lastKnownLocation?.latitude != it.latitude && lastKnownLocation?.longitude != it.longitude
-                }?.let { location ->
-                    map.also {
-                        val geoPoint = GeoPoint(
-                            location.latitude,
-                            location.longitude
-                        )
-
-                        it.controller.setZoom(10.0)
-                        it.controller.setCenter(geoPoint)
-
-                        val marker = Marker(map).also {
-                            it.position = geoPoint
-                            it.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            it.icon = resources.getDrawable(R.drawable.geo_localization_marker)
-
-                            setUpMarker(it)
-                        }
-
-                        lastKnownMarker?.let { item ->
-                            map.overlays.remove(item)
-                        }
-
-                        lastKnownLocation = location
-                        lastKnownMarker = marker
-
-                        map.overlays.add(marker)
-                    }
-                } ?: {
-                    toastUtil.showWarningToast(
-                        "Not possible to geocode your position",
-                        requireContext()
-                    )
-                }
-
-                fusedLocationClient.removeLocationUpdates(locationCallback)
-            }
-        }
-    }
-
-    private fun getCurrentLocation() {
-        if (checkPermission()) {
-            setUpCurrentLocationUpdate()
-
-            if (::locationRequest.isInitialized && ::locationCallback.isInitialized) {
-                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
-            }
-        } else {
-            toastUtil.showBasicToast(
-                "Geo localization is not active",
-                requireContext()
-            )
-        }
-    }
-
-    private fun checkPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 }

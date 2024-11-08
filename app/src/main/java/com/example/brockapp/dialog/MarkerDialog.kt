@@ -3,6 +3,7 @@ package com.example.brockapp.dialog
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.interfaces.ScheduleWorkerImpl
 import com.example.brockapp.interfaces.ReverseGeocodingImpl
 
 import android.os.Bundle
@@ -38,6 +39,7 @@ class MarkerDialog(private val marker: Marker, private val map: MapView, private
         val latitude = marker.position.latitude
         val longitude = marker.position.longitude
 
+        val scheduleWorkerUtil = ScheduleWorkerImpl(requireContext())
         val address = geocodeUtil.getAddress(name, latitude, longitude)
 
         dialog?.window?.setLayout(
@@ -50,6 +52,7 @@ class MarkerDialog(private val marker: Marker, private val map: MapView, private
         setUpDialog(name, address)
 
         view.findViewById<TextView>(R.id.button_delete_marker).setOnClickListener {
+            scheduleWorkerUtil.scheduleDeleteGeofenceAreaWorker(latitude, longitude)
             viewModel.deleteGeofenceArea(longitude, latitude)
             map.overlays.remove(marker)
             dismiss()
