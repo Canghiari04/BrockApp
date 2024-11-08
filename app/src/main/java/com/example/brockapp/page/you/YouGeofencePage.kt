@@ -15,14 +15,17 @@ class YouGeofencePage: GeofencePage() {
         viewModelGeofence.geofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
-                populateSpinner(transitions)
+                populateSpinnerNames(transitions)
             } else {
                 Log.d("GEOFENCE_PAGE", "No one user's transitions retrieved")
             }
         }
     }
 
-    override fun loadGeofenceTransitions() {
-        viewModelGeofence.getGeofenceTransitions()
+    override fun loadGeofenceTransitions(startOfPeriod: String, endOfPeriod: String) {
+        viewModelGeofence.getGeofenceTransitions(
+            startOfPeriod,
+            endOfPeriod
+        )
     }
 }

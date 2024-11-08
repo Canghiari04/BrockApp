@@ -5,6 +5,7 @@ import com.example.brockapp.room.BrockDB
 import com.example.brockapp.data.TransitionAverage
 import com.example.brockapp.adapter.GeofenceAdapter
 import com.example.brockapp.viewmodel.GroupViewModel
+import com.example.brockapp.interfaces.PeriodRangeImpl
 import com.example.brockapp.viewmodel.GeofenceViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
 import com.example.brockapp.room.GeofenceTransitionsEntity
@@ -14,6 +15,7 @@ import com.example.brockapp.viewmodel.GeofenceViewModelFactory
 
 import android.os.Bundle
 import android.view.View
+import java.time.LocalDate
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
@@ -27,8 +29,12 @@ import kotlin.time.Duration.Companion.milliseconds
 import androidx.recyclerview.widget.LinearLayoutManager
 
 abstract class GeofencePage: Fragment(R.layout.page_geofence) {
-    private lateinit var spinner: Spinner
+    private val rangeUtil = PeriodRangeImpl()
+
+    private lateinit var spinnerName: Spinner
+    private lateinit var spinnerMonth: Spinner
     private lateinit var recyclerView: RecyclerView
+    private lateinit var period: Pair<String, String>
 
     protected val toastUtil = ShowCustomToastImpl()
 
@@ -49,7 +55,9 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
 
         buttonUser = view.findViewById(R.id.button_user_geofence_page)
 
-        spinner = view.findViewById(R.id.spinner_transitions_names)
+        spinnerMonth = view.findViewById(R.id.spinner_transitions_temporal)
+        spinnerName = view.findViewById(R.id.spinner_transitions_names)
+
         recyclerView = view.findViewById(R.id.recycler_view_page_geofence)
 
         val db = BrockDB.getInstance(requireContext())
@@ -65,14 +73,67 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
 
         observeGeofenceTransitions()
 
-        loadGeofenceTransitions()
+        populateSpinnerTemporal()
     }
 
     protected abstract fun setUpCardView()
 
     protected abstract fun observeGeofenceTransitions()
 
-    protected abstract fun loadGeofenceTransitions()
+    private fun populateSpinnerTemporal() {
+        val spinnerItems = resources.getStringArray(R.array.spinner_temporal_items)
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerMonth.adapter = adapter
+
+        spinnerMonth.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val item = spinnerItems[position]
+
+                when (item) {
+                    "Day" -> {
+                        period = rangeUtil.getDayRange(LocalDate.now())
+                        loadGeofenceTransitions(
+                            period.first,
+                            period.second
+                        )
+                    }
+
+                    "Week" -> {
+                        period = rangeUtil.getWeekRange(LocalDate.now())
+                        loadGeofenceTransitions(
+                            period.first,
+                            period.second
+                        )
+                    }
+
+                    "Month" -> {
+                        period = rangeUtil.getMonthRange(LocalDate.now())
+                        loadGeofenceTransitions(
+                            period.first,
+                            period.second
+                        )
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                period = rangeUtil.getDayRange(LocalDate.now())
+                loadGeofenceTransitions(
+                    period.first,
+                    period.second
+                )
+            }
+        }
+    }
+
+    protected abstract fun loadGeofenceTransitions(startOfPeriod: String, endOfPeriod: String)
 
     protected fun getGroupedTransitions(items: List<GeofenceTransitionsEntity>): List<TransitionAverage> {
         val groupedByLocation = items.groupBy { it.nameLocation }
@@ -95,23 +156,23 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
                 longitude = firstLocation.longitude,
                 latitude = firstLocation.latitude,
                 averageTime = averageDuration,
-                count = locationList.size.toLong()
+                count = locationList.size
             )
         }
     }
 
-    protected fun populateSpinner(transitions: List<TransitionAverage>) {
+    protected fun populateSpinnerNames(transitions: List<TransitionAverage>) {
         val spinnerItems = transitions.map {
             it.nameLocation
         }.toMutableList()
 
-        spinnerItems += "All transitions"
+        spinnerItems.add(0, "All transitions")
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        spinnerName.adapter = adapter
 
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        spinnerName.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -131,9 +192,7 @@ abstract class GeofencePage: Fragment(R.layout.page_geofence) {
                 )
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 

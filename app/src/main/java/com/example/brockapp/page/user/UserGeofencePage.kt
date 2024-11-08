@@ -3,7 +3,6 @@ package com.example.brockapp.page.user
 import com.example.brockapp.R
 import com.example.brockapp.data.Friend
 import com.example.brockapp.page.GeofencePage
-import com.example.brockapp.extraObject.MyUser
 
 import android.util.Log
 import android.view.View
@@ -73,7 +72,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
                 buttonUser.setText("REMOVE")
                 buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
             } else {
-                buttonUser.setText("ADD")
+                buttonUser.setText("FOLLOW")
                 buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
@@ -83,14 +82,14 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
         viewModelGroup.userGeofenceTransitions.observe(viewLifecycleOwner) { items ->
             if (!items.isNullOrEmpty()) {
                 val transitions = getGroupedTransitions(items)
-                populateSpinner(transitions)
+                populateSpinnerNames(transitions)
             } else {
                 Log.d("GEOFENCE_PAGE", "No one friend's transitions retrieved")
             }
         }
     }
 
-    override fun loadGeofenceTransitions() {
-        viewModelGroup.getUserGeofenceTransitions(friend)
+    override fun loadGeofenceTransitions(startOfPeriod: String, endOfPeriod: String) {
+        viewModelGroup.getUserGeofenceTransitions(startOfPeriod, endOfPeriod, friend)
     }
 }

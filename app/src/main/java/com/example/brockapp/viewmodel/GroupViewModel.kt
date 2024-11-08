@@ -560,7 +560,9 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         _userPieChartEntries.postValue(entries)
     }
 
-    fun getUserGeofenceTransitions(friend: Friend) {
+    fun getUserGeofenceTransitions(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
+        val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
+
         val list = ArrayList<GeofenceTransitionsEntity>()
 
         if (friend.geofenceTransitions.isNotEmpty()) {
@@ -568,6 +570,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
                 val transition = GeofenceTransitionsEntity(
                     it.id,
                     it.username,
+                    it.timestamp,
                     it.nameLocation,
                     it.longitude,
                     it.latitude,
@@ -579,7 +582,13 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        _userGeofenceTransitions.postValue(list.filter { it.nameLocation.isNotBlank() })
+        _userGeofenceTransitions.postValue(list
+            .filter { it.nameLocation.isNotBlank() }
+            .filter {
+                val timeStamp = LocalDateTime.parse(it.timestamp, pattern)
+                (timeStamp.isBefore(end) && timeStamp.isAfter(start))
+            }
+        )
     }
 
     fun addFriend(username: String?) {

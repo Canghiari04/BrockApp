@@ -16,27 +16,31 @@ class GeofenceViewModel(private val db: BrockDB): ViewModel() {
     private val _geofenceTransitions = MutableLiveData<List<GeofenceTransitionsEntity>>()
     val geofenceTransitions: LiveData<List<GeofenceTransitionsEntity>> get() = _geofenceTransitions
 
+    private val _isAlreadyIn = MutableLiveData<Boolean>()
+    val isAlreadyIn: LiveData<Boolean> get() = _isAlreadyIn
+
     private val _staticAreas = MutableLiveData<List<GeofenceAreasEntity>>()
     val staticAreas: LiveData<List<GeofenceAreasEntity>> get() = _staticAreas
 
     private val _dynamicAreas = MutableLiveData<List<GeofenceAreasEntity>>()
     val dynamicAreas: LiveData<List<GeofenceAreasEntity>> get() = _dynamicAreas
 
-    fun getGeofenceTransitions() {
+    fun getGeofenceTransitions(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val transitions = db.GeofenceTransitionsDao()
-                .getAllGeofenceTransitionsByUsername(MyUser.username)
-                .filter { it.nameLocation.isNotBlank() }
+            val transitions = db.GeofenceTransitionsDao().getGeofenceTransitionsByUsernameAndPeriod(
+                MyUser.username,
+                startOfPeriod,
+                endOfPeriod
+            ).filter { it.nameLocation.isNotBlank() }
 
             _geofenceTransitions.postValue(transitions)
         }
     }
 
-    // Difference between the fetch methods is that this one is used to define the area already inside the database
-    fun fetchStaticGeofenceAreas() {
+    fun checkGeofenceAreaAlreadyIn(area: GeofenceAreasEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            val items = db.GeofenceAreasDao().getAllGeofenceAreasByUsername(MyUser.username)
-            _staticAreas.postValue(items)
+            val item = db.GeofenceAreasDao().countGeofenceArea(area.name, area.latitude, area.longitude)
+            _isAlreadyIn.postValue(item)
         }
     }
 
@@ -47,18 +51,26 @@ class GeofenceViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    fun deleteGeofenceArea(longitude: Double, latitude: Double) {
+    // Difference between the fetch methods is that this one is used to define the area already inside the database
+    fun fetchStaticGeofenceAreas() {
         viewModelScope.launch(Dispatchers.IO) {
-            db.GeofenceAreasDao().deleteGeofenceArea(longitude, latitude)
-            fetchDynamicGeofenceAreas()
+            val items = db.GeofenceAreasDao().getGeofenceAreasByUsername(MyUser.username)
+            _staticAreas.postValue(items)
         }
     }
 
     // Second one used to define new area added from the MapFragment by the user
     private fun fetchDynamicGeofenceAreas() {
         viewModelScope.launch(Dispatchers.IO) {
-            val items = db.GeofenceAreasDao().getAllGeofenceAreasByUsername(MyUser.username)
+            val items = db.GeofenceAreasDao().getGeofenceAreasByUsername(MyUser.username)
             _dynamicAreas.postValue(items)
+        }
+    }
+
+    fun deleteGeofenceArea(longitude: Double, latitude: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.GeofenceAreasDao().deleteGeofenceArea(longitude, latitude)
+            fetchDynamicGeofenceAreas()
         }
     }
 }
