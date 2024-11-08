@@ -1,5 +1,6 @@
 package com.example.brockapp.service
 
+import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.singleton.MyGeofence
@@ -9,9 +10,11 @@ import com.example.brockapp.interfaces.ReverseGeocodingImpl
 
 import android.Manifest
 import android.util.Log
+import java.time.Instant
 import android.os.IBinder
 import androidx.work.Data
 import android.app.Service
+import java.time.ZoneOffset
 import android.content.Intent
 import kotlinx.coroutines.async
 import androidx.work.WorkManager
@@ -20,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import kotlinx.coroutines.CoroutineScope
+import java.time.format.DateTimeFormatter
 import androidx.work.OneTimeWorkRequestBuilder
 import com.google.android.gms.location.LocationServices
 
@@ -95,6 +99,7 @@ class GeofenceService: Service() {
         CoroutineScope(Dispatchers.IO).launch {
             val transition = GeofenceTransitionsEntity(
                 username = MyUser.username,
+                timestamp = getInstant(),
                 nameLocation = nameLocation ?: " ",
                 longitude = longitude,
                 latitude = latitude,
@@ -109,6 +114,13 @@ class GeofenceService: Service() {
             job.await()
             stopSelf()
         }
+    }
+
+    private fun getInstant(): String {
+        return DateTimeFormatter
+            .ofPattern(ISO_DATE_FORMAT)
+            .withZone(ZoneOffset.UTC)
+            .format(Instant.now())
     }
 
     private fun update(exitTime: Long) {
@@ -128,7 +140,7 @@ class GeofenceService: Service() {
             stopSelf()
         }
 
-        MyGeofence.defineAreas(db.GeofenceAreasDao().getAllGeofenceAreasByUsername(MyUser.username))
+        MyGeofence.defineAreas(db.GeofenceAreasDao().getGeofenceAreasByUsername(MyUser.username))
         MyGeofence.defineRadius(this)
 
         val geofenceClient = LocationServices.getGeofencingClient(this)

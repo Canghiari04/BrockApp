@@ -14,6 +14,7 @@ import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.room.UsersRunActivityEntity
 import com.example.brockapp.room.UsersWalkActivityEntity
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.interfaces.ScheduleWorkerImpl
 import com.example.brockapp.room.UsersStillActivityEntity
 import com.example.brockapp.room.GeofenceTransitionsEntity
 import com.example.brockapp.interfaces.ShowCustomToastImpl
@@ -48,6 +49,7 @@ class SupabaseService: Service() {
     private lateinit var s3Client: AmazonS3Client
     private lateinit var supabase: SupabaseClient
     private lateinit var receiver: BroadcastReceiver
+    private lateinit var scheduleWorkerUtil: ScheduleWorkerImpl
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
@@ -58,6 +60,8 @@ class SupabaseService: Service() {
 
         s3Client = MyS3ClientProvider.getInstance(this)
         file = File(this.filesDir, "user_data.json")
+
+        scheduleWorkerUtil = ScheduleWorkerImpl(this)
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -132,18 +136,33 @@ class SupabaseService: Service() {
     private fun syncSupabase() {
         try {
             CoroutineScope(Dispatchers.IO).launch {
-                supabase.also {
+                supabase.apply {
                     val user =  room.UsersDao().getUserFromUsernameAndPassword(MyUser.username, MyUser.password)
 
                     // Activities
-                    val runActivities = room.UsersRunActivityDao().getRunActivitiesByUsername(MyUser.username)
-                    val walkActivities = room.UsersWalkActivityDao().getWalkActivitiesByUsername(MyUser.username)
-                    val stillActivities = room.UsersStillActivityDao().getStillActivitiesByUsername(MyUser.username)
-                    val vehicleActivities = room.UsersVehicleActivityDao().getVehicleActivitiesByUsername(MyUser.username)
+                    val runActivities = room.UsersRunActivityDao()
+                        .getRunActivitiesByUsername(MyUser.username)
+                        .filter { it.distanceDone > 0.0 }
+
+                    val walkActivities = room.UsersWalkActivityDao()
+                        .getWalkActivitiesByUsername(MyUser.username)
+                        .filter { it.stepsNumber > 0 }
+
+                    val stillActivities = room.UsersStillActivityDao()
+                        .getStillActivitiesByUsername(MyUser.username)
+
+                    val vehicleActivities = room.UsersVehicleActivityDao()
+                        .getVehicleActivitiesByUsername(MyUser.username)
+                        .filter { it.distanceTravelled > 0.0 }
 
                     // Geofence area and transition
-                    val geofenceAreas = room.GeofenceAreasDao().getAllGeofenceAreasByUsername(MyUser.username)
-                    val geofenceTransition = room.GeofenceTransitionsDao().getAllGeofenceTransitionsByUsername(MyUser.username)
+                    val geofenceAreas = room.GeofenceAreasDao()
+                        .getGeofenceAreasByUsername(MyUser.username)
+                        .filter { it.name.isNotBlank() }
+
+                    val geofenceTransition = room.GeofenceTransitionsDao()
+                        .getGeofenceTransitionsByUsername(MyUser.username)
+                        .filter { it.nameLocation.isNotBlank() }
 
                     // Calendar's memos
                     val memos = room.MemosDao().getMemosByUsername(MyUser.username)
@@ -151,39 +170,39 @@ class SupabaseService: Service() {
                     // Friends
                     val friends = room.FriendsDao().getFriendsByUsername(MyUser.username)
 
-                    it.from("Users").upsert(
+                    supabase.from("Users").upsert(
                         user
                     )
 
-                    it.from("UsersVehicleActivity").upsert(
+                    supabase.from("UsersVehicleActivity").upsert(
                         vehicleActivities
                     )
 
-                    it.from("UsersRunActivity").upsert(
+                    supabase.from("UsersRunActivity").upsert(
                         runActivities
                     )
 
-                    it.from("UsersStillActivity").upsert(
+                    supabase.from("UsersStillActivity").upsert(
                         stillActivities
                     )
 
-                    it.from("UsersWalkActivity").upsert(
+                    supabase.from("UsersWalkActivity").upsert(
                         walkActivities
                     )
 
-                    it.from("GeofenceAreas").upsert(
+                    supabase.from("GeofenceAreas").upsert(
                         geofenceAreas
                     )
 
-                    it.from("GeofenceTransitions").upsert(
+                    supabase.from("GeofenceTransitions").upsert(
                         geofenceTransition
                     )
 
-                    it.from("Memos").upsert(
+                    supabase.from("Memos").upsert(
                         memos
                     )
 
-                    it.from("Friends").upsert(
+                    supabase.from("Friends").upsert(
                         friends
                     )
                 }
@@ -193,6 +212,12 @@ class SupabaseService: Service() {
                     MyUser.username,
                     MyUser.password
                 )
+
+                scheduleWorkerUtil.also {
+                    it.deleteMemoWorker()
+                    it.deleteSyncPeriodic()
+                    it.deleteGeofenceAreaWorker()
+                }
 
                 Intent().also {
                     it.action = "SYNC_DATA_ACTION"
@@ -222,6 +247,7 @@ class SupabaseService: Service() {
             ID_SUPABASE_SERVICE_NOTIFY,
             notificationUtil.getNotificationBody(
                 CHANNEL_ID_SUPABASE_SERVICE,
+                R.drawable.baseline_sync_24,
                 "BrockApp - Sync to service",
                 "The app is being configured, please wait a few seconds",
                 this
@@ -269,7 +295,7 @@ class SupabaseService: Service() {
                     filter { eq("username", MyUser.username) }
                 }.decodeList<FriendsEntity>()
 
-                // Previous delete made to avoid unique constraints inside the room database
+                // Previous delete made to avoid unique exception inside the room database
                 room.UsersDao().deleteUser(
                     user.username,
                     user.password
@@ -290,17 +316,15 @@ class SupabaseService: Service() {
                 room.FriendsDao().insertFriends(friends)
 
                 Intent().also {
-                    it.action = "SYNC_DATA_ACTION"
                     it.putExtra("NEXT_ACTIVITY", NextActivity.HOME.toString())
-
+                    it.action = "SYNC_DATA_ACTION"
                     sendBroadcast(it)
                 }
             }
         } catch (e: Exception) {
             Intent().also {
+                it.putExtra("NEXT_ACTIVITY", NextActivity.LOGIN.toString())
                 it.action = "SYNC_DATA_ACTION"
-                it.putExtra("NEXT_ACTIVITY", NextActivity.HOME.toString())
-
                 sendBroadcast(it)
             }
         }
@@ -329,6 +353,12 @@ class SupabaseService: Service() {
                     s3Client.deleteObject(request)
                 } catch (e: Exception) {
                     Log.d("SUPABASE_SERVICE", "User does not have the dump on S3")
+                }
+
+                scheduleWorkerUtil.also {
+                    it.deleteMemoWorker()
+                    it.deleteSyncPeriodic()
+                    it.deleteGeofenceAreaWorker()
                 }
 
                 Intent().also {
