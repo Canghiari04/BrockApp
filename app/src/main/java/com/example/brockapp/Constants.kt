@@ -60,7 +60,7 @@ const val DESCRIPTION_CHANNEL_HEIGHT_DIFFERENCE_SERVICE = "Channel for height di
 const val REQUEST_CODE_PICKING_IMAGE = 4
 
 // Database Version
-const val ROOM_DATABASE_VERSION = 31
+const val ROOM_DATABASE_VERSION = 32
 
 // Date Formatting
 const val DATE_TEXT_VIEW = ", "

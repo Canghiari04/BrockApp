@@ -55,7 +55,7 @@ class SyncBucketWorker(private val context: Context, workerParams: WorkerParamet
 
             val geofence = db
                 .GeofenceTransitionsDao()
-                .getAllGeofenceTransitionsByUsername(MyUser.username)
+                .getGeofenceTransitionsByUsername(MyUser.username)
 
             val userData = mapOf(
                 "username" to MyUser.username,

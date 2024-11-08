@@ -50,8 +50,11 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
 
         when (isConnected) {
             true -> {
+                val icon = R.drawable.baseline_signal_wifi_statusbar_4_bar_24
+
                 notification = notificationUtil.getNotificationBody(
                     CHANNEL_ID_CONNECTIVITY_WORKER,
+                    icon,
                     title,
                     content,
                     context
@@ -59,8 +62,11 @@ class ConnectivityWorker(private val context: Context, workerParams: WorkerParam
             }
 
             else -> {
+                val icon = R.drawable.baseline_signal_wifi_statusbar_null_24
+
                 notification = notificationUtil.getNotificationBodyWithPendingIntent(
                     CHANNEL_ID_CONNECTIVITY_WORKER,
+                    icon,
                     title,
                     content,
                     notificationUtil.getConnectivityPendingIntent(context),

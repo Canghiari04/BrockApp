@@ -29,6 +29,7 @@ class DailyMemoWorker(private val context: Context, workerParams: WorkerParamete
 
         val notification = util.getNotificationBody(
             CHANNEL_ID_MEMO_WORKER,
+            R.drawable.baseline_calendar_month_24,
             title,
             content,
             context

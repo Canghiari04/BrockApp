@@ -37,12 +37,13 @@ class NotificationUtil {
 
     fun getNotificationBody(
         channelId: String,
+        icon: Int,
         title: String?,
         text: String?,
         context: Context
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
-            setSmallIcon(R.drawable.baseline_directions_run_24)
+            setSmallIcon(icon)
             setContentTitle(HtmlCompat.fromHtml("<b>${title}</b>", HtmlCompat.FROM_HTML_MODE_LEGACY))
             setContentText(text)
             setStyle(NotificationCompat.BigTextStyle()
@@ -53,13 +54,14 @@ class NotificationUtil {
 
     fun getNotificationBodyWithPendingIntent(
         channelId: String,
+        icon: Int,
         title: String,
         content: String,
         pendingIntent: PendingIntent,
         context: Context
     ): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, channelId).apply {
-            setSmallIcon(R.drawable.baseline_directions_run_24)
+            setSmallIcon(icon)
             setContentTitle(HtmlCompat.fromHtml("<b>${title}</b>", HtmlCompat.FROM_HTML_MODE_LEGACY))
             setContentText(content)
             setStyle(
