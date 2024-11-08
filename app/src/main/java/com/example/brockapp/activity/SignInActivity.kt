@@ -38,8 +38,6 @@ class SignInActivity: AppCompatActivity() {
     private var networkUtil = InternetAvailableImpl()
 
     private lateinit var city: String
-    private lateinit var username: String
-    private lateinit var password: String
     private lateinit var typeActivity: String
     private lateinit var buttonSignIn: Button
     private lateinit var viewModelUser: UserViewModel
@@ -52,6 +50,7 @@ class SignInActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
+
         supportActionBar?.hide()
 
         buttonSignIn = findViewById(R.id.button_sign_in)
@@ -66,6 +65,7 @@ class SignInActivity: AppCompatActivity() {
         viewModelNetwork = ViewModelProvider(this)[NetworkViewModel::class.java]
 
         registerReceiver()
+
         checkConnectivity()
 
         observeNetwork()
@@ -80,8 +80,8 @@ class SignInActivity: AppCompatActivity() {
         setUpSpinnerActivity(findViewById(R.id.spinner_sign_in_activity))
 
         buttonSignIn.setOnClickListener {
-            username = findViewById<EditText>(R.id.edit_text_sign_in_username).text.toString()
-            password = findViewById<EditText>(R.id.edit_text_sign_in_password).text.toString()
+            val username = findViewById<EditText>(R.id.edit_text_sign_in_username).text.toString()
+            val password = findViewById<EditText>(R.id.edit_text_sign_in_password).text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 viewModelUser.registerUser(username, password, typeActivity, country.first, city)
@@ -95,15 +95,11 @@ class SignInActivity: AppCompatActivity() {
 
         findViewById<TextView>(R.id.text_view_login).setOnClickListener {
             Intent(this, LoginActivity::class.java).also {
+                unregisterReceiver(receiver)
                 startActivity(it)
                 finish()
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(receiver)
     }
 
     private fun registerReceiver() {
@@ -184,33 +180,10 @@ class SignInActivity: AppCompatActivity() {
 
     private fun goToHome() {
         Intent(this, PageLoaderActivity::class.java).also {
-            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             it.putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
+            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(it)
             finish()
-        }
-    }
-
-    private fun setUpSpinnerActivity(spinner: Spinner) {
-        val spinnerItems = resources.getStringArray(R.array.spinner_activities)
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                typeActivity = spinnerItems[position]
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
         }
     }
 
@@ -241,9 +214,7 @@ class SignInActivity: AppCompatActivity() {
                 viewModelUser.getCitiesFromCountry(country.second!!)
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 
@@ -262,9 +233,28 @@ class SignInActivity: AppCompatActivity() {
                 city = spinnerItems[position]
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
+        }
+    }
+
+    private fun setUpSpinnerActivity(spinner: Spinner) {
+        val spinnerItems = resources.getStringArray(R.array.spinner_activities)
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                typeActivity = spinnerItems[position]
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 }

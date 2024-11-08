@@ -31,7 +31,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
-import com.example.brockapp.interfaces.SchedulePeriodicWorkerImpl
 
 class AccountActivity: AppCompatActivity() {
     private var networkUtil = InternetAvailableImpl()
@@ -45,7 +44,6 @@ class AccountActivity: AppCompatActivity() {
     private lateinit var viewModelGroup: GroupViewModel
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var permissionUtil: AccountActivityPermissionUtil
-    private lateinit var scheduleWorkerUtil: SchedulePeriodicWorkerImpl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +74,6 @@ class AccountActivity: AppCompatActivity() {
         findViewById<TextView>(R.id.text_view_danger_zone).text =
             ("You are entering a danger area. Please proceed with caution or exit immediately")
 
-        scheduleWorkerUtil = SchedulePeriodicWorkerImpl(this)
-
         // Inside there is the callback to start the new intent
         permissionUtil = AccountActivityPermissionUtil(this) { pickImage() }
 
@@ -102,10 +98,7 @@ class AccountActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, PageLoaderActivity::class.java).putExtra(
-                    "FRAGMENT_TO_SHOW",
-                    R.id.navbar_item_you
-                )
+                val intent = Intent(this, PageLoaderActivity::class.java).putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
                 startActivity(intent)
                 finish()
                 true
@@ -153,12 +146,19 @@ class AccountActivity: AppCompatActivity() {
             permissionUtil.requestReadStoragePermission()
         }
 
+        logoutTextView.setOnClickListener {
+            sync(SupabaseService.Actions.SYNC.toString())
+        }
+
         deleteTextView.setOnClickListener {
             showDangerousDialog()
         }
+    }
 
-        logoutTextView.setOnClickListener {
-            sync(SupabaseService.Actions.SYNC.toString())
+    private fun sync(action: String) {
+        Intent(this, SupabaseService::class.java).also {
+            it.action = action
+            startService(it)
         }
     }
 
@@ -175,15 +175,6 @@ class AccountActivity: AppCompatActivity() {
             }
             .create()
             .show()
-    }
-
-    private fun sync(action: String) {
-        scheduleWorkerUtil.deleteSyncPeriodic()
-
-        Intent(this, SupabaseService::class.java).also {
-            it.action = action
-            startService(it)
-        }
     }
 
     private fun defineSubscriberAddress(country: String?, city: String?): String {
@@ -219,7 +210,6 @@ class AccountActivity: AppCompatActivity() {
                 }
             }
 
-
             deleteTextView.also {
                 it.isEnabled = item
 
@@ -234,11 +224,7 @@ class AccountActivity: AppCompatActivity() {
 
     private fun observeNumberOfFollower() {
         viewModelGroup.currentFriends.observe(this) {
-            if (it.isNotEmpty()) {
-                contentFirstColumn.text = it.size.toString()
-            } else {
-                Log.d("ACCOUNT_ACTIVITY", "No one friend retrieved")
-            }
+            contentFirstColumn.text = it.size.toString()
         }
     }
 }

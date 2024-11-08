@@ -24,8 +24,8 @@ import android.content.Intent
 import android.widget.EditText
 import android.widget.TextView
 import android.content.IntentFilter
-import androidx.annotation.RequiresApi
 import android.net.ConnectivityManager
+import androidx.annotation.RequiresApi
 import android.content.BroadcastReceiver
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -35,8 +35,6 @@ class LoginActivity: AppCompatActivity() {
     private var toastUtil = ShowCustomToastImpl()
     private var networkUtil = InternetAvailableImpl()
 
-    private lateinit var username: String
-    private lateinit var password: String
     private lateinit var buttonLogin: Button
     private lateinit var receiver: BroadcastReceiver
     private lateinit var viewModelUser: UserViewModel
@@ -67,29 +65,35 @@ class LoginActivity: AppCompatActivity() {
             }
 
             observeUserFromPreferences()
+
             permissionUtil.requestPostNotificationPermission()
         } else {
             setContentView(R.layout.activity_login)
+
             buttonLogin = findViewById(R.id.button_login)
 
             registerReceiver()
+
             checkConnectivity()
 
             viewModelNetwork = ViewModelProvider(this)[NetworkViewModel::class.java]
+
+            observeNetwork()
+            observeLogin()
 
             permissionUtil = PostNotificationsPermissionUtil(this) {
                 observeUser()
             }
 
-            observeNetwork()
-            observeLogin()
-
             buttonLogin.setOnClickListener {
-                username = findViewById<EditText>(R.id.edit_text_login_username).text.toString()
-                password = findViewById<EditText>(R.id.edit_text_login_password).text.toString()
+                val username = findViewById<EditText>(R.id.edit_text_login_username).text.toString()
+                val password = findViewById<EditText>(R.id.edit_text_login_password).text.toString()
 
                 if (username.isNotEmpty() && password.isNotEmpty()) {
-                    viewModelUser.getUserFromSupabase(username, password)
+                    viewModelUser.getUserFromSupabase(
+                        username,
+                        password
+                    )
                 } else {
                     toastUtil.showWarningToast(
                         "You must insert the field required",
@@ -150,40 +154,7 @@ class LoginActivity: AppCompatActivity() {
 
     // Function used to set the primary state of connection, without is not possible to use the observer pattern for LiveData
     private fun checkConnectivity() {
-        if (networkUtil.isInternetActive(this)) {
-            MyNetwork.isConnected = true
-        } else {
-            MyNetwork.isConnected = false
-            toastUtil.showWarningToast(
-                "You are offline, check the settings",
-                this
-            )
-        }
-    }
-
-    private fun observeUser() {
-        viewModelUser.user.observe(this) {
-            if (it != null) {
-                MyUser.apply {
-                    username = it.username
-                    password = it.password
-                    typeActivity = it.typeActivity
-                    country = it.country
-                    city = it.city
-                }
-
-                MySharedPreferences.setUpSharedPreferences(this)
-                unregisterReceiver(receiver)
-                sync()
-            }
-        }
-    }
-
-    private fun sync() {
-        Intent(this, SupabaseService::class.java).also {
-            it.action = SupabaseService.Actions.READ.toString()
-            startService(it)
-        }
+        MyNetwork.isConnected = networkUtil.isInternetActive(this)
     }
 
     private fun observeNetwork() {
@@ -211,6 +182,31 @@ class LoginActivity: AppCompatActivity() {
                     this
                 )
             }
+        }
+    }
+
+    private fun observeUser() {
+        viewModelUser.user.observe(this) {
+            if (it != null) {
+                MyUser.apply {
+                    username = it.username
+                    password = it.password
+                    typeActivity = it.typeActivity
+                    country = it.country
+                    city = it.city
+                }
+
+                MySharedPreferences.setUpSharedPreferences(this)
+                unregisterReceiver(receiver)
+                sync()
+            }
+        }
+    }
+
+    private fun sync() {
+        Intent(this, SupabaseService::class.java).also {
+            it.action = SupabaseService.Actions.READ.toString()
+            startService(it)
         }
     }
 }

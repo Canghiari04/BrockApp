@@ -57,7 +57,7 @@ class PageLoaderActivity: AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var drawer: DrawerLayout
-    private lateinit var viewModel: MemoViewModel
+    private lateinit var viewModelMemo: MemoViewModel
     private lateinit var receiver: ConnectivityReceiver
     private lateinit var viewModelGeofence: GeofenceViewModel
     private lateinit var settingsButton: FloatingActionButton
@@ -83,10 +83,9 @@ class PageLoaderActivity: AppCompatActivity() {
             R.id.navbar_item_group to groupFragment
         )
 
-        checkConnectivity()
-        checkServicesActive()
-
-        registerReceiver()
+        val db = BrockDB.getInstance(this)
+        val viewModelFactory = MemoViewModelFactory(db)
+        viewModelMemo = ViewModelProvider(this, viewModelFactory)[MemoViewModel::class.java]
 
         setUpActionBar()
         setUpFloatingButton()
@@ -97,133 +96,18 @@ class PageLoaderActivity: AppCompatActivity() {
             switchFragment(key, mapperFragment.getValue(key))
         }
 
-        val db = BrockDB.getInstance(this)
-        val viewModelFactory = MemoViewModelFactory(db)
-        viewModel = ViewModelProvider(this, viewModelFactory)[MemoViewModel::class.java]
-
+        checkServices()
+        checkConnectivity()
         checkCurrentMemos()
 
-        viewModel.getMemos(LocalDate.now().toString())
+        registerReceiver()
+
+        viewModelMemo.getMemos(LocalDate.now().toString())
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
-    }
-
-    private fun registerReceiver() {
-        receiver = ConnectivityReceiver(this)
-
-        ContextCompat.registerReceiver(
-            this,
-            receiver,
-            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-    }
-
-    private fun checkConnectivity() {
-        if (networkUtil.isInternetActive(this)) {
-            MyNetwork.isConnected = true
-        } else {
-            MyNetwork.isConnected = false
-            toastUtil.showWarningToast(
-                "You are offline, check the settings",
-                this
-            )
-        }
-    }
-
-    private fun checkServicesActive() {
-        if (checkGeofenceService()) {
-            if (!MyGeofence.getStatus()) {
-                startGeofenceTransition()
-            } else {
-                toastUtil.showBasicToast(
-                    "Geofence service is already active",
-                    this
-                )
-            }
-        } else {
-            toastUtil.showWarningToast(
-                "Geofence service is not active",
-                this
-            )
-        }
-
-        if (checkActivityRecognitionService()) {
-            if (!MyActivityRecognition.getStatus()) {
-                startActivityRecognition()
-            } else {
-                toastUtil.showBasicToast(
-                    "Recognition service is already active",
-                    this
-                )
-            }
-        } else {
-            toastUtil.showWarningToast(
-                "Recognition service is not active",
-                this
-            )
-        }
-    }
-
-    private fun checkGeofenceService(): Boolean {
-        return MySharedPreferences.checkService("GEOFENCE_TRANSITION", this) &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun checkActivityRecognitionService(): Boolean {
-        return MySharedPreferences.checkService("ACTIVITY_RECOGNITION", this) &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun startGeofenceTransition() {
-        val db = BrockDB.getInstance(this)
-        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
-        viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
-
-        // Observer used to work around a fatal error caused by the absence of geofence areas
-        observeGeofenceAreas()
-
-        viewModelGeofence.fetchStaticGeofenceAreas()
-    }
-
-    private fun observeGeofenceAreas() {
-        viewModelGeofence.staticAreas.observe(this) { items ->
-            if (!items.isNullOrEmpty()) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    MyGeofence.defineRadius(this)
-                    MyGeofence.defineAreas(items)
-
-                    val request = MyGeofence.getRequest()
-                    val pendingIntent = MyGeofence.getPendingIntent(this)
-                    val geofencingClient = LocationServices.getGeofencingClient(this)
-
-                    geofencingClient.addGeofences(request, pendingIntent).run {
-                        addOnSuccessListener {
-                            MyGeofence.setStatus(true)
-                        }
-                        addOnFailureListener {
-                            Log.e("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
-                        }
-                    }
-                }
-            } else {
-                Log.wtf("PAGE_LOADER_ACTIVITY", "Permission geofence transition has denied")
-            }
-        }
-    }
-
-    private fun startActivityRecognition() {
-        MyActivityRecognition.getTask(this)?.run {
-            addOnSuccessListener {
-                MyActivityRecognition.setStatus(true)
-            }
-            addOnFailureListener {
-                Log.d("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
-            }
-        }
     }
 
     private fun setUpActionBar() {
@@ -262,9 +146,10 @@ class PageLoaderActivity: AppCompatActivity() {
         newActivityButton = findViewById(R.id.button_new_activity)
 
         settingsButton.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-            finish()
+            Intent(this, SettingsActivity::class.java).also {
+                startActivity(it)
+                finish()
+            }
         }
 
         newActivityButton.setOnClickListener {
@@ -315,13 +200,120 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
+    private fun checkServices() {
+        if (checkGeofenceService()) {
+            if (!MyGeofence.getStatus()) {
+                startGeofenceTransition()
+            } else {
+                toastUtil.showBasicToast(
+                    "Geofence service is already active",
+                    this
+                )
+            }
+        } else {
+            toastUtil.showWarningToast(
+                "Geofence service is not active",
+                this
+            )
+        }
+
+        if (checkActivityRecognitionService()) {
+            if (!MyActivityRecognition.getStatus()) {
+                startActivityRecognition()
+            } else {
+                toastUtil.showBasicToast(
+                    "Recognition service is already active",
+                    this
+                )
+            }
+        } else {
+            toastUtil.showWarningToast(
+                "Recognition service is not active",
+                this
+            )
+        }
+    }
+
+    private fun checkGeofenceService(): Boolean {
+        return MySharedPreferences.checkService("GEOFENCE_TRANSITION", this) &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startGeofenceTransition() {
+        val db = BrockDB.getInstance(this)
+        val factoryViewModelGeofence = GeofenceViewModelFactory(db)
+        viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
+
+        // Observer used to work around a fatal error caused by the absence of geofence areas
+        observeGeofenceAreas()
+
+        viewModelGeofence.fetchStaticGeofenceAreas()
+    }
+
+    private fun observeGeofenceAreas() {
+        viewModelGeofence.staticAreas.observe(this) { items ->
+            if (!items.isNullOrEmpty()) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    MyGeofence.defineRadius(this)
+                    MyGeofence.defineAreas(items)
+
+                    val request = MyGeofence.getRequest()
+                    val pendingIntent = MyGeofence.getPendingIntent(this)
+                    val geofencingClient = LocationServices.getGeofencingClient(this)
+
+                    geofencingClient.addGeofences(request, pendingIntent).run {
+                        addOnSuccessListener {
+                            MyGeofence.setStatus(true)
+                        }
+                        addOnFailureListener {
+                            Log.e("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
+                        }
+                    }
+                }
+            } else {
+                Log.wtf("PAGE_LOADER_ACTIVITY", "Permission geofence transition has denied")
+            }
+        }
+    }
+
+    private fun checkActivityRecognitionService(): Boolean {
+        return MySharedPreferences.checkService("ACTIVITY_RECOGNITION", this) &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startActivityRecognition() {
+        MyActivityRecognition.getTask(this)?.run {
+            addOnSuccessListener {
+                MyActivityRecognition.setStatus(true)
+            }
+            addOnFailureListener {
+                Log.d("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
+            }
+        }
+    }
+
+    private fun checkConnectivity() {
+        MyNetwork.isConnected = networkUtil.isInternetActive(this)
+    }
+
     private fun checkCurrentMemos() {
-        viewModel.memos.observe(this) { items ->
+        viewModelMemo.memos.observe(this) { items ->
             if (!items.isNullOrEmpty()) {
                 OneTimeWorkRequestBuilder<DailyMemoWorker>().build().also {
                     WorkManager.getInstance(this).enqueue(it)
                 }
             }
         }
+    }
+
+    private fun registerReceiver() {
+        receiver = ConnectivityReceiver(this)
+
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 }

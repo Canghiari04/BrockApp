@@ -7,11 +7,11 @@ import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.service.GeofenceService
 import com.example.brockapp.viewmodel.UserViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.interfaces.ScheduleWorkerImpl
 import com.example.brockapp.viewmodel.UserViewModelFactory
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.singleton.MyActivityRecognition
 import com.example.brockapp.service.ActivityRecognitionService
-import com.example.brockapp.interfaces.SchedulePeriodicWorkerImpl
 import com.example.brockapp.util.ActivityRecognitionPermissionUtil
 import com.example.brockapp.util.GeofenceTransitionPermissionsUtil
 
@@ -37,9 +37,9 @@ class SettingsActivity: AppCompatActivity() {
 
     private lateinit var viewModel: UserViewModel
     private lateinit var switchDumpDatabase: SwitchCompat
+    private lateinit var scheduleWorkerUtil: ScheduleWorkerImpl
     private lateinit var switchGeofenceTransition: SwitchCompat
     private lateinit var switchActivityRecognition: SwitchCompat
-    private lateinit var scheduleWorkerUtil: SchedulePeriodicWorkerImpl
     private lateinit var geofenceUtil: GeofenceTransitionPermissionsUtil
     private lateinit var recognitionUtil: ActivityRecognitionPermissionUtil
 
@@ -48,11 +48,11 @@ class SettingsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        setSupportActionBar(toolbar)
-
-        scheduleWorkerUtil = SchedulePeriodicWorkerImpl(this)
+        findViewById<Toolbar>(R.id.toolbar_settings_activity).also {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            setSupportActionBar(it)
+            it.setTitle(R.string.text_blank)
+        }
 
         findViewById<TextView>(R.id.text_view_description_dump_database).text =
             "Sharing your data allows the app to provide a personalized experience!"
@@ -63,6 +63,8 @@ class SettingsActivity: AppCompatActivity() {
         switchDumpDatabase = findViewById(R.id.switch_share_dump_database)
         switchGeofenceTransition = findViewById(R.id.switch_geofence_transition_service)
         switchActivityRecognition = findViewById(R.id.switch_activity_recognition_service)
+
+        scheduleWorkerUtil = ScheduleWorkerImpl(this)
 
         switchMapper = mapOf(
             findViewById<SwitchCompat>(R.id.switch_vehicle_activity) to Pair("VEHICLE_ACTIVITY", DetectedActivity.IN_VEHICLE),
@@ -265,7 +267,6 @@ class SettingsActivity: AppCompatActivity() {
                     }
 
                     MySharedPreferences.setService("ACTIVITY_RECOGNITION", false, context)
-                    MyActivityRecognition.setStatus(false)
                 }
             }
         }

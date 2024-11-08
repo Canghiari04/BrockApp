@@ -23,7 +23,7 @@ class StillActivity: ChronometerActivity() {
         viewModel.updateStillActivity(System.currentTimeMillis())
     }
 
-    override fun setKindOfSensors() {
+    override fun setUpSensors() {
         firstTableRow.visibility = View.GONE
         secondTableRow.visibility = View.GONE
     }
@@ -38,7 +38,7 @@ class StillActivity: ChronometerActivity() {
             if (hours >= 10 && !notificationSent) {
                 sendNotification(
                     "BrockApp - Stand up!",
-                    "You have been stilled for more than an hour, do some stretching"
+                    "You have been stilled for more than an hour, do some stretching!"
                 )
 
                 notificationSent = true
