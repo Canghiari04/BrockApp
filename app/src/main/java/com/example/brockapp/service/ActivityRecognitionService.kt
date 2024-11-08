@@ -1,11 +1,14 @@
 package com.example.brockapp.service
 
 import com.example.brockapp.*
-import com.example.brockapp.database.BrockDB
+import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.database.UserWalkActivityEntity
-import com.example.brockapp.database.UserStillActivityEntity
-import com.example.brockapp.database.UserVehicleActivityEntity
+import com.example.brockapp.room.UsersRunActivityEntity
+import com.example.brockapp.room.UsersWalkActivityEntity
+import com.example.brockapp.room.UsersStillActivityEntity
+import com.example.brockapp.room.UsersVehicleActivityEntity
+import com.example.brockapp.singleton.MyActivityRecognition
+import com.example.brockapp.extraObject.MyServiceConnection
 
 import android.util.Log
 import java.time.Instant
@@ -14,8 +17,8 @@ import android.app.Service
 import java.time.ZoneOffset
 import android.content.Intent
 import android.content.Context
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import android.content.ComponentName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 import android.content.ServiceConnection
@@ -23,40 +26,23 @@ import java.time.format.DateTimeFormatter
 import com.google.android.gms.location.DetectedActivity
 
 class ActivityRecognitionService: Service() {
-    private var isBoundWalkService = false
-    private var isBoundVehicleService = false
-    private var walkService: WalkService? = null
-    private var vehicleService: VehicleService? = null
+    private var isDistanceServiceBound = false
+    private var isStepCounterServiceBound = false
+    private var isHeightDifferenceServiceBound = false
+    private var distanceService: DistanceService? = null
+    private var stepCounterService: StepCounterService? = null
+    private var heightDifferenceService: HeightDifferenceService? = null
+
+    private val serviceMapper = mapOf(
+        DetectedActivity.IN_VEHICLE to ::defineVehicleService,
+        DetectedActivity.RUNNING to ::defineRunService,
+        DetectedActivity.WALKING to ::defineWalkService
+    )
 
     private lateinit var db: BrockDB
-
-    private val vehicleServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            // When connection is established I can retrieve the service to get the distance traveled
-            val binder = service as VehicleService.LocalBinder
-            vehicleService = binder.getService()
-
-            isBoundVehicleService = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            isBoundVehicleService = false
-        }
-    }
-
-    private val walkServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            // I retrieve the service from thr binder, then I will take the step done
-            val binder = service as WalkService.LocalBinder
-
-            walkService = binder.getService()
-            isBoundWalkService = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            isBoundWalkService = false
-        }
-    }
+    private lateinit var distanceServiceConnection: ServiceConnection
+    private lateinit var heightDifferenceConnection: ServiceConnection
+    private lateinit var stepCounterServiceConnection: ServiceConnection
 
     override fun onCreate() {
         super.onCreate()
@@ -64,27 +50,42 @@ class ActivityRecognitionService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null) {
-            // Sync automatic when new activity are inserted
-            // viewModelFriends.uploadUserData()
-
-            // If activity type not found, I will put the UNKNOWN type
+        if (intent == null) {
+            stopSelf()
+        } else {
             val activityType = intent.getIntExtra("ACTIVITY_TYPE", 4)
-            val transitionType = intent.getIntExtra("TRANSITION_TYPE", 0)
             val arrivalTime = intent.getLongExtra("ARRIVAL_TIME", 0L)
             val exitTime = intent.getLongExtra("EXIT_TIME", 0L)
 
-            val timeStamp = getInstant()
+            when (intent.action) {
+                Actions.INSERT.toString() -> {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        serviceMapper[activityType]?.invoke()
+                        insert(activityType, arrivalTime)
+                    }
+                }
 
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    insertActivity(activityType, transitionType, timeStamp, arrivalTime, exitTime)
-                } catch (e: Exception) {
-                    Log.e("ACTIVITY_SERVICE", e.toString())
+                Actions.UPDATE.toString() -> {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val job = async {
+                            update(activityType, exitTime)
+                        }
+
+                        job.await()
+                        stopSelf()
+                    }
+                }
+
+                Actions.RESTART.toString() -> {
+                    restartMonitoring()
+                    stopSelf()
+                }
+
+                Actions.TERMINATE.toString() -> {
+                    MyActivityRecognition.removeTask(this)
+                    stopSelf()
                 }
             }
-        } else {
-            Log.d("ACTIVITY_SERVICE", "Null intent")
         }
 
         return super.onStartCommand(intent, flags, startId)
@@ -94,6 +95,143 @@ class ActivityRecognitionService: Service() {
         return null
     }
 
+    enum class Actions {
+        INSERT, UPDATE, RESTART, TERMINATE
+    }
+
+    private fun defineVehicleService() {
+        distanceServiceConnection = MyServiceConnection.createDistanceServiceConnection(
+            onConnected = { service ->
+                this.distanceService = service
+                isDistanceServiceBound = true
+            },
+            onDisconnected = {
+                isDistanceServiceBound = false
+            }
+        )
+    }
+
+    private fun defineRunService() {
+        distanceServiceConnection = MyServiceConnection.createDistanceServiceConnection(
+            onConnected = { service ->
+                this.distanceService = service
+                isDistanceServiceBound = true
+            },
+            onDisconnected = {
+                isDistanceServiceBound = false
+            }
+        )
+
+        heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
+            onConnected = { service ->
+                heightDifferenceService = service
+                isHeightDifferenceServiceBound = true
+            },
+            onDisconnected = {
+                isHeightDifferenceServiceBound = false
+            }
+        )
+    }
+
+    private fun defineWalkService() {
+        stepCounterServiceConnection = MyServiceConnection.createStepCounterService(
+            onConnected = { service ->
+                stepCounterService = service
+                isStepCounterServiceBound = true
+            },
+            onDisconnected = {
+                isStepCounterServiceBound = false
+            }
+        )
+
+        heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
+            onConnected = { service ->
+                heightDifferenceService = service
+                isHeightDifferenceServiceBound = true
+            },
+            onDisconnected = {
+                isHeightDifferenceServiceBound = false
+            }
+        )
+    }
+
+    private suspend fun insert(activityType: Int, arrivalTime: Long) {
+        when (activityType) {
+            DetectedActivity.IN_VEHICLE -> {
+                val intent = Intent(this, DistanceService::class.java)
+                startService(intent)
+                bindService(intent, distanceServiceConnection, Context.BIND_AUTO_CREATE)
+
+                db.UsersVehicleActivityDao().insertVehicleActivity(
+                    UsersVehicleActivityEntity(
+                        username = MyUser.username,
+                        timestamp = getInstant(),
+                        arrivalTime = arrivalTime,
+                        exitTime = 0L,
+                        distanceTravelled = 0.0
+                    )
+                )
+            }
+
+            DetectedActivity.RUNNING -> {
+                Intent(this, StepCounterService::class.java).also {
+                    startService(it)
+                    bindService(it, stepCounterServiceConnection, Context.BIND_AUTO_CREATE)
+                }
+
+                Intent(this, HeightDifferenceService::class.java).also {
+                    startService(it)
+                    bindService(it, heightDifferenceConnection, Context.BIND_AUTO_CREATE)
+                }
+
+                db.UsersRunActivityDao().insertRunActivity(
+                    UsersRunActivityEntity(
+                        username = MyUser.username,
+                        timestamp = getInstant(),
+                        arrivalTime = arrivalTime,
+                        exitTime = 0L,
+                        distanceDone = 0.0,
+                        heightDifference = 0f
+                    )
+                )
+            }
+
+            DetectedActivity.STILL -> {
+                db.UsersStillActivityDao().insertStillActivity(
+                    UsersStillActivityEntity(
+                        username = MyUser.username,
+                        timestamp = getInstant(),
+                        arrivalTime = arrivalTime,
+                        exitTime = 0L,
+                    )
+                )
+            }
+
+            DetectedActivity.WALKING -> {
+                Intent(this, StepCounterService::class.java).also {
+                    startService(it)
+                    bindService(it, stepCounterServiceConnection, Context.BIND_AUTO_CREATE)
+                }
+
+                Intent(this, HeightDifferenceService::class.java).also {
+                    startService(it)
+                    bindService(it, heightDifferenceConnection, Context.BIND_AUTO_CREATE)
+                }
+
+                db.UsersWalkActivityDao().insertWalkActivity(
+                    UsersWalkActivityEntity(
+                        username = MyUser.username,
+                        timestamp = getInstant(),
+                        arrivalTime = arrivalTime,
+                        exitTime = 0L,
+                        stepsNumber = 0L,
+                        heightDifference = 0f
+                    )
+                )
+            }
+        }
+    }
+
     private fun getInstant(): String {
         return DateTimeFormatter
             .ofPattern(ISO_DATE_FORMAT)
@@ -101,91 +239,77 @@ class ActivityRecognitionService: Service() {
             .format(Instant.now())
     }
 
-    private suspend fun insertActivity(activityType: Int, transitionType: Int, timeStamp: String, arrivalTime: Long, exitTime: Long) {
-        when (activityType) {
-            DetectedActivity.STILL -> {
-                if (transitionType == 0) {
-                    insertStillActivity(timeStamp, arrivalTime, exitTime)
-                } else {
-                    val lastId = db.UserStillActivityDao().getLastInsertedId()!!
-                    db.UserStillActivityDao().updateExitTime(lastId, exitTime)
+    private suspend fun update(activityType: Int, exitTime: Long) {
+        when(activityType) {
+            DetectedActivity.IN_VEHICLE -> {
+                if (isDistanceServiceBound)  {
+                    val distanceTravelled = distanceService?.getDistance() ?: 0.0
+                    unbindService(distanceServiceConnection)
+
+                    val lastId = db.UsersVehicleActivityDao().getLastInsertedId()
+                    db.UsersVehicleActivityDao().updateLastRecord(
+                        lastId,
+                        exitTime,
+                        distanceTravelled
+                    )
                 }
             }
 
-            DetectedActivity.IN_VEHICLE -> {
-                if (transitionType == 0) {
-                    val intent = Intent(this, VehicleService::class.java)
-                    startService(intent)
-                    bindService(intent, vehicleServiceConnection, Context.BIND_AUTO_CREATE)
+            DetectedActivity.RUNNING -> {
+                if (isDistanceServiceBound && isHeightDifferenceServiceBound) {
+                    val distanceDone = distanceService?.getDistance() ?: 0.0
+                    unbindService(distanceServiceConnection)
 
-                    insertVehicleActivity(timeStamp, arrivalTime, exitTime, 0.0)
-                } else {
-                    if (isBoundVehicleService) {
-                        val distanceTraveled = vehicleService?.getDistance()!!
-                        unbindService(vehicleServiceConnection)
+                    val heightDifference = heightDifferenceService?.getAltitude() ?: 0f
+                    unbindService(heightDifferenceConnection)
 
-                        val lastId = db.UserVehicleActivityDao().getLastInsertedId()!!
-                        db.UserVehicleActivityDao().updateExitTimeAndDistance(lastId, exitTime, distanceTraveled)
-                    } else {
-                        Log.e("ACTIVITY_RECOGNITION_SERVICE", "Connection closed unexpectedly")
-                    }
+                    val lastId = db.UsersRunActivityDao().getLastInsertedId()
+                    db.UsersRunActivityDao().updateLastRecord(
+                        lastId,
+                        exitTime,
+                        distanceDone,
+                        heightDifference
+                    )
                 }
+            }
+
+            DetectedActivity.STILL -> {
+                val lastId = db.UsersStillActivityDao().getLastInsertedId()
+                db.UsersStillActivityDao().updateLastRecord(
+                    lastId,
+                    exitTime
+                )
             }
 
             DetectedActivity.WALKING -> {
-                if (transitionType == 0) {
-                    val intent = Intent(this, WalkService::class.java)
-                    startService(intent)
-                    bindService(intent, walkServiceConnection, Context.BIND_AUTO_CREATE)
+                if (isStepCounterServiceBound && isHeightDifferenceServiceBound) {
+                    val stepsNumber = stepCounterService?.getSteps() ?: 0L
+                    unbindService(stepCounterServiceConnection)
 
-                    insertWalkActivity(timeStamp, arrivalTime, exitTime, 0L)
-                } else {
-                    if (isBoundWalkService) {
-                        val stepNumber = walkService?.getSteps()!!
-                        unbindService(walkServiceConnection)
+                    val heightDifference = heightDifferenceService?.getAltitude() ?: 0f
+                    unbindService(heightDifferenceConnection)
 
-                        val lastId = db.UserWalkActivityDao().getLastInsertedId()!!
-                        db.UserWalkActivityDao().updateExitTimeAndSteps(lastId, exitTime, stepNumber)
-                    } else {
-                        Log.e("ACTIVITY_RECOGNITION_SERVICE", "Connection closed unexpectedly")
-                    }
+                    val lastId = db.UsersRunActivityDao().getLastInsertedId()
+                    db.UsersWalkActivityDao().updateLastRecord(
+                        lastId,
+                        exitTime,
+                        stepsNumber,
+                        heightDifference
+                    )
                 }
             }
         }
     }
 
-    private suspend fun insertStillActivity(timeStamp: String, arrivalTime: Long, exitTime: Long) {
-        db.UserStillActivityDao().insertStillActivity(
-            UserStillActivityEntity(
-                userId = MyUser.id,
-                timestamp = timeStamp,
-                arrivalTime = arrivalTime,
-                exitTime = exitTime
-            )
-        )
-    }
-
-    private suspend fun insertVehicleActivity(timeStamp: String, arrivalTime: Long, exitTime: Long, distanceTraveled: Double) {
-        db.UserVehicleActivityDao().insertVehicleActivity(
-            UserVehicleActivityEntity(
-                userId = MyUser.id,
-                timestamp = timeStamp,
-                arrivalTime = arrivalTime,
-                exitTime = exitTime,
-                distanceTravelled = distanceTraveled
-            )
-        )
-    }
-
-    private suspend fun insertWalkActivity(timeStamp: String, arrivalTime: Long, exitTime: Long, stepNumber: Long) {
-        db.UserWalkActivityDao().insertWalkActivity(
-            UserWalkActivityEntity(
-                userId = MyUser.id,
-                timestamp = timeStamp,
-                arrivalTime = arrivalTime,
-                exitTime = exitTime,
-                stepNumber = stepNumber
-            )
-        )
+    private fun restartMonitoring() {
+        MyActivityRecognition.removeTask(this)
+        MyActivityRecognition.getTask(this)?.run {
+            addOnSuccessListener {
+                MyActivityRecognition.setStatus(true)
+            }
+            addOnFailureListener {
+                Log.d("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
+            }
+        }
     }
 }
