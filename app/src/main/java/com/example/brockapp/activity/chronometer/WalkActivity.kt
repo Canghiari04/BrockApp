@@ -2,12 +2,11 @@ package com.example.brockapp.activity.chronometer
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.service.StepCounterService
-import com.example.brockapp.room.UserWalkActivityEntity
+import com.example.brockapp.room.UsersWalkActivityEntity
 import com.example.brockapp.activity.ChronometerActivity
 import com.example.brockapp.service.HeightDifferenceService
 import com.example.brockapp.extraObject.MyServiceConnection
 
-import android.os.SystemClock
 import android.content.Intent
 import android.content.Context
 import android.content.ServiceConnection
@@ -24,28 +23,54 @@ class WalkActivity: ChronometerActivity() {
     override fun onStart() {
         super.onStart()
 
-        stepCounterServiceConnection = MyServiceConnection.createStepCounterService(
-            onConnected = { service ->
-                stepCounterService = service
-                isStepCounterServiceBound = true
-            },
-            onDisconnected = {
-                isStepCounterServiceBound = false
-            }
-        )
+        if (!isStepCounterServiceBound) {
+            stepCounterServiceConnection = MyServiceConnection.createStepCounterService(
+                onConnected = { service ->
+                    stepCounterService = service
+                    isStepCounterServiceBound = true
+                },
+                onDisconnected = {
+                    isStepCounterServiceBound = false
+                }
+            )
+        }
 
-        heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
-            onConnected = { service ->
-                heightDifferenceService = service
-                isHeightDifferenceServiceBound = true
-            },
-            onDisconnected = {
-                isHeightDifferenceServiceBound = false
-            }
-        )
+        if (!isHeightDifferenceServiceBound) {
+            heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
+                onConnected = { service ->
+                    heightDifferenceService = service
+                    isHeightDifferenceServiceBound = true
+                },
+                onDisconnected = {
+                    isHeightDifferenceServiceBound = false
+                }
+            )
+        }
     }
 
-    override fun registerActivity() {
+    override fun onPause() {
+        super.onPause()
+
+        if (isStepCounterServiceBound || isHeightDifferenceServiceBound) {
+            updateActivity()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isStepCounterServiceBound) {
+            isStepCounterServiceBound = false
+            unbindService(stepCounterServiceConnection)
+        }
+
+        if (isHeightDifferenceServiceBound) {
+            isHeightDifferenceServiceBound = false
+            unbindService(heightDifferenceConnection)
+        }
+    }
+
+    override fun insertActivity() {
         Intent(this, StepCounterService::class.java).also {
             startService(it)
             bindService(it, stepCounterServiceConnection, Context.BIND_AUTO_CREATE)
@@ -57,8 +82,8 @@ class WalkActivity: ChronometerActivity() {
         }
 
         viewModel.insertWalkActivity(
-            UserWalkActivityEntity(
-                userId = MyUser.id,
+            UsersWalkActivityEntity(
+                username = MyUser.username,
                 timestamp = getInstant(),
                 arrivalTime = System.currentTimeMillis(),
                 exitTime = 0L,
@@ -69,23 +94,26 @@ class WalkActivity: ChronometerActivity() {
     }
 
     override fun updateActivity() {
-        if (isStepCounterServiceBound && isHeightDifferenceServiceBound) {
-            val stepsNumber = stepCounterService?.getSteps()
-            unbindService(stepCounterServiceConnection)
-
-            val heightDifference = heightDifferenceService?.getAltitude()
-            unbindService(heightDifferenceConnection)
-
-            setKindOfSensors()
-            viewModel.updateWalkActivity(
-                System.currentTimeMillis(),
-                stepsNumber,
-                heightDifference
-            )
+        val stepsNumber = takeIf {
+            isStepCounterServiceBound
+        }.let {
+            stepCounterService?.getSteps()
         }
+
+        val heightDifference = takeIf {
+            isHeightDifferenceServiceBound
+        }.let {
+            heightDifferenceService?.getAltitude()
+        }
+
+        viewModel.updateWalkActivity(
+            System.currentTimeMillis(),
+            stepsNumber ?: 0L,
+            heightDifference ?: 0f
+        )
     }
 
-    override fun setKindOfSensors() {
+    override fun setUpSensors() {
         textViewTitleFirstSensor.text = "Step counter"
         textViewValueFirstSensor.text = "0 steps"
         textViewTitleSecondSensor.text = "Height difference"
@@ -94,16 +122,12 @@ class WalkActivity: ChronometerActivity() {
 
     override fun setUpChronometer() {
         chronometer.setOnChronometerTickListener {
-            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+            stepCounterService?.getSteps().let {
+                textViewValueFirstSensor.setText("%d steps".format(it))
+            }
 
-            if ((elapsedTime % 10).toInt() == 0) {
-                stepCounterService?.getSteps().also {
-                    if (it != null) textViewValueFirstSensor.setText("%d steps".format(it))
-                }
-
-                heightDifferenceService?.getAltitude().also {
-                    if (it != null) textViewValueSecondSensor.setText("%.3f m".format(it))
-                }
+            heightDifferenceService?.getAltitude().let {
+                textViewValueSecondSensor.setText("%.3f m".format(it))
             }
         }
     }

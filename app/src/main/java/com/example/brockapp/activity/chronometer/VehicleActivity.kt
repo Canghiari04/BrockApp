@@ -7,7 +7,6 @@ import com.example.brockapp.room.UsersVehicleActivityEntity
 import com.example.brockapp.extraObject.MyServiceConnection
 
 import android.view.View
-import android.os.SystemClock
 import android.content.Intent
 import android.content.Context
 import android.content.ServiceConnection
@@ -21,15 +20,34 @@ class VehicleActivity: ChronometerActivity() {
     override fun onStart() {
         super.onStart()
 
-        serviceConnection = MyServiceConnection.createDistanceServiceConnection(
-            onConnected = { service ->
-                this.service = service
-                isBound = true
-            },
-            onDisconnected = {
-                isBound = false
-            }
-        )
+        if (!isBound) {
+            serviceConnection = MyServiceConnection.createDistanceServiceConnection(
+                onConnected = { service ->
+                    this.service = service
+                    isBound = true
+                },
+                onDisconnected = {
+                    isBound = false
+                }
+            )
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (isBound) {
+            updateActivity()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isBound) {
+            isBound = false
+            unbindService(serviceConnection)
+        }
     }
 
     override fun insertActivity() {
@@ -50,31 +68,29 @@ class VehicleActivity: ChronometerActivity() {
     }
 
     override fun updateActivity() {
-        if (isBound) {
-            val distanceTravelled = service?.getDistance()
-            unbindService(serviceConnection)
-
-            setKindOfSensors()
-            viewModel.updateVehicleActivity(System.currentTimeMillis(), distanceTravelled)
+        val distanceTravelled = takeIf {
+            isBound
+        }.let {
+            service?.getDistance()
         }
+
+        viewModel.updateVehicleActivity(
+            System.currentTimeMillis(),
+            distanceTravelled ?: 0.0
+        )
     }
 
-    override fun setKindOfSensors() {
+    override fun setUpSensors() {
         secondTableRow.visibility = View.GONE
 
         textViewTitleFirstSensor.text = "Distance travelled"
-        textViewValueFirstSensor.text = "0.0 km"
+        textViewValueFirstSensor.text = "0 km"
     }
 
-    // I used the chronometer view to update the value of the distance done
     override fun setUpChronometer() {
         chronometer.setOnChronometerTickListener {
-            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-
-            if ((elapsedTime % 10).toInt() == 0) {
-                service?.getDistance()?.div(TO_KM).also {
-                    if (it != null) textViewValueFirstSensor.text = ("%.1f km".format(it))
-                }
+            service?.getDistance()?.div(TO_KM).let {
+                textViewValueFirstSensor.text = ("%.3f km".format(it))
             }
         }
     }

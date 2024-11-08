@@ -52,7 +52,8 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chronometer)
 
-        supportActionBar?.setTitle(R.string.text_blank)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.setTitle(R.string.text_blank)
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = ActivitiesViewModelFactory(db)
@@ -133,6 +134,7 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
                 stopButton.isEnabled = false
                 startButton.isEnabled = true
 
+                setUpSensors()
                 updateActivity()
             }
         }

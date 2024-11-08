@@ -7,7 +7,6 @@ import com.example.brockapp.activity.ChronometerActivity
 import com.example.brockapp.service.HeightDifferenceService
 import com.example.brockapp.extraObject.MyServiceConnection
 
-import android.os.SystemClock
 import android.content.Intent
 import android.content.Context
 import android.content.ServiceConnection
@@ -24,25 +23,51 @@ class RunActivity: ChronometerActivity() {
     override fun onStart() {
         super.onStart()
 
-        distanceServiceConnection = MyServiceConnection.createDistanceServiceConnection(
-            onConnected = { service ->
-                distanceService = service
-                isDistanceServiceBound = true
-            },
-            onDisconnected = {
-                isDistanceServiceBound = false
-            }
-        )
+        if (!isDistanceServiceBound) {
+            distanceServiceConnection = MyServiceConnection.createDistanceServiceConnection(
+                onConnected = { service ->
+                    distanceService = service
+                    isDistanceServiceBound = true
+                },
+                onDisconnected = {
+                    isDistanceServiceBound = false
+                }
+            )
+        }
 
-        heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
-            onConnected = { service ->
-                heightDifferenceService = service
-                isHeightDifferenceServiceBound = true
-            },
-            onDisconnected = {
-                isHeightDifferenceServiceBound = false
-            }
-        )
+        if (!isHeightDifferenceServiceBound) {
+            heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
+                onConnected = { service ->
+                    heightDifferenceService = service
+                    isHeightDifferenceServiceBound = true
+                },
+                onDisconnected = {
+                    isHeightDifferenceServiceBound = false
+                }
+            )
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (isDistanceServiceBound || isHeightDifferenceServiceBound) {
+            updateActivity()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isDistanceServiceBound) {
+            isDistanceServiceBound = false
+            unbindService(distanceServiceConnection)
+        }
+
+        if (isHeightDifferenceServiceBound) {
+            isHeightDifferenceServiceBound = false
+            unbindService(heightDifferenceConnection)
+        }
     }
 
     override fun insertActivity() {
@@ -69,23 +94,26 @@ class RunActivity: ChronometerActivity() {
     }
 
     override fun updateActivity() {
-        if (isDistanceServiceBound && isHeightDifferenceServiceBound) {
-            val distancedDone = distanceService?.getDistance()
-            unbindService(distanceServiceConnection)
-
-            val heightDifference = heightDifferenceService?.getAltitude()
-            unbindService(heightDifferenceConnection)
-
-            setKindOfSensors()
-            viewModel.updateRunActivity(
-                System.currentTimeMillis(),
-                distancedDone,
-                heightDifference
-            )
+        val distanceRun = takeIf {
+            isDistanceServiceBound
+        }.let {
+            distanceService?.getDistance()
         }
+
+        val heightDifference = takeIf {
+            isHeightDifferenceServiceBound
+        }.let {
+            heightDifferenceService?.getAltitude()
+        }
+
+        viewModel.updateRunActivity(
+            System.currentTimeMillis(),
+            distanceRun ?: 0.0,
+            heightDifference ?: 0f
+        )
     }
 
-    override fun setKindOfSensors() {
+    override fun setUpSensors() {
         textViewTitleFirstSensor.text = "Distance run"
         textViewValueFirstSensor.text = "0 km"
         textViewTitleSecondSensor.text = "Height difference"
@@ -94,18 +122,12 @@ class RunActivity: ChronometerActivity() {
 
     override fun setUpChronometer() {
         chronometer.setOnChronometerTickListener {
-            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
+            distanceService?.getDistance()?.div(TO_KM).let {
+                textViewValueFirstSensor.text = ("%.3f km".format(it))
+            }
 
-            if ((elapsedTime % 5).toInt() == 0) {
-                distanceService?.getDistance()?.div(TO_KM).also {
-                    if (it != null) {
-                        textViewValueFirstSensor.text = ("%.3f km".format(it))
-                    }
-                }
-
-                heightDifferenceService?.getAltitude().also {
-                    if (it != null) textViewValueSecondSensor.text = ("%.3f m".format(it))
-                }
+            heightDifferenceService?.getAltitude().let {
+                textViewValueSecondSensor.text = ("%.3f m".format(it))
             }
         }
     }
