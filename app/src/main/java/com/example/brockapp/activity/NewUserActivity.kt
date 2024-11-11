@@ -6,30 +6,29 @@ import com.example.brockapp.activity.chronometer.WalkActivity
 import com.example.brockapp.activity.chronometer.StillActivity
 import com.example.brockapp.activity.chronometer.VehicleActivity
 import com.example.brockapp.util.AccessFineLocationPermissionUtil
+import com.example.brockapp.util.ActivityRecognitionPermissionUtil
 
 import android.os.Bundle
 import android.view.MenuItem
 import android.content.Intent
-import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NewUserActivity: AppCompatActivity() {
-    private lateinit var newUserActivityUtil: AccessFineLocationPermissionUtil
+    private lateinit var recognitionUtil: ActivityRecognitionPermissionUtil
+    private lateinit var accessRunLocationUtil: AccessFineLocationPermissionUtil
+    private lateinit var accessVehicleLocationUtil: AccessFineLocationPermissionUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_user)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
-        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        findViewById<TextView>(R.id.text_view_welcome_new_activity).text =
-            "Some activity may require permission to access your location, to improve the use of app"
+        supportActionBar?.title = resources.getText(R.string.toolbar_new_activity)
 
         val buttonVehicle = findViewById<FloatingActionButton>(R.id.button_vehicle)
         val buttonStill = findViewById<FloatingActionButton>(R.id.button_still)
@@ -37,20 +36,28 @@ class NewUserActivity: AppCompatActivity() {
         val buttonRun = findViewById<FloatingActionButton>(R.id.button_run)
         setUpButtons(buttonVehicle, buttonRun, buttonStill, buttonWalk)
 
-        newUserActivityUtil = AccessFineLocationPermissionUtil(
-            this
-        ) { enableButtons(buttonVehicle, buttonRun) }
+        accessVehicleLocationUtil = AccessFineLocationPermissionUtil(
+            this,
+        ) { startRegisterActivity("Vehicle") }
 
-        newUserActivityUtil.requestAccessFineLocation()
+        accessRunLocationUtil = AccessFineLocationPermissionUtil(
+            this
+        ) { startRegisterActivity("Run") }
+
+        recognitionUtil = ActivityRecognitionPermissionUtil(
+            this,
+            { startRegisterActivity("Walk") },
+            null
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, PageLoaderActivity::class.java).putExtra(
-                    "FRAGMENT_TO_SHOW",
-                    R.id.navbar_item_you
-                    )
+                val intent = Intent(this, PageLoaderActivity::class.java).apply {
+                    putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
+                }
+
                 startActivity(intent)
                 finish()
                 true
@@ -63,43 +70,55 @@ class NewUserActivity: AppCompatActivity() {
         }
     }
 
-    // I ust define the other button for run activity
-    private fun setUpButtons(buttonVehicle: FloatingActionButton, buttonRun: FloatingActionButton, buttonStill: FloatingActionButton, buttonWalk: FloatingActionButton) {
-        buttonVehicle.also {
-            it.isEnabled = false
-            it.setOnClickListener {
-                val intent = Intent(this, VehicleActivity::class.java)
-                startActivity(intent)
-                finish()
+    private fun setUpButtons(
+        buttonVehicle: FloatingActionButton,
+        buttonRun: FloatingActionButton,
+        buttonStill: FloatingActionButton,
+        buttonWalk: FloatingActionButton
+    ) {
+        buttonVehicle.apply {
+            setOnClickListener {
+                accessVehicleLocationUtil.requestAccessFineLocation()
             }
         }
 
-        buttonRun.also {
-            it.isEnabled = false
-            it.setOnClickListener {
-                val intent = Intent(this, RunActivity::class.java)
-                startActivity(intent)
-                finish()
+        buttonRun.apply {
+            setOnClickListener {
+                accessRunLocationUtil.requestAccessFineLocation()
             }
         }
 
         buttonStill.setOnClickListener {
-            val intent = Intent(this, StillActivity::class.java)
-            startActivity(intent)
-            finish()
+            startRegisterActivity("Still")
         }
 
-        buttonWalk.also {
-            it.setOnClickListener {
-                val intent = Intent(this, WalkActivity::class.java)
-                startActivity(intent)
-                finish()
+        buttonWalk.apply {
+            setOnClickListener {
+                recognitionUtil.requestActivityRecognitionPermission()
             }
         }
     }
 
-    private fun enableButtons(buttonVehicle: FloatingActionButton, buttonRun: FloatingActionButton) {
-        buttonVehicle.isEnabled = true
-        buttonRun.isEnabled = true
+    private fun startRegisterActivity(activity: String) {
+        val intent = when (activity) {
+            "Vehicle" -> {
+                Intent(this, VehicleActivity::class.java)
+            }
+
+            "Run" -> {
+                Intent(this, RunActivity::class.java)
+            }
+
+            "Still" -> {
+                Intent(this, StillActivity::class.java)
+            }
+
+            else -> {
+                Intent(this, WalkActivity::class.java)
+            }
+        }
+
+        startActivity(intent)
+        finish()
     }
 }
