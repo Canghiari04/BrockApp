@@ -431,7 +431,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.distanceTravelled } / TO_KM).toFloat()
             }
 
-            val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
+            val entries = defineLineChartEntries(firstDay, lastDay.plusDays(1), distancePerDay)
 
             _vehicleLineChartEntries.postValue(entries)
         }
@@ -461,7 +461,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.distanceDone } / TO_KM).toFloat()
             }
 
-            val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
+            val entries = defineLineChartEntries(firstDay, lastDay.plusDays(1), distancePerDay)
 
             _runLineChartEntries.postValue(entries)
         }
@@ -491,7 +491,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 (it.value.sumOf { it.stepsNumber }).toFloat()
             }
 
-            val entries = defineLineChartEntries(firstDay, lastDay, stepsPerDay)
+            val entries = defineLineChartEntries(firstDay, lastDay.plusDays(1), stepsPerDay)
 
             _walkLineChartEntries.postValue(entries)
         }

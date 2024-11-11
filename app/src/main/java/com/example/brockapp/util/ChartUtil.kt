@@ -42,8 +42,19 @@ class ChartUtil {
                 }
 
                 else -> {
-                    // Here I need the check about the activity's type that I clicked before
-                    "%.3f".format(entry?.y)
+                    when (entry?.data) {
+                        "km" -> {
+                            "%.3f km".format(entry.y)
+                        }
+
+                        "steps" -> {
+                            "%.0f steps".format(entry.y)
+                        }
+
+                        else -> {
+                            " "
+                        }
+                    }
                 }
             }
 
@@ -117,6 +128,26 @@ class ChartUtil {
     }
 
     fun populateLineChart(label: String,  entries: List<Entry>, lineChart: LineChart, context: Context) {
+        when {
+            label.contains("Distance") -> {
+                entries.forEach {
+                    it.data = "km"
+                }
+            }
+
+            label.contains("Kilometers") -> {
+                entries.forEach {
+                    it.data = "km"
+                }
+            }
+
+            label.contains("Steps") -> {
+                entries.forEach {
+                    it.data = "steps"
+                }
+            }
+        }
+
         val dataSet = LineDataSet(entries, label)
 
         dataSet.lineWidth = 2f

@@ -453,7 +453,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.distanceTravelled } / TO_KM).toFloat()
         }
 
-        val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
+        val entries = defineLineChartEntries(firstDay, lastDay.plusDays(1), distancePerDay)
 
         _userVehicleLineChartEntries.postValue(entries)
     }
@@ -475,7 +475,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.distanceDone } / TO_KM).toFloat()
         }
 
-        val entries = defineLineChartEntries(firstDay, lastDay, distancePerDay)
+        val entries = defineLineChartEntries(firstDay, lastDay.plusDays(1), distancePerDay)
 
         _userRunLineChartEntries.postValue(entries)
     }
@@ -497,7 +497,7 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             (it.value.sumOf { it.stepsNumber }).toFloat()
         }
 
-        val entries = defineLineChartEntries(firstDay, lastDay, stepsPerDay)
+        val entries = defineLineChartEntries(firstDay, lastDay.plusDays(1), stepsPerDay)
 
         _userWalkLineChartEntries.postValue(entries)
     }
