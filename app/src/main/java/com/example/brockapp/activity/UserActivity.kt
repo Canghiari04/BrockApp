@@ -31,13 +31,13 @@ class UserActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
 
-        // Here I don't need the view model group, but only pass the username to the fragment
         username = intent.getStringExtra("USERNAME_SUBSCRIBER")
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_user_activity)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
+
+        supportActionBar?.title = null
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val db = BrockDB.getInstance(this)
         val s3Client = MyS3ClientProvider.getInstance(this)
@@ -68,7 +68,6 @@ class UserActivity: AppCompatActivity() {
         }
     }
 
-    // Only when I loaded the set of information about the friend then I will create the view pager
     private fun observeFriend() {
         viewModel.friend.observe(this) {
             val adapter = ViewPagerUserAdapter(it, supportFragmentManager, lifecycle)

@@ -112,7 +112,6 @@ class LoginActivity: AppCompatActivity() {
         }
     }
 
-    // Function used when there is already an account logged
     private fun observeUserFromPreferences() {
         viewModelUser.user.observe(this) {
             viewModelUser.user.observe(this) {
@@ -152,7 +151,6 @@ class LoginActivity: AppCompatActivity() {
         )
     }
 
-    // Function used to set the primary state of connection, without is not possible to use the observer pattern for LiveData
     private fun checkConnectivity() {
         MyNetwork.isConnected = networkUtil.isInternetActive(this)
     }
@@ -196,7 +194,7 @@ class LoginActivity: AppCompatActivity() {
                     city = it.city
                 }
 
-                MySharedPreferences.setUpSharedPreferences(this)
+                MySharedPreferences.setCredentials(this)
                 unregisterReceiver(receiver)
                 sync()
             }

@@ -172,7 +172,7 @@ class SignInActivity: AppCompatActivity() {
                     city = it.city
                 }
 
-                MySharedPreferences.setUpSharedPreferences(this)
+                MySharedPreferences.setCredentials(this)
                 goToHome()
             }
         }

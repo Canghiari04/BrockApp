@@ -48,17 +48,11 @@ class SettingsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        findViewById<Toolbar>(R.id.toolbar_settings_activity).also {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            setSupportActionBar(it)
-            it.setTitle(R.string.text_blank)
-        }
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
+        setSupportActionBar(toolbar)
 
-        findViewById<TextView>(R.id.text_view_description_dump_database).text =
-            "Sharing your data allows the app to provide a personalized experience!"
-
-        findViewById<TextView>(R.id.text_view_description_activities).text =
-            "Choose the activities that you want to detect"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = resources.getText(R.string.toolbar_settings)
 
         switchDumpDatabase = findViewById(R.id.switch_share_dump_database)
         switchGeofenceTransition = findViewById(R.id.switch_geofence_transition_service)
@@ -85,7 +79,6 @@ class SettingsActivity: AppCompatActivity() {
 
         observeRecordingOnS3()
 
-        // Creating the launcher for the permissions required by the app
         geofenceUtil = GeofenceTransitionPermissionsUtil(
             this,
             { changeCheckSwitch("GEOFENCE_TRANSITION", switchGeofenceTransition) },
@@ -121,12 +114,10 @@ class SettingsActivity: AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        // Set up switches in base of the user's shared preferences
         setUpSwitchGeofenceTransition()
         setUpSwitchActivityRecognition()
     }
 
-    // Callback provided to set true a switch when the permission is allowed
     private fun changeCheckSwitch(key: String, switch: SwitchCompat) {
         MySharedPreferences.setService(key, true, this)
 
@@ -134,7 +125,6 @@ class SettingsActivity: AppCompatActivity() {
         switch.trackTintList = ContextCompat.getColorStateList(baseContext, R.color.uni_red)
     }
 
-    // I used the mapper to retrieve all the data saved inside the shared preferences
     private fun setUpSwitchActivities() {
         val isActive = MySharedPreferences.checkService("ACTIVITY_RECOGNITION", this)
 
@@ -221,7 +211,6 @@ class SettingsActivity: AppCompatActivity() {
 
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    // The action to set true the switch is allowed iif the permission is not denied
                     geofenceUtil.requestGeofenceTransitionPermissions()
                 } else {
                     trackTintList = ContextCompat.getColorStateList(context, R.color.grey)

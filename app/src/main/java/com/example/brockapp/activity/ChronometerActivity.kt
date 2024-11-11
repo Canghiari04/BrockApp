@@ -38,7 +38,6 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
     protected lateinit var chronometer: Chronometer
     protected lateinit var textViewTypeActivity: TextView
 
-    // Sensor tab layout
     protected lateinit var firstTableRow: TableRow
     protected lateinit var secondTableRow: TableRow
     protected lateinit var textViewTitleFirstSensor: TextView
@@ -52,8 +51,8 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chronometer)
 
+        supportActionBar?.title = null
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.setTitle(R.string.text_blank)
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = ActivitiesViewModelFactory(db)

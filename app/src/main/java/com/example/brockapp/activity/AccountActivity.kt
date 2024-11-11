@@ -50,9 +50,10 @@ class AccountActivity: AppCompatActivity() {
         setContentView(R.layout.activity_account)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_account_activity)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
+
+        supportActionBar?.title = resources.getText(R.string.toolbar_account)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         contentFirstColumn = findViewById(R.id.text_view_content_first_column)
 
@@ -71,10 +72,6 @@ class AccountActivity: AppCompatActivity() {
         findViewById<TextView>(R.id.text_view_user_address).text =
             defineSubscriberAddress(MyUser.country, MyUser.city)
 
-        findViewById<TextView>(R.id.text_view_danger_zone).text =
-            ("You are entering a danger area. Please proceed with caution or exit immediately")
-
-        // Inside there is the callback to start the new intent
         permissionUtil = AccountActivityPermissionUtil(this) { pickImage() }
 
         val db = BrockDB.getInstance(this)

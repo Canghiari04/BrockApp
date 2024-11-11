@@ -7,7 +7,6 @@ import com.example.brockapp.room.MemosEntity
 import com.example.brockapp.viewmodel.MemoViewModel
 import com.example.brockapp.adapter.DailyMemoAdapter
 import com.example.brockapp.interfaces.ScheduleWorkerImpl
-import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.viewmodel.MemoViewModelFactory
 
 import android.util.Log
@@ -26,8 +25,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class DailyMemoActivity: AppCompatActivity() {
     private var date: String? = null
 
-    private val toastUtil = ShowCustomToastImpl()
-
     private lateinit var viewModel: MemoViewModel
     private lateinit var adapter: DailyMemoAdapter
     private lateinit var recyclerView: RecyclerView
@@ -39,9 +36,10 @@ class DailyMemoActivity: AppCompatActivity() {
         setContentView(R.layout.activity_daily_memo)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_daily_memo_activity)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setSupportActionBar(toolbar)
-        toolbar.setTitle(R.string.text_blank)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = resources.getText(R.string.toolbar_daily_memo)
 
         date = intent.getStringExtra("CALENDAR_DATE")
 
@@ -117,17 +115,14 @@ class DailyMemoActivity: AppCompatActivity() {
             if (!list.isNullOrEmpty()) {
                 populateRecyclerView(list)
             } else {
-                toastUtil.showBasicToast(
-                    "No one memo retrieved",
-                    this
-                )
-
                 if (!checkCurrentDate(date)) {
                     setContentView(R.layout.activity_empty_page)
 
                     val toolbar = findViewById<Toolbar>(R.id.toolbar_empty_activity)
-                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
                     setSupportActionBar(toolbar)
+
+                    supportActionBar?.title = null
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
                 }
             }
         }
