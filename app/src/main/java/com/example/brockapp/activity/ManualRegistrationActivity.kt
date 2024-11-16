@@ -54,7 +54,7 @@ class NewUserActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, PageLoaderActivity::class.java).apply {
+                val intent = Intent(this, MainActivity::class.java).apply {
                     putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
                 }
 

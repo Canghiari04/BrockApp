@@ -3,22 +3,18 @@ package com.example.brockapp.activity
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.fragment.MapFragment
-import com.example.brockapp.fragment.YouFragment
 import com.example.brockapp.extraObject.MyNetwork
-import com.example.brockapp.fragment.GroupFragment
-import com.example.brockapp.worker.DailyMemoWorker
-import com.example.brockapp.viewmodel.MemoViewModel
-import com.example.brockapp.fragment.CalendarFragment
-import com.example.brockapp.viewmodel.GeofenceViewModel
+import com.example.brockapp.viewModel.MemoViewModel
+import com.example.brockapp.worker.MemoNotifierWorker
+import com.example.brockapp.viewModel.GeofenceViewModel
 import com.example.brockapp.receiver.ConnectivityReceiver
-import com.example.brockapp.viewmodel.MemoViewModelFactory
+import com.example.brockapp.viewModel.MemoViewModelFactory
 import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.singleton.MyActivityRecognition
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.service.ActivityRecognitionService
-import com.example.brockapp.viewmodel.GeofenceViewModelFactory
+import com.example.brockapp.viewModel.GeofenceViewModelFactory
 
 import android.Manifest
 import android.util.Log
@@ -27,74 +23,55 @@ import java.time.LocalDate
 import android.content.Intent
 import androidx.work.WorkManager
 import android.content.IntentFilter
-import androidx.fragment.app.Fragment
 import android.net.ConnectivityManager
 import androidx.core.app.ActivityCompat
 import androidx.appcompat.widget.Toolbar
 import android.content.pm.PackageManager
+import android.view.MenuItem
 import androidx.core.content.ContextCompat
+import androidx.navigation.ui.NavigationUI
 import androidx.lifecycle.ViewModelProvider
-import androidx.fragment.app.FragmentManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 
 class PageLoaderActivity: AppCompatActivity() {
     private val toastUtil = ShowCustomToastImpl()
     private val networkUtil = InternetAvailableImpl()
-    private val mapperDrawer = mutableMapOf(R.id.drawer_item_your_account to AccountActivity::class.java)
 
-    private var youFragment = YouFragment()
-    private var mapFragment = MapFragment()
-    private var groupFragment = GroupFragment()
-    private var calendarFragment = CalendarFragment()
-    private var mapperFragment = mutableMapOf<Int, Fragment>()
-
-    private lateinit var toolbar: Toolbar
-    private lateinit var drawer: DrawerLayout
+    private lateinit var navController: NavController
     private lateinit var viewModelMemo: MemoViewModel
     private lateinit var receiver: ConnectivityReceiver
     private lateinit var viewModelGeofence: GeofenceViewModel
-    private lateinit var settingsButton: FloatingActionButton
     private lateinit var newActivityButton: FloatingActionButton
-    private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page_loader)
 
-        supportFragmentManager.beginTransaction().apply {
-            add(R.id.page_loader_fragment, youFragment)
-            add(R.id.page_loader_fragment, calendarFragment)
-            add(R.id.page_loader_fragment, mapFragment)
-            add(R.id.page_loader_fragment, groupFragment)
-            commit()
-        }
-
-        mapperFragment = mutableMapOf(
-            R.id.navbar_item_you to youFragment,
-            R.id.navbar_item_calendar to calendarFragment,
-            R.id.navbar_item_map to mapFragment,
-            R.id.navbar_item_group to groupFragment
-        )
+        newActivityButton = findViewById(R.id.button_new_activity)
+        navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = MemoViewModelFactory(db)
         viewModelMemo = ViewModelProvider(this, viewModelFactory)[MemoViewModel::class.java]
 
-        setUpActionBar()
+        setUpNavigation()
         setUpFloatingButton()
-        setUpBottomNavigationView()
-
-        if (intent.hasExtra("FRAGMENT_TO_SHOW")) {
-            val key = intent.getIntExtra("FRAGMENT_TO_SHOW", 0)
-            switchFragment(key, mapperFragment.getValue(key))
-        }
 
         checkServices()
         checkConnectivity()
@@ -105,45 +82,66 @@ class PageLoaderActivity: AppCompatActivity() {
         viewModelMemo.getMemos(LocalDate.now().toString())
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+
+        val intent = Intent(this, ActivityRecognitionService::class.java).apply {
+            action = ActivityRecognitionService.Actions.TERMINATE.toString()
+        }
+
+        if (MyActivityRecognition.getStatus()) {
+            startService(intent)
+        }
+
         unregisterReceiver(receiver)
     }
 
-    private fun setUpActionBar() {
-        toolbar = findViewById(R.id.toolbar_page_loader)
-        drawer = findViewById(R.id.drawer_page_loader)
+    private fun setUpNavigation() {
+        val navViewDrawer = findViewById<NavigationView>(R.id.navigation_view_drawer)
 
-        toolbar.run {
-            setSupportActionBar(toolbar)
-            supportActionBar?.setDisplayShowTitleEnabled(false)
-        }
+        val drawer = findViewById<DrawerLayout>(R.id.drawer_page_loader)
+        val bottomBar = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
 
-        actionBarDrawerToggle = ActionBarDrawerToggle(
-            this,
-            drawer,
-            toolbar,
-            R.string.drawer_open,
-            R.string.drawer_close
+        appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.navbar_item_you, R.id.navbar_item_map, R.id.navbar_item_calendar, R.id.navbar_item_group),
+            drawer
         )
 
-        actionBarDrawerToggle.run {
-            drawerArrowDrawable.color = ContextCompat.getColor(applicationContext, R.color.white)
-        }
+        setupActionBarWithNavController(
+            navController,
+            appBarConfiguration
+        )
 
-        drawer.addDrawerListener(actionBarDrawerToggle)
-        actionBarDrawerToggle.syncState()
+        navViewDrawer.setupWithNavController(navController)
+        bottomBar.setupWithNavController(navController)
 
-        findViewById<NavigationView>(R.id.navigation_view_page_loader).setNavigationItemSelectedListener { item ->
-            startActivity(Intent(this, mapperDrawer[item.itemId]))
-            finish()
-            true
+        navViewDrawer.setNavigationItemSelectedListener { item ->
+            item.isChecked = true
+            drawer.closeDrawers()
+
+            when (item.itemId) {
+                R.id.drawer_item_account -> {
+                    navController.navigate(R.id.drawer_item_account)
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
         }
     }
 
     private fun setUpFloatingButton() {
-        settingsButton = findViewById(R.id.button_settings)
-        newActivityButton = findViewById(R.id.button_new_activity)
+        val settingsButton = findViewById<FloatingActionButton>(R.id.button_settings)
 
         settingsButton.setOnClickListener {
             Intent(this, SettingsActivity::class.java).also {
@@ -153,11 +151,6 @@ class PageLoaderActivity: AppCompatActivity() {
         }
 
         newActivityButton.setOnClickListener {
-            Intent(this, ActivityRecognitionService::class.java).also {
-                it.action = ActivityRecognitionService.Actions.TERMINATE.toString()
-                startService(it)
-            }
-
             Intent(this, NewUserActivity::class.java).also {
                 startActivity(it)
                 finish()
@@ -165,50 +158,10 @@ class PageLoaderActivity: AppCompatActivity() {
         }
     }
 
-    private fun setUpBottomNavigationView() {
-        findViewById<BottomNavigationView>(R.id.bottom_navigation_view).setOnItemSelectedListener { item ->
-            switchFragment(item.itemId, mapperFragment.getValue(item.itemId))
-            true
-        }
-    }
-
-    private fun switchFragment(key: Int, fragment: Fragment) {
-        hideButton(key)
-        hideAllFragment(supportFragmentManager)
-
-        supportFragmentManager.beginTransaction().apply {
-            show(fragment)
-            commit()
-        }
-    }
-
-    private fun hideButton(item: Int) {
-        if (item == R.id.navbar_item_you) {
-            newActivityButton.show()
-        } else {
-            newActivityButton.hide()
-        }
-    }
-
-    private fun hideAllFragment(manager: FragmentManager) {
-        manager.beginTransaction().apply {
-            mapperFragment.forEach { (_, value) ->
-                hide(value)
-            }
-
-            commit()
-        }
-    }
-
     private fun checkServices() {
         if (checkGeofenceService()) {
             if (!MyGeofence.getStatus()) {
                 startGeofenceTransition()
-            } else {
-                toastUtil.showBasicToast(
-                    "Geofence service is already active",
-                    this
-                )
             }
         } else {
             toastUtil.showWarningToast(
@@ -220,11 +173,6 @@ class PageLoaderActivity: AppCompatActivity() {
         if (checkActivityRecognitionService()) {
             if (!MyActivityRecognition.getStatus()) {
                 startActivityRecognition()
-            } else {
-                toastUtil.showBasicToast(
-                    "Recognition service is already active",
-                    this
-                )
             }
         } else {
             toastUtil.showWarningToast(
@@ -244,7 +192,6 @@ class PageLoaderActivity: AppCompatActivity() {
         val factoryViewModelGeofence = GeofenceViewModelFactory(db)
         viewModelGeofence = ViewModelProvider(this, factoryViewModelGeofence)[GeofenceViewModel::class.java]
 
-        // Observer used to work around a fatal error caused by the absence of geofence areas
         observeGeofenceAreas()
 
         viewModelGeofence.fetchStaticGeofenceAreas()
@@ -285,11 +232,20 @@ class PageLoaderActivity: AppCompatActivity() {
         MyActivityRecognition.getTask(this)?.run {
             addOnSuccessListener {
                 MyActivityRecognition.setStatus(true)
+                startActivityRecognitionService()
             }
             addOnFailureListener {
                 Log.d("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
             }
         }
+    }
+
+    private fun startActivityRecognitionService() {
+        val intent = Intent(this, ActivityRecognitionService::class.java).apply {
+            action = ActivityRecognitionService.Actions.START.toString()
+        }
+
+        startService(intent)
     }
 
     private fun checkConnectivity() {
@@ -299,7 +255,7 @@ class PageLoaderActivity: AppCompatActivity() {
     private fun checkCurrentMemos() {
         viewModelMemo.memos.observe(this) { items ->
             if (!items.isNullOrEmpty()) {
-                OneTimeWorkRequestBuilder<DailyMemoWorker>().build().also {
+                OneTimeWorkRequestBuilder<MemoNotifierWorker>().build().also {
                     WorkManager.getInstance(this).enqueue(it)
                 }
             }

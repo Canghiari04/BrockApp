@@ -1,17 +1,17 @@
 import java.util.Properties
 
 plugins {
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jetbrains.kotlin.android)
-
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
 
     kotlin("kapt") version "1.9.0"
 }
 
 android {
     namespace = "com.example.brockapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.brockapp"
@@ -58,6 +58,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        compose = true
         buildConfig = true
         viewBinding = true
     }
@@ -70,13 +71,20 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.coordinatorlayout)
 
-    // Material Design
-    implementation(libs.material)
-    implementation(libs.material.v180)
-
     // Google Play Services
     implementation(libs.play.services.location)
-    implementation(libs.play.services.location.v1800)
+
+    // Jetpack compose
+    val composeBom = platform("androidx.compose:compose-bom:2024.03.00")
+    implementation(composeBom)
+    implementation(libs.androidx.ui)
+    androidTestImplementation(composeBom)
+    implementation(libs.androidx.material3)
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 
     // Osmdroid
     implementation(libs.osmdroid.wms)

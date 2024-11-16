@@ -5,9 +5,9 @@ import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.room.MemosEntity
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.viewmodel.MemoViewModel
+import com.example.brockapp.viewModel.MemoViewModel
 import com.example.brockapp.interfaces.ShowCustomToastImpl
-import com.example.brockapp.viewmodel.MemoViewModelFactory
+import com.example.brockapp.viewModel.MemoViewModelFactory
 
 import android.view.View
 import android.os.Bundle
@@ -45,9 +45,10 @@ class NewMemoActivity: AppCompatActivity() {
         description = intent.getStringExtra("DESCRIPTION_MEMO") ?: ""
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_new_memo_activity)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setTitle(R.string.text_blank)
         setSupportActionBar(toolbar)
+
+        supportActionBar?.title = null
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         titleTextView = findViewById(R.id.edit_text_title)
         descriptionTextView = findViewById(R.id.edit_text_description)
@@ -102,16 +103,14 @@ class NewMemoActivity: AppCompatActivity() {
                 typeActivity = spinnerItems[position]
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 
     private fun setUpButton(id: Long, button: Button) {
         if (id == 0L) {
             button.also {
-                it.text = "ADD MEMO"
+                it.text = resources.getText(R.string.button_add_memo)
                 it.setOnClickListener {
                     if (!titleTextView.text.isNullOrBlank() && !descriptionTextView.text.isNullOrBlank()) {
                         insertMemo()
@@ -125,7 +124,7 @@ class NewMemoActivity: AppCompatActivity() {
             }
         } else {
             button.also {
-                it.text = "UPDATE MEMO"
+                it.text = resources.getText(R.string.button_modify_memo)
                 it.setOnClickListener {
                     if (!titleTextView.text.isNullOrBlank() && !descriptionTextView.text.isNullOrBlank()) {
                         updateMemo(id)
