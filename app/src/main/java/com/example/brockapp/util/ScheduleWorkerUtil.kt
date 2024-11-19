@@ -1,4 +1,4 @@
-package com.example.brockapp.interfaces
+package com.example.brockapp.util
 
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.worker.SyncBucketWorker
@@ -15,8 +15,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.ExistingPeriodicWorkPolicy
 
-class ScheduleWorkerImpl(private val context: Context): ScheduleWorker {
-    override fun scheduleSyncPeriodic() {
+class ScheduleWorkerUtil(private val context: Context) {
+
+    fun scheduleSyncPeriodic() {
         val constraint = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -39,7 +40,7 @@ class ScheduleWorkerImpl(private val context: Context): ScheduleWorker {
         }
     }
 
-    override fun scheduleDeleteMemoWorker(id: Long) {
+    fun scheduleDeleteMemoWorker(id: Long) {
         val constraint = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -57,7 +58,7 @@ class ScheduleWorkerImpl(private val context: Context): ScheduleWorker {
         WorkManager.getInstance(context).enqueue(request)
     }
 
-    override fun scheduleDeleteGeofenceAreaWorker(latitude: Double, longitude: Double) {
+    fun scheduleDeleteGeofenceAreaWorker(latitude: Double, longitude: Double) {
         val constraint = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -76,15 +77,15 @@ class ScheduleWorkerImpl(private val context: Context): ScheduleWorker {
         WorkManager.getInstance(context).enqueue(request)
     }
 
-    override fun deleteSyncPeriodic() {
+    fun deleteSyncPeriodic() {
         WorkManager.getInstance(context).cancelUniqueWork("SyncBucketWorker")
     }
 
-    override fun deleteMemoWorker() {
+    fun deleteMemoWorker() {
         WorkManager.getInstance(context).cancelAllWorkByTag("DeleteMemoWorker")
     }
 
-    override fun deleteGeofenceAreaWorker() {
+    fun deleteGeofenceAreaWorker() {
         WorkManager.getInstance(context).cancelAllWorkByTag("DeleteGeofenceAreaWorker")
     }
 }
