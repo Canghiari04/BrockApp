@@ -39,7 +39,7 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
                     ///
                     val notification = notificationUtil.getNotificationBody(
                         CHANNEL_ID_MEMO_WORKER,
-                        R.drawable.baseline_directions_run_24,
+                        R.drawable.icon_run,
                         "BrockApp - Receiver",
                         "Type ${type}, transition ${transition}",
                         context

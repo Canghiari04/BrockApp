@@ -30,7 +30,7 @@ class MemoNotifierWorker(private val context: Context, workerParams: WorkerParam
 
         val notification = util.getNotificationBody(
             CHANNEL_ID_MEMO_WORKER,
-            R.drawable.baseline_calendar_month_24,
+            R.drawable.icon_calendar,
             title,
             content,
             context

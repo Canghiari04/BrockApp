@@ -95,7 +95,7 @@ class NotificationUtil {
             notificationId,
             getNotificationBody(
                 CHANNEL_ID_ACTIVITY_RECOGNITION_WORKER,
-                R.drawable.baseline_directions_run_24,
+                R.drawable.icon_run,
                 "BrockApp - Activity Recognition Service",
                 "${mapperActivityNotification[type]}",
                 context

@@ -33,7 +33,7 @@ class ActivityNotifierWorker(private val context: Context, workerParams: WorkerP
 
         val notification = util.getNotificationBody(
             CHANNEL_ID_ACTIVITY_RECOGNITION_WORKER,
-            R.drawable.baseline_directions_run_24,
+            R.drawable.icon_run,
             title,
             content,
             context

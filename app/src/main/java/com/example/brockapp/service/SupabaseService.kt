@@ -242,7 +242,7 @@ class SupabaseService: Service() {
             ID_SUPABASE_SERVICE_NOTIFY,
             notificationUtil.getNotificationBody(
                 CHANNEL_ID_SUPABASE_SERVICE,
-                R.drawable.baseline_sync_24,
+                R.drawable.icon_sync,
                 "BrockApp - Sync to service",
                 "The app is being configured, please wait a few seconds",
                 this

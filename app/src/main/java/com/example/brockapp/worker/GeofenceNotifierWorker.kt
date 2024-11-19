@@ -33,7 +33,7 @@ class GeofenceNotifierWorker(private val context: Context, workerParams: WorkerP
 
         val notification = util.getNotificationBodyWithPendingIntent(
             CHANNEL_ID_GEOFENCE_WORKER,
-            R.drawable.marker_icon,
+            R.drawable.icon_marker,
             title,
             content,
             util.getGeofencePendingIntent(context),

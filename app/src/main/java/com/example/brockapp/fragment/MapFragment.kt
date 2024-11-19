@@ -350,7 +350,7 @@ class MapFragment: Fragment() {
                 )
                 icon = ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.geo_localization_marker,
+                    R.drawable.map_current_position_marker,
                     null
                 )
             }
