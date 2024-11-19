@@ -16,43 +16,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.ExistingPeriodicWorkPolicy
 
 class ScheduleWorkerImpl(private val context: Context): ScheduleWorker {
-    override fun scheduleDeleteGeofenceAreaWorker(latitude: Double, longitude: Double) {
-        val constraint = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val inputData = Data.Builder()
-            .putDouble("LATITUDE", latitude)
-            .putDouble("LONGITUDE", longitude)
-            .build()
-
-        val request = OneTimeWorkRequestBuilder<DeleteGeofenceAreaWorker>()
-            .setConstraints(constraint)
-            .addTag("DeleteGeofenceAreaWorker")
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(context).enqueue(request)
-    }
-
-    override fun scheduleDeleteMemoWorker(id: Long) {
-        val constraint = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val inputData = Data.Builder()
-            .putLong("ID", id)
-            .build()
-
-        val request = OneTimeWorkRequestBuilder<DeleteMemoWorker>()
-            .setConstraints(constraint)
-            .addTag("DeleteMemoWorker")
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(context).enqueue(request)
-    }
-
     override fun scheduleSyncPeriodic() {
         val constraint = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -76,15 +39,52 @@ class ScheduleWorkerImpl(private val context: Context): ScheduleWorker {
         }
     }
 
-    override fun deleteGeofenceAreaWorker() {
-        WorkManager.getInstance(context).cancelAllWorkByTag("DeleteGeofenceAreaWorker")
+    override fun scheduleDeleteMemoWorker(id: Long) {
+        val constraint = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val inputData = Data.Builder()
+            .putLong("ID", id)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<DeleteMemoWorker>()
+            .setConstraints(constraint)
+            .addTag("DeleteMemoWorker")
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(request)
+    }
+
+    override fun scheduleDeleteGeofenceAreaWorker(latitude: Double, longitude: Double) {
+        val constraint = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val inputData = Data.Builder()
+            .putDouble("LATITUDE", latitude)
+            .putDouble("LONGITUDE", longitude)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<DeleteGeofenceAreaWorker>()
+            .setConstraints(constraint)
+            .addTag("DeleteGeofenceAreaWorker")
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(request)
+    }
+
+    override fun deleteSyncPeriodic() {
+        WorkManager.getInstance(context).cancelUniqueWork("SyncBucketWorker")
     }
 
     override fun deleteMemoWorker() {
         WorkManager.getInstance(context).cancelAllWorkByTag("DeleteMemoWorker")
     }
 
-    override fun deleteSyncPeriodic() {
-        WorkManager.getInstance(context).cancelUniqueWork("SyncBucketWorker")
+    override fun deleteGeofenceAreaWorker() {
+        WorkManager.getInstance(context).cancelAllWorkByTag("DeleteGeofenceAreaWorker")
     }
 }
