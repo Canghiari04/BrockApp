@@ -3,87 +3,122 @@ package com.example.brockapp.service
 import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.room.UsersRunActivityEntity
+import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.room.UsersWalkActivityEntity
+import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.room.UsersStillActivityEntity
 import com.example.brockapp.room.UsersVehicleActivityEntity
 import com.example.brockapp.singleton.MyActivityRecognition
-import com.example.brockapp.extraObject.MyServiceConnection
 
+import android.os.Build
 import android.util.Log
 import java.time.Instant
 import android.os.IBinder
 import android.app.Service
 import java.time.ZoneOffset
 import android.content.Intent
+import android.hardware.Sensor
 import android.content.Context
-import kotlinx.coroutines.async
+import android.location.Location
 import kotlinx.coroutines.launch
+import android.hardware.SensorEvent
 import kotlinx.coroutines.Dispatchers
+import android.hardware.SensorManager
+import android.annotation.SuppressLint
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.CoroutineScope
-import android.content.ServiceConnection
 import java.time.format.DateTimeFormatter
+import android.hardware.SensorEventListener
+import com.google.android.gms.location.Priority
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.DetectedActivity
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
 
-class ActivityRecognitionService: Service() {
-    private var isDistanceServiceBound = false
-    private var isStepCounterServiceBound = false
-    private var isHeightDifferenceServiceBound = false
-    private var distanceService: DistanceService? = null
-    private var stepCounterService: StepCounterService? = null
-    private var heightDifferenceService: HeightDifferenceService? = null
+class ActivityRecognitionService: Service(), SensorEventListener, NotificationSender {
 
-    private val serviceMapper = mapOf(
-        DetectedActivity.IN_VEHICLE to ::defineVehicleService,
-        DetectedActivity.RUNNING to ::defineRunService,
-        DetectedActivity.WALKING to ::defineWalkService
-    )
+    private var initialStepCount = 0L
+    private var sessionStepsCount = 0L
+    private var distance: Double = 0.0
+    private var startLocation: Location? = null
+    private var stepCounterSensor: Sensor? = null
+    private var notificationUtil = NotificationUtil()
 
     private lateinit var db: BrockDB
-    private lateinit var distanceServiceConnection: ServiceConnection
-    private lateinit var heightDifferenceConnection: ServiceConnection
-    private lateinit var stepCounterServiceConnection: ServiceConnection
 
+    private lateinit var sensorManager: SensorManager
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
         super.onCreate()
+
         db = BrockDB.getInstance(this)
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        fusedLocationClient =  LocationServices.getFusedLocationProviderClient(this)
+
+        setUpLocationUpdates()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) {
             stopSelf()
         } else {
-            val activityType = intent.getIntExtra("ACTIVITY_TYPE", 4)
-            val arrivalTime = intent.getLongExtra("ARRIVAL_TIME", 0L)
-            val exitTime = intent.getLongExtra("EXIT_TIME", 0L)
-
             when (intent.action) {
+                Actions.START.toString() -> {
+                    startForeground(
+                        ID_ACTIVITY_RECOGNITION_WORKER_NOTIFY,
+                        notificationUtil.getNotificationBody(
+                            CHANNEL_ID_ACTIVITY_RECOGNITION_WORKER,
+                            R.drawable.icon_run,
+                            "BrockApp - Activity Recognition Service",
+                            "BrockApp is monitoring your activity as long as it's active",
+                            this
+                        ).build()
+                    )
+                }
+
                 Actions.INSERT.toString() -> {
+                    val type = intent.getIntExtra("ACTIVITY_TYPE", 4)
+                    val arrivalTime = intent.getLongExtra("ARRIVAL_TIME", 0L)
+
+                    notificationUtil.updateActivityRecognitionNotification(
+                        ID_ACTIVITY_RECOGNITION_WORKER_NOTIFY,
+                        type,
+                        this
+                    )
+
+                    // startSensors(type)
+
                     CoroutineScope(Dispatchers.IO).launch {
-                        serviceMapper[activityType]?.invoke()
-                        insert(activityType, arrivalTime)
+                        // insert(type, arrivalTime)
                     }
                 }
 
                 Actions.UPDATE.toString() -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val job = async {
-                            update(activityType, exitTime)
-                        }
+                    val type = intent.getIntExtra("ACTIVITY_TYPE", 4)
+                    val exitTime = intent.getLongExtra("EXIT_TIME", 0L)
 
-                        job.await()
-                        stopSelf()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        // update(type, exitTime)
                     }
                 }
 
                 Actions.RESTART.toString() -> {
                     restartMonitoring()
+                }
+
+                Actions.STOP.toString() -> {
                     stopSelf()
                 }
 
                 Actions.TERMINATE.toString() -> {
-                    MyActivityRecognition.removeTask(this)
-                    stopSelf()
+                    terminateMonitoring()
                 }
             }
         }
@@ -95,78 +130,98 @@ class ActivityRecognitionService: Service() {
         return null
     }
 
+    override fun sendNotification(title: String, content: String) {
+        notificationUtil.getNotificationBody(
+            CHANNEL_ID_STEP_COUNTER_SERVICE,
+            R.drawable.icon_run,
+            title,
+            content,
+            this
+        )
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        if (initialStepCount == 0L) {
+            initialStepCount = event.values[0].toLong()
+        }
+
+        sessionStepsCount = event.values[0].toInt() - initialStepCount
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
+
     enum class Actions {
-        INSERT, UPDATE, RESTART, TERMINATE
+        START, INSERT, UPDATE, RESTART, STOP, TERMINATE
     }
 
-    private fun defineVehicleService() {
-        distanceServiceConnection = MyServiceConnection.createDistanceServiceConnection(
-            onConnected = { service ->
-                this.distanceService = service
-                isDistanceServiceBound = true
-            },
-            onDisconnected = {
-                isDistanceServiceBound = false
+    private fun setUpLocationUpdates() {
+        locationRequest = LocationRequest
+            .Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                5000)
+            .build()
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val locations = locationResult.locations
+
+                if (locations.isNotEmpty()) {
+                    val newLocation = locations.last()
+
+                    if (startLocation == null) {
+                        startLocation = newLocation
+                    } else {
+                        startLocation?.let {
+                            distance += it.distanceTo(newLocation).toDouble()
+                        }
+
+                        startLocation = newLocation
+                    }
+                }
             }
-        )
+        }
     }
 
-    private fun defineRunService() {
-        distanceServiceConnection = MyServiceConnection.createDistanceServiceConnection(
-            onConnected = { service ->
-                this.distanceService = service
-                isDistanceServiceBound = true
-            },
-            onDisconnected = {
-                isDistanceServiceBound = false
-            }
-        )
-
-        heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
-            onConnected = { service ->
-                heightDifferenceService = service
-                isHeightDifferenceServiceBound = true
-            },
-            onDisconnected = {
-                isHeightDifferenceServiceBound = false
-            }
-        )
-    }
-
-    private fun defineWalkService() {
-        stepCounterServiceConnection = MyServiceConnection.createStepCounterService(
-            onConnected = { service ->
-                stepCounterService = service
-                isStepCounterServiceBound = true
-            },
-            onDisconnected = {
-                isStepCounterServiceBound = false
-            }
-        )
-
-        heightDifferenceConnection = MyServiceConnection.createHeightDifferenceService(
-            onConnected = { service ->
-                heightDifferenceService = service
-                isHeightDifferenceServiceBound = true
-            },
-            onDisconnected = {
-                isHeightDifferenceServiceBound = false
-            }
-        )
-    }
-
-    private suspend fun insert(activityType: Int, arrivalTime: Long) {
-        when (activityType) {
+    @SuppressLint("MissingPermission")
+    private fun startSensors(type: Int) {
+        when (type) {
             DetectedActivity.IN_VEHICLE -> {
-                val intent = Intent(this, DistanceService::class.java)
-                startService(intent)
-                bindService(intent, distanceServiceConnection, Context.BIND_AUTO_CREATE)
+                distance = 0.0
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+            }
 
+            DetectedActivity.RUNNING -> {
+                distance = 0.0
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+            }
+
+            DetectedActivity.WALKING -> {
+                if (stepCounterSensor != null) {
+                    sessionStepsCount = 0L
+
+                    sensorManager.registerListener(
+                        this,
+                        stepCounterSensor,
+                        SensorManager.SENSOR_DELAY_FASTEST
+                    )
+                } else {
+                    sendNotification(
+                        "BrockApp - Step counter service",
+                        "Step counter sensor is not available in this device"
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun insert(type: Int, arrivalTime: Long) {
+        when (type) {
+            DetectedActivity.IN_VEHICLE -> {
                 db.UsersVehicleActivityDao().insertVehicleActivity(
                     UsersVehicleActivityEntity(
                         username = MyUser.username,
                         timestamp = getInstant(),
-                        arrivalTime = arrivalTime,
+                        arrivalTime = System.currentTimeMillis(),
                         exitTime = 0L,
                         distanceTravelled = 0.0
                     )
@@ -174,26 +229,7 @@ class ActivityRecognitionService: Service() {
             }
 
             DetectedActivity.RUNNING -> {
-                Intent(this, StepCounterService::class.java).also {
-                    startService(it)
-                    bindService(it, stepCounterServiceConnection, Context.BIND_AUTO_CREATE)
-                }
 
-                Intent(this, HeightDifferenceService::class.java).also {
-                    startService(it)
-                    bindService(it, heightDifferenceConnection, Context.BIND_AUTO_CREATE)
-                }
-
-                db.UsersRunActivityDao().insertRunActivity(
-                    UsersRunActivityEntity(
-                        username = MyUser.username,
-                        timestamp = getInstant(),
-                        arrivalTime = arrivalTime,
-                        exitTime = 0L,
-                        distanceDone = 0.0,
-                        heightDifference = 0f
-                    )
-                )
             }
 
             DetectedActivity.STILL -> {
@@ -202,22 +238,12 @@ class ActivityRecognitionService: Service() {
                         username = MyUser.username,
                         timestamp = getInstant(),
                         arrivalTime = arrivalTime,
-                        exitTime = 0L,
+                        exitTime = 0L
                     )
                 )
             }
 
             DetectedActivity.WALKING -> {
-                Intent(this, StepCounterService::class.java).also {
-                    startService(it)
-                    bindService(it, stepCounterServiceConnection, Context.BIND_AUTO_CREATE)
-                }
-
-                Intent(this, HeightDifferenceService::class.java).also {
-                    startService(it)
-                    bindService(it, heightDifferenceConnection, Context.BIND_AUTO_CREATE)
-                }
-
                 db.UsersWalkActivityDao().insertWalkActivity(
                     UsersWalkActivityEntity(
                         username = MyUser.username,
@@ -239,64 +265,38 @@ class ActivityRecognitionService: Service() {
             .format(Instant.now())
     }
 
-    private suspend fun update(activityType: Int, exitTime: Long) {
-        when(activityType) {
+    private suspend fun update(type: Int, exitTime: Long) {
+        when(type) {
             DetectedActivity.IN_VEHICLE -> {
-                if (isDistanceServiceBound)  {
-                    val distanceTravelled = distanceService?.getDistance() ?: 0.0
-                    unbindService(distanceServiceConnection)
+                db.UsersVehicleActivityDao().updateLastRecord(
+                    db.UsersVehicleActivityDao().getLastInsertedId(),
+                    System.currentTimeMillis(),
+                    distance
+                )
 
-                    val lastId = db.UsersVehicleActivityDao().getLastInsertedId()
-                    db.UsersVehicleActivityDao().updateLastRecord(
-                        lastId,
-                        exitTime,
-                        distanceTravelled
-                    )
-                }
+                fusedLocationClient.removeLocationUpdates(locationCallback)
             }
 
             DetectedActivity.RUNNING -> {
-                if (isDistanceServiceBound && isHeightDifferenceServiceBound) {
-                    val distanceDone = distanceService?.getDistance() ?: 0.0
-                    unbindService(distanceServiceConnection)
-
-                    val heightDifference = heightDifferenceService?.getAltitude() ?: 0f
-                    unbindService(heightDifferenceConnection)
-
-                    val lastId = db.UsersRunActivityDao().getLastInsertedId()
-                    db.UsersRunActivityDao().updateLastRecord(
-                        lastId,
-                        exitTime,
-                        distanceDone,
-                        heightDifference
-                    )
-                }
+                fusedLocationClient.removeLocationUpdates(locationCallback)
             }
 
             DetectedActivity.STILL -> {
-                val lastId = db.UsersStillActivityDao().getLastInsertedId()
                 db.UsersStillActivityDao().updateLastRecord(
-                    lastId,
+                    db.UsersStillActivityDao().getLastInsertedId(),
                     exitTime
                 )
             }
 
             DetectedActivity.WALKING -> {
-                if (isStepCounterServiceBound && isHeightDifferenceServiceBound) {
-                    val stepsNumber = stepCounterService?.getSteps() ?: 0L
-                    unbindService(stepCounterServiceConnection)
+                sensorManager.unregisterListener(this)
 
-                    val heightDifference = heightDifferenceService?.getAltitude() ?: 0f
-                    unbindService(heightDifferenceConnection)
-
-                    val lastId = db.UsersRunActivityDao().getLastInsertedId()
-                    db.UsersWalkActivityDao().updateLastRecord(
-                        lastId,
-                        exitTime,
-                        stepsNumber,
-                        heightDifference
-                    )
-                }
+                db.UsersWalkActivityDao().updateLastRecord(
+                    db.UsersWalkActivityDao().getLastInsertedId(),
+                    exitTime,
+                    sessionStepsCount,
+                    0f
+                )
             }
         }
     }
@@ -311,5 +311,10 @@ class ActivityRecognitionService: Service() {
                 Log.d("PAGE_LOADER_ACTIVITY", "Unsuccessful connection")
             }
         }
+    }
+
+    private fun terminateMonitoring() {
+        MyActivityRecognition.removeTask(this)
+        stopSelf()
     }
 }
