@@ -39,7 +39,7 @@ class RegistrationMemoActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_memo)
+        setContentView(R.layout.activity_registration_memo)
 
         date = intent.getStringExtra("CALENDAR_DATE") ?: ""
         title = intent.getStringExtra("TITLE_MEMO") ?: ""

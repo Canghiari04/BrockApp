@@ -23,7 +23,7 @@ class ManualRegistrationActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_new_user)
+        setContentView(R.layout.activity_manual_registration)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
         setSupportActionBar(toolbar)

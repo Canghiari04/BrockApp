@@ -28,7 +28,7 @@ class MarkerDialog(private val marker: Marker, private val map: MapView, private
         savedInstanceState: Bundle?
     ): View? {
         geocodeUtil = ReverseGeocodingImpl(requireContext())
-        return inflater.inflate(R.layout.dialog_map_marker_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_dialog_map_marker, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
