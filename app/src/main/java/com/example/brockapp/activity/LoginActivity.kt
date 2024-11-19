@@ -3,13 +3,12 @@ package com.example.brockapp.activity
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.extraObject.MyNetwork
-import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewModel.UserViewModel
 import com.example.brockapp.service.SupabaseService
-import com.example.brockapp.viewmodel.NetworkViewModel
+import com.example.brockapp.viewModel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
-import com.example.brockapp.receiver.AuthenticatorReceiver
-import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.receiver.ConnectivityReceiver
+import com.example.brockapp.viewModel.UserViewModelFactory
 import com.example.brockapp.interfaces.ShowCustomToastImpl
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.interfaces.InternetAvailableImpl
@@ -32,8 +31,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
 
 class LoginActivity: AppCompatActivity() {
-    private var toastUtil = ShowCustomToastImpl()
-    private var networkUtil = InternetAvailableImpl()
+
+    private val toastUtil = ShowCustomToastImpl()
+    private val networkUtil = InternetAvailableImpl()
 
     private lateinit var buttonLogin: Button
     private lateinit var receiver: BroadcastReceiver
@@ -72,11 +72,11 @@ class LoginActivity: AppCompatActivity() {
 
             buttonLogin = findViewById(R.id.button_login)
 
+            viewModelNetwork = ViewModelProvider(this)[NetworkViewModel::class.java]
+
             registerReceiver()
 
-            checkConnectivity()
-
-            viewModelNetwork = ViewModelProvider(this)[NetworkViewModel::class.java]
+            setupButton(networkUtil.isInternetActive(this))
 
             observeNetwork()
             observeLogin()
@@ -106,7 +106,6 @@ class LoginActivity: AppCompatActivity() {
                 Intent(this, SignInActivity::class.java).also {
                     unregisterReceiver(receiver)
                     startActivity(it)
-                    finish()
                 }
             }
         }
@@ -133,15 +132,13 @@ class LoginActivity: AppCompatActivity() {
     }
 
     private fun goToHome() {
-        Intent(this, PageLoaderActivity::class.java).also {
-            it.putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
-            startActivity(it)
-            finish()
-        }
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun registerReceiver() {
-        receiver = AuthenticatorReceiver(this)
+        receiver = ConnectivityReceiver(this)
 
         ContextCompat.registerReceiver(
             this,
@@ -151,21 +148,20 @@ class LoginActivity: AppCompatActivity() {
         )
     }
 
-    private fun checkConnectivity() {
-        MyNetwork.isConnected = networkUtil.isInternetActive(this)
+    private fun setupButton(item: Boolean) {
+        if (item) {
+            buttonLogin.setTextColor(resources.getColor(R.color.white))
+            buttonLogin.backgroundTintList = resources.getColorStateList(R.color.uni_red)
+        } else {
+            buttonLogin.setTextColor(resources.getColor(R.color.black))
+            buttonLogin.backgroundTintList = resources.getColorStateList(R.color.grey)
+        }
     }
 
     private fun observeNetwork() {
-        viewModelNetwork.authNetwork.observe(this) {
+        viewModelNetwork.currentNetwork.observe(this) {
+            setupButton(it)
             buttonLogin.isEnabled = it
-
-            if (it) {
-                buttonLogin.setTextColor(resources.getColor(R.color.white))
-                buttonLogin.backgroundTintList = resources.getColorStateList(R.color.uni_red)
-            } else {
-                buttonLogin.setTextColor(resources.getColor(R.color.black))
-                buttonLogin.backgroundTintList = resources.getColorStateList(R.color.grey)
-            }
         }
     }
 

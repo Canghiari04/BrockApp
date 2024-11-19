@@ -3,13 +3,12 @@ package com.example.brockapp.activity
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.extraObject.MyNetwork
-import com.example.brockapp.viewmodel.UserViewModel
-import com.example.brockapp.viewmodel.NetworkViewModel
+import com.example.brockapp.viewModel.UserViewModel
+import com.example.brockapp.viewModel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
+import com.example.brockapp.receiver.ConnectivityReceiver
 import com.example.brockapp.interfaces.ShowCustomToastImpl
-import com.example.brockapp.receiver.AuthenticatorReceiver
-import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.viewModel.UserViewModelFactory
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.interfaces.InternetAvailableImpl
 import com.example.brockapp.util.PostNotificationsPermissionUtil
@@ -29,20 +28,22 @@ import android.widget.ArrayAdapter
 import android.content.IntentFilter
 import androidx.annotation.RequiresApi
 import android.net.ConnectivityManager
+import android.content.BroadcastReceiver
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
 
 class SignInActivity: AppCompatActivity() {
-    private var toastUtil = ShowCustomToastImpl()
-    private var networkUtil = InternetAvailableImpl()
+
+    private val toastUtil = ShowCustomToastImpl()
+    private val networkUtil = InternetAvailableImpl()
 
     private lateinit var city: String
     private lateinit var typeActivity: String
     private lateinit var buttonSignIn: Button
+    private lateinit var receiver: BroadcastReceiver
     private lateinit var viewModelUser: UserViewModel
     private lateinit var country: Pair<String, String?>
-    private lateinit var receiver: AuthenticatorReceiver
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var permissionUtil: PostNotificationsPermissionUtil
 
@@ -66,7 +67,7 @@ class SignInActivity: AppCompatActivity() {
 
         registerReceiver()
 
-        checkConnectivity()
+        setupButton(networkUtil.isInternetActive(this))
 
         observeNetwork()
         observeSignIn()
@@ -97,13 +98,12 @@ class SignInActivity: AppCompatActivity() {
             Intent(this, LoginActivity::class.java).also {
                 unregisterReceiver(receiver)
                 startActivity(it)
-                finish()
             }
         }
     }
 
     private fun registerReceiver() {
-        receiver = AuthenticatorReceiver(this)
+        receiver = ConnectivityReceiver(this)
 
         ContextCompat.registerReceiver(
             this,
@@ -113,21 +113,20 @@ class SignInActivity: AppCompatActivity() {
         )
     }
 
-    private fun checkConnectivity() {
-        MyNetwork.isConnected = networkUtil.isInternetActive(this)
+    private fun setupButton(item: Boolean) {
+        if (item) {
+            buttonSignIn.setTextColor(resources.getColor(R.color.white))
+            buttonSignIn.backgroundTintList = resources.getColorStateList(R.color.uni_red)
+        } else {
+            buttonSignIn.setTextColor(resources.getColor(R.color.black))
+            buttonSignIn.backgroundTintList = resources.getColorStateList(R.color.grey)
+        }
     }
 
     private fun observeNetwork() {
-        viewModelNetwork.authNetwork.observe(this) {
+        viewModelNetwork.currentNetwork.observe(this) {
+            setupButton(it)
             buttonSignIn.isEnabled = it
-
-            if (it) {
-                buttonSignIn.setTextColor(resources.getColor(R.color.white))
-                buttonSignIn.backgroundTintList = resources.getColorStateList(R.color.uni_red)
-            } else {
-                buttonSignIn.setTextColor(resources.getColor(R.color.black))
-                buttonSignIn.backgroundTintList = resources.getColorStateList(R.color.grey)
-            }
         }
     }
 
@@ -179,7 +178,7 @@ class SignInActivity: AppCompatActivity() {
     }
 
     private fun goToHome() {
-        Intent(this, PageLoaderActivity::class.java).also {
+        Intent(this, MainActivity::class.java).also {
             it.putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
             it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(it)
