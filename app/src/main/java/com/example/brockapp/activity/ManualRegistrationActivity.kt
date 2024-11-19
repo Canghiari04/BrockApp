@@ -15,20 +15,21 @@ import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class NewUserActivity: AppCompatActivity() {
-    private lateinit var recognitionUtil: ActivityRecognitionPermissionUtil
-    private lateinit var accessRunLocationUtil: AccessFineLocationPermissionUtil
-    private lateinit var accessVehicleLocationUtil: AccessFineLocationPermissionUtil
+class ManualRegistrationActivity: AppCompatActivity() {
+
+    private lateinit var permissionRecognitionUtil: ActivityRecognitionPermissionUtil
+    private lateinit var permissionAccessLocationRunUtil: AccessFineLocationPermissionUtil
+    private lateinit var permissionAccessLocationVehicleUtil: AccessFineLocationPermissionUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_user)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_user_activity)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = resources.getText(R.string.toolbar_new_activity)
+        supportActionBar?.title = null
 
         val buttonVehicle = findViewById<FloatingActionButton>(R.id.button_vehicle)
         val buttonStill = findViewById<FloatingActionButton>(R.id.button_still)
@@ -36,15 +37,17 @@ class NewUserActivity: AppCompatActivity() {
         val buttonRun = findViewById<FloatingActionButton>(R.id.button_run)
         setUpButtons(buttonVehicle, buttonRun, buttonStill, buttonWalk)
 
-        accessVehicleLocationUtil = AccessFineLocationPermissionUtil(
+        permissionAccessLocationRunUtil = AccessFineLocationPermissionUtil(
             this,
-        ) { startRegisterActivity("Vehicle") }
-
-        accessRunLocationUtil = AccessFineLocationPermissionUtil(
-            this
+            "Run"
         ) { startRegisterActivity("Run") }
 
-        recognitionUtil = ActivityRecognitionPermissionUtil(
+        permissionAccessLocationVehicleUtil = AccessFineLocationPermissionUtil(
+            this,
+            "Vehicle"
+        ) { startRegisterActivity("Vehicle") }
+
+        permissionRecognitionUtil = ActivityRecognitionPermissionUtil(
             this,
             { startRegisterActivity("Walk") },
             null
@@ -52,12 +55,9 @@ class NewUserActivity: AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        return when(item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
-                }
-
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
                 true
@@ -78,13 +78,13 @@ class NewUserActivity: AppCompatActivity() {
     ) {
         buttonVehicle.apply {
             setOnClickListener {
-                accessVehicleLocationUtil.requestAccessFineLocation()
+                permissionAccessLocationRunUtil.requestAccessLocationPermission()
             }
         }
 
         buttonRun.apply {
             setOnClickListener {
-                accessRunLocationUtil.requestAccessFineLocation()
+                permissionAccessLocationVehicleUtil.requestAccessLocationPermission()
             }
         }
 
@@ -94,7 +94,7 @@ class NewUserActivity: AppCompatActivity() {
 
         buttonWalk.apply {
             setOnClickListener {
-                recognitionUtil.requestActivityRecognitionPermission()
+                permissionRecognitionUtil.requestActivityRecognitionPermission()
             }
         }
     }
@@ -119,6 +119,5 @@ class NewUserActivity: AppCompatActivity() {
         }
 
         startActivity(intent)
-        finish()
     }
 }

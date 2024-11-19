@@ -5,10 +5,10 @@ import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.singleton.MyGeofence
 import com.example.brockapp.service.GeofenceService
-import com.example.brockapp.viewmodel.UserViewModel
+import com.example.brockapp.viewModel.UserViewModel
+import com.example.brockapp.util.ScheduleWorkerUtil
 import com.example.brockapp.singleton.MyS3ClientProvider
-import com.example.brockapp.interfaces.ScheduleWorkerImpl
-import com.example.brockapp.viewmodel.UserViewModelFactory
+import com.example.brockapp.viewModel.UserViewModelFactory
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.singleton.MyActivityRecognition
 import com.example.brockapp.service.ActivityRecognitionService
@@ -19,12 +19,9 @@ import java.io.File
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import android.view.MenuItem
 import android.content.Intent
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import androidx.appcompat.widget.Toolbar
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -33,11 +30,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.DetectedActivity
 
 class SettingsActivity: AppCompatActivity() {
+
     private var switchMapper = mapOf<SwitchCompat, Pair<String, Int>>()
 
     private lateinit var viewModel: UserViewModel
     private lateinit var switchDumpDatabase: SwitchCompat
-    private lateinit var scheduleWorkerUtil: ScheduleWorkerImpl
+    private lateinit var scheduleWorkerUtil: ScheduleWorkerUtil
     private lateinit var switchGeofenceTransition: SwitchCompat
     private lateinit var switchActivityRecognition: SwitchCompat
     private lateinit var geofenceUtil: GeofenceTransitionPermissionsUtil
@@ -48,9 +46,6 @@ class SettingsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_settings_activity)
-        setSupportActionBar(toolbar)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = resources.getText(R.string.toolbar_settings)
 
@@ -58,7 +53,7 @@ class SettingsActivity: AppCompatActivity() {
         switchGeofenceTransition = findViewById(R.id.switch_geofence_transition_service)
         switchActivityRecognition = findViewById(R.id.switch_activity_recognition_service)
 
-        scheduleWorkerUtil = ScheduleWorkerImpl(this)
+        scheduleWorkerUtil = ScheduleWorkerUtil(this)
 
         switchMapper = mapOf(
             findViewById<SwitchCompat>(R.id.switch_vehicle_activity) to Pair("VEHICLE_ACTIVITY", DetectedActivity.IN_VEHICLE),
@@ -90,25 +85,6 @@ class SettingsActivity: AppCompatActivity() {
             { changeCheckSwitch("ACTIVITY_RECOGNITION", switchActivityRecognition) },
             switchActivityRecognition
         )
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                val intent = Intent(this, PageLoaderActivity::class.java).putExtra(
-                    "FRAGMENT_TO_SHOW",
-                    R.id.navbar_item_you
-                )
-                startActivity(intent)
-                finish()
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
-        }
     }
 
     override fun onResume() {

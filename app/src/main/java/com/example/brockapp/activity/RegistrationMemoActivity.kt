@@ -25,7 +25,8 @@ import java.time.format.DateTimeFormatter
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.app.AppCompatActivity
 
-class NewMemoActivity: AppCompatActivity() {
+class RegistrationMemoActivity: AppCompatActivity() {
+
     private val toastUtil = ShowCustomToastImpl()
 
     private lateinit var date: String
@@ -44,11 +45,11 @@ class NewMemoActivity: AppCompatActivity() {
         title = intent.getStringExtra("TITLE_MEMO") ?: ""
         description = intent.getStringExtra("DESCRIPTION_MEMO") ?: ""
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_new_memo_activity)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar_registration_memo_activity)
         setSupportActionBar(toolbar)
 
-        supportActionBar?.title = null
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = null
 
         titleTextView = findViewById(R.id.edit_text_title)
         descriptionTextView = findViewById(R.id.edit_text_description)
@@ -69,7 +70,9 @@ class NewMemoActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, DailyMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
+                val intent = Intent(this, DailyMemoActivity::class.java).apply {
+                    putExtra("CALENDAR_DATE", date)
+                }
                 startActivity(intent)
                 finish()
                 true
@@ -77,6 +80,7 @@ class NewMemoActivity: AppCompatActivity() {
 
             else -> {
                 super.onOptionsItemSelected(item)
+                false
             }
         }
     }
