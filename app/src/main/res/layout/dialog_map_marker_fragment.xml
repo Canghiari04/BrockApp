@@ -31,7 +31,7 @@
 
                 <ImageView
                     android:contentDescription="@string/description_marker_icon"
-                    android:src="@drawable/marker_icon"
+                    android:src="@drawable/icon_marker"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:gravity="center">

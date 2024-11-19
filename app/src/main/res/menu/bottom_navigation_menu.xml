@@ -3,17 +3,17 @@
     <item
         android:id="@+id/navbar_item_you"
         android:title="@string/menu_you"
-        android:icon="@drawable/baseline_home_24" />
+        android:icon="@drawable/icon_home" />
     <item
         android:id="@+id/navbar_item_map"
         android:title="@string/menu_map"
-        android:icon="@drawable/baseline_map_24" />
+        android:icon="@drawable/icon_map" />
     <item
         android:id="@+id/navbar_item_calendar"
         android:title="@string/menu_activity"
-        android:icon="@drawable/baseline_calendar_month_24" />
+        android:icon="@drawable/icon_calendar" />
     <item
         android:id="@+id/navbar_item_group"
         android:title="@string/menu_group"
-        android:icon="@drawable/baseline_people_24" />
+        android:icon="@drawable/icon_people" />
 </menu>

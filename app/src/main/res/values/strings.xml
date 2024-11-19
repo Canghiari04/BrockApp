@@ -3,6 +3,19 @@
 
     <string name="text_blank"> </string>
 
+    <string-array name="spinner_activities">
+        <item>Vehicle</item>
+        <item>Run</item>
+        <item>Still</item>
+        <item>Walk</item>
+    </string-array>
+
+    <string-array name="spinner_temporal_items">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+    </string-array>
+
     <string name="text_view_sign_in">Sign In</string>
     <string name="text_view_login">Login</string>
     <string name="edit_text_username">Username</string>
@@ -15,26 +28,23 @@
     <string name="text_view_switch_to_login">Switch to Login</string>
     <string name="text_view_switch_to_sign_in">Switch to Sign In</string>
 
-    <string-array name="spinner_activities">
-        <item>Vehicle</item>
-        <item>Run</item>
-        <item>Still</item>
-        <item>Walk</item>
-    </string-array>
-
     <string name="menu_you">You</string>
     <string name="menu_map">Map</string>
     <string name="menu_activity">Calendar</string>
     <string name="menu_group">Group</string>
 
-    <string name="drawer_open">Open</string>
-    <string name="drawer_close">Close</string>
-    <string name="drawer_account">ACCOUNT</string>
+    <string name="drawer_account">Account</string>
+    <string name="drawer_activity_summary">Activity summary</string>
+    <string name="drawer_geofence_summary">Geofence summary</string>
 
     <string name="text_view_title_page_progress">Look your progress!</string>
     <string name="text_view_title_fist_card">This week</string>
     <string name="text_view_title_second_card">Your stats</string>
     <string name="text_view_title_third_card">This day</string>
+    <string name="text_view_title_bar_chart_vehicle">In vehicle</string>
+    <string name="text_view_title_bar_chart_run">Running</string>
+    <string name="text_view_title_bar_chart_still">Still</string>
+    <string name="text_view_title_bar_chart_walk">Walking</string>
     <string name="text_view_distance">Distance</string>
     <string name="text_view_time">Average time</string>
     <string-array name="spinner_line_chart">
@@ -42,38 +52,31 @@
         <item>Run</item>
         <item>Walk</item>
     </string-array>
-
-    <string-array name="spinner_temporal_items">
-        <item>Day</item>
-        <item>Week</item>
-        <item>Month</item>
-    </string-array>
+    <string name="text_view_title_line_chart_vehicle">Distance travelled</string>
+    <string name="text_view_title_line_chart_run">Distance run</string>
+    <string name="text_view_title_line_chart_walk">Steps done</string>
 
     <string name="text_view_title_page_area">Look your areas!</string>
-    <string name="text_view_transitions_month">Select the period</string>
+    <string name="text_view_welcome_geofence">Areas Overview: Here you\'ll find all the transitions done in the last month</string>
     <string name="text_view_transitions_name">Select the area</string>
 
-    <string name="button_new_activity">Icon add</string>
-    <string name="button_settings">Icon settings</string>
-
-    <string name="title_new_activity">Choose one of them to register</string>
+    <string name="text_view_title_new_activity">Choose one of them to register</string>
+    <string name="text_view_welcome_new_activity">Some activity may require permission to access your location, to improve the use of app</string>
     <string name="title_vehicle">Vehicle Activity</string>
-    <string name="description_vehicle_icon">Car icon</string>
     <string name="title_run">Run Activity</string>
-    <string name="description_run_icon">Running icon</string>
     <string name="title_still">Still Activity</string>
-    <string name="description_still_icon">Still icon</string>
     <string name="title_walk">Walk Activity</string>
-    <string name="description_walk_icon">Walking icon</string>
+    <string name="button_stop">STOP</string>
+    <string name="button_start">START</string>
 
-    <string name="stop_button">STOP</string>
-    <string name="start_button">START</string>
-
+    <string name="toolbar_settings">Settings</string>
     <string name="text_view_service">Check the active service</string>
     <string name="text_view_activity_recognition">Daily activity recognition</string>
     <string name="text_view_geofence_transition">Geofence transition service</string>
+    <string name="text_view_description_dump_database">Sharing your data allows the app to provide a personalized experience!</string>
     <string name="text_view_dump_service">Share your dump database</string>
     <string name="text_view_dump_database">Share your progress</string>
+    <string name="text_view_description_activities">Choose the activities that you want to detect</string>
     <string name="text_view_activities">Choose the activities to detect</string>
     <string name="text_view_in_vehicle">In vehicle</string>
     <string name="text_view_run">Run</string>
@@ -92,21 +95,6 @@
     <string name="positive_button">Allow</string>
     <string name="negative_button">Deny</string>
 
-    <string name="description_user_icon">User icon</string>
-    <string name="text_view_impressions">Impressions</string>
-    <string name="text_view_following">Following</string>
-    <string name="text_view_danger">Danger</string>
-    <string name="text_view_logout_account">Logout</string>
-    <string name="text_view_delete_account">Delete Account</string>
-
-    <string name="dangerous_dialog_title">Attention</string>
-    <string name="dangerous_dialog_message">If you decide to delete your account, you will lose all the data stored</string>
-    <string name="dangerous_positive_button">DELETE</string>
-    <string name="dangerous_negative_button">DENY</string>
-
-    <string name="auto_complete_text_view_search_new_area">Search a new area</string>
-
-    <string name="description_marker_icon">Icon marker</string>
     <string name="text_view_feature_name">Feature name</string>
     <string name="text_view_city">City</string>
     <string name="text_view_address">Address</string>
@@ -122,20 +110,41 @@
     <string name="saturday_text_view">sat</string>
     <string name="sunday_text_view">sun</string>
 
-    <string name="description_daily_memo_icon">Icon add memo</string>
+    <string name="toolbar_daily_memo">Daily memo</string>
     <string name="button_modify_memo">MODIFY</string>
 
     <string name="edit_text_title_memo">Enter memo title</string>
     <string name="edit_text_description_memo">Enter memo description</string>
     <string name="button_add_memo">ADD MEMO</string>
+    <string name="button_update_memo">UPDATE MEMO</string>
 
     <string name="auto_complete_search_users">Type an username</string>
     <string name="text_view_show_user">Show</string>
-    <string name="button_follow_user">Follow</string>
+    <string name="button_follow_user">FOLLOW</string>
+    <string name="button_remove_user">REMOVE</string>
 
-    <string name="description_activity_icon">Activity icon</string>
+    <string name="toolbar_account">Account</string>
+    <string name="text_view_impressions">Impressions</string>
+    <string name="text_view_following">Following</string>
+    <string name="text_view_danger">Danger</string>
+    <string name="text_view_danger_zone">You are entering a danger area. Please proceed with caution or exit immediately</string>
+    <string name="text_view_logout_account">Logout</string>
+    <string name="text_view_delete_account">Delete Account</string>
+    <string name="dangerous_dialog_title">Attention</string>
+    <string name="dangerous_dialog_message">If you decide to delete your account, you will lose all the data stored</string>
+    <string name="dangerous_positive_button">DELETE</string>
+    <string name="dangerous_negative_button">DENY</string>
 
-    <string name="description_empty_icon">Icon empty page</string>
-
+    <string name="description_add_icon">Icon add</string>
+    <string name="description_user_icon">User icon</string>
+    <string name="description_vehicle_icon">Car icon</string>
+    <string name="description_run_icon">Running icon</string>
+    <string name="description_still_icon">Still icon</string>
+    <string name="description_walk_icon">Walking icon</string>
     <string name="description_toast_icon">Warning icon</string>
+    <string name="description_marker_icon">Icon marker</string>
+    <string name="description_empty_icon">Icon empty page</string>
+    <string name="description_activity_icon">Activity icon</string>
+    <string name="description_settings_icon">Icon settings</string>
+    <string name="description_daily_memo_icon">Icon add memo</string>
 </resources>

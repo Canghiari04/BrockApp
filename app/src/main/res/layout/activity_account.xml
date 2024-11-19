@@ -9,7 +9,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_account_activity"
-        app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
+        app:navigationIcon="@drawable/icon_arrow_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleTextColor="@android:color/white"
@@ -39,7 +39,7 @@
                     <ImageView
                         android:id="@+id/image_view_account"
                         android:contentDescription="@string/description_user_icon"
-                        android:src="@drawable/baseline_account_circle_24"
+                        android:src="@drawable/icon_account"
                         android:layout_width="75dp"
                         android:layout_height="75dp"
                         app:tint="@color/grey">
@@ -135,9 +135,9 @@
                     android:textColor="@color/black" />
 
                 <TextView
-                    android:id="@+id/text_view_danger_zone"
-                    android:layout_width="300dp"
+                    android:layout_width="375dp"
                     android:layout_height="wrap_content"
+                    android:text="@string/text_view_danger_zone"
                     android:textSize="16sp"
                     android:textColor="@color/black">
                 </TextView>

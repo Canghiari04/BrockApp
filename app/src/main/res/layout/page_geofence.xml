@@ -30,7 +30,7 @@
 
             <TextView
                 android:id="@+id/text_view_welcome_geofence"
-                android:layout_width="350dp"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="48dp"
                 android:layout_marginStart="16dp"
@@ -57,7 +57,7 @@
 
                 <ImageView
                     android:contentDescription="@string/description_user_icon"
-                    android:src="@drawable/baseline_account_circle_24"
+                    android:src="@drawable/icon_account"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     app:tint="@color/grey">
@@ -106,8 +106,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -128,28 +127,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
-                        android:text="@string/text_view_transitions_month"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black">
-                    </TextView>
-
-                    <Spinner
-                        android:id="@+id/spinner_transitions_temporal"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginBottom="16dp"
-                        android:background="@drawable/border_background_grey">
-                    </Spinner>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
                         android:text="@string/text_view_transitions_name"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black">
+                        android:textStyle="bold">
                     </TextView>
 
                     <Spinner
@@ -162,11 +143,9 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_page_geofence"
+                android:id="@+id/recycler_view_geofence"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:scrollbars="vertical" />
+                android:layout_height="match_parent" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

@@ -11,14 +11,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_user_activity"
-            app:navigationIcon="@drawable/baseline_arrow_back_toolbar_24"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:titleTextColor="@color/white"
-            android:background="@color/uni_red" />
-
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout_user"
             android:layout_width="match_parent"

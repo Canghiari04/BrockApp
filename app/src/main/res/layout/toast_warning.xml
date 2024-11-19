@@ -22,7 +22,7 @@
         android:padding="10dp">
 
         <ImageView
-            android:src="@drawable/outline_info_24"
+            android:src="@drawable/icon_info"
             android:contentDescription="@string/description_toast_icon"
             android:layout_width="30dp"
             android:layout_height="30dp"
