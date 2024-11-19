@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineScope
 
 class ReverseGeocodingImpl(private val context: Context): ReverseGeocoding {
+
     override fun getAddress(name: String?, latitude: Double, longitude: Double): Address {
         val geocoder = Geocoder(context, Locale.getDefault())
         val addresses = geocoder.getFromLocation(latitude, longitude, 10)

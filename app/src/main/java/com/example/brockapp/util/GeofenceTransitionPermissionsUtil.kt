@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
 class GeofenceTransitionPermissionsUtil(private val activity: AppCompatActivity, private val onPermissionsGranted: () -> Unit, private val switch: SwitchCompat) {
+
     private lateinit var requestBackgroundPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestLocationPermissionsLauncher: ActivityResultLauncher<Array<String>>
     

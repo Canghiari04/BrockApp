@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 class PeriodRangeImpl: PeriodRange {
+
     val datesOfWeek = mutableMapOf<Int, String>().apply {
         val range = getWeekRange(LocalDate.now())
 

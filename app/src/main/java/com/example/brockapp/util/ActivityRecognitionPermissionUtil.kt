@@ -13,7 +13,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
-class ActivityRecognitionPermissionUtil(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit, private val switch: SwitchCompat) {
+class ActivityRecognitionPermissionUtil(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit, private val switch: SwitchCompat?) {
+
     private lateinit var requestRecognitionPermissionLauncher: ActivityResultLauncher<String>
 
     init {
@@ -57,7 +58,7 @@ class ActivityRecognitionPermissionUtil(private val activity: AppCompatActivity,
             }
             .setNegativeButton(R.string.negative_button) { dialog, _ ->
                 dialog.dismiss()
-                switch.isChecked = false
+                switch?.let { it.isChecked = false }
             }
             .create()
             .show()
@@ -78,7 +79,7 @@ class ActivityRecognitionPermissionUtil(private val activity: AppCompatActivity,
             }
             .setNegativeButton(R.string.negative_button) { dialog, _ ->
                 dialog.dismiss()
-                switch.isChecked = false
+                switch?.let { it.isChecked = false }
             }
             .create()
             .show()

@@ -1,4 +1,4 @@
-package com.example.brockapp.viewmodel
+package com.example.brockapp.viewModel
 
 import com.example.brockapp.extraObject.MyNetwork
 
@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 
 class NetworkViewModel: ViewModel() {
+
     private val _currentNetwork = MutableLiveData<Boolean>()
     val currentNetwork: LiveData<Boolean> get() = _currentNetwork
 

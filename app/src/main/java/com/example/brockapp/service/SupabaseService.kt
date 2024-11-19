@@ -8,13 +8,13 @@ import com.example.brockapp.room.FriendsEntity
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.singleton.MySupabase
 import com.example.brockapp.util.NotificationUtil
+import com.example.brockapp.activity.MainActivity
 import com.example.brockapp.activity.LoginActivity
+import com.example.brockapp.util.ScheduleWorkerUtil
 import com.example.brockapp.room.GeofenceAreasEntity
-import com.example.brockapp.activity.PageLoaderActivity
 import com.example.brockapp.room.UsersRunActivityEntity
 import com.example.brockapp.room.UsersWalkActivityEntity
 import com.example.brockapp.singleton.MyS3ClientProvider
-import com.example.brockapp.interfaces.ScheduleWorkerImpl
 import com.example.brockapp.room.UsersStillActivityEntity
 import com.example.brockapp.room.GeofenceTransitionsEntity
 import com.example.brockapp.interfaces.ShowCustomToastImpl
@@ -40,6 +40,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.DeleteObjectRequest
 
 class SupabaseService: Service() {
+
     private var notificationUtil = NotificationUtil()
 
     private val toastUtil = ShowCustomToastImpl()
@@ -49,7 +50,7 @@ class SupabaseService: Service() {
     private lateinit var s3Client: AmazonS3Client
     private lateinit var supabase: SupabaseClient
     private lateinit var receiver: BroadcastReceiver
-    private lateinit var scheduleWorkerUtil: ScheduleWorkerImpl
+    private lateinit var scheduleWorkerUtil: ScheduleWorkerUtil
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
@@ -61,7 +62,7 @@ class SupabaseService: Service() {
         s3Client = MyS3ClientProvider.getInstance(this)
         file = File(this.filesDir, "user_data.json")
 
-        scheduleWorkerUtil = ScheduleWorkerImpl(this)
+        scheduleWorkerUtil = ScheduleWorkerUtil(this)
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -76,9 +77,8 @@ class SupabaseService: Service() {
                         }
 
                         NextActivity.HOME.toString() -> {
-                            Intent(context, PageLoaderActivity::class.java).also {
+                            Intent(context, MainActivity::class.java).also {
                                 it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                it.putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_you)
                                 startActivity(it)
                                 stopSelf()
                             }
@@ -132,14 +132,12 @@ class SupabaseService: Service() {
         LOGIN, HOME
     }
 
-    // Function used to retrieve all the data inserted inside the local database
     private fun syncSupabase() {
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 supabase.apply {
                     val user =  room.UsersDao().getUserFromUsernameAndPassword(MyUser.username, MyUser.password)
 
-                    // Activities
                     val runActivities = room.UsersRunActivityDao()
                         .getRunActivitiesByUsername(MyUser.username)
                         .filter { it.distanceDone > 0.0 }
@@ -155,7 +153,6 @@ class SupabaseService: Service() {
                         .getVehicleActivitiesByUsername(MyUser.username)
                         .filter { it.distanceTravelled > 0.0 }
 
-                    // Geofence area and transition
                     val geofenceAreas = room.GeofenceAreasDao()
                         .getGeofenceAreasByUsername(MyUser.username)
                         .filter { it.name.isNotBlank() }
@@ -164,10 +161,8 @@ class SupabaseService: Service() {
                         .getGeofenceTransitionsByUsername(MyUser.username)
                         .filter { it.nameLocation.isNotBlank() }
 
-                    // Calendar's memos
                     val memos = room.MemosDao().getMemosByUsername(MyUser.username)
 
-                    // Friends
                     val friends = room.FriendsDao().getFriendsByUsername(MyUser.username)
 
                     supabase.from("Users").upsert(
@@ -207,15 +202,15 @@ class SupabaseService: Service() {
                     )
                 }
 
-                // I will delete the User so all the records saved can be remove automatically
                 room.UsersDao().deleteUser(
                     MyUser.username,
                     MyUser.password
                 )
 
                 scheduleWorkerUtil.also {
-                    it.deleteMemoWorker()
                     it.deleteSyncPeriodic()
+
+                    it.deleteMemoWorker()
                     it.deleteGeofenceAreaWorker()
                 }
 
@@ -255,7 +250,6 @@ class SupabaseService: Service() {
         )
     }
 
-    // Function used to insert all the records inside the Supabase database
     private fun syncRoom() {
         try {
             CoroutineScope(Dispatchers.IO).launch {
@@ -295,7 +289,6 @@ class SupabaseService: Service() {
                     filter { eq("username", MyUser.username) }
                 }.decodeList<FriendsEntity>()
 
-                // Previous delete made to avoid unique exception inside the room database
                 room.UsersDao().deleteUser(
                     user.username,
                     user.password

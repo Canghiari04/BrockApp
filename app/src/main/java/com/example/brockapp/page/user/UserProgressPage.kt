@@ -9,6 +9,7 @@ import android.widget.TextView
 import kotlin.time.Duration.Companion.milliseconds
 
 class UserProgressPage(private val friend: Friend): ProgressPage() {
+
     companion object {
         const val TO_KM = 1000.0
     }
@@ -75,10 +76,10 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     private fun observeCurrentFriends() {
         viewModelGroup.currentFriends.observe(viewLifecycleOwner) { items ->
             if (items.contains(friend.username)) {
-                buttonUser.setText("REMOVE")
+                buttonUser.text = resources.getText(R.string.button_remove_user)
                 buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
             } else {
-                buttonUser.setText("FOLLOW")
+                buttonUser.text = resources.getText(R.string.button_follow_user)
                 buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
@@ -109,6 +110,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
         viewModelGroup.userVehicleBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(vehicleBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_vehicle)
             }
         }
     }
@@ -138,6 +140,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
         viewModelGroup.userRunBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(runBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_run)
             }
         }
     }
@@ -156,6 +159,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
         viewModelGroup.userStillBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(stillBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_still)
             }
         }
     }
@@ -181,6 +185,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
         viewModelGroup.userWalkBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(walkBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_walk)
             }
         }
     }
@@ -188,7 +193,8 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     override fun observeVehicleLineChartEntries() {
         viewModelGroup.userVehicleLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Distance travelled", entries, vehicleLineChart, requireContext())
+                titleLineChart.text = resources.getString(R.string.text_view_title_line_chart_vehicle)
+                chartUtil.populateLineChart("Vehicle", entries, vehicleLineChart, requireContext())
             }
         }
     }
@@ -196,7 +202,8 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     override fun observeRunLineChartEntries() {
         viewModelGroup.userRunLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Kilometers run", entries, runLineChart, requireContext())
+                titleLineChart.text = resources.getString(R.string.text_view_title_line_chart_run)
+                chartUtil.populateLineChart("Run", entries, runLineChart, requireContext())
             }
         }
     }
@@ -204,7 +211,8 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
     override fun observeWalkLineChartEntries() {
         viewModelGroup.userWalkLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Steps done", entries, walkLineChart, requireContext())
+                titleLineChart.text = resources.getString(R.string.text_view_title_line_chart_walk)
+                chartUtil.populateLineChart("Walk", entries, walkLineChart, requireContext())
             }
         }
     }

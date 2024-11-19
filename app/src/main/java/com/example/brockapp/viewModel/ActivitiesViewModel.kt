@@ -1,4 +1,4 @@
-package com.example.brockapp.viewmodel
+package com.example.brockapp.viewModel
 
 import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
@@ -139,7 +139,6 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 endOfWeek
             ).filter { it.distanceTravelled > 0.0 }
 
-            // All the activities are grouped by the day
             val groupedItems = items.groupBy {
                 it.timestamp.let { timestamp ->
                     LocalDate.parse(
@@ -149,7 +148,6 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 }
             }
 
-            // Define the time for each week's day
             val timePerDay = groupedItems.mapValues { it ->
                 (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
             }

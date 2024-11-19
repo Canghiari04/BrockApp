@@ -9,13 +9,11 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 
 object MyServiceConnection {
-    // I passed a callback inside the function parameters, so I can get the service instance
     fun createDistanceServiceConnection(
         onConnected: (DistanceService) -> Unit,
         onDisconnected: () -> Unit
     ): ServiceConnection {
         return object : ServiceConnection {
-            // When the binding is completed I will obtain the instance by the binder
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 val binder = service as DistanceService.LocalBinder
                 onConnected(binder.getService())

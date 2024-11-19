@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.PutObjectRequest
 
 class SyncBucketWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
+
     private lateinit var file: File
     private lateinit var db: BrockDB
     private lateinit var util: NotificationUtil

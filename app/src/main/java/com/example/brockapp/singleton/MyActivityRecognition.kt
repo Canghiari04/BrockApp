@@ -18,6 +18,7 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransitionRequest
 
 class MyActivityRecognition private constructor() {
+
     companion object {
         @Volatile
         private var status: Boolean = false
@@ -67,7 +68,7 @@ class MyActivityRecognition private constructor() {
                         }
                     }
                 } else {
-                    Log.wtf("MY_ACTIVITY_RECOGNITION", "Permission activity recognition denied")
+                    Log.wtf("MY_ACTIVITY_RECOGNITION", "Permission denied")
                 }
             }
         }
@@ -75,7 +76,6 @@ class MyActivityRecognition private constructor() {
         private fun createTask(context: Context): Task<Void>? {
             pendingIntent = createPendingIntent(context)
 
-            // I will save inside the shared preferences all the interested activities by Settings
             val transitions = createActivityTransitions(context)
 
             if (ActivityCompat.checkSelfPermission(
@@ -94,7 +94,6 @@ class MyActivityRecognition private constructor() {
             )
         }
 
-        // Will be fine define by the user the activity he/she is interested in
         private fun createActivityTransitions(context: Context): List<ActivityTransition> {
             val list = mutableListOf(
                 MySharedPreferences.getActivity("VEHICLE_ACTIVITY", context),
@@ -103,7 +102,6 @@ class MyActivityRecognition private constructor() {
                 MySharedPreferences.getActivity("WALK_ACTIVITY", context)
             ).apply { removeAll { it == DetectedActivity.UNKNOWN } }
 
-            // Inside the shared preferences I will put the same type in .setActivityType
             return mutableListOf<ActivityTransition>().apply {
                 list.forEach { item ->
                     add(

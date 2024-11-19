@@ -27,6 +27,7 @@ import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 class ChartUtil {
+
     inner class CustomChartMarkerView(context: Context, layoutResource: Int): MarkerView(context, layoutResource) {
         private val dates = PeriodRangeImpl().datesOfWeek
         private val labelTextView: TextView = findViewById(R.id.marker_value)
@@ -75,24 +76,19 @@ class ChartUtil {
 
         dataSet.setDrawValues(false)
 
-        // Define the dataset to insert inside the chart
         val barData = BarData(dataSet)
         barData.setDrawValues(false)
         barChart.data = barData
 
-        // Marker used to see the data on the chart
         val marker = CustomChartMarkerView(context, R.layout.marker_chart_view)
         barChart.marker = marker
 
-        // Removing the background grid lines
         barChart.setDrawGridBackground(false)
         barChart.setBackgroundColor(Color.WHITE)
 
-        // Removing the grid lines and positioning the x axis to the bottom of the plot
         barChart.xAxis.setDrawGridLines(false)
         barChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
 
-        // Removing other grid lines
         barChart.axisLeft.setDrawGridLines(false)
         barChart.axisRight.isEnabled = false
         barChart.axisRight.setDrawGridLines(false)
@@ -100,7 +96,6 @@ class ChartUtil {
         barChart.xAxis.isGranularityEnabled = true
         barChart.xAxis.granularity = 1f
 
-        // Define the start of the bar plot
         barChart.axisLeft.axisMinimum = 0f
         barChart.axisRight.axisMinimum = 0f
 
@@ -127,28 +122,28 @@ class ChartUtil {
         })
     }
 
-    fun populateLineChart(label: String,  entries: List<Entry>, lineChart: LineChart, context: Context) {
+    fun populateLineChart(label: String, entries: List<Entry>, lineChart: LineChart, context: Context) {
         when {
-            label.contains("Distance") -> {
+            label.contains("Vehicle") -> {
                 entries.forEach {
                     it.data = "km"
                 }
             }
 
-            label.contains("Kilometers") -> {
+            label.contains("Run") -> {
                 entries.forEach {
                     it.data = "km"
                 }
             }
 
-            label.contains("Steps") -> {
+            label.contains("Walk") -> {
                 entries.forEach {
                     it.data = "steps"
                 }
             }
         }
 
-        val dataSet = LineDataSet(entries, label)
+        val dataSet = LineDataSet(entries, " ")
 
         dataSet.lineWidth = 2f
         dataSet.color = Color.RED
@@ -175,6 +170,7 @@ class ChartUtil {
         leftAxis.axisMinimum = 0f
         leftAxis.setDrawGridLines(false)
 
+        lineChart.legend.isEnabled = false
         lineChart.axisRight.isEnabled = false
         lineChart.description.isEnabled = false
 
@@ -185,7 +181,6 @@ class ChartUtil {
     }
 
     fun populatePieChart(entries: List<PieEntry>, pieChart: PieChart, context: Context) {
-        // I passed a mutable list of colors to obtain the possibility to change the color while the app running
         val dataSet = PieDataSet(entries, " ")
 
         dataSet.valueTextSize = 12f

@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 
 class MyS3ClientProvider private constructor() {
+
     companion object {
         @Volatile
         private var s3Client: AmazonS3Client? = null

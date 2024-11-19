@@ -3,7 +3,7 @@ package com.example.brockapp.service
 import com.example.brockapp.*
 import com.example.brockapp.util.NotificationUtil
 import com.example.brockapp.interfaces.NotificationSender
-import com.example.brockapp.worker.ActivityRecognitionWorker
+import com.example.brockapp.worker.ActivityNotifierWorker
 
 import android.os.Binder
 import androidx.work.Data
@@ -19,6 +19,7 @@ import android.hardware.SensorEventListener
 import androidx.work.OneTimeWorkRequestBuilder
 
 class StepCounterService: Service(), SensorEventListener, NotificationSender {
+
     private var initialStepCount = 0L
     private var sessionStepsCount = 0L
     private var sensor: Sensor? = null
@@ -34,10 +35,10 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
     override fun onCreate() {
         super.onCreate()
 
-        start()
-
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        start()
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -55,7 +56,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (initialStepCount < 0) {
+        if (initialStepCount == 0L) {
             initialStepCount = event.values[0].toLong()
         }
 
@@ -70,11 +71,15 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
             .putString("CONTENT", content)
             .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<ActivityNotifierWorker>()
             .setInputData(inputData)
             .build()
 
         WorkManager.getInstance(this).enqueue(workRequest)
+    }
+
+    fun resetStep() {
+        sessionStepsCount = 0L
     }
 
     fun getSteps(): Long {
@@ -82,12 +87,7 @@ class StepCounterService: Service(), SensorEventListener, NotificationSender {
     }
 
     private fun start() {
-        if (sensor == null) {
-            sendNotification(
-                "BrockApp - Step Counter Sensor",
-                "Step counter sensor is not present in this device"
-            )
-        } else {
+        if (sensor != null) {
             startForeground(
                 ID_STEP_COUNTER_SERVICE_NOTIFY,
                 notificationUtil.getNotificationBody(

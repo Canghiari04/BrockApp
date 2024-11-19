@@ -2,23 +2,19 @@ package com.example.brockapp.service
 
 import com.example.brockapp.*
 import com.example.brockapp.util.NotificationUtil
-import com.example.brockapp.interfaces.NotificationSender
-import com.example.brockapp.worker.ActivityRecognitionWorker
 
 import android.os.Binder
 import android.os.IBinder
-import androidx.work.Data
 import android.app.Service
 import android.content.Intent
 import android.hardware.Sensor
 import android.content.Context
-import androidx.work.WorkManager
 import android.hardware.SensorEvent
 import android.hardware.SensorManager
 import android.hardware.SensorEventListener
-import androidx.work.OneTimeWorkRequestBuilder
 
-class HeightDifferenceService: Service(), SensorEventListener, NotificationSender {
+class HeightDifferenceService: Service(), SensorEventListener {
+
     private var sensor: Sensor? = null
     private var binder = LocalBinder()
     private var previousAltitude: Float? = null
@@ -35,10 +31,10 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
     override fun onCreate() {
         super.onCreate()
 
-        start()
-
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+
+        start()
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -75,17 +71,9 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
 
-    override fun sendNotification(title: String, content: String) {
-        val inputData = Data.Builder()
-            .putString("TITLE", title)
-            .putString("CONTENT", content)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(this).enqueue(workRequest)
+    fun resetAltitude() {
+        totalNegativeHeightDifference = 0f
+        totalPositiveHeightDifference = 0f
     }
 
     fun getAltitude(): Float {
@@ -93,12 +81,7 @@ class HeightDifferenceService: Service(), SensorEventListener, NotificationSende
     }
 
     private fun start() {
-        if (sensor == null) {
-            sendNotification(
-                "BrockApp - Pressure sensor",
-                "Pressure sensor is not present in this device"
-            )
-        } else {
+        if (sensor != null) {
             startForeground(
                 ID_HEIGHT_DIFFERENCE_SERVICE_NOTIFY,
                 notificationUtil.getNotificationBody(

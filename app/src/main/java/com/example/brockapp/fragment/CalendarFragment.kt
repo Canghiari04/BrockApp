@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 
 class CalendarFragment: Fragment(R.layout.fragment_calendar) {
+
     private val util = CalendarUtil()
     private val formatter = DateTimeFormatter.ofPattern(CALENDAR_DATE_FORMAT)
 
@@ -37,7 +38,7 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
 
     private fun setDate(date: LocalDate) {
         view?.findViewById<TextView>(R.id.text_view_date)?.apply {
-            text = "${date.month.toString().toLowerCase()}, ${date.year}"
+            text = "${date.month.toString().lowercase()}, ${date.year}"
         }
     }
 
@@ -79,8 +80,10 @@ class CalendarFragment: Fragment(R.layout.fragment_calendar) {
     }
 
     private fun showMemos(date: String) {
-        val intent = Intent(requireContext(), DailyMemoActivity::class.java).putExtra("CALENDAR_DATE", date)
+        val intent = Intent(requireContext(), DailyMemoActivity::class.java).apply {
+            putExtra("CALENDAR_DATE", date)
+        }
+
         startActivity(intent)
-        activity?.finish()
     }
 }

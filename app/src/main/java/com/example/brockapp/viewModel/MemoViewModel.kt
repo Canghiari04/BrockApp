@@ -1,4 +1,4 @@
-package com.example.brockapp.viewmodel
+package com.example.brockapp.viewModel
 
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.room.MemosEntity
@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 
 class MemoViewModel(private val db: BrockDB): ViewModel() {
+
     private val _memos = MutableLiveData<List<MemosEntity>>()
     val memos: LiveData<List<MemosEntity>> get() = _memos
 

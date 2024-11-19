@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.FusedLocationProviderClient
 
 class DistanceService: Service() {
+
     private var binder = LocalBinder()
     private var distance: Double = 0.0
     private var startLocation: Location? = null
@@ -35,10 +36,10 @@ class DistanceService: Service() {
     override fun onCreate() {
         super.onCreate()
 
-        start()
-
         setUpLocationUpdates()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        start()
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -53,6 +54,10 @@ class DistanceService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY
+    }
+
+    fun resetDistance() {
+        distance = 0.0
     }
 
     fun getDistance(): Double {

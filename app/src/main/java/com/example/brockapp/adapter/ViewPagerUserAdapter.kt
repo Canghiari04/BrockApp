@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerUserAdapter(private val friend: Friend, fragmentManager: FragmentManager, lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
+
     override fun getItemCount(): Int {
         return 2
     }

@@ -14,6 +14,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 
 class MyGeofence private constructor() {
+
     companion object {
         private var radius = 0
         private var duration = 86400000L
@@ -114,7 +115,11 @@ class MyGeofence private constructor() {
 
             for (area in areas) {
                 listLocalities.add(
-                    Locality(area.id.toString(), area.longitude, area.latitude)
+                    Locality(
+                        area.id.toString(),
+                        area.longitude,
+                        area.latitude
+                    )
                 )
             }
 

@@ -6,6 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitClientInstance {
+
     companion object {
         val api: GeoApiService by lazy {
             Retrofit.Builder()

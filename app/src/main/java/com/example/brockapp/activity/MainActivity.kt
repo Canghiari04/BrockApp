@@ -20,35 +20,31 @@ import android.Manifest
 import android.util.Log
 import android.os.Bundle
 import java.time.LocalDate
+import android.view.MenuItem
 import android.content.Intent
 import androidx.work.WorkManager
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import androidx.core.app.ActivityCompat
-import androidx.appcompat.widget.Toolbar
+import androidx.navigation.NavController
+import androidx.navigation.ui.navigateUp
 import android.content.pm.PackageManager
-import android.view.MenuItem
 import androidx.core.content.ContextCompat
-import androidx.navigation.ui.NavigationUI
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.onNavDestinationSelected
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.onNavDestinationSelected
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class PageLoaderActivity: AppCompatActivity() {
+class MainActivity: AppCompatActivity() {
+
     private val toastUtil = ShowCustomToastImpl()
     private val networkUtil = InternetAvailableImpl()
 
@@ -56,22 +52,19 @@ class PageLoaderActivity: AppCompatActivity() {
     private lateinit var viewModelMemo: MemoViewModel
     private lateinit var receiver: ConnectivityReceiver
     private lateinit var viewModelGeofence: GeofenceViewModel
-    private lateinit var newActivityButton: FloatingActionButton
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_page_loader)
+        setContentView(R.layout.activity_main)
 
-        newActivityButton = findViewById(R.id.button_new_activity)
         navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = MemoViewModelFactory(db)
         viewModelMemo = ViewModelProvider(this, viewModelFactory)[MemoViewModel::class.java]
 
-        setUpNavigation()
-        setUpFloatingButton()
+        setupNavigation()
 
         checkServices()
         checkConnectivity()
@@ -104,10 +97,10 @@ class PageLoaderActivity: AppCompatActivity() {
         unregisterReceiver(receiver)
     }
 
-    private fun setUpNavigation() {
-        val navViewDrawer = findViewById<NavigationView>(R.id.navigation_view_drawer)
+    private fun setupNavigation() {
+        val navDrawer = findViewById<NavigationView>(R.id.drawer_navigation_view)
 
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_page_loader)
+        val drawer = findViewById<DrawerLayout>(R.id.drawer_main)
         val bottomBar = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
 
         appBarConfiguration = AppBarConfiguration(
@@ -120,10 +113,9 @@ class PageLoaderActivity: AppCompatActivity() {
             appBarConfiguration
         )
 
-        navViewDrawer.setupWithNavController(navController)
-        bottomBar.setupWithNavController(navController)
+        navDrawer.setupWithNavController(navController)
 
-        navViewDrawer.setNavigationItemSelectedListener { item ->
+        navDrawer.setNavigationItemSelectedListener { item ->
             item.isChecked = true
             drawer.closeDrawers()
 
@@ -138,24 +130,8 @@ class PageLoaderActivity: AppCompatActivity() {
                 }
             }
         }
-    }
 
-    private fun setUpFloatingButton() {
-        val settingsButton = findViewById<FloatingActionButton>(R.id.button_settings)
-
-        settingsButton.setOnClickListener {
-            Intent(this, SettingsActivity::class.java).also {
-                startActivity(it)
-                finish()
-            }
-        }
-
-        newActivityButton.setOnClickListener {
-            Intent(this, NewUserActivity::class.java).also {
-                startActivity(it)
-                finish()
-            }
-        }
+        bottomBar.setupWithNavController(navController)
     }
 
     private fun checkServices() {

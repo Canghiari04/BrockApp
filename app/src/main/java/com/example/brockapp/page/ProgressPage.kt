@@ -4,13 +4,13 @@ import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.util.ChartUtil
 import com.example.brockapp.extraObject.MyUser
-import com.example.brockapp.viewmodel.GroupViewModel
+import com.example.brockapp.viewModel.GroupViewModel
 import com.example.brockapp.interfaces.PeriodRangeImpl
 import com.example.brockapp.singleton.MyS3ClientProvider
-import com.example.brockapp.viewmodel.ActivitiesViewModel
+import com.example.brockapp.viewModel.ActivitiesViewModel
 import com.example.brockapp.interfaces.ShowCustomToastImpl
-import com.example.brockapp.viewmodel.GroupViewModelFactory
-import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
+import com.example.brockapp.viewModel.GroupViewModelFactory
+import com.example.brockapp.viewModel.ActivitiesViewModelFactory
 
 import android.os.Bundle
 import android.view.View
@@ -28,7 +28,8 @@ import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.charts.LineChart
 
 abstract class ProgressPage: Fragment(R.layout.page_progress) {
-    private var rangeUtil = PeriodRangeImpl()
+
+    private val rangeUtil = PeriodRangeImpl()
 
     private val barChartMapper = mapOf(
         "Vehicle" to ::showVehicleBarChart,
@@ -49,34 +50,33 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
         "Month" to ::showMonthlyPieChart
     )
 
+    private lateinit var titleThirdCardView: TextView
+
     protected val chartUtil = ChartUtil()
     protected val toastUtil = ShowCustomToastImpl()
 
     protected lateinit var buttonUser: Button
-    private lateinit var titleThirdCardView: TextView
     protected lateinit var cardViewYouProgressPage: CardView
     protected lateinit var cardViewUserProgressPage: CardView
 
-    // Table
+    protected lateinit var titleBarChart: TextView
+    protected lateinit var titleLineChart: TextView
+
     protected lateinit var infoFirstColumn: TextView
     protected lateinit var infoSecondColumn: TextView
     protected lateinit var titleSecondColumn: TextView
 
-    // Bar charts
     protected lateinit var runBarChart: BarChart
     protected lateinit var walkBarChart: BarChart
     protected lateinit var stillBarChart: BarChart
     protected lateinit var vehicleBarChart: BarChart
 
-    // Line charts
     protected lateinit var runLineChart: LineChart
     protected lateinit var walkLineChart: LineChart
     protected lateinit var vehicleLineChart: LineChart
 
-    // Pie chart
     protected lateinit var pieChart: PieChart
 
-    // View model
     protected lateinit var viewModelGroup: GroupViewModel
     protected lateinit var viewModelActivities: ActivitiesViewModel
 
@@ -91,25 +91,24 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
 
         buttonUser = view.findViewById(R.id.button_user_progress_page)
 
+        titleBarChart = view.findViewById(R.id.text_view_bar_chart)
+        titleLineChart = view.findViewById(R.id.text_view_title_line_chart)
+
         titleThirdCardView = view.findViewById(R.id.text_view_title_third_card)
 
-        // Table view
         titleSecondColumn = view.findViewById(R.id.text_view_title_second_column)
         infoFirstColumn = view.findViewById(R.id.text_view_content_first_column)
         infoSecondColumn = view.findViewById(R.id.text_view_content_second_column)
 
-        // Bar charts
         runBarChart = view.findViewById(R.id.bar_chart_run)
         walkBarChart = view.findViewById(R.id.bar_chart_walk)
         stillBarChart = view.findViewById(R.id.bar_chart_still)
         vehicleBarChart = view.findViewById(R.id.bar_chart_vehicle)
 
-        // Line charts
         runLineChart = view.findViewById(R.id.line_chart_run)
         walkLineChart = view.findViewById(R.id.line_chart_walk)
         vehicleLineChart = view.findViewById(R.id.line_chart_vehicle)
 
-        // Pie chart
         pieChart = view.findViewById(R.id.pie_chart_activities)
 
         val db = BrockDB.getInstance(requireContext())
@@ -171,9 +170,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
                 barChartMapper[itemSelected]?.invoke(range)
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 
@@ -197,9 +194,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
                 lineChartMapper[itemSelected]?.invoke(range)
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 
@@ -221,9 +216,7 @@ abstract class ProgressPage: Fragment(R.layout.page_progress) {
                 pieChartMapper[itemSelected]?.invoke()
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                //
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 

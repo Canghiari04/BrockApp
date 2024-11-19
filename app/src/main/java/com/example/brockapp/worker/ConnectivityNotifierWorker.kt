@@ -12,7 +12,8 @@ import androidx.work.WorkerParameters
 import android.app.NotificationManager
 import androidx.core.app.NotificationCompat
 
-class ConnectivityWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams), NotificationSender {
+class ConnectivityNotifierWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams), NotificationSender {
+
     private var isConnected = false
 
     override fun doWork(): Result {

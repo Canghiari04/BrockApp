@@ -1,8 +1,9 @@
-package com.example.brockapp.page.userlist
+package com.example.brockapp.page.userList
 
 import com.example.brockapp.page.UserListPage
 
 class SubscribersPage: UserListPage() {
+
     override fun loadUsers() {
         viewModelGroup.getAllSubscribers()
     }

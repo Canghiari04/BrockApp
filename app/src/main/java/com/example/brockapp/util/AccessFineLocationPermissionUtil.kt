@@ -12,14 +12,15 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
-class AccessFineLocationPermissionUtil(private val activity: AppCompatActivity, private val onPermissionGranted: () -> Unit) {
+class AccessFineLocationPermissionUtil(private val activity: AppCompatActivity, private val type: String, private val onPermissionGranted: (String) -> Unit) {
+
     private lateinit var requestLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
 
     init {
         setUpLocationPermissionLauncher()
     }
 
-    fun requestAccessFineLocation() {
+    fun requestAccessLocationPermission() {
         requestLocationPermissionLauncher.launch(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -31,13 +32,12 @@ class AccessFineLocationPermissionUtil(private val activity: AppCompatActivity, 
     private fun setUpLocationPermissionLauncher() {
         requestLocationPermissionLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val areGranted = run {
-                val deniedPermissions = permissions.filter { !it.value }.keys
-                deniedPermissions.isEmpty()
+                permissions.filter { !it.value }.keys.isEmpty()
             }
 
             when {
                 areGranted -> {
-                    onPermissionGranted()
+                    onPermissionGranted(type)
                 }
 
                 shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION) -> {

@@ -2,8 +2,8 @@ package com.example.brockapp.dialog
 
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
-import com.example.brockapp.viewmodel.GeofenceViewModel
-import com.example.brockapp.interfaces.ScheduleWorkerImpl
+import com.example.brockapp.util.ScheduleWorkerUtil
+import com.example.brockapp.viewModel.GeofenceViewModel
 import com.example.brockapp.interfaces.ReverseGeocodingImpl
 
 import android.os.Bundle
@@ -18,6 +18,7 @@ import org.osmdroid.views.overlay.Marker
 import androidx.fragment.app.DialogFragment
 
 class MarkerDialog(private val marker: Marker, private val map: MapView, private val viewModel: GeofenceViewModel): DialogFragment() {
+
     private lateinit var db: BrockDB
     private lateinit var geocodeUtil: ReverseGeocodingImpl
 
@@ -39,7 +40,7 @@ class MarkerDialog(private val marker: Marker, private val map: MapView, private
         val latitude = marker.position.latitude
         val longitude = marker.position.longitude
 
-        val scheduleWorkerUtil = ScheduleWorkerImpl(requireContext())
+        val scheduleWorkerUtil = ScheduleWorkerUtil(requireContext())
         val address = geocodeUtil.getAddress(name, latitude, longitude)
 
         dialog?.window?.setLayout(

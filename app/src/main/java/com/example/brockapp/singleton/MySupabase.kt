@@ -7,6 +7,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.createSupabaseClient
 
 class MySupabase private constructor() {
+
     companion object {
         @Volatile
         private var INSTANCE: SupabaseClient? = null

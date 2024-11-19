@@ -11,6 +11,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class GroupFragment: Fragment(R.layout.fragment_group) {
+
     private val tabsTitleArray = mapOf(
         0 to "Subscribers",
         1 to "Friends"

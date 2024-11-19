@@ -5,10 +5,10 @@ import com.example.brockapp.data.User
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.adapter.UserAdapter
 import com.example.brockapp.activity.UserActivity
-import com.example.brockapp.viewmodel.GroupViewModel
-import com.example.brockapp.viewmodel.NetworkViewModel
+import com.example.brockapp.viewModel.GroupViewModel
+import com.example.brockapp.viewModel.NetworkViewModel
 import com.example.brockapp.singleton.MyS3ClientProvider
-import com.example.brockapp.viewmodel.GroupViewModelFactory
+import com.example.brockapp.viewModel.GroupViewModelFactory
 
 import android.os.Bundle
 import android.view.View
@@ -21,6 +21,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 
 abstract class UserListPage: Fragment(R.layout.page_user_list) {
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewModelNetwork: NetworkViewModel
     private lateinit var searchTextView: AutoCompleteTextView
@@ -55,7 +56,6 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         }
     }
 
-    // User can search subscribers or friends only when there is connection
     private fun observeNetwork() {
         viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { item ->
             if (item) loadUsers()
@@ -75,7 +75,6 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         }
     }
 
-    // Refactor the names
     protected fun populateRecyclerView(subscribers: List<User>) {
         val adapter = UserAdapter(subscribers) { username -> showSubscribe(username) }
         val layoutManager = LinearLayoutManager(context)
@@ -87,6 +86,5 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
     private fun showSubscribe(username: String) {
         val intent = Intent(requireContext(), UserActivity::class.java).putExtra("USERNAME_SUBSCRIBER", username)
         startActivity(intent)
-        requireActivity().finish()
     }
 }

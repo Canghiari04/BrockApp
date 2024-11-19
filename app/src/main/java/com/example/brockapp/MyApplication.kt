@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import androidx.core.app.NotificationManagerCompat
 
 class MyApplication: Application() {
+
     private lateinit var manager: NotificationManagerCompat
 
     override fun onCreate() {
@@ -13,13 +14,11 @@ class MyApplication: Application() {
 
         manager = NotificationManagerCompat.from(this)
 
-        // Channel for service
         supabaseNotificationChannel()
         distanceNotificationChannel()
         stepCounterNotificationChannel()
         heightDifferenceNotificationChannel()
 
-        // Channel for worker
         memoNotificationChannel()
         geofencingNotificationChannel()
         connectivityNotificationChannel()

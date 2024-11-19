@@ -1,4 +1,4 @@
-package com.example.brockapp.viewmodel
+package com.example.brockapp.viewModel
 
 import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
@@ -27,6 +27,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 
 class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Client, private val file: File): ViewModel() {
+
     private var _user = MutableLiveData<UsersEntity>()
     val user: LiveData<UsersEntity> get() = _user
 
@@ -154,7 +155,6 @@ class UserViewModel(private val db: BrockDB, private val s3Client: AmazonS3Clien
         return file
     }
 
-    // Here is defined the first upload inside the bucket
     private fun uploadUserToS3(username: String, jsonFile: File) {
         val userKey = "user/$username.json"
 

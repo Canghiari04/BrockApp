@@ -1,6 +1,7 @@
 package com.example.brockapp.data
 
-data class TransitionAverage(
+data class GeofenceTransition(
+    val timestamps: List<Pair<String, String>>,
     val nameLocation: String,
     val longitude: Double,
     val latitude: Double,

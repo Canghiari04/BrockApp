@@ -1,11 +1,13 @@
 package com.example.brockapp.page.you
 
+import com.example.brockapp.R
 import com.example.brockapp.page.ProgressPage
 
 import android.view.View
 import kotlin.time.Duration.Companion.milliseconds
 
 class YouProgressPage: ProgressPage() {
+
     companion object {
         const val TO_KM = 1000.0
     }
@@ -38,6 +40,7 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.vehicleBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(vehicleBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_vehicle)
             }
         }
     }
@@ -65,6 +68,7 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.runBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(runBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_run)
             }
         }
     }
@@ -83,6 +87,7 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.stillBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(stillBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_still)
             }
         }
     }
@@ -108,6 +113,7 @@ class YouProgressPage: ProgressPage() {
         viewModelActivities.walkBarChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
                 chartUtil.populateBarChart(walkBarChart, entries, requireContext())
+                titleBarChart.text = resources.getString(R.string.text_view_title_bar_chart_walk)
             }
         }
     }
@@ -115,7 +121,8 @@ class YouProgressPage: ProgressPage() {
     override fun observeVehicleLineChartEntries() {
         viewModelActivities.vehicleLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Distance travelled", entries, vehicleLineChart, requireContext())
+                titleLineChart.text = resources.getString(R.string.text_view_title_line_chart_vehicle)
+                chartUtil.populateLineChart("Vehicle", entries, vehicleLineChart, requireContext())
             }
         }
     }
@@ -123,7 +130,8 @@ class YouProgressPage: ProgressPage() {
     override fun observeRunLineChartEntries() {
         viewModelActivities.runLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Kilometers run",  entries, runLineChart, requireContext())
+                titleLineChart.text = resources.getString(R.string.text_view_title_line_chart_run)
+                chartUtil.populateLineChart("Run", entries, runLineChart, requireContext())
             }
         }
     }
@@ -131,7 +139,8 @@ class YouProgressPage: ProgressPage() {
     override fun observeWalkLineChartEntries() {
         viewModelActivities.walkLineChartEntries.observe(viewLifecycleOwner) { entries ->
             if (entries.isNotEmpty()) {
-                chartUtil.populateLineChart("Steps done",  entries, walkLineChart, requireContext())
+                titleLineChart.text = resources.getString(R.string.text_view_title_line_chart_walk)
+                chartUtil.populateLineChart("Walk", entries, walkLineChart, requireContext())
             }
         }
     }

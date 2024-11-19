@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class PostNotificationsPermissionUtil(private val activity: FragmentActivity, private val onPermissionGranted: () -> Unit) {
+
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
 
     init {

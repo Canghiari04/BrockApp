@@ -9,8 +9,8 @@ import android.content.Context
 import android.view.LayoutInflater
 
 class ShowCustomToastImpl: ShowCustomToast {
+
     override fun showBasicToast(message: String, context: Context) {
-        // Previously I create an empty Toast, where I will put the layout and the text
         val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -18,7 +18,6 @@ class ShowCustomToastImpl: ShowCustomToast {
         val myBasicToast = inflater.inflate(R.layout.toast_basic, parent)
         myBasicToast.findViewById<TextView>(R.id.text_view_toast_basic).setText(message)
 
-        // Finally I set the View with mine Toast View
         toast.view = myBasicToast
         toast.show()
     }

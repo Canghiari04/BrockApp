@@ -4,7 +4,7 @@ import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.singleton.MyGeofence
-import com.example.brockapp.worker.GeofenceWorker
+import com.example.brockapp.worker.GeofenceNotifierWorker
 import com.example.brockapp.room.GeofenceTransitionsEntity
 import com.example.brockapp.interfaces.ReverseGeocodingImpl
 
@@ -28,6 +28,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import com.google.android.gms.location.LocationServices
 
 class GeofenceService: Service() {
+
     private lateinit var db: BrockDB
     private lateinit var geocodingUtil: ReverseGeocodingImpl
 
@@ -90,7 +91,7 @@ class GeofenceService: Service() {
     private fun notify(item: String?) {
         val inputData = Data.Builder().putString("LOCATION_NAME", item ?: "Unknown").build()
 
-        OneTimeWorkRequestBuilder<GeofenceWorker>().setInputData(inputData).build().also {
+        OneTimeWorkRequestBuilder<GeofenceNotifierWorker>().setInputData(inputData).build().also {
             WorkManager.getInstance(this).enqueue(it)
         }
     }

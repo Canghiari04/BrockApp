@@ -1,4 +1,4 @@
-package com.example.brockapp.viewmodel
+package com.example.brockapp.viewModel
 
 import com.example.brockapp.*
 import com.example.brockapp.data.User
@@ -27,6 +27,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.ListObjectsRequest
 
 class GroupViewModel(private val s3Client: AmazonS3Client, private val db: BrockDB): ViewModel() {
+
     companion object {
         const val TO_KM = 1000f
         const val TO_MINUTES = 60000f
@@ -103,7 +104,6 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     private val _errorDeleteFriend = MutableLiveData<Boolean>()
     val errorDeleteFriend: LiveData<Boolean> = _errorDeleteFriend
 
-    // This function must be called while the app is starting
     fun getAllSubscribers() {
         viewModelScope.launch(Dispatchers.IO) {
             val listObjectsRequest = ListObjectsRequest().withBucketName(BuildConfig.BUCKET_NAME)
@@ -118,7 +118,6 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             val subscribers = mutableListOf<User?>()
             val friends = db.FriendsDao().getUsernamesFriendsByUsername(MyUser.username)
 
-            // Items contains all the usernames
             if (items.isNotEmpty()) {
                 for (item in items) {
                     if (!friends.contains(item)) subscribers.add(loadDataUser(item))
@@ -135,7 +134,6 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
 
     fun getAllFriends() {
         viewModelScope.launch(Dispatchers.IO) {
-            // Define all the username to search inside the Bucket
             val listUsernames = mutableListOf<String>().also {
                 val usernames = db.FriendsDao().getUsernamesFriendsByUsername(MyUser.username)
 
@@ -202,7 +200,6 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         }
     }
 
-    // Function used to retrieve all the data about the user
     fun loadDataFriend(username: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val key = "user/$username.json"
@@ -220,7 +217,6 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
         }
     }
 
-    // Function used to search if an user is currently a friend
     fun getCurrentFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             val item = db.FriendsDao().getUsernamesFriendsByUsername(MyUser.username)
@@ -505,7 +501,6 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
     fun getUserCountOfActivities(startOfPeriod: String, endOfPeriod: String, friend: Friend) {
         val (start, end) = getLocalDateFromTimeStamp(startOfPeriod, endOfPeriod)
 
-        // I use scope function filter to avoid concurrent exceptions
         val vehicleActivities = friend.vehicleActivities
             .filter { it.exitTime > it.arrivalTime }
             .filter {
