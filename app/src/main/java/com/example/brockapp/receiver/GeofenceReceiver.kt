@@ -1,59 +1,43 @@
 package com.example.brockapp.receiver
 
 import com.example.brockapp.*
-import com.example.brockapp.service.GeofenceService
+import com.example.brockapp.worker.GeofenceProcessingWorker
 
 import android.util.Log
+import androidx.work.Data
 import android.content.Intent
 import android.content.Context
+import androidx.work.WorkManager
 import android.content.BroadcastReceiver
+import androidx.work.OneTimeWorkRequestBuilder
 import com.google.android.gms.location.GeofencingEvent
-import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT
-import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 
 class GeofenceReceiver: BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == GEOFENCE_INTENT_TYPE) {
+
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent?.action == GEOFENCE_INTENT_TYPE) {
             val event = GeofencingEvent.fromIntent(intent)
 
             if (event != null) {
                 if (event.hasError()) {
                     Log.e("GEOFENCE_RECEIVER", event.errorCode.toString())
                 } else {
-                    val geofenceTransition = event.geofenceTransition
+                    val transition = event.geofenceTransition
+                    val location = event.triggeringLocation
 
-                    when (geofenceTransition) {
-                        GEOFENCE_TRANSITION_DWELL -> {
-                            val geofenceLocation = event.triggeringLocation
+                    context?.let {
+                        location?.let {
+                            val inputData = Data.Builder()
+                                .putInt("TRANSITION", transition)
+                                .putDouble("LATITUDE", it.latitude)
+                                .putDouble("LONGITUDE", it.longitude)
+                                .build()
 
-                            if (geofenceLocation != null) {
-                                val arrivalTime = System.currentTimeMillis()
+                            val request = OneTimeWorkRequestBuilder<GeofenceProcessingWorker>()
+                                .setInputData(inputData)
+                                .build()
 
-                                context.startService(
-                                    Intent(context, GeofenceService::class.java).also {
-                                        it.action = GeofenceService.Actions.INSERT.toString()
-                                        it.putExtra("LATITUDE", geofenceLocation.latitude)
-                                        it.putExtra("LONGITUDE", geofenceLocation.longitude)
-                                        it.putExtra("ARRIVAL_TIME", arrivalTime)
-                                        it.putExtra("EXIT_TIME", 0L)
-                                    }
-                                )
-                            }
-                        }
-
-                        GEOFENCE_TRANSITION_EXIT -> {
-                            val exitTime = System.currentTimeMillis()
-
-                            context.startService(
-                                Intent(context, GeofenceService::class.java).also {
-                                    it.action = GeofenceService.Actions.UPDATE.toString()
-                                    it.putExtra("EXIT_TIME", exitTime)
-                                }
-                            )
-                        }
-
-                        else -> {
-                            Log.e("GEOFENCE_RECEIVER", "Transition not recognize")
+                            WorkManager.getInstance(context).enqueue(request)
                         }
                     }
                 }
