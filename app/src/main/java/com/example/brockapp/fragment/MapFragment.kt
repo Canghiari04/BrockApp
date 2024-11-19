@@ -286,7 +286,7 @@ class MapFragment: Fragment() {
                             Text(
                                 text = item,
                                 modifier = Modifier
-                                    .padding(8.dp)
+                                    .padding(12.dp)
                                     .fillMaxWidth()
                                     .background(Color.White)
                                     .clickable { addNewArea(it[item]!!) },
@@ -506,7 +506,7 @@ class MapFragment: Fragment() {
                 title = key
                 position = value
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = resources.getDrawable(R.drawable.map_marker_icon)
+                icon = resources.getDrawable(R.drawable.map_marker)
             }
 
             setupMarker(marker)
@@ -579,7 +579,7 @@ class MapFragment: Fragment() {
                 position = geoPoint
                 title = geofenceArea.name
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = resources.getDrawable(R.drawable.map_marker_icon)
+                icon = resources.getDrawable(R.drawable.map_marker)
             }
 
             setupMarker(marker)

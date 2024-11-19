@@ -1,4 +1,4 @@
-<map_marker xmlns:android="http://schemas.android.com/apk/res/android"
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="40dp"
     android:viewportWidth="20"
@@ -12,4 +12,4 @@
         android:pathData="M10,9.964m-3.599,0a3.599,3.599 45,1 1,7.198 0a3.599,3.599 45,1 1,-7.198 0"
         android:strokeWidth="0"
         android:fillColor="#590000"/>
-</map_marker>
+</vector>

@@ -79,7 +79,7 @@ class NotificationUtil {
                 NotificationCompat.BigTextStyle().bigText(content)
             )
             setPriority(NotificationCompat.PRIORITY_HIGH)
-            addAction(R.drawable.baseline_more_horiz_24, "Open", pendingIntent)
+            addAction(R.drawable.icon_more, "Open", pendingIntent)
         }
     }
 
