@@ -4,17 +4,15 @@ import com.example.brockapp.*
 import com.example.brockapp.R
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.interfaces.NotificationSender
-import com.example.brockapp.viewmodel.ActivitiesViewModel
-import com.example.brockapp.worker.ActivityRecognitionWorker
-import com.example.brockapp.viewmodel.ActivitiesViewModelFactory
+import com.example.brockapp.viewModel.ActivitiesViewModel
+import com.example.brockapp.worker.ActivityNotifierWorker
+import com.example.brockapp.viewModel.ActivitiesViewModelFactory
 
 import android.os.Bundle
 import java.time.Instant
 import androidx.work.Data
 import java.time.ZoneOffset
-import android.view.MenuItem
 import android.widget.Button
-import android.content.Intent
 import android.os.SystemClock
 import android.widget.TableRow
 import android.widget.TextView
@@ -26,6 +24,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.appcompat.app.AppCompatActivity
 
 abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
+
     companion object {
         const val TO_KM = 1000.0
     }
@@ -51,8 +50,8 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chronometer)
 
-        supportActionBar?.title = null
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = null
 
         val db = BrockDB.getInstance(this)
         val viewModelFactory = ActivitiesViewModelFactory(db)
@@ -79,29 +78,13 @@ abstract class ChronometerActivity: AppCompatActivity(), NotificationSender {
         stopButton.isEnabled = false
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                val intent = Intent(this, NewUserActivity::class.java)
-                startActivity(intent)
-                finish()
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-                false
-            }
-        }
-    }
-
     override fun sendNotification(title: String, content: String) {
         val inputData = Data.Builder()
             .putString("TITLE", title)
             .putString("CONTENT", content)
             .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<ActivityRecognitionWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<ActivityNotifierWorker>()
             .setInputData(inputData)
             .build()
 

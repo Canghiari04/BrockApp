@@ -5,9 +5,9 @@ import com.example.brockapp.activity.ChronometerActivity
 import com.example.brockapp.room.UsersStillActivityEntity
 
 import android.view.View
-import android.os.SystemClock
 
 class StillActivity: ChronometerActivity() {
+
     override fun insertActivity() {
         viewModel.insertStillActivity(
             UsersStillActivityEntity(
@@ -28,23 +28,7 @@ class StillActivity: ChronometerActivity() {
         secondTableRow.visibility = View.GONE
     }
 
-    override fun setUpChronometer() {
-        var notificationSent = false
-
-        chronometer.setOnChronometerTickListener {
-            val elapsedTime = SystemClock.elapsedRealtime() - chronometer.base
-            val hours = (elapsedTime / 1000).toInt()
-
-            if (hours >= 10 && !notificationSent) {
-                sendNotification(
-                    "BrockApp - Stand up!",
-                    "You have been stilled for more than an hour, do some stretching!"
-                )
-
-                notificationSent = true
-            }
-        }
-    }
+    override fun setUpChronometer() { }
 
     override fun setTypeActivityTextView() {
         textViewTypeActivity.also {

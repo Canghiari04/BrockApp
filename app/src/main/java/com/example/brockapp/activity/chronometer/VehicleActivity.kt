@@ -12,6 +12,7 @@ import android.content.Context
 import android.content.ServiceConnection
 
 class VehicleActivity: ChronometerActivity() {
+
     private var isBound = false
     private var service: DistanceService? = null
 
@@ -25,6 +26,8 @@ class VehicleActivity: ChronometerActivity() {
                 onConnected = { service ->
                     this.service = service
                     isBound = true
+
+                    this.service?.resetDistance()
                 },
                 onDisconnected = {
                     isBound = false

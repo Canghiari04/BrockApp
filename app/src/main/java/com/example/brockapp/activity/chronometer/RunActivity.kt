@@ -12,6 +12,7 @@ import android.content.Context
 import android.content.ServiceConnection
 
 class RunActivity: ChronometerActivity() {
+
     private var isDistanceServiceBound = false
     private var isHeightDifferenceServiceBound = false
     private var distanceService: DistanceService? = null
@@ -28,6 +29,8 @@ class RunActivity: ChronometerActivity() {
                 onConnected = { service ->
                     distanceService = service
                     isDistanceServiceBound = true
+
+                    distanceService?.resetDistance()
                 },
                 onDisconnected = {
                     isDistanceServiceBound = false
@@ -40,6 +43,8 @@ class RunActivity: ChronometerActivity() {
                 onConnected = { service ->
                     heightDifferenceService = service
                     isHeightDifferenceServiceBound = true
+
+                    heightDifferenceService?.resetAltitude()
                 },
                 onDisconnected = {
                     isHeightDifferenceServiceBound = false
