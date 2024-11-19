@@ -30,7 +30,9 @@
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,78 +42,74 @@
         <activity
             android:name=".activity.SignInActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
-            android:name=".activity.PageLoaderActivity"
+            android:name=".activity.MainActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        </activity>
-        <activity
-            android:name=".activity.AccountActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+            android:windowSoftInputMode="adjustNothing">
         </activity>
         <activity
             android:name=".activity.SettingsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+            android:parentActivityName=".activity.MainActivity">
         </activity>
         <activity
-            android:name=".activity.NewUserActivity"
+            android:name=".activity.ManualRegistrationActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
             android:name=".activity.chronometer.VehicleActivity"
             android:exported="false"
-            android:parentActivityName=".activity.NewUserActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.ManualRegistrationActivity">
         </activity>
         <activity
             android:name=".activity.chronometer.RunActivity"
             android:exported="false"
-            android:parentActivityName=".activity.NewUserActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.ManualRegistrationActivity">
         </activity>
         <activity
             android:name=".activity.chronometer.StillActivity"
             android:exported="false"
-            android:parentActivityName=".activity.NewUserActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.ManualRegistrationActivity">
         </activity>
         <activity
             android:name=".activity.chronometer.WalkActivity"
             android:exported="false"
-            android:parentActivityName=".activity.NewUserActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.ManualRegistrationActivity">
         </activity>
         <activity
             android:name=".activity.DailyMemoActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+            android:parentActivityName=".activity.MainActivity">
         </activity>
         <activity
-            android:name=".activity.NewMemoActivity"
+            android:name=".activity.RegistrationMemoActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:parentActivityName=".activity.DailyMemoActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         </activity>
         <activity
             android:name=".activity.UserActivity"
             android:exported="false"
-            android:parentActivityName=".activity.NewUserActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+            android:parentActivityName=".activity.MainActivity">
         </activity>
 
         <receiver
