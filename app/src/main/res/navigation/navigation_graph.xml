@@ -2,30 +2,35 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation_graph_bottom_bar"
     app:startDestination="@id/navbar_item_you">
 
     <fragment
         android:id="@+id/navbar_item_you"
         tools:layout="@layout/fragment_you"
-        android:label="YouFragment"
+        android:label="Home"
         android:name="com.example.brockapp.fragment.YouFragment" />
 
     <fragment
         android:id="@+id/navbar_item_map"
         tools:layout="@layout/fragment_map"
-        android:label="MapFragment"
+        android:label="Map"
         android:name="com.example.brockapp.fragment.MapFragment" />
 
     <fragment
         android:id="@+id/navbar_item_calendar"
         tools:layout="@layout/fragment_calendar"
-        android:label="MapFragment"
+        android:label="Calendar"
         android:name="com.example.brockapp.fragment.CalendarFragment" />
 
     <fragment
         android:id="@+id/navbar_item_group"
         tools:layout="@layout/fragment_group"
-        android:label="GroupFragment"
+        android:label="Group"
         android:name="com.example.brockapp.fragment.GroupFragment" />
+
+    <fragment
+        android:id="@+id/drawer_item_account"
+        tools:layout="@layout/fragment_account"
+        android:label="Account"
+        android:name="com.example.brockapp.fragment.AccountFragment" />
 </navigation>

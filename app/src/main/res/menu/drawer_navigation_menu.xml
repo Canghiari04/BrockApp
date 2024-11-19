@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/drawer_item_your_account"
-        android:title="@string/drawer_account" />
-    <item
-        android:id="@+id/drawer_item_list_activity"
-        android:title="@string/drawer_list_activity" />
-    <item
-        android:id="@+id/drawer_item_list_geofence"
-        android:title="@string/drawer_list_geofence" />
+        <item
+            android:id="@+id/drawer_item_account"
+            android:title="@string/drawer_account"
+            android:icon="@drawable/baseline_account_circle_24" />
+        <item
+            android:id="@+id/drawer_item_summary_activity"
+            android:title="@string/drawer_activity_summary"
+            android:icon="@drawable/baseline_directions_run_24" />
+        <item
+            android:id="@+id/drawer_item_summary_geofence"
+            android:title="@string/drawer_geofence_summary"
+            android:icon="@drawable/marker_icon" />
 </menu>
