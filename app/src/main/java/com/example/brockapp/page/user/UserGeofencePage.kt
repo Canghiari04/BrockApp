@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 
 class UserGeofencePage(private val friend: Friend): GeofencePage() {
+
     override fun setUpCardView() {
         cardViewYouGeofencePage.visibility = View.GONE
         cardViewUserGeofencePage.visibility = View.VISIBLE
@@ -35,7 +36,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     private fun observeAddedFriend() {
         viewModelGroup.errorAddFriend.observe(this) {
             if (it) {
-                buttonUser.setText("REMOVE")
+                button.text = resources.getText(R.string.button_remove_user)
                 toastUtil.showBasicToast(
                     "${friend.username} is your new friend",
                     requireContext()
@@ -52,7 +53,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     private fun observeRemovedFriend() {
         viewModelGroup.errorDeleteFriend.observe(this) {
             if (it) {
-                buttonUser.setText("FOLLOW")
+                button.text = resources.getText(R.string.button_follow_user)
                 toastUtil.showBasicToast(
                     "${friend.username} has been removed",
                     requireContext()
@@ -69,11 +70,11 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
     private fun observeCurrentFriends() {
         viewModelGroup.currentFriends.observe(viewLifecycleOwner) { items ->
             if (items.contains(friend.username)) {
-                buttonUser.setText("REMOVE")
-                buttonUser.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
+                button.text = resources.getText(R.string.button_remove_user)
+                button.setOnClickListener { viewModelGroup.deleteFriend(friend.username) }
             } else {
-                buttonUser.setText("FOLLOW")
-                buttonUser.setOnClickListener { viewModelGroup.addFriend(friend.username) }
+                button.text = resources.getText(R.string.button_follow_user)
+                button.setOnClickListener { viewModelGroup.addFriend(friend.username) }
             }
         }
     }
@@ -84,7 +85,7 @@ class UserGeofencePage(private val friend: Friend): GeofencePage() {
                 val transitions = getGroupedTransitions(items)
                 populateSpinnerNames(transitions)
             } else {
-                Log.d("GEOFENCE_PAGE", "No one friend's transitions retrieved")
+                Log.d("GEOFENCE_PAGE", "No transitions found")
             }
         }
     }

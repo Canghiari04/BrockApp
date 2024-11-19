@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 
 class YouGeofencePage: GeofencePage() {
+
     override fun setUpCardView() {
         cardViewUserGeofencePage.visibility = View.GONE
         cardViewYouGeofencePage.visibility = View.VISIBLE
@@ -17,7 +18,7 @@ class YouGeofencePage: GeofencePage() {
                 val transitions = getGroupedTransitions(items)
                 populateSpinnerNames(transitions)
             } else {
-                Log.d("GEOFENCE_PAGE", "No one user's transitions retrieved")
+                Log.d("YOU_GEOFENCE_PAGE", "No transitions found")
             }
         }
     }
