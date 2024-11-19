@@ -1,37 +1,69 @@
 package com.example.brockapp.viewModel
 
-import android.location.Geocoder
-import android.location.Location
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.MutableLiveData
+import com.example.brockapp.data.Area
+
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
+import android.location.Geocoder
+import org.osmdroid.util.GeoPoint
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.FlowPreview
+import androidx.lifecycle.viewModelScope
 
 class MapViewModel(private val geocoder: Geocoder): ViewModel() {
 
-    private val _searchLocation = MutableStateFlow("")
-    val searchLocation = _searchLocation.asStateFlow()
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
 
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
-    
-    private val _locations = MutableStateFlow(listOf<Location>())
-    val locations = searchLocation
+
+    private val _suggestions = MutableStateFlow<Map<String, Area>?>(null)
+    @OptIn(FlowPreview::class)
+    val suggestions = searchText
         .debounce(1000L)
         .onEach { _isSearching.update { true } }
-        .combine(_locations) { text, _ ->
+        .combine(_suggestions) { text, _ ->
             if (text.isNotBlank()) {
                 delay(2000L)
-                val addresses = geocoder.getFromLocationName(query, 10)
+                defineSuggestions(text)
+            } else {
+                null
             }
         }
+        .onEach { _isSearching.update { false } }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            _suggestions.value
+        )
 
-    fun onSearchLocationChange(text: String) {
-        _searchLocation.value = text
+    fun onSearchTextChange(item: String) {
+        _searchText.value = item
+    }
+
+    private fun defineSuggestions(query: String): Map<String, Area> {
+        try {
+            val suggestions: MutableMap<String, Area> = mutableMapOf()
+            val addresses = geocoder.getFromLocationName(query.lowercase(), 10)
+
+            addresses?.let {
+                for (address in it) {
+                    suggestions.put(
+                        address.getAddressLine(0),
+                        Area(
+                            address,
+                            GeoPoint(
+                                address.latitude,
+                                address.longitude
+                            )
+                        )
+                    )
+                }
+            }
+            return suggestions
+        } catch (e: Exception) {
+            return mutableMapOf()
+        }
     }
 }
