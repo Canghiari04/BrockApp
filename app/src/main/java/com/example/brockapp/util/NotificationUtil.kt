@@ -2,16 +2,27 @@ package com.example.brockapp.util
 
 import com.example.brockapp.*
 import com.example.brockapp.R
-import com.example.brockapp.activity.PageLoaderActivity
+import com.example.brockapp.activity.MainActivity
 
 import android.content.Intent
 import android.content.Context
 import android.app.PendingIntent
 import android.provider.Settings
 import androidx.core.text.HtmlCompat
+import android.annotation.SuppressLint
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.google.android.gms.location.DetectedActivity
 
 class NotificationUtil {
+
+    private val mapperActivityNotification = mapOf(
+        DetectedActivity.IN_VEHICLE to "You're driving. Stay focus, don't use your telephone",
+        DetectedActivity.RUNNING to "You're running! You're doing great",
+        DetectedActivity.WALKING to "You're walking! Keep up the good work",
+        DetectedActivity.STILL to "You are currently idle. Try moving to stay active"
+    )
+
     fun getConnectivityPendingIntent(context: Context): PendingIntent {
         return PendingIntent.getActivity(
             context,
@@ -22,7 +33,7 @@ class NotificationUtil {
     }
 
     fun getGeofencePendingIntent(context: Context): PendingIntent {
-        val intent = Intent(context, PageLoaderActivity::class.java).apply {
+        val intent = Intent(context, MainActivity::class.java).apply {
             putExtra("FRAGMENT_TO_SHOW", R.id.navbar_item_map)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -70,5 +81,25 @@ class NotificationUtil {
             setPriority(NotificationCompat.PRIORITY_HIGH)
             addAction(R.drawable.baseline_more_horiz_24, "Open", pendingIntent)
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun updateActivityRecognitionNotification(
+        notificationId: Int,
+        type: Int,
+        context: Context
+    ) {
+        val manager = NotificationManagerCompat.from(context)
+
+        manager.notify(
+            notificationId,
+            getNotificationBody(
+                CHANNEL_ID_ACTIVITY_RECOGNITION_WORKER,
+                R.drawable.baseline_directions_run_24,
+                "BrockApp - Activity Recognition Service",
+                "${mapperActivityNotification[type]}",
+                context
+            ).build()
+        )
     }
 }
