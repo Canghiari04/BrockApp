@@ -9,7 +9,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import android.app.NotificationManager
 
-class MemoNotifierWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams), NotificationSender {
+class MemoNotifierWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams), NotificationSender {
 
     private lateinit var util: NotificationUtil
     private lateinit var manager: NotificationManager

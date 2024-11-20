@@ -8,7 +8,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import io.github.jan.supabase.postgrest.from
 
-class DeleteGeofenceAreaWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
+class DeleteGeofenceAreaWorker(appContext: Context, params: WorkerParameters): CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
         val latitude = inputData.getDouble("LATITUDE", 0.0)

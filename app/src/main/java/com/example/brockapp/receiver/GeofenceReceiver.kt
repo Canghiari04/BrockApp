@@ -1,7 +1,7 @@
 package com.example.brockapp.receiver
 
 import com.example.brockapp.*
-import com.example.brockapp.worker.GeofenceProcessingWorker
+import com.example.brockapp.worker.GeofencePreprocessingWorker
 
 import android.util.Log
 import androidx.work.Data
@@ -33,7 +33,7 @@ class GeofenceReceiver: BroadcastReceiver() {
                                 .putDouble("LONGITUDE", it.longitude)
                                 .build()
 
-                            val request = OneTimeWorkRequestBuilder<GeofenceProcessingWorker>()
+                            val request = OneTimeWorkRequestBuilder<GeofencePreprocessingWorker>()
                                 .setInputData(inputData)
                                 .build()
 

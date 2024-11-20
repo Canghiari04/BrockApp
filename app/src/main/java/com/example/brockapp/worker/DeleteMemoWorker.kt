@@ -8,7 +8,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import io.github.jan.supabase.postgrest.from
 
-class DeleteMemoWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
+class DeleteMemoWorker(appContext: Context, params: WorkerParameters): CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
         val id = inputData.getLong("ID", 0L)

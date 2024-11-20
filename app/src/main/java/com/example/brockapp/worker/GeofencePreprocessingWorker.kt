@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 
-class GeofenceProcessingWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+class GeofencePreprocessingWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
 
     override fun doWork(): Result {
         val transition = inputData.getInt("TRANSITION", -1)

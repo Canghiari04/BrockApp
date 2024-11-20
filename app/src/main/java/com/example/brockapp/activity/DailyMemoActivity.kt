@@ -117,9 +117,9 @@ class DailyMemoActivity: AppCompatActivity() {
                 populateRecyclerView(list)
             } else {
                 if (!checkCurrentDate(date)) {
-                    setContentView(R.layout.activity_empty_page)
+                    setContentView(R.layout.activity_empty)
 
-                    val composeView = findViewById<ComposeView>(R.id.compose_view_activity_empty_page)
+                    val composeView = findViewById<ComposeView>(R.id.compose_view_activity_empty)
 
                     composeView.setContent {
                         EmptyPage()

@@ -1,10 +1,10 @@
 package com.example.brockapp.receiver
 
 import com.example.brockapp.service.GeofenceService
-import com.example.brockapp.worker.ConnectivityNotifierWorker
 import com.example.brockapp.viewModel.NetworkViewModel
 import com.example.brockapp.extraObject.MySharedPreferences
 import com.example.brockapp.interfaces.InternetAvailableImpl
+import com.example.brockapp.worker.ConnectivityNotifierWorker
 
 import android.util.Log
 import androidx.work.Data
