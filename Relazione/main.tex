@@ -65,9 +65,6 @@
         \begin{minipage}[t]{0.4\textwidth}\raggedleft
         {\fontsize{12}{13}{}\
             \fontsize{12}{13}{\\ Canghiari Matteo \\ Matricola 1032059 \\ matteo.canghiari@studio.unibo.it}}
-
-        {\fontsize{12}{13}{}\
-            \fontsize{12}{13}{\\ Rocca Claudio \\ Matricola 1020395 \\ claudio.rocca@studio.unibo.it}}
         \end{minipage}
 
         \vspace*{140px}
@@ -82,246 +79,262 @@
     \subsection*{Introduzione}
     \large
 
-    \textbf{Personal Physical Tracker} è un'applicazione nativa Android che permette di registrare le attività compiute durante la giornata, contraddistinte in \textbf{camminata}, \textbf{spostamenti in macchina} e \textbf{attività sedentarie}.
-    L'applicazione possiede differenti funzionalità, tra cui la registrazione delle attività compiute e la visualizzazione dei dati di altri utenti presenti sulla piattaforma. Tutte le funzionalità sviluppate saranno successivamente approfondite nella sezione \textbf{Feature}, tuttavia è possibile anticipare ciò che contraddistingue il sistema software ideato. \vspace*{7pt}\\
-    Ad un primo avvio l'utente visualizza la schermata per la registrazione in cui può effettuare il \textit{Sign In} in caso di un nuovo utente, o il \textit{Login} in caso di utente già registrato. Proseguendo, viene mostrata la schermata Home dell'app, composta da una \textit{Navigation Bottom Bar}, che garantisce l'accesso diretto alle funzionalità sviluppate. \\
-    Tramite la Navigation Bar l'utente ha la possibilità di \textbf{registrare} nuove attività, \textbf{visualizzare} il proprio storico, osservare le proprie \textbf{aree geografiche di interesse}, visualizzare i \textbf{grafici} relativi alle proprie attività registrate ed, infine, condividere e visualizzare le attività condivise da altri utenti nella sezione \textbf{amici}. \vspace*{7pt}\\
-    Di seguito vengono brevemente descritte alcune scelte implementative e strumenti utilizzati durante lo sviluppo dell'app: per il versionamento del codice è stato utilizzato \textbf{Git}, con repository accessibile su \textbf{GitHub}, mentre per lo sviluppo dell'applicativo è stato utilizzato il linguaggio di programmazione \textbf{Kotlin}, per la realizzazione di un'applicazione \textbf{nativa Android}. Il progetto si compone di tre punti cardine per il corretto funzionamento, suddivisi come segue:
+    \textbf{Personal Physical Tracker} è un'applicazione nativa Android, che permette di registrare le attività motorie quotidiane che possano essere compiute durante la giornata,
+    contraddistinte in \textbf{camminata}, \textbf{spostamenti tramite veicoli}, \textbf{attività sedentarie} e \textbf{corsa}.
+    L'obiettivo dell'applicazione consiste nello sviluppo di un sistema software in grado di poter memorizzare dati riferiti alle attività compiute, favorendo un'interfaccia 
+    grafica semplice e di facile utilizzo, da cui sia possibile osservare attivamente le informazioni manipolate e rappresentate.
+    L'insieme delle funzionalità saranno successivamente approfondite nella sezione \textbf{Feature}, tuttavia è possibile anticipare il contenuto che contraddistingue il progetto
+    proposto. \vspace*{7pt}\\
+    Ad un primo avvio l'utente visualizza la schermata per la registrazione, in cui può effettuare il \textit{Sign In} qualora dovesse essere un nuovo iscritto, oppure il 
+    \textit{Login} in caso sia già registrato; infatti, è richiesta totale univocità pur di garantire la persistenza dei dati. 
+    Proseguendo, viene mostrato il layout principale dell'applicazione, responsabile dell'avvicendamento dei molteplici \textit{Fragment} ospitati al suo interno, composto da una
+    \textit{Navigation Bottom Bar} e da un \textit{Drawer}. Mediante la \textit{Navigation Bar}, l'utente possiede la facoltà di \textbf{registrare manualmente} nuove attività, 
+    accedere al \textbf{pannello di controllo}, visualizzare i propri \textbf{progressi}, osservare le \textbf{geofence di interesse}, \textbf{pianificare} le proprie attività ed,
+    infine, visualizzare le attività condivise da altri iscritti nella sezione \textbf{Group}. \vspace{7pt}\\
+    Di seguito sono brevemente descritte alcune scelte implementative e strumenti utilizzati durante lo sviluppo: per il versionamento del codice è stato utilizzato \textbf{Git},
+    con repository accessibile su \textbf{GitHub}, mentre lo sviluppo dell'applicativo è stato condotto mediante il linguaggio di programmazione \textbf{Kotlin}. Il progetto si 
+    compone di quattro punti cardine per il corretto funzionamento, suddivisi in:
     \begin{itemize}
         \renewcommand{\labelitemi}{-}
-        \item Design pattern architetturale \textbf{MVVM}, utilizzato per separare i componenti \textbf{Model}, ovvero il \textit{contenitore di dati}, e la sezione \textit{attiva}, la \textbf{View} mostrata direttamente all'utente. In questo modo si garantisce la separazione tra i componenti, riducendo l'accoppiamento e le \textit{dipendenze funzionali}, che potrebbero causare danni ai componenti dell'applicazione anche in seguito a piccole modifiche
-        \item \textbf{Room}, utilizzato per garantire la persistenza dei dati all'interno di un \textit{Database Relazionale}
-        \item \textbf{Amazon S3}, utilizzato per salvare in cloud i dati degli utenti attraverso un \textit{database dump}, consentendo la condivisione dei dati salvati sul \textit{database locale} e permettendo di visualizzare i dati condivisi dagli amici
+        \item Design pattern architetturale \textbf{MVVM}, utilizzato per separare il \textbf{Model}, ovvero il contenitore di dati, e la sezione attiva, la \textbf{View}. In questo modo si garantisce la separazione dei componenti, riducendo l'accoppiamento e le dipendenze funzionali, che potrebbero causare massicci problemi in seguito a piccole modifiche
+        \item \textbf{Jetpack Compose}, un toolkit moderno utilizzato per velocizzare l'implementazione della \textit{User Interface} in determinate circostanze; dato il suo approccio dichiarativo e di facile intuizione ha permesso di incrementare e migliorare l'interattività dell'applicazione per specifiche componenti
+        \item \textbf{Room}, utilizzato per garantire la persistenza dei dati all'interno di un \textit{Database Relazionale Locale}
+        \item \textbf{Supabase}, utilizzato per garantire un'ulteriore livello di persistenza dei dati, affinchè il \textit{Database Locale} mantenga al suo interno un unico utente come riferimento, delegando al \textit{Real Time Database} il compito di salvaguardare l'insieme di tutti i dati degli utenti iscritti
+        \item \textbf{Amazon S3}, utilizzato per salvare in cloud i dati degli utenti tramite un \textbf{dump} del Database, consentendo la condivisione dell'informazioni memorizzate
     \end{itemize}
 
     \newpage
-    \subsection*{Feature}
+    \subsection*{Features}
+    \large
+
     \textit{Registrazione} \vspace*{7pt}\\
-    All'avvio dell'app è richiesta la registrazione delle credenziali. E' necessario registrarsi con un username non ancora presente, per garantire l' univocità dei dati. Una volta registrato, all'utente sarà richiesto di concedere tutti i permessi necessari per il funzionamento dell'applicazione. L'applicazione utilizza la \textit{connessione Internet} per controllare se un altro utente si è già registrato in passato con lo stesso username, è pertanto necessario avere una connessione dati per registrarsi all'app.
-    Tra i permessi richiesti sono presenti:
-    \begin{itemize}
-        \renewcommand{\labelitemi}{-}
-        \item \textbf{Access fine location}, autorizzazione di accesso alla posizione corrente del dispositivo, necessaria per monitorare le aree geografiche varcate
-        \item \textbf{Access background location}, permesso necessario per accedere alla posizione del dispositivo anche quando l'applicazione è in secondo piano
-        \item \textbf{Post notifications}, consente di inviare notifiche al dispositivo
-    \end{itemize}
-    Qualora siano negati i permessi richiesti non sarà consentito l'utilizzo dell'applicazione; ad un nuovo avvio è mostrato un \textit{Alert Dialog} in cui è richiesto all'utente di abilitare le autorizzazioni necessarie tramite \textit{Impostazioni}.
+    All'avvio dell'applicazione è richiesta la registrazione. Come già ribadito, è necessario che le credenziali siano univoche, per garantire la persistenza dei dati.
+    Accettate e registrate quest'ultime, è richiesto il permesso di \textbf{Post Notification}, garantendo l'opportunità di inviare delle notifiche al dispositivo; in caso dovesse essere negato, è concesso ugualmente l'accesso. Tale feature richiede una \textit{connessione ad Internet} stabile, per controllare l'unicità delle credenziali
+    all'interno di \textit{Supabase}.
     \begin{center}
         \begin{figure}[H]
             \centering
-            \subfigure[Sign In fragment]{
-                \includegraphics[width=0.35\textwidth]{img1.png}
+            \subfigure[Login Activity]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img1.png}}
             }
-            \subfigure[Login fragment]{
-                \includegraphics[width=0.35\textwidth]{img2.png}
+            \subfigure[Sign In Activity]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img2.png}}
             }
         \end{figure}
     \end{center}
-    \textit{Registrazione attività} \vspace*{7pt}\\
-    Proseguendo, successivamente all'autenticazione, è possibile registrare le attività compiute durante la giornata cliccando sul \textit{floating button} presente nella schermata \textbf{Home}, \textbf{Calendario} e \textbf{Grafici}. L'utente può registrare le seguenti attività:
-    \begin{itemize}
-        \renewcommand{\labelitemi}{-}
-        \item \textbf{Attività sedentaria}, in cui è definito il tempo trascorso
-        \item \textbf{Camminata}, in cui sono memorizzati i passi fatti e il dislivello percorso durante la registrazione
-        \item \textbf{Spostamenti in macchina}, durante i quali viene registrata la distanza percorsa
-    \end{itemize}
-    Tutti i dati relativi alle attività dell'utente vengono salvati in un database locale e rielaborati per consentirne la visualizzazione grafica. Per consentire ciò è necessario che l'utente, abbia in precedenza autorizzato il permesso \textbf{Activity recognition}. Quest'ultimo garantisce di identificare propriamente l'avvio oppure l'interruzione di un'attività. \vspace*{7pt}\\
-    \textit{Nota bene}: nel progetto proposto la funzionalità legata al \textbf{detect} dell'attività in corso non consiste in un'\textbf{operazione in background}.
+    \textit{Dashboard}  \vspace*{7pt}\\
+    Successivamente all'autenticazione, il primo layout presentato riguarda la sezione personale dell'utente. Mediante un \textit{Tab Layout}, è possibile osservare i \textit{progressi}
+    ottenuti durante la registrazione delle attività motorie e le \textit{transizioni} verificatesi durante lo stazionamento all'interno delle \textit{Geofence}.
+    La \textit{Progress Page} possiede una \textit{View} focalizzata sulla descrizione delle attività compiute attraverso l'ausilio di \textbf{grafici}, mentre la 
+    \textit{Geofence Page} evidenzia le \textbf{transizioni} avvenute durante un determinato arco temporale.
     \begin{center}
         \begin{figure}[H]
             \centering
-            \subfigure[Registrazione nuove attività]{
-                \includegraphics[width=0.35\textwidth]{img3.png}
+            \subfigure[Page Progress]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img3.png}}
             }
-            \subfigure[Avvio/Interruzione registrazione attività]{
-                \includegraphics[width=0.35\textwidth]{img4.png}
-            }
-        \end{figure}
-    \end{center}
-    \textit{Calendario} \vspace*{7pt}\\
-    L'utente può visualizzare nel \textbf{calendario} tutte le attività registrate. Cliccando su una delle celle che compongono il \textit{calendario}, è possibile visualizzare le attività compiute nella giornata selezionata e le relative informazioni, oltre ad un \textit{grafico a torta} che riporta il tempo speso per i vari tipi di attività durante l'arco delle 24 ore, specificando la porzione di tempo di cui non si hanno dati a disposizione.
-    \begin{center}
-        \begin{figure}[H]
-            \centering
-            \subfigure[Calendario]{
-                \includegraphics[width=0.35\textwidth]{img5.png}
-            }
-            \subfigure[Visualizzazione attività]{
-                \includegraphics[width=0.35\textwidth]{img6.png}
+            \subfigure[Page Geofence]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img4.png}}
             }
         \end{figure}
     \end{center}
-    \textit{Grafici} \vspace*{7pt}\\
-    La feature \textit{grafici} permette di visualizzare in maniera intuitiva i dati registrati dall'applicazione nel mese selezionato. La \textit{View} è composta da tre grafici, cosi suddivisi:
-    \begin{itemize}
-        \renewcommand{\labelitemi}{-}
-        \item \textbf{Grafico a barre}, contenente i \textbf{passi fatti} dall'utente per ogni giorno che componga il mese registrati durante attività di \textit{camminata}
-        \item \textbf{Grafico a barre}, utilizzato per visualizzare la \textbf{distanza percorsa} dall'utente ogni giorno durante le attività di \textit{spostamento con veicolo}
-        \item \textbf{Grafico a torta}, che riporta in percentuale la suddivisione per \textbf{tipo di attività} registrate dall'utente
-    \end{itemize}
+    Inoltre, entrambi i \textit{Fragment} ospitano due \textit{Floating Button}; rispettivamente, il primo consente di \textit{registrare manualmente} nuove attività,
+    mentre il secondo permette l'accesso al \textit{pannello di controllo}, in cui l'utente può selezionare le proprie preferenze, abilitando oppure disabilitando le funzionalità disponibili. \vspace*{7pt}\\
     \textit{Mappa} \vspace*{7pt}\\
-    La \textit{View} contiene una \textbf{mappa} all'interno di un \textit{FragmentContainerView}. L'utente può inserire, visualizzare ed eliminare le \textit{aree geografiche di interesse}, registrate all'interno del \textit{database locale}. Una zona di interesse è l'area compresa nel raggio di [150m, 250m] rispetto alle coordinate geografiche selezionate, varcata la soglia di una di esse l'utente riceve una notifica. \vspace*{7pt}\\
-    \textit{Nota bene}: il funzionamento della feature è garantito solamente in presenza di una \textbf{connessione dati stabile}.
+    La \textit{View} contiene una \textbf{mappa} all'interno di un \textit{MapView}. L'utente può inserire, visualizzare ed eliminare le \textit{aree geografiche di interesse};
+    una zona di interesse è l'area compresa nel raggio di \{150, 200, 250\} metri, rispetto alle coordinate geografiche che definiscono il centro della circonferenza, varcata
+    la soglia di una di esse il dispositivo riceve una notifica personalizzata. 
+    Premendo su uno dei molteplici \textit{marker} a disposizione, è mostrato un \textit{Dialog} contenente le informazioni principali della località, tra cui, il nome, la provincia
+    e l'indirizzo. 
     \begin{center}
         \begin{figure}[H]
             \centering
-            \subfigure[Mappa]{
-                \includegraphics[width=0.35\textwidth]{img7.png}
+            \subfigure[Map Fragment]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img5.png}}
             }
-            \subfigure[Dialog dei marker sulla mappa]{
-                \includegraphics[width=0.35\textwidth]{img8.png}
+            \subfigure[Marker Dialog]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img6.png}}
             }
         \end{figure}
     \end{center}
-    \textit{Amici} \\
-    Tramite l'applicativo è possibile condividere le proprie attività con altri \textbf{utenti} utilizzatori e visualizzare le stesse da loro compiute. Un utente può cercare lo \textit{username} di un amico per poi aggiungerlo alle proprie \textbf{amicizie} e visualizzare le attività da esso memorizzate.
-    Precedentemente alla condivisione dei dati, viene mostrato un \textit{Alert Dialog} che richiede l'autorizzazione per il salvataggio dei dati in cloud, se il permesso dovesse essere negato sarà comunque possibile visualizzare i dati degli amici.
-    Inoltre, l'utente può sincronizzare i dati salvati in \textit{cloud} in qualsiasi momento, cliccando sul \textit{floating button} presente nella schermata. \vspace*{7pt}\\
-    \textit{Nota bene}: il funzionamento della feature è garantito solamente in presenza di una \textbf{connessione dati stabile}.
-    \begin{figure}[H]
-        \centering
-        \subfigure[Amici fragment]{
-            \includegraphics[width=0.35\textwidth]{img9.png}
-        }
-        \subfigure[Visualizzazione dati amico]{
-            \includegraphics[width=0.35\textwidth]{img10.png}
-        }
-    \end{figure}
+    Concludendo, è presente un ulteriore \textit{Floating Button}, visualizzabile solamente all'interno di questo \textit{Fragment}, in grado di marcare la posizione corrente 
+    dell'utente; per riusciure nell'intento è necessario che sia stato autorizzato il permesso di \textbf{Access Fine Location}. \vspace*{7pt}\\
+    \textit{Calendario} \vspace*{7pt}\\
+    L'utente utilizzando il \textbf{calendario} può organizzare le proprie attività. Cliccando su una delle celle, sono mostrati tutti i \textit{Memo} correnti alla data selezionata.
+    Ogni \textit{Memo} possiede un titolo, una descrizione e una tipologia di attività associata. L'utilizzatore premendo sul \textit{Floating Button} possiede l'opportunità di inserire nuovi promemoria; cliccando sul bottone riportato nello stesso componente, ha la possibilità di variarne il contenuto. Contrariamente, qualora siano conclusi alcuni
+    promemoria, digitando sulle checkbox e raggiungendo l'\textit{Activity} precedente, saranno automaticamente eliminati dal \textit{Database Locale}.
+    Quest'ultima azione scaturisce l'avvio di un determinato \textit{Worker}, denominato \textit{DeleteMemoWorker}. Tale componente, data la presenza di una \textit{connessione ad Internet} stabile, consente di eliminare i \textit{Memo} selezionati all'interno di \textit{Supabase}.
+    \begin{center}
+        \begin{figure}[H]
+            \centering
+            \subfigure[Calendar Fragment]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img7.png}}
+            }
+            \subfigure[Daily Memo Activity]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img8.png}}
+            }
+        \end{figure}
+    \end{center}
+    \textbf{Nota bene}: in assenza di Internet il \textit{Worker} narrato viene momentaneamente sospeso, in attesa di una connessione, Wi-Fi oppure cellulare. \vspace*{7pt}\\
+    \textit{Gruppi} \vspace*{7pt}\\
+    Tramite l'applicativo è possibile condividere le proprie attività e transizioni con altri \textit{iscritti}, e visualizzare le stesse da loro compiute. Affinchè i dati di un ulteriore utente siano osservabili, occorre che abbia abilitato il \textit{servizio di sincronizzazione}. Tale funzionalità è stata implementata mediante un \textit{Worker}, denominato \textit{SyncBucketWorker}. Si tratta di un \textbf{Worker periodico}, in cui definito un certo arco temporale di attesa, provvede a sincronizzare le informazioni memorizzate localmente rispetto al \textit{dump} contenuto nel \textbf{Bucket} in cloud, agendo in totale autonomia.
+    \begin{center}
+        \begin{figure}[H]
+            \centering
+            \subfigure[Group Fragment]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img9.png}}
+            }
+            \subfigure[Page Progress User]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img10.png}}
+            }
+        \end{figure}
+    \end{center}
+    \textbf{Nota bene}: come accade per il \textit{DeleteMemoWorker}, in assenza di connessione il \textit{Worker} descritto viene sospeso. \vspace*{7pt}\\
+    \textit{Registrazione attività} \vspace*{7pt}\\
+    Come da immagine sottostante, l'utente può registrare quattro tipologie di attività, a cui sono associati alcuni sensori, suddivise in:
+    \begin{itemize}
+        \renewcommand{\labelitemi}{-}
+        \item \textbf{Vehicle Activity}, attività che ricadono nell'utilizzo di un qualche veicolo, in cui è memorizzata la distanza percorsa
+        \item \textbf{Run Activity}, attività di corsa, in cui è rilevata la distanza sostenuta e il dislivello affrontato
+        \item \textbf{Still Activity}, attività sedentaria, in questo specifico caso non è attuato alcun sensore
+        \item \textbf{Walk Activity}, dove è memorizzato il numero di passi e il dislivello affrontato durante la camminata
+    \end{itemize}
+    \begin{center}
+        \begin{figure}[H]
+            \centering
+            \subfigure[Manual Registration Activity]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img11.png}}
+            }
+            \subfigure[Run Activity]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img12.png}}
+            }
+        \end{figure}
+    \end{center}
+    Tutti i dati estrapolati vengono catalogati e salvati all'interno del \textit{Database Locale}, per poi essere successivamente rielaborati per consentirne la corretta
+    visualizzazione grafica. Alcuni dei sensori citati, richiedono che l'utente abbia preventivamente accettato il permesso di \textbf{Access Fine Location}, necessario per
+    specificare la distanza percorsa durante uno spostamento tramite veicolo oppure durante una corsa.
+    Inoltre, sono stati implementati ulteriori due sensori, rispettivamente il \textbf{Step Counter Sensor}, che, come da denominazione, permette di circoscrivere il numero di passi,
+    e il \textbf{Sensore di Pressione}, adeguato per indicare il dislivello affrontato durante la rilevazione dell'attività.
+    \vspace*{7pt}\\
+    \textit{Pannello di controllo} \vspace*{7pt}\\
+    Il \textbf{pannello di controllo} costituisce un riferimento univoco in cui l'utente può abilitare oppure disabilitare i servizi disponibili. Al tempo stesso, qualora alcuni di essi non siano mai stati attivati, saranno richiesti i permessi necessari pur di avviare i componenti desiderati. Pertanto, all'interno di tale \textit{Activity} sono richiesti:
+    \begin{itemize}
+        \renewcommand{\labelitemi}{-}
+        \item \textbf{Activity Recognition}, permesso necessario per abilitare il riconoscimento automatico delle attività compiute dall'utente
+        \item \textbf{Access Fine Location}, come già narrato, autorizzazione fondamentale per risalire alla geolocalizzazione corrente del dispositivo
+        \item \textbf{Access Background Location}, accesso alla geolocalizzazione del dispositivo anche qualora l'applicazione non sia in uso
+    \end{itemize}
+    Rispettivamente, il primo permesso è necessario per avviare il \textit{service di Activity Recognition}, mentre i restanti sono a loro volta necessari per abilitare
+    il \textit{service di Geofencing}.
+    \begin{center}
+        \begin{figure}[H]
+            \centering
+            \subfigure[Settings Activity]{
+                \fbox{\includegraphics[width=0.35\textwidth]{img13.png}}
+            }
+        \end{figure}
+    \end{center}
+    \textbf{Nota bene}: il layout riporta nella sezione finale un breve catalogo di tutte le attività che il servizio è in grado di gestire e manipolare; in assenza di \textit{Toggle} selezionati non sarà possibile avviare il riconoscimento automatico delle attività, anche qualora il \textit{service} sia stato attivato.
 
     \newpage
     \subsection*{Scelte implementative}
-    \subsubsection*{RecyclerView}
-    Questo tipo di \textit{View} è stata utilizzata per la rappresentazione delle attività dell'utente, essa è infatti ottimizzata per gestire grandi quantità di dati pur garantendo buone prestazioni nella velocità di caricamento. \vspace*{7pt}\\
-    Negli screenshot riportati, la \textbf{RecyclerView} è stata utilizzata nelle schermate Home, Calendario e Amici, riutilizzando il codice per caricare i dati all'interno delle card. In diverse occasioni sono state implementate funzionalità direttamente nei singoli ViewHolder, operazione resa possibile grazie al \textit{binding} dei parametri, semplificato dall'implementazione degli \textit{Adapter}. Questo approccio permette una gestione più efficiente e flessibile dei dati nelle varie sezioni dell'app.
-    \subsubsection*{ViewModel}
-    Come già accennato nell'introduzione, uno dei punti cardine su cui si basa il progetto è il design pattern architetturale \textbf{Model-View-ViewModel}. \\
-    Questo approccio separa la \textit{View}, definita \textbf{entità attiva}, poichè al suo interno è sviluppata la \textit{business logic}, e il Model, \textbf{entità passiva}, contenitore statico di dati. \vspace*{7pt}\\
-    Il \textbf{ViewModel} è incaricato di mantenere aggiornate le strutture dati che acquisiscono informazioni dal \textit{Model}. Ciò avviene per garantire che tutti i soggetti il cui comportamento può variare al cambiamento dei dati contenuti nel \textit{Model}, possano essere notificati dinnanzi ad una qualsiasi modifica. Questo comportamento è stato ottenuto attraverso l'impiego di \textbf{LiveData}, i quali si basano sul concetto di \textit{Observables}.
-    \begin{lstlisting}[language = JAVA]
+    Nella sezione seguente sono riportate le considerazioni adeguate durante il proseguimento del progetto. L'obiettivo del paragrafo consiste nella definizione e stesura degli aspetti cruciali che abbiano maggiormente inciso durante l'implementazione. \vspace{7pt}\\
+    \textit{Model-View-ViewModel} \vspace{7pt}\\
+    Come già accennato dall'introduzione, uno dei punti cardine su cui si basa il progetto è il design pattern architetturale \textbf{Model-View-ViewModel}.
+    Questo approccio separa la \textit{View}, denominata entità attiva, dal \textit{Model}, contenitore statico di dati, permettendone lo scambio. \\
+    Il \textit{ViewModel} è incaricato di mantenere aggiornate le strutture dati che possiedono informazioni del \textit{Model}. Ciò avviene per garantire che tutti i soggetti il cui comportamento può variare in base al contenuto dei dati del \textit{Model}, possano essere notificati dinnanzi ad una qualsiasi variazione.
+    Comportamento reso possibile mediante l'impiego di \textbf{LiveData}, a loro volta basati sul concetto di \textit{Observables}.
+    \begin{lstlisting}[language=Java]
 class NetworkViewModel: ViewModel() {
+
     private val _currentNetwork = MutableLiveData<Boolean>()
     val currentNetwork: LiveData<Boolean> get() = _currentNetwork
 
     init {
-        _currentNetwork.value = MyNetwork.isConnected
+        _currentNetwork.postValue(MyNetwork.isConnected)
     }
 
     fun setNetwork(enabled: Boolean) {
-        viewModelScope.launch(Dispatchers.Main) {
-            if (_currentNetwork.value != enabled) {
-                _currentNetwork.value = enabled
-            }
+        if (_currentNetwork.value != enabled) {
+            _currentNetwork.postValue(enabled)
         }
     }
 }
     \end{lstlisting}
-    La sezione di codice riportata definisce il metodo utilizzato per mantenere aggiornati i \textit{Fragment} interessati allo stato corrente della \textit{connessione}. All'interno delle classi è implementata una funzione incaricata di osservare cambiamenti del \textit{LiveData currentNetwork}, abilitando oppure disabilitando le funzionalità che richiedono una connessione.
-    \subsubsection*{Room}
-    Per garantire la persistenza dei dati è stata utilizzata la libreria \textbf{Room}. \textit{Room} permette di gestire con semplicità un \textit{Database Relazionale}, consentendo la gestione automatica di aggiornamento del database, causato per esempio dall'introduzione di una nuova tabella o dalle modifiche apportate alla struttura di una esistente. \vspace*{7pt}\\
-    L'implementazione di \textit{Room} è piuttosto intuitiva. Dichiarata un'instanza del database, è necessario creare le differenti tabelle che caratterizzano il \textit{Modello E-R} dedotto e i loro \textbf{DAO}, ossia classi in cui sono definite le principali interazioni possibili con il database.
-    \begin{lstlisting}[language = JAVA]
-@Database(
-    entities = [UserEntity::class, UserStillActivityEntity::class, UserVehicleActivityEntity::class, UserWalkActivityEntity::class, GeofenceAreaEntry::class, FriendEntity::class],
-    version = ROOM_DATABASE_VERSION
-)
-abstract class BrockDB: RoomDatabase() {
-    abstract fun UserDao(): UserDao
-    abstract fun UserStillActivityDao(): UserStillActivityDao
-    abstract fun UserVehicleActivityDao(): UserVehicleActivityDao
-    abstract fun UserWalkActivityDao(): UserWalkActivityDao
-    abstract fun GeofenceAreaDao(): GeofenceAreaDao
-    abstract fun FriendDao(): FriendDao
-
-    companion object {
-        @Volatile
-        var INSTANCE: BrockDB? = null
-
-        @Synchronized
-        fun getInstance(context: Context): BrockDB {
-            if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(
-                    context,
-                    BrockDB::class.java,
-                    "brock.db"
-                ).fallbackToDestructiveMigration()
-                    .build()
-            }
-            return INSTANCE as BrockDB
-        }
-    }
-}
-    \end{lstlisting}
-    Come è possibile osservare dallo snippet di codice proposto, il database è composto da sei \textit{tabelle}, ad ognuna delle quali è associato il proprio \textit{DAO}.
-    Inoltre, seguendo il \textit{design pattern Singleton}, è realizzata una sola istanza del \textit{database}, per garantire che tutte le operazioni di lettura e scrittura siano sincronizzate e che facciano riferimento agli stessi dati.
-
-    \subsubsection*{Background operations}
-    Le \textbf{operazioni in background} sviluppate all'interno del progetto si suddividono in due sezioni, cosi descritte:
-    \begin{itemize}
-        \renewcommand{\labelitemi}{-}
-        \item \textbf{Geofencing}, recinti virtuali utilizzati per contrassegnare località di interesse. A partire dalle coordinate geografiche scelte dall'utente viene registrata un'area circolare, rispetto ad un raggio prestabilito. Qualora l'utente dovesse varcare la soglia di una di queste are, l'applicativo invia una notifica al dispositivo
-        \item \textbf{Connectivity}, utilizzato per accertarsi della presenza di una \textit{connessione ad Internet} stabile, abilitando oppure disabilitando determinate funzionalità richiedenti una connessione dati. Tale approccio è utilizzato soprattutto per ovviare a comportamenti indesiderati dell'applicazione
-    \end{itemize}
-    \begin{center}
-        \begin{figure}[H]
-            \centering
-            \subfigure[Notifica proveniente da Geofencing]{
-                \includegraphics[width=0.35\textwidth]{img11.png}
-            }
-            \subfigure[Notifica proveniente da Connectivity]{
-                \includegraphics[width=0.35\textwidth]{img12.png}
-            }
-        \end{figure}
-    \end{center}
-    \textit{Geofencing} \\
-    Come già accennato, l'operazione in questione controlla attivamente qualora l'utente varchi i confini di un'area di interesse. A questo scopo, è stato implementato un \textbf{Broadcast Receiver} capace di intercettare intenti lanciati dai componenti che registrano la posizione dell'utente. Un \textbf{Worker} viene poi incaricato di notificare il dispositivo dell'utente.\vspace*{7pt}\\
-    \textit{Connectivity} \\
-    Contrariamente a quanto fatto per il Geofencing, in questo caso è stato utilizzato un \textbf{Service}. Nuovamente, è stato implementato un \textbf{Broadcast Receiver} affinchè possano essere gestiti cambiamenti della connessione. Una volta ricevuto l'intento viene richiamato il \textit{Service}, in cui è controllato lo stato della connessione: a seconda della disponibilità della connessione vengono abilitate o disabilitate le feature che richiedono l'accesso ad Internet.\\
-    Infine, è avviato un \textbf{Worker} incaricato di notificare l'utente in caso di cambiamenti significativi della connessione. \vspace*{7pt}\\
-    Tuttavia, è bene affermare che il \textit{Service} descritto è utilizzato anche per modificare la dimensione dell'aree di interesse. In base alla tipologia di \textit{connessione ad Internet} presente, il servizio provvederà a modificare il raggio delle \textit{aree di interesse}, in ottica di risparmio energetico e per garantire maggiore accuratezza anche in caso di connessione scarsa.
-    \subsubsection*{AWS Simple Storage Service}
-    Per consentire agli utenti di condividere i propri dati è stato utilizzato \textit{AWS Simple Storage Service}, la scelta è ricaduta su esso per le conoscenze pregresse del gruppo e per la facile integrazione fornita dalla AWS SDK in Kotlin.\\
-    Al momento della condivisione dei dati dell'utente viene effettuato un dump del database in formato JSON: i dati vengono strutturati in questo formato tramite la popolare libreria Gson, per poi essere salvati su un file che viene caricato su un bucket tramite una richiesta formulata da un AwsS3Client come nel seguente codice:\\
+    Lo snippet di codice precedente, definisce il metodo implementato per aggiornare tutte le componenti dell'applicazione che siano interessate allo stato corrente della connessione. All'interno delle classi è sviluppata una funzione \textit{Observer} dedita ad acquisire i potenziali cambiamenti del \textit{LiveData} circoscritto, abilitanto oppure disabilitando le feature che richiedano una connessione persistente. \vspace{7pt}\\
+    \textit{Jetpack Compose} \vspace{7pt}\\
+    \textbf{Jetpack Compose} è un framework utilizzato per l'implementazione della \textit{User Interface} di un'applicazione Android.
+    Rappresenta uno strumento in grado di accelerare lo sviluppo dell'interfaccia grafica, concentrando in un solo componente,
+    \textit{Activity} o \textit{Fragment}, tutto il codice necessario per la sua realizzazione. \vspace{7pt}\\
+    Ogni funzione che si accinge a definire qualsiasi \textit{View}, deve riportare la \textit{keyword @Composable}. 
     \begin{lstlisting}[language=Java]
-fun uploadUserData() {
-    viewModelScope.launch(Dispatchers.Default) {
-        val walkActivities = db.UserWalkActivityDao().getWalkActivitiesByUserId(User.id)
-        val vehicleActivities = db.UserVehicleActivityDao().getVehicleActivitiesByUserId(User.id)
-        val stillActivities = db.UserStillActivityDao().getStillActivitiesByUserId(User.id)
-
-        val userData = mapOf(
-            "username" to User.username,
-            "walkActivities" to walkActivities,
-            "vehicleActivities" to vehicleActivities,
-            "stillActivities" to stillActivities
+@Composable
+private fun DefineFloatingButton(description: String, icon: ImageVector, onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = {
+            onClick()
+        },
+        containerColor = colorResource(id = R.color.uni_red),
+        elevation = FloatingActionButtonDefaults.elevation(4.dp),
+        shape = CircleShape
+    ) {
+         Icon(
+            imageVector = icon,
+            contentDescription = description,
+            tint = Color.White
         )
-
-        val gson = Gson()
-        val json = gson.toJson(userData)
-
-        val file = File(context.filesDir, "user_data.json")
-        file.writeText(json)
-
-        withContext(Dispatchers.IO) {
-            try {
-                val request = PutObjectRequest(BUCKET_NAME, "user/${User.username}.json", file)
-                s3Client.putObject(request)
-            } catch (e: Exception) {
-                Log.e("S3Upload", "Failed to upload user data", e)
-            }
-        }
     }
 }
     \end{lstlisting}
-    Per cercare un amico l'utente digita lo username della persona desiderata nella barra di ricerca, viene dunque effettuata una richiesta di \textit{getObject} al bucket, che restituisce i dati di tutti gli utenti che hanno come prefisso dello username la stringa inserita dall'utente nella barra di ricerca.
-
-    \subsection*{Possibili sviluppi futuri}
-    In un ulteriore sviluppo dell'applicazione sarebbe possibile migliorare i seguenti aspetti:
+    Il progetto proposto adotta un approccio \textit{ibrido}, ossia impiega i layout realizzati mediante file con estensione \textit{XML} assieme a specifici tag \textit{ComposeView}, articolando i due paradigmi. La scelta di una composizione simile, ha facilitato lo sviluppo di tutti i componenti grafici attesi da un aspetto comportamentale, ovviando a potenziali dipendenze che avrebbero potuto causare differenti problematiche dinnanzi a modifiche necessarie. \vspace{7pt}\\
+    \textit{Room} \vspace{7pt}\\
+    Per la gestione del \textit{Model} è stato utilizzato \textbf{Room}. La libreria ha permesso di creare e di manipolare con estrema semplicità un \textit{Database Relazionale}, memorizzando al suo interno tutte le informazioni estrapolate durante l'utilizzo dell'applicazione da parte dell'utente. \vspace{7pt}\\
+    Dichiarata un'istanza della base di dati, è necessario definire le \textit{Entity}, ossia le tabelle dedotte durante la stesura del \textit{Modello E-R}, e i \textit{DAO}, contenenti tutte le funzioni desiderate. \vspace{7pt}\\
+    \textit{AWS} \vspace{7pt}\\
+    Per consentire agli utenti di condividere i propri progressi è stato utilizzato \textit{AWS}. La scelta è ricaduta su di esso per le conoscenze pregresse e l'intuitiva implementazione garantita dalla SDK di Kotlin. Abilitato il servizio in questione, presente all'interno del \textit{pannello di controllo}, è programmato un \textbf{Worker periodico}, incaricato di effettuare un \textit{dump} della basi di dati in formato \textit{JSON}, successivamente caricato all'interno di un \textit{bucket} mediante una richiesta \textit{AWS-S3Client}. In questo modo è possibile garantire totale autosufficienza della feature, poichè provvede autonomamente a memorizzare i record del database mediante l'ausilio del servizio esterno. Qualora l'utente decidesse di non condividere più i propri progressi, potrà semplicemente disabilitare la funzionalità dal \textit{pannello di controllo}.
+    \vspace{7pt}\\
+    \textit{Background operations} \vspace{7pt}\\
+    Le operazioni in background sviluppate all'interno del progetto si articolano in tre sezioni differenti, così suddivise:
     \begin{itemize}
         \renewcommand{\labelitemi}{-}
-        \item \textbf{Maggiore sicurezza} nella condivisione dei dati in cloud, per garantire l'accesso solo agli utenti autorizzati
-        \item \textbf{Miglioramento interfaccia} ed esperienza utente, per garantire un facile accesso a tutte le funzionalità
-        \item \textbf{Aumento dei servizi in background}, come la registrazione automatica delle attività, per eliminare la necessità dell'avvio e dell'interruzione di una attività da parte dell'utente.
-        \item \textbf{Miglioramento gestione batteria}, con riduzione delle prestazioni dell'app in caso di batteria scarica
-        \item Possibilità di \textbf{eliminare amici} appartenenti alle proprie amicizie
+        \item \textbf{Activity Recognition}, deduzione automatica dell'attività fisica conseguita dall'utente. Dopo aver precedentemente stabilito quali attività siano di suo interesse, l'applicazione mediante un \textit{Broadcast Receiver} e un \textit{Service}, dedito alla memorizzazione dei dati estrapolati, provvede a notificare l'utilizzatore
+        \item \textbf{Geofencing}, recinti virtuali attuati per contrassegnare località di interesse. A partire dalle coordinate geografiche, è realizzata un'area circolare avente un raggio prestabilito; qualora l'utente dovesse varcare la soglia di una di queste circonferenze, l'applicativo memorizza l'evento all'interno del Database Locale ed invia una notifica al dispositivo 
+        \item \textbf{Connectivity}, \textit{Broadcast Receiver} registrato per acquisire tutti i cambiamenti incisivi di connessione che interessino il dispositivo
     \end{itemize}
+    A livello implementativo, tutte le \textit{background operations} riportate sono caratterizzate da un'architettura piuttosto simile.
+    Ad ognuno di esse è stato associato un \textit{Broadcast Receiver}, responsabile di intercettare gli intenti inviati dal sistema e di risvegliare i \textit{Service} circoscritti. Per attivare i servizi, sono stati implementati dei \textit{Worker}, incaricati di effettuare alcune azioni di \textit{pre-processing} prima di richiamare la funzione \textit{startService()}. Successivamente i \textit{Service}, ottenuti i dati necessari, provvedono a salvare le informazioni dedotte all'interno della base di dati. \vspace{7pt}\\
+    Nota a margine per quanto riguarda l'operazione \textit{Connectivity}. Il servizio citato, oltre ad aggiornare lo stato corrente della connessione, permette di variare la dimensione delle \textit{Geofence}. Ciò avviene mediante l'impiego del \textit{Geofence Service};
+    una volta risvegliato, si accerta della tipologia di connessione corrente, e varia di conseguenza il perimetro dell'aree di interesse,
+    in ottica di risparmio energetico e per garantire maggiore accuratezza.
+    \begin{lstlisting}[language=Java]
+class ActivityPreprocessingWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
+
+    override fun doWork(): Result {
+        val type = inputData.getInt("TYPE", 4)
+        val transition = inputData.getInt("TRANSITION", -1)
+
+        val serviceIntent = Intent(context, ActivityRecognitionService::class.java).apply {
+            val items = if (transition == 0) {
+                Pair(
+                    ActivityRecognitionService.Actions.INSERT.toString(),
+                    "ARRIVAL_TIME"
+                )
+            } else {
+                Pair(
+                    ActivityRecognitionService.Actions.UPDATE.toString(),
+                    "EXIT_TIME"
+                )
+            }
+
+            action = items.first
+            putExtra("ACTIVITY_TYPE", type)
+            putExtra(items.second, System.currentTimeMillis())
+        }
+
+        context.startService(serviceIntent)
+
+        return Result.success()
+    }
+}
+    \end{lstlisting}
 \end{document}
