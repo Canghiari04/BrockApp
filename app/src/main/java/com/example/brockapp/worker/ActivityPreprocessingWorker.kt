@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.Context
 import androidx.work.WorkerParameters
 
-class ActivityPreprocessingWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+class ActivityPreprocessingWorker(private val context: Context, workerParams: WorkerParameters): Worker(context, workerParams) {
 
     override fun doWork(): Result {
         val type = inputData.getInt("TYPE", 4)

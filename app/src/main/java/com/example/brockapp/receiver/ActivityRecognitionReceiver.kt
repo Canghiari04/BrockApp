@@ -7,15 +7,11 @@ import androidx.work.Data
 import android.content.Intent
 import android.content.Context
 import androidx.work.WorkManager
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import androidx.work.OneTimeWorkRequestBuilder
-import com.example.brockapp.util.NotificationUtil
 import com.google.android.gms.location.ActivityTransitionResult
 
 class ActivityRecognitionReceiver: BroadcastReceiver() {
-
-    private var notificationUtil = NotificationUtil()
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == ACTIVITY_RECOGNITION_INTENT_TYPE) {
@@ -35,19 +31,6 @@ class ActivityRecognitionReceiver: BroadcastReceiver() {
                     val request = OneTimeWorkRequestBuilder<ActivityPreprocessingWorker>()
                         .setInputData(inputData)
                         .build()
-
-                    ///
-                    val notification = notificationUtil.getNotificationBody(
-                        CHANNEL_ID_MEMO_WORKER,
-                        R.drawable.icon_run,
-                        "BrockApp - Receiver",
-                        "Type ${type}, transition ${transition}",
-                        context
-                    )
-
-                    val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    manager.notify(ID_MEMO_WORKER_NOTIFY, notification.build())
-                    ///
 
                     WorkManager.getInstance(context).enqueue(request)
                 }
