@@ -4,6 +4,7 @@ import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.util.NotificationUtil
+import com.example.brockapp.room.UsersRunActivityEntity
 import com.example.brockapp.room.UsersWalkActivityEntity
 import com.example.brockapp.interfaces.NotificationSender
 import com.example.brockapp.room.UsersStillActivityEntity
@@ -93,10 +94,10 @@ class ActivityRecognitionService: Service(), SensorEventListener, NotificationSe
                         this
                     )
 
-                    // startSensors(type)
+                    startSensors(type)
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        // insert(type, arrivalTime)
+                        insert(type, arrivalTime)
                     }
                 }
 
@@ -105,7 +106,7 @@ class ActivityRecognitionService: Service(), SensorEventListener, NotificationSe
                     val exitTime = intent.getLongExtra("EXIT_TIME", 0L)
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        // update(type, exitTime)
+                        update(type, exitTime)
                     }
                 }
 
@@ -229,7 +230,16 @@ class ActivityRecognitionService: Service(), SensorEventListener, NotificationSe
             }
 
             DetectedActivity.RUNNING -> {
-
+                db.UsersRunActivityDao().insertRunActivity(
+                    UsersRunActivityEntity(
+                        username = MyUser.username,
+                        timestamp = getInstant(),
+                        arrivalTime = System.currentTimeMillis(),
+                        exitTime = 0L,
+                        distanceDone = 0.0,
+                        heightDifference = 0f
+                    )
+                )
             }
 
             DetectedActivity.STILL -> {
@@ -278,6 +288,13 @@ class ActivityRecognitionService: Service(), SensorEventListener, NotificationSe
             }
 
             DetectedActivity.RUNNING -> {
+                db.UsersRunActivityDao().updateLastRecord(
+                    db.UsersRunActivityDao().getLastInsertedId(),
+                    System.currentTimeMillis(),
+                    distance,
+                    0f
+                )
+
                 fusedLocationClient.removeLocationUpdates(locationCallback)
             }
 
@@ -289,14 +306,14 @@ class ActivityRecognitionService: Service(), SensorEventListener, NotificationSe
             }
 
             DetectedActivity.WALKING -> {
-                sensorManager.unregisterListener(this)
-
                 db.UsersWalkActivityDao().updateLastRecord(
                     db.UsersWalkActivityDao().getLastInsertedId(),
                     exitTime,
                     sessionStepsCount,
                     0f
                 )
+
+                sensorManager.unregisterListener(this)
             }
         }
     }
