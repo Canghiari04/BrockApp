@@ -28,7 +28,7 @@ class NotificationUtil {
             context,
             REQUEST_CODE_CONNECTIVITY_NOTIFY,
             Intent(Settings.ACTION_SETTINGS),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 
@@ -42,7 +42,7 @@ class NotificationUtil {
             context,
             REQUEST_CODE_CONNECTIVITY_NOTIFY,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 

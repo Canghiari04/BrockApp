@@ -89,7 +89,7 @@ class SupabaseService: Service() {
         }
 
         val intentFilter = IntentFilter("SYNC_DATA_ACTION")
-        registerReceiver(receiver, intentFilter, RECEIVER_NOT_EXPORTED)
+        registerReceiver(receiver, intentFilter, RECEIVER_EXPORTED)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

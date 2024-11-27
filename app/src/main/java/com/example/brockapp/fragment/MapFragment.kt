@@ -41,6 +41,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import android.annotation.SuppressLint
 import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.overlay.Marker
 import androidx.compose.runtime.getValue
@@ -154,17 +155,6 @@ class MapFragment: Fragment() {
 
         map = view.findViewById(R.id.container_view_map)
 
-        map.apply {
-            setMultiTouchControls(true)
-            controller.setZoom(7.0)
-            controller.setCenter(
-                GeoPoint(
-                    41.8719,
-                    12.5674
-                )
-            )
-        }
-
         searchLocation.setContent {
             DefineSearchTextView()
         }
@@ -191,6 +181,8 @@ class MapFragment: Fragment() {
                 )
             }
         }
+
+        getLastKnownLocation()
 
         observeNetwork()
         observeStaticGeofenceAreas()
@@ -311,20 +303,35 @@ class MapFragment: Fragment() {
         viewModelGeofence.checkGeofenceAreaAlreadyIn(geofenceArea)
     }
 
-    @SuppressLint("MissingPermission")
     private fun getLastKnownLocation() {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null && isLocationFresh(location)) {
-                addCurrentMarker(location)
-            } else {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null && isLocationFresh(location)) {
+                    addCurrentMarker(location)
+                } else {
+                    getCurrentLocation()
+                }
+            }
+
+            fusedLocationClient.lastLocation.addOnFailureListener {
                 getCurrentLocation()
             }
-        }
-
-        fusedLocationClient.lastLocation.addOnFailureListener {
-            getCurrentLocation()
+        } else {
+            map.apply {
+                setMultiTouchControls(true)
+                controller.setZoom(7.0)
+                controller.setCenter(
+                    GeoPoint(
+                        41.8719,
+                        12.5674
+                    )
+                )
+            }
         }
     }
     
