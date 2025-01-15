@@ -73,7 +73,6 @@ class GeofenceService: Service() {
 
             Actions.TERMINATE.toString() -> {
                 terminateMonitoring()
-                stopSelf()
             }
         }
 

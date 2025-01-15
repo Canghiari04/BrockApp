@@ -39,7 +39,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 
 class GeofenceAdapter(private val list: List<GeofenceTransition>): RecyclerView.Adapter<GeofenceAdapter.GeofenceViewHolder>() {
 
-    inner class GeofenceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class GeofenceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.text_view_title_geofence)
         val timeSpent: TextView = itemView.findViewById(R.id.text_view_spent_time)
         val accessCount: TextView = itemView.findViewById(R.id.text_view_access_count)

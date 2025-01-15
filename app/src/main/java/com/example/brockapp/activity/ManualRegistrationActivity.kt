@@ -78,13 +78,13 @@ class ManualRegistrationActivity: AppCompatActivity() {
     ) {
         buttonVehicle.apply {
             setOnClickListener {
-                permissionAccessLocationRunUtil.requestAccessLocationPermission()
+                permissionAccessLocationVehicleUtil.requestAccessLocationPermission()
             }
         }
 
         buttonRun.apply {
             setOnClickListener {
-                permissionAccessLocationVehicleUtil.requestAccessLocationPermission()
+                permissionAccessLocationRunUtil.requestAccessLocationPermission()
             }
         }
 

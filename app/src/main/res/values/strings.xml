@@ -73,6 +73,7 @@
     <string name="text_view_service">Check the active service</string>
     <string name="text_view_activity_recognition">Daily activity recognition</string>
     <string name="text_view_geofence_transition">Geofence transition service</string>
+    <string name="text_view_permission_geofence_transition">Click <b>Allow all the time</b></string>
     <string name="text_view_description_dump_database">Sharing your data allows the app to provide a personalized experience!</string>
     <string name="text_view_dump_service">Share your dump database</string>
     <string name="text_view_dump_database">Share your progress</string>
