@@ -97,7 +97,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.username,
                 startOfPeriod,
                 endOfPeriod
-            )
+            ).filter { it.distanceTravelled > 0.0 }
 
             // Whole time spent during the week
             val time = run {
@@ -183,7 +183,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.username,
                 startOfPeriod,
                 endOfPeriod
-            )
+            ).filter { it.distanceDone > 0.0 }
 
             val time = run {
                 if (activities.isNotEmpty()) {
@@ -341,7 +341,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 MyUser.username,
                 startOfPeriod,
                 endOfPeriod
-            )
+            ).filter { it.stepsNumber > 0L }
 
             val time = run {
                 if (activities.isNotEmpty()) {
@@ -497,27 +497,31 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
 
     fun getCountOfActivities(startOfPeriod: String, endOfPeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val vehicleActivitiesCount = db.UsersVehicleActivityDao()
+            val vehicleActivities = db.UsersVehicleActivityDao()
                 .getVehicleActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
+                .filter { it.distanceTravelled > 0.0 }
                 .toMutableList()
 
-            val runActivitiesCount = db.UsersRunActivityDao()
+            val runActivities = db.UsersRunActivityDao()
                 .getRunActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
+                .filter { it.distanceDone > 0.0 }
                 .toMutableList()
 
-            val stillActivitiesCount = db.UsersStillActivityDao()
+            val stillActivities = db.UsersStillActivityDao()
                 .getStillActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
+                .filter { it.exitTime > it.arrivalTime }
                 .toMutableList()
 
-            val walkActivitiesCount = db.UsersWalkActivityDao()
+            val walkActivities = db.UsersWalkActivityDao()
                 .getWalkActivitiesByUsernameAndPeriod(MyUser.username, startOfPeriod, endOfPeriod)
+                .filter { it.stepsNumber > 0L }
                 .toMutableList()
 
             val map = mutableMapOf(
-                "Vehicle" to vehicleActivitiesCount.size,
-                "Run" to runActivitiesCount.size,
-                "Still" to stillActivitiesCount.size,
-                "Walk" to walkActivitiesCount.size
+                "Vehicle" to vehicleActivities.size,
+                "Run" to runActivities.size,
+                "Still" to stillActivities.size,
+                "Walk" to walkActivities.size
             )
 
             val entries = ArrayList<PieEntry>()

@@ -66,7 +66,6 @@ class MainActivity: AppCompatActivity() {
 
         setupNavigation()
 
-        checkServices()
         checkConnectivity()
         checkCurrentMemos()
 
@@ -81,6 +80,11 @@ class MainActivity: AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkServices()
     }
 
     override fun onDestroy() {

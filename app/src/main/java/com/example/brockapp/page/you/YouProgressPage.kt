@@ -147,9 +147,7 @@ class YouProgressPage: ProgressPage() {
 
     override fun observeUserActivities() {
         viewModelActivities.pieChartEntries.observe(viewLifecycleOwner) { entries ->
-            if (entries.isNotEmpty()) {
-                chartUtil.populatePieChart(entries, pieChart, requireContext())
-            }
+            chartUtil.populatePieChart(entries, pieChart, requireContext())
         }
     }
 

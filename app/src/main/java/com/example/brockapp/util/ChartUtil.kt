@@ -195,6 +195,9 @@ class ChartUtil {
         val marker = CustomChartMarkerView(context, R.layout.marker_chart_view)
         pieChart.marker = marker
 
+        pieChart.setNoDataText("")
+        pieChart.setNoDataTextColor(Color.TRANSPARENT)
+
         pieChart.legend.isEnabled = false
         pieChart.description?.isEnabled = false
 

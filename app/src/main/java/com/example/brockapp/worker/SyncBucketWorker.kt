@@ -41,10 +41,12 @@ class SyncBucketWorker(private val context: Context, workerParams: WorkerParamet
             val vehicleActivities = db
                 .UsersVehicleActivityDao()
                 .getVehicleActivitiesByUsername(MyUser.username)
+                .filter { it.distanceTravelled > 0 }
 
             val runActivities = db
                 .UsersRunActivityDao()
                 .getRunActivitiesByUsername(MyUser.username)
+                .filter { it.distanceDone > 0 }
 
             val stillActivities = db
                 .UsersStillActivityDao()
@@ -53,6 +55,7 @@ class SyncBucketWorker(private val context: Context, workerParams: WorkerParamet
             val walkActivities = db
                 .UsersWalkActivityDao()
                 .getWalkActivitiesByUsername(MyUser.username)
+                .filter { it.stepsNumber > 0L }
 
             val geofence = db
                 .GeofenceTransitionsDao()

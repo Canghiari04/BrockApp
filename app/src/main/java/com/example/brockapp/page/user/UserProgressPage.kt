@@ -219,9 +219,7 @@ class UserProgressPage(private val friend: Friend): ProgressPage() {
 
     override fun observeUserActivities() {
         viewModelGroup.userPieChartEntries.observe(viewLifecycleOwner) { entries ->
-            if (entries.isNotEmpty()) {
-                chartUtil.populatePieChart(entries, pieChart, requireContext())
-            }
+            chartUtil.populatePieChart(entries, pieChart, requireContext())
         }
     }
 
