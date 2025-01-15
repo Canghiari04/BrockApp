@@ -32,7 +32,6 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recycler_view_user_list_page)
-
         searchTextView = view.findViewById(R.id.auto_complete_text_view_user_list_page)
 
         val db: BrockDB = BrockDB.getInstance(requireContext())
@@ -49,6 +48,12 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
         observeSuggestion()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (viewModelNetwork.currentNetwork.value == true) loadUsers()
+    }
+
     private fun setUpSearchTextView() {
         searchTextView.addTextChangedListener {
             val user = searchTextView.text.toString()
@@ -58,7 +63,6 @@ abstract class UserListPage: Fragment(R.layout.page_user_list) {
 
     private fun observeNetwork() {
         viewModelNetwork.currentNetwork.observe(viewLifecycleOwner) { item ->
-            if (item) loadUsers()
             searchTextView.isEnabled = item
         }
     }
