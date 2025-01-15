@@ -178,7 +178,6 @@ class AccountFragment: Fragment(R.layout.fragment_account) {
         }
 
         requireContext().startService(intent)
-        requireActivity().finish()
     }
 
     private fun showDangerousDialog() {

@@ -207,6 +207,8 @@ class SupabaseService: Service() {
                     MyUser.password
                 )
 
+                MySharedPreferences.deleteSavedPreferences(applicationContext)
+
                 scheduleWorkerUtil.also {
                     it.deleteSyncPeriodic()
 
@@ -218,7 +220,6 @@ class SupabaseService: Service() {
                     it.action = "SYNC_DATA_ACTION"
                     it.putExtra("NEXT_ACTIVITY", NextActivity.LOGIN.toString())
 
-                    MySharedPreferences.deleteSavedPreferences(applicationContext)
                     sendBroadcast(it)
                 }
             }
