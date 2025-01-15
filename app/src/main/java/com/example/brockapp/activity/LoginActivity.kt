@@ -113,20 +113,18 @@ class LoginActivity: AppCompatActivity() {
 
     private fun observeUserFromPreferences() {
         viewModelUser.user.observe(this) {
-            viewModelUser.user.observe(this) {
-                if (it != null) {
-                    MyUser.apply {
-                        username = it.username
-                        password = it.password
-                        typeActivity = it.typeActivity
-                        country = it.country
-                        city = it.city
-                    }
-
-                    goToHome()
-                } else {
-                    Log.e("LOGIN_ACTIVITY", "User not found.")
+            if (it != null) {
+                MyUser.apply {
+                    username = it.username
+                    password = it.password
+                    typeActivity = it.typeActivity
+                    country = it.country
+                    city = it.city
                 }
+
+                goToHome()
+            } else {
+                Log.e("LOGIN_ACTIVITY", "User not found.")
             }
         }
     }

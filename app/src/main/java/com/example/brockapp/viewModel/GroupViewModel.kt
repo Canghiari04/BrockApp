@@ -271,7 +271,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val timePerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val timePerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
@@ -327,7 +338,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val timePerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val timePerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
@@ -367,7 +389,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val timePerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val timePerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
@@ -423,7 +456,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val timePerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val timePerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.exitTime - it.arrivalTime } / TO_MINUTES)
         }
 
@@ -445,7 +489,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val distancePerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val distancePerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.distanceTravelled } / TO_KM).toFloat()
         }
 
@@ -467,7 +522,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val distancePerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val distancePerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.distanceDone } / TO_KM).toFloat()
         }
 
@@ -489,7 +555,18 @@ class GroupViewModel(private val s3Client: AmazonS3Client, private val db: Brock
             }
         }
 
-        val stepsPerDay = groupedItems.mapValues { it ->
+        val filteredItems = groupedItems.mapValues { (_, values) ->
+            values.filter {
+                val valueDate = LocalDate.parse(
+                    it.timestamp,
+                    pattern
+                )
+
+                valueDate.isAfter(firstDay.minusDays(1)) && valueDate.isBefore(lastDay.plusDays(1))
+            }
+        }
+
+        val stepsPerDay = filteredItems.mapValues { it ->
             (it.value.sumOf { it.stepsNumber }).toFloat()
         }
 
