@@ -23,4 +23,7 @@ interface UsersStillActivityDao {
 
     @Query("UPDATE UsersStillActivity SET exit_time=:exitTime WHERE id=:id")
     suspend fun updateLastRecord(id: Long, exitTime: Long)
+
+    @Query("DELETE FROM UsersStillActivity WHERE id=:id")
+    suspend fun deleteStillActivity(id: Long)
 }

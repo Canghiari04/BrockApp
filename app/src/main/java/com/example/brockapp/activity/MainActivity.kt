@@ -129,6 +129,11 @@ class MainActivity: AppCompatActivity() {
                     true
                 }
 
+                R.id.drawer_item_activities_summary -> {
+                    navController.navigate(R.id.drawer_item_activities_summary)
+                    true
+                }
+
                 else -> {
                     false
                 }

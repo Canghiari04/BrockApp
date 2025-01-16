@@ -3,6 +3,7 @@ package com.example.brockapp.util
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.worker.SyncBucketWorker
 import com.example.brockapp.worker.DeleteMemoWorker
+import com.example.brockapp.worker.DeleteActivityWorker
 import com.example.brockapp.worker.DeleteGeofenceAreaWorker
 
 import androidx.work.Data
@@ -77,6 +78,25 @@ class ScheduleWorkerUtil(private val context: Context) {
         WorkManager.getInstance(context).enqueue(request)
     }
 
+    fun scheduleDeleteActivityWorker(id: Long, table: String) {
+        val constraint = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val inputData = Data.Builder()
+            .putLong("ID", id)
+            .putString("TABLE", table)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<DeleteActivityWorker>()
+            .setConstraints(constraint)
+            .addTag("DeleteActivityWorker")
+            .setInputData(inputData)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(request)
+    }
+
     fun deleteSyncPeriodic() {
         WorkManager.getInstance(context).cancelUniqueWork("SyncBucketWorker")
     }
@@ -87,5 +107,9 @@ class ScheduleWorkerUtil(private val context: Context) {
 
     fun deleteGeofenceAreaWorker() {
         WorkManager.getInstance(context).cancelAllWorkByTag("DeleteGeofenceAreaWorker")
+    }
+
+    fun deleteActivityWorker() {
+        WorkManager.getInstance(context).cancelAllWorkByTag("DeleteActivityWorker")
     }
 }

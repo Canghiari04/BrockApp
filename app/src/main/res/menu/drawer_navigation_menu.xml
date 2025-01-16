@@ -5,11 +5,7 @@
             android:title="@string/drawer_account"
             android:icon="@drawable/icon_account" />
         <item
-            android:id="@+id/drawer_item_summary_activity"
+            android:id="@+id/drawer_item_activities_summary"
             android:title="@string/drawer_activity_summary"
             android:icon="@drawable/icon_run" />
-        <item
-            android:id="@+id/drawer_item_summary_geofence"
-            android:title="@string/drawer_geofence_summary"
-            android:icon="@drawable/icon_marker" />
 </menu>

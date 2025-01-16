@@ -33,4 +33,10 @@
         tools:layout="@layout/fragment_account"
         android:label="Account"
         android:name="com.example.brockapp.fragment.AccountFragment" />
+
+    <fragment
+        android:id="@+id/drawer_item_activities_summary"
+        tools:layout="@layout/fragment_activities_summary"
+        android:label="Activities summary"
+        android:name="com.example.brockapp.fragment.ActivitiesSummaryFragment" />
 </navigation>

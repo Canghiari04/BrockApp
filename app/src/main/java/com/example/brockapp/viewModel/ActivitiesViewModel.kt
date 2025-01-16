@@ -2,6 +2,7 @@ package com.example.brockapp.viewModel
 
 import com.example.brockapp.*
 import com.example.brockapp.room.BrockDB
+import com.example.brockapp.data.Activity
 import com.example.brockapp.extraObject.MyUser
 import com.example.brockapp.room.UsersRunActivityEntity
 import com.example.brockapp.room.UsersWalkActivityEntity
@@ -9,6 +10,7 @@ import com.example.brockapp.room.UsersStillActivityEntity
 import com.example.brockapp.room.UsersVehicleActivityEntity
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -19,8 +21,10 @@ import java.time.format.DateTimeFormatter
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.PieEntry
+import kotlin.time.Duration.Companion.milliseconds
 
 class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
+
     companion object {
         const val TO_KM = 1000f
         const val TO_MINUTES = 60000f
@@ -73,6 +77,9 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
     private val _pieChartEntries = MutableLiveData<List<PieEntry>>()
     val pieChartEntries: MutableLiveData<List<PieEntry>> get() = _pieChartEntries
 
+    private val _listActivities = MutableLiveData<List<Activity>>()
+    val listActivities: LiveData<List<Activity>> get() = _listActivities
+
     fun insertVehicleActivity(item: UsersVehicleActivityEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             db.UsersVehicleActivityDao().insertVehicleActivity(item)
@@ -99,7 +106,6 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                 endOfPeriod
             ).filter { it.distanceTravelled > 0.0 }
 
-            // Whole time spent during the week
             val time = run {
                 var sum = 0L
 
@@ -544,7 +550,74 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         }
     }
 
-    private fun defineBarChartEntries(firstDay: LocalDate, lastDay: LocalDate, timePerDay: Map<Int, Float>):  List<BarEntry> {
+    fun getAllActivities(startOfPeriod: String, endOfPeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = listOf(
+                    db.UsersVehicleActivityDao().getVehicleActivitiesByUsernameAndPeriod(
+                        MyUser.username,
+                        startOfPeriod,
+                        endOfPeriod
+                    ).map { activity ->
+                        extractActivity("Vehicle activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                    },
+
+                    db.UsersRunActivityDao().getRunActivitiesByUsernameAndPeriod(
+                        MyUser.username,
+                        startOfPeriod,
+                        endOfPeriod
+                    ).map { activity ->
+                        extractActivity("Run activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                    },
+
+                    db.UsersStillActivityDao().getStillActivitiesByUsernameAndPeriod(
+                        MyUser.username,
+                        startOfPeriod,
+                        endOfPeriod
+                    ).map { activity ->
+                        extractActivity("Still activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                    },
+
+                    db.UsersWalkActivityDao().getWalkActivitiesByUsernameAndPeriod(
+                        MyUser.username,
+                        startOfPeriod,
+                        endOfPeriod
+                    ).map { activity ->
+                        extractActivity("Walk activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                    }
+            ).flatten().sortedBy { activity ->
+                LocalDateTime.parse(
+                    activity.timestamp,
+                    DateTimeFormatter.ofPattern(ISO_DATE_FORMAT)
+                )
+            }
+
+            _listActivities.postValue(list)
+        }
+    }
+
+    fun deleteActivity(id: Long, type: String) {
+        viewModelScope.launch {
+            when {
+                type.contains("Vehicle") -> {
+                    db.UsersVehicleActivityDao().deleteVehicleActivity(id)
+                }
+
+                type.contains("Run") -> {
+                    db.UsersRunActivityDao().deleteRunActivity(id)
+                }
+
+                type.contains("Still") -> {
+                    db.UsersStillActivityDao().deleteStillActivity(id)
+                }
+
+                type.contains("Walk") -> {
+                    db.UsersWalkActivityDao().deleteWalkActivity(id)
+                }
+            }
+        }
+    }
+
+    private fun defineBarChartEntries(firstDay: LocalDate, lastDay: LocalDate, timePerDay: Map<Int, Float>): List<BarEntry> {
         val entries = ArrayList<BarEntry>()
 
         var i = 0
@@ -586,5 +659,22 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
         }
 
         return entries
+    }
+
+    private fun <T> extractActivity(type: String, id: (T) -> Long, timestamp: (T) -> String, arrivalTime: (T) -> Long, exitTime: (T) -> Long, raw: T): Activity {
+        return Activity(
+            id = id(raw),
+            type = type,
+            timestamp = timestamp(raw),
+            duration = "Time spent ${defineDuration(arrivalTime(raw), exitTime(raw))}"
+        )
+    }
+
+    private fun defineDuration(arrivalTime: Long, exitTime: Long): String {
+        val timeSpent = exitTime - arrivalTime
+
+        return timeSpent.milliseconds.toComponents { hours, minutes, seconds, _ ->
+            "%01dh %01dm %01ds".format(hours, minutes, seconds)
+        }
     }
 }

@@ -23,4 +23,7 @@ interface UsersRunActivityDao {
 
     @Query("UPDATE UsersRunActivity SET exit_time=:exitTime, distance_done=:distanceDone, height_difference=:heightDifference WHERE id=:id")
     suspend fun updateLastRecord(id: Long, exitTime: Long, distanceDone: Double, heightDifference: Float)
+
+    @Query("DELETE FROM UsersRunActivity WHERE id=:id")
+    suspend fun deleteRunActivity(id: Long)
 }

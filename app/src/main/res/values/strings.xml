@@ -3,6 +3,14 @@
 
     <string name="text_blank"> </string>
 
+    <string-array name="spinner_all_activities">
+        <item>All</item>
+        <item>Vehicle</item>
+        <item>Run</item>
+        <item>Still</item>
+        <item>Walk</item>
+    </string-array>
+
     <string-array name="spinner_activities">
         <item>Vehicle</item>
         <item>Run</item>
@@ -34,8 +42,7 @@
     <string name="menu_group">Group</string>
 
     <string name="drawer_account">Account</string>
-    <string name="drawer_activity_summary">Activity summary</string>
-    <string name="drawer_geofence_summary">Geofence summary</string>
+    <string name="drawer_activity_summary">Activities summary</string>
 
     <string name="text_view_title_page_progress">Look your progress!</string>
     <string name="text_view_title_fist_card">This week</string>
@@ -135,6 +142,10 @@
     <string name="dangerous_dialog_message">If you decide to delete your account, you will lose all the data stored</string>
     <string name="dangerous_positive_button">DELETE</string>
     <string name="dangerous_negative_button">DENY</string>
+
+    <string name="text_view_title_activities_summary">Choose a day</string>
+    <string name="text_view_description_activities_summary">Below there you can choose a day to see the activities done and the type associated with them</string>
+    <string name="button_delete_activity">DELETE</string>
 
     <string name="description_add_icon">Icon add</string>
     <string name="description_user_icon">User icon</string>

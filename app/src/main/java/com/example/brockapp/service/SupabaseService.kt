@@ -213,6 +213,7 @@ class SupabaseService: Service() {
                     it.deleteSyncPeriodic()
 
                     it.deleteMemoWorker()
+                    it.deleteActivityWorker()
                     it.deleteGeofenceAreaWorker()
                 }
 
@@ -352,6 +353,7 @@ class SupabaseService: Service() {
                 scheduleWorkerUtil.also {
                     it.deleteMemoWorker()
                     it.deleteSyncPeriodic()
+                    it.deleteActivityWorker()
                     it.deleteGeofenceAreaWorker()
                 }
 

@@ -23,4 +23,7 @@ interface UsersVehicleActivityDao {
 
     @Query("UPDATE UsersVehicleActivity SET exit_time=:exitTime, distance_travelled=:distanceTravelled WHERE id=:id")
     suspend fun updateLastRecord(id: Long, exitTime: Long, distanceTravelled: Double)
+
+    @Query("DELETE FROM UsersVehicleActivity WHERE id=:id")
+    suspend fun deleteVehicleActivity(id: Long)
 }
