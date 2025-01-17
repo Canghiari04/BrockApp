@@ -29,7 +29,6 @@
 
             <ImageView
                 android:id="@+id/image_view_activity"
-                android:src="@drawable/icon_car"
                 android:contentDescription="@string/description_activity_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"

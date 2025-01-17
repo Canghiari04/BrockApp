@@ -121,7 +121,7 @@ class GeofenceAdapter(private val list: List<GeofenceTransition>): RecyclerView.
     }
 
     @Composable
-    fun DateTimeDisplay( date: String, time: String) {
+    fun DateTimeDisplay(date: String, time: String) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

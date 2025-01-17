@@ -3,7 +3,6 @@ package com.example.brockapp.dialog
 import com.example.brockapp.interfaces.PeriodRangeImpl
 import com.example.brockapp.viewModel.ActivitiesViewModel
 
-import android.util.Log
 import android.os.Bundle
 import java.util.Calendar
 import android.app.Dialog
