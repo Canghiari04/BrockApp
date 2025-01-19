@@ -89,10 +89,10 @@
     \textit{Login} in caso sia già registrato; infatti, è richiesta totale univocità pur di garantire la persistenza dei dati. 
     Proseguendo, viene mostrato il layout principale dell'applicazione, responsabile dell'avvicendamento dei molteplici \textit{Fragment} ospitati al suo interno, composto da una
     \textit{Navigation Bottom Bar} e da un \textit{Drawer}. Mediante la \textit{Navigation Bar}, l'utente possiede la facoltà di \textbf{registrare manualmente} nuove attività, 
-    accedere al \textbf{pannello di controllo}, visualizzare i propri \textbf{progressi}, osservare le \textbf{geofence di interesse}, \textbf{pianificare} le proprie attività ed,
+    accedere al \textbf{pannello di controllo}, visualizzare i propri \textbf{progressi}, osservare le \textbf{geofence di interesse}, \textbf{pianificare} le proprie attività e,
     infine, visualizzare le attività condivise da altri iscritti nella sezione \textbf{Group}. \vspace{7pt}\\
     Di seguito sono brevemente descritte alcune scelte implementative e strumenti utilizzati durante lo sviluppo: per il versionamento del codice è stato utilizzato \textbf{Git},
-    con repository accessibile su \textbf{GitHub}, mentre lo sviluppo dell'applicativo è stato condotto mediante il linguaggio di programmazione \textbf{Kotlin}. Il progetto si 
+    con repository accessibile su \textbf{GitHub}, mentre l'applicativo è stato sviluppato tramite il linguaggio di programmazione \textbf{Kotlin}. Il progetto si 
     compone di quattro punti cardine per il corretto funzionamento, suddivisi in:
     \begin{itemize}
         \renewcommand{\labelitemi}{-}
@@ -160,7 +160,7 @@
     Concludendo, è presente un ulteriore \textit{Floating Button}, visualizzabile solamente all'interno di questo \textit{Fragment}, in grado di marcare la posizione corrente 
     dell'utente; per riusciure nell'intento è necessario che sia stato autorizzato il permesso di \textbf{Access Fine Location}. \vspace*{7pt}\\
     \textit{Calendario} \vspace*{7pt}\\
-    L'utente utilizzando il \textbf{calendario} può organizzare le proprie attività. Cliccando su una delle celle, sono mostrati tutti i \textit{Memo} correnti alla data selezionata.
+    L'utente utilizzando il \textbf{calendario} può organizzare le proprie attività. Cliccando su una delle celle sono mostrati tutti i \textit{Memo} correnti alla data selezionata.
     Ogni \textit{Memo} possiede un titolo, una descrizione e una tipologia di attività associata. L'utilizzatore premendo sul \textit{Floating Button} possiede l'opportunità di inserire nuovi promemoria; cliccando sul bottone riportato nello stesso componente, ha la possibilità di variarne il contenuto. Contrariamente, qualora siano conclusi alcuni
     promemoria, digitando sulle checkbox e raggiungendo l'\textit{Activity} precedente, saranno automaticamente eliminati dal \textit{Database Locale}.
     Quest'ultima azione scaturisce l'avvio di un determinato \textit{Worker}, denominato \textit{DeleteMemoWorker}. Tale componente, data la presenza di una \textit{connessione ad Internet} stabile, consente di eliminare i \textit{Memo} selezionati all'interno di \textit{Supabase}.
@@ -175,7 +175,7 @@
             }
         \end{figure}
     \end{center}
-    \textbf{Nota bene}: in assenza di Internet il \textit{Worker} narrato viene momentaneamente sospeso, in attesa di una connessione, Wi-Fi oppure cellulare. \vspace*{7pt}\\
+    \textbf{Nota bene}: in assenza di una connessione Internet, il \textit{Worker} viene momentaneamente sospeso, rimanendo in attesa di un collegamento, sia Wi-Fi che rete cellulare. \vspace*{7pt}\\
     \textit{Gruppi} \vspace*{7pt}\\
     Tramite l'applicativo è possibile condividere le proprie attività e transizioni con altri \textit{iscritti}, e visualizzare le stesse da loro compiute. Affinchè i dati di un ulteriore utente siano osservabili, occorre che abbia abilitato il \textit{servizio di sincronizzazione}. Tale funzionalità è stata implementata mediante un \textit{Worker}, denominato \textit{SyncBucketWorker}. Si tratta di un \textbf{Worker periodico}, in cui definito un certo arco temporale di attesa, provvede a sincronizzare le informazioni memorizzate localmente rispetto al \textit{dump} contenuto nel \textbf{Bucket} in cloud, agendo in totale autonomia.
     \begin{center}
