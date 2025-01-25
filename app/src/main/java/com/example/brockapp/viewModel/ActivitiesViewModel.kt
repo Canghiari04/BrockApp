@@ -558,7 +558,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                         startOfPeriod,
                         endOfPeriod
                     ).map { activity ->
-                        extractActivity("Vehicle activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                        extractActivity("Vehicle", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
                     },
 
                     db.UsersRunActivityDao().getRunActivitiesByUsernameAndPeriod(
@@ -566,7 +566,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                         startOfPeriod,
                         endOfPeriod
                     ).map { activity ->
-                        extractActivity("Run activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                        extractActivity("Run", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
                     },
 
                     db.UsersStillActivityDao().getStillActivitiesByUsernameAndPeriod(
@@ -574,7 +574,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                         startOfPeriod,
                         endOfPeriod
                     ).map { activity ->
-                        extractActivity("Still activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                        extractActivity("Still", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
                     },
 
                     db.UsersWalkActivityDao().getWalkActivitiesByUsernameAndPeriod(
@@ -582,7 +582,7 @@ class ActivitiesViewModel(private val db: BrockDB): ViewModel() {
                         startOfPeriod,
                         endOfPeriod
                     ).map { activity ->
-                        extractActivity("Walk activity", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
+                        extractActivity("Walk", { activity.id }, { activity.timestamp }, { activity.arrivalTime }, { activity.exitTime }, activity)
                     }
             ).flatten().sortedBy { activity ->
                 LocalDateTime.parse(
