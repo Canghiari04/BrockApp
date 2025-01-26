@@ -181,7 +181,7 @@ La suddivisione del progetto avviene in differenti componenti, ognuna delle qual
     \small Il \textbf{Model} definisce l'insieme dei dati ritenuti autorevoli, memorizzati in un contenitore durante le interazioni con l'utente. Avviene una suddivisione del Model in due entità distinte, quali: Room e Supabase. \vspace*{7pt}\\ La decisione di sviluppare un doppio livello di persistenza dei dati nasce principalmente dall'esigenza di garantire che un singolo utente rimanga il punto di \textbf{riferimento unico} a livello locale. \vspace*{7pt}\\ Pertanto, il real time database è incaricato di memorizzare tutte le informazioni degli utenti iscritti. \vspace{7pt}\\ Al momento del login oppure del logout avviene un trasferimento dei dati secondo un formato consono, quale un dump, a seconda della casistica.
 \end{frame}
 
-\section{Bucker AWS}
+\section{Bucket AWS}
 \begin{frame}{Bucket AWS}
     \small La condivisione dei propri dati tramite l'applicazione avviene mediante \textbf{AWS}. \vspace*{7pt}\\ Abilitato il servizio all'interno dell'activity Settings, l'applicazione programmerà un \textbf{Worker periodico} incaricato di effettuare un \textbf{dump} del database. \vspace*{7pt}\\ Il dump è successivamente caricato all'interno di un \textbf{Bucket} mediante un richiesta \textbf{AWS-S3Client}.
 \end{frame}
