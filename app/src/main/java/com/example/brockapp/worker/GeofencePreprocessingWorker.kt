@@ -3,8 +3,8 @@ package com.example.brockapp.worker
 import com.example.brockapp.service.GeofenceService
 
 import androidx.work.Worker
-import android.content.Context
 import android.content.Intent
+import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
